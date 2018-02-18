@@ -9,7 +9,8 @@ package track_model;
  *
  * @author Fenne
  */
-public class TrackBlock {
+public class TrackBlock 
+{
 	public int ID;
 	public GlobalCoordinates startPoint;
 	public GlobalCoordinates endPoint;
@@ -19,7 +20,7 @@ public class TrackBlock {
 	{
 		startPoint = start;
 		endPoint = end;
-		// 0 = nothing, 1 = switch, 2 = station, 3 = crossing
+		// 0 = nothing, 1 = switch, 2 = station, 3 = crossing, 4 = yard
 		hasStructure = structure;
 		ID = newID;
 	}
