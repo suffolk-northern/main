@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import updater.Updateable;
 import track_model.GlobalCoordinates;
+import track_model.Track;
 import train_model.Train;
 
 // Main MBO model
@@ -26,8 +27,10 @@ public class MBO implements Updateable
 	{
 		int index = 0;
 
-		for (Train train : trains) {
+		for (Train train : trains) 
+		{
 			GlobalCoordinates location = train.location();
+                        double authority = findAuthority(location);
 			double distance = location.distanceTo(pittsburgh);
 
 			System.out.printf(
@@ -49,5 +52,10 @@ public class MBO implements Updateable
 	public void unregisterTrain(Train train)
 	{
 		trains.remove(train);
+	}
+        
+	public void findAuthority(Train train)
+	{
+		for (Train train: trains) 
 	}
 }
