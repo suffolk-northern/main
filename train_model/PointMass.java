@@ -149,13 +149,18 @@ public class PointMass
 	// Returns newtons.
 	public double forceForPower(double power)
 	{
+		if (speed == 0.0)
+			return 0.0;
+
 		// power is kilogram * meter^2 / second^3
 		//
 		// speed is meter / second
 		//
 		// force is kilogram * meter / second^2 = newton
 
-		return power / speed;
+		double absValue = power / Math.abs(speed);
+
+		return power >= 0.0 ? absValue : -absValue;
 	}
 
 	// How much this mass (in kilograms) weighs in pounds force
