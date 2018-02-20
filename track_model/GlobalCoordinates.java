@@ -6,6 +6,8 @@
 
 package track_model;
 
+import track_model.Orientation;
+
 // Location of an object on the globe of the Earth
 
 public class GlobalCoordinates
@@ -86,6 +88,39 @@ public class GlobalCoordinates
 		               * hav(longitude0 - longitude1);
 
 		return radius * ahav(term1 + term2);
+	}
+
+	// Returns the direction from this set of coordinates to another set of
+	// coordinates.
+	//
+	// If the sets of coordinates are equal, returns north.
+	//
+	// Do not use for long distances (e.g. 100 miles).
+	public Orientation directionTo(GlobalCoordinates other)
+	{
+		GlobalCoordinates otherY = new GlobalCoordinates(
+			other.latitude,
+			longitude
+		);
+
+		double distance  = distanceTo(other);
+		double distanceY = distanceTo(otherY);
+
+		if (other.latitude < latitude)
+			distanceY = -distanceY;
+
+		double direction = Math.asin(distanceY / distance);
+
+		direction = -direction + Math.PI / 2.0;
+
+		if (other.longitude < longitude)
+			direction = 2.0 * Math.PI - direction;
+
+		// clip to legal range because floating point errors
+		if (direction <  0.0          ) direction = 0.0;
+		if (direction >= 2.0 * Math.PI) direction = 0.0;
+
+		return Orientation.radians(direction);
 	}
 
 	// Adds latitude and longitude components in degrees to this set of
