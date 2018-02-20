@@ -15,11 +15,11 @@ public class GlobalCoordinates
 	//   = radius in miles * yard/mi
 	//
 	//   radius in miles from Wikipedia
-	private static double radius = 3958.8 * 1760;
+	private static final double radius = 3958.8 * 1760;
 
 	// stored as degrees
-	private double latitude;
-	private double longitude;
+	private final double latitude;
+	private final double longitude;
 
 	// Constructs a GlobalCoordinates object as a copy of another.
 	public GlobalCoordinates(GlobalCoordinates other)
