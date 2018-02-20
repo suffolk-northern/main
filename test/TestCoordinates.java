@@ -4,6 +4,8 @@
  * Basic demonstration of GlobalCoordinates.
  */
 
+package test;
+
 import track_model.GlobalCoordinates;
 
 public class TestCoordinates

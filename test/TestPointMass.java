@@ -1,3 +1,11 @@
+/*
+ * Ryan Matthews
+ *
+ * Basic demonstration of PointMass.
+ */
+
+package test;
+
 import track_model.GlobalCoordinates;
 import track_model.Orientation;
 import train_model.PointMass;

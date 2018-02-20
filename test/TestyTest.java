@@ -4,6 +4,8 @@
  * Demonstration of basic Updater.
  */
 
+package test;
+
 import mbo.MBO;
 import patrick.Patrick;
 import spongebob.Spongebob;

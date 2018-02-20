@@ -1,3 +1,11 @@
+/*
+ * Ryan Matthews
+ *
+ * Basic demonstration of Orientation.
+ */
+
+package test;
+
 import track_model.Orientation;
 
 public class TestOrientation
