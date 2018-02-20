@@ -39,7 +39,8 @@ public class TestyTest
 			updater.iteration();
 
 			// hand-wave the timing
-			try {
+			try
+			{
 				Thread.sleep(250);
 			}
 			catch (InterruptedException e)
