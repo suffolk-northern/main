@@ -4,6 +4,8 @@
  * Basic demonstration of GlobalCoordinates.
  */
 
+package test;
+
 import track_model.GlobalCoordinates;
 
 public class TestCoordinates
@@ -16,6 +18,8 @@ public class TestCoordinates
 		stretching();
 		System.out.println();
 		addition();
+		System.out.println();
+		direction();
 	}
 
 	// Demonstrates longitudinal stretching away from equator.
@@ -66,6 +70,27 @@ public class TestCoordinates
 			b.latitude(), b.longitude(),
 			c.latitude(), c.longitude(),
 			d.latitude(), d.longitude()
+		);
+	}
+
+	// Demonstrates direction calculation.
+	public static void direction()
+	{
+		GlobalCoordinates origin = new GlobalCoordinates( 0,  0);
+		GlobalCoordinates north  = new GlobalCoordinates( 1,  0);
+		GlobalCoordinates south  = new GlobalCoordinates(-1,  0);
+		GlobalCoordinates east   = new GlobalCoordinates( 0,  1);
+		GlobalCoordinates west   = new GlobalCoordinates( 0, -1);
+
+		System.out.printf(
+			"north is %5.1f degrees\n" +
+			"south is %5.1f degrees\n" +
+			"east  is %5.1f degrees\n" +
+			"west  is %5.1f degrees\n",
+			origin.directionTo(north).degrees(),
+			origin.directionTo(south).degrees(),
+			origin.directionTo(east ).degrees(),
+			origin.directionTo(west ).degrees()
 		);
 	}
 }
