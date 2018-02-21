@@ -203,7 +203,7 @@ public class MyCtc {
             t = curr.getTo();
             swID = curr.getBlock().getSwID();
             block = curr.getBlock();
-            if(!block.getSwitchFrom().equals(f) || !block.getSwitchTo().equals(t))
+            if(!block.getSwitchCurrFrom().equals(f) || !block.getSwitchCurrTo().equals(t))
                 setSwitch(block,f,t);
             
         }
