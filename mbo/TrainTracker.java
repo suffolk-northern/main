@@ -13,12 +13,12 @@ import train_model.Train;
  */
 public class TrainTracker 
 {
-	Train train;
+	FakeTrain train;
 	TrackBlock block;
 	int authority;
 	int suggestedSpeed;
 	
-	public TrainTracker(Train newTrain, TrackBlock newBlock)
+	public TrainTracker(FakeTrain newTrain, TrackBlock newBlock)
 	{
 		train = newTrain;
 		block = newBlock;

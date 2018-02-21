@@ -21,11 +21,13 @@ import track_model.Orientation;
 
 public class MBO implements Updateable
 {
-	private static final GlobalCoordinates pittsburgh =
-		new GlobalCoordinates(40.0, 80.0);
-
 	private ArrayList<TrainTracker> trains = new ArrayList<TrainTracker>();
 	private Track myTrack;
+	
+	public MBO()
+	{
+		myTrack = new Track();
+	}
 
 	// Updates this object.
 	public void update()
@@ -38,34 +40,11 @@ public class MBO implements Updateable
 			train.setBlock(getBlock(train.train.location()));
 		}
 		
-		for (int i = 0; i < trains.size(); i++)
+		for (TrainTracker train: trains)
 		{
-			TrackBlock[] route = getRoute(trains.get(i).getBlock());
-			int blockingBlock = Integer.MAX_VALUE;
-			TrainTracker blockingTrain = null;
-			for (int j = 0; j < trains.size(); j++)
-			{
-				TrackBlock occupiedBlock = trains.get(i).getBlock();
-				for (int k = 0; k < route.length; k++)
-				{
-					if (occupiedBlock == route[k] && j < blockingBlock)
-					{
-						blockingBlock = k;
-						blockingTrain = trains.get(i);
-					}
-				}
-				if (blockingBlock == Integer.MAX_VALUE)
-				{
-					// Ugh				
-				}
-			}
-			int authority = 0;
-			for (int j = 0; j < blockingBlock; j++)
-			{
-				authority += route[j].getLength();
-			}
-			authority += route[blockingBlock].startPoint.distanceTo(blockingTrain.train.location());
-			trains.get(i).setAuthority(authority);
+			double authority = findAuthority(train);
+			train.setAuthority((int) authority);
+			train.setSuggestedSpeed(30);
 		}
 	}
 	
@@ -107,26 +86,59 @@ public class MBO implements Updateable
 		return blocks;
 	}
 	
-	// Adds a Train to the set of objects this object communicates with.
-	public void registerTrain(Train train)
+	// Adds a FakeTrainto the set of objects this object communicates with.
+	public void registerTrain(FakeTrain train, TrackBlock block)
 	{
-		trains.add(train);
+		TrainTracker trainTrack = new TrainTracker(train, block);
+		trains.add(trainTrack);
 	}
 
 	// Removes a train from the set of objects this object communicates
 	// with.
-	public void unregisterTrain(Train train)
+	public void unregisterTrain(FakeTrain train)
 	{
-		trains.remove(train);
+		for (TrainTracker curTrain: trains)
+		{
+			if (curTrain.train == train)
+			{
+				trains.remove(curTrain);
+				break;
+			}
+		}
 	}
         
-	public void findAuthority(Train train)
+	public double findAuthority(TrainTracker train)
 	{
-		GlobalCoordinates curLoc = train.location();
-		for (Train otherTrain: trains)
+		TrackBlock[] route = getRoute(train.getBlock());
+		int blockingBlock = Integer.MAX_VALUE;
+		TrainTracker blockingTrain = null;
+		for (int j = 0; j < trains.size(); j++)
 		{
-			
+			TrackBlock occupiedBlock = train.getBlock();
+			for (int k = 0; k < route.length; k++)
+			{
+				if (occupiedBlock == route[k] && j < blockingBlock)
+				{
+					blockingBlock = k;
+					blockingTrain = trains.get(i);
+				}
+			}
+			if (blockingBlock == Integer.MAX_VALUE)
+			{
+				// Ugh				
+			}
 		}
-			
+		double authority = 0;
+		for (int j = 0; j < blockingBlock; j++)
+		{
+			authority += route[j].getLength();
+		}
+		authority += route[blockingBlock].startPoint.distanceTo(blockingTrain.train.location());
+		return authority;
+	}
+	
+	public void setSwitch(int switchID, int switchState)
+	{
+		myTrack.sections[0].switches[switchID].setSwitch(switchState);
 	}
 }
