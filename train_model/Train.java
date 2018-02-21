@@ -116,6 +116,21 @@ public class Train implements Updateable
 		return new GlobalCoordinates(pointMass.pose().position);
 	}
 
+	// Returns the current orientation.
+	public Orientation orientation()
+	{
+		return pointMass.orientation();
+	}
+
+	// Sets the orientation.
+	//
+	// Causes an instantaneous change in the direction of the velocity
+	// vector, i.e., "turns" the train without changing its speed.
+	public void orientation(Orientation value)
+	{
+		pointMass.orientation(value);
+	}
+
 	// Returns the current speed.
 	//
 	// Units: meters per second
