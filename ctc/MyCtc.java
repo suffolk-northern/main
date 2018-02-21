@@ -218,6 +218,8 @@ public class MyCtc {
     
     private static void printSwitchesOnRoute(ArrayDeque<SwitchAndPos> swpos)
     {
+        System.out.println("Switches");
+        
         Block block;
         
         ArrayDeque<SwitchAndPos> temp2 = swpos.clone();
@@ -238,6 +240,8 @@ public class MyCtc {
     
     private static void printRoute(ArrayDeque<Block> route)
     {
+        System.out.println("Route");
+        
         ArrayDeque<Block> temp = route.clone();
         while(!temp.isEmpty())
         {
@@ -323,6 +327,16 @@ public class MyCtc {
     private static void updateTrack()
     {
         // for all track block in blue line
+        ArrayDeque<Block> temp = blueline.clone();
+        Block bl;
+        String str = "";
+        
+        while(!temp.isEmpty())
+        {
+            bl = temp.poll();
+            str += bl.display();
+            
+        }
     }
     
     private static void updateTrains()
@@ -330,9 +344,19 @@ public class MyCtc {
         // for all trains in trains
     }
     
-    private static void tellMBOswitches()
+    protected void tellMBOSwitches()
     {
         // for all blocks in switches
+        System.out.println("To MBO");
+        ArrayDeque<Block> temp = switches.clone();
+        Block sw;
+        
+        while(!temp.isEmpty())
+        {
+            sw = temp.poll();
+            System.out.println("Switch in block "+sw.display());
+            System.out.println("Current position: from "+sw.getSwitchCurrFrom().display()+", to "+sw.getSwitchCurrTo().display());
+        }
     }
     
     private static void loadSched()
@@ -349,9 +373,15 @@ public class MyCtc {
     {
         Block loc = train.getLoc();
         
+        SwitchAndPos swpos = getSwitches(train.getRoute()).peek();
+        Block sw = swpos.getBlock();
+        Block from = swpos.getFrom();
+        Block to = swpos.getTo();
+        
         System.out.println("To Track Controller");
         System.out.println("Train "+train.getID()+" at location "+loc.display());
         System.out.println("Send speed = " + speed + ", authority = "+ auth);
+        System.out.println("Next switch position, in block: "+sw.display()+" from: "+from.display()+" to: "+to.display());
     }
     
     private static void setSwitch(Block swBlock, Block from, Block to)
@@ -582,6 +612,11 @@ public class MyCtc {
             deadline = 0;
             passengers = 0;
         
+        }
+        
+        private ArrayDeque<Block> getRoute()
+        {
+            return route;
         }
         
         private void setLoc(Block newLoc)

@@ -14,6 +14,7 @@ public class CtcDriver {
     public static void main(String[] args)
     {
         MyCtc ctc = new MyCtc();
+        ctc.tellMBOSwitches();
     }
     
 }
