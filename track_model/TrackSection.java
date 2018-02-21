@@ -10,10 +10,12 @@ package track_model;
 public class TrackSection {
 	public int numBlocks;
 	public TrackBlock blocks[];
+	public TrackSwitch switches[];
 	
-	public TrackSection(int newNum, TrackBlock newBlocks[])
+	public TrackSection(int newNum, TrackBlock newBlocks[], TrackSwitch newSwitches[])
 	{
 		numBlocks = newNum;
 		blocks = newBlocks;
+		switches = newSwitches;
 	}
 }
