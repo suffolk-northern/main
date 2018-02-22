@@ -25,6 +25,10 @@ public class Controller implements Updateable
 	private int heaterCounter = 0;
 	private boolean heaterState = false;
 
+	private final int LIGHTS_MOD = 100;
+	private int lightsCounter = 50;
+	private boolean lightsState = false;
+
 	// real implementation won't have this
 	private final Train train;
 	private static GlobalCoordinates origin =
@@ -109,5 +113,15 @@ public class Controller implements Updateable
 			link.heaterOff();
 
 		heaterCounter = (heaterCounter + 1) % HEATER_MOD;
+
+		if (lightsCounter == 0)
+			lightsState = !lightsState;
+
+		if (lightsState)
+			link.lightsOn();
+		else
+			link.lightsOff();
+
+		lightsCounter = (lightsCounter + 1) % HEATER_MOD;
 	}
 }
