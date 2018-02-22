@@ -149,4 +149,22 @@ public class ControllerLink
 	{
 		train.heaterOff();
 	}
+
+	// Returns true if the lights are on.
+	public boolean lights()
+	{
+		return train.lights();
+	}
+
+	// Turns the lights on.
+	public void lightsOn()
+	{
+		train.lightsOn();
+	}
+
+	// Turns the lights off.
+	public void lightsOff()
+	{
+		train.lightsOff();
+	}
 }

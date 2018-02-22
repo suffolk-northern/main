@@ -75,6 +75,8 @@ public class Train
 	private final PointHeat pointHeat = new PointHeat();
 	private double heaterPower = 0.0;
 
+	private boolean lightsAreOn = false;
+
 	private final Relay relay = new Relay(this);
 
 	private final ControllerLink controllerLink =
@@ -306,6 +308,24 @@ public class Train
 	public void heaterOff()
 	{
 		heaterPower = 0.0;
+	}
+
+	// Returns true if the lights are on.
+	public boolean lights()
+	{
+		return lightsAreOn;
+	}
+
+	// Turns the lights on.
+	public void lightsOn()
+	{
+		lightsAreOn = true;
+	}
+
+	// Turns the lights off.
+	public void lightsOff()
+	{
+		lightsAreOn = false;
 	}
 
 	// Determines if we should notify observers this update. If so, notifes
