@@ -19,7 +19,6 @@ public class MBODemo
 	public static void main(String[] args)
 	{
 		MBO mbo = new MBO();
-
 		
 		MBODemoUI ui = new MBODemoUI();
 		ui.setVisible(true);

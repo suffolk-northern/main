@@ -19,7 +19,7 @@ import mbo.FakeTrain;
  *
  * @author Fenne
  */
-public class MBOController extends JFrame
+public class ControllerUI extends JFrame
 {
 	private JFrame frame;
 	private JPanel mainPanel;
@@ -31,7 +31,7 @@ public class MBOController extends JFrame
 	private String[] tableHeader;
 	private Object[][] tableContents;
 	
-	public MBOController()
+	public ControllerUI()
 	{
 		frame = new JFrame("MBOController");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -127,7 +127,7 @@ public class MBOController extends JFrame
 		/* Create and display the form */
 		java.awt.EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				new MBOController().setVisible(true);
+				new ControllerUI().setVisible(true);
 			}
 		});
 	}

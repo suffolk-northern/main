@@ -16,7 +16,7 @@ import track_model.TrackBlock;
 import track_model.TrackSection;
 import train_model.Train;
 import track_model.Orientation;
-import controller.MBOController;
+import controller.ControllerUI;
 
 // Main MBO model
 
@@ -24,12 +24,12 @@ public class MBO implements Updateable
 {
 	private ArrayList<TrainTracker> trains = new ArrayList<TrainTracker>();
 	private Track myTrack;
-	private MBOController ui;
+	private ControllerUI ui;
 	
 	public MBO()
 	{
 		myTrack = new Track();
-		ui = new MBOController();
+		ui = new ControllerUI();
 		ui.setVisible(true);
 	}
 
@@ -49,6 +49,7 @@ public class MBO implements Updateable
 			double authority = findAuthority(train);
 			train.setAuthority((int) authority);
 			train.setSuggestedSpeed(30);
+			ui.updateTrain(train.train.trainID, 'A', train.block.ID, 0, train.getAuthority());
 		}
 	}
 	
@@ -113,32 +114,33 @@ public class MBO implements Updateable
         
 	public double findAuthority(TrainTracker train)
 	{
-		TrackBlock[] route = getRoute(train.getBlock());
-		int blockingBlock = Integer.MAX_VALUE;
-		TrainTracker blockingTrain = null;
-		for (int j = 0; j < trains.size(); j++)
-		{
-			TrackBlock occupiedBlock = train.getBlock();
-			for (int k = 0; k < route.length; k++)
-			{
-				if (occupiedBlock == route[k] && j < blockingBlock)
-				{
-					blockingBlock = k;
-					blockingTrain = train;
-				}
-			}
-			if (blockingBlock == Integer.MAX_VALUE)
-			{
-				// Ugh				
-			}
-		}
-		double authority = 0;
-		for (int j = 0; j < blockingBlock; j++)
-		{
-			authority += route[j].getLength();
-		}
-		authority += route[blockingBlock].startPoint.distanceTo(blockingTrain.train.location());
-		return authority;
+//		TrackBlock[] route = getRoute(train.getBlock());
+//		int blockingBlock = Integer.MAX_VALUE;
+//		TrainTracker blockingTrain = null;
+//		for (int j = 0; j < trains.size(); j++)
+//		{
+//			TrackBlock occupiedBlock = train.getBlock();
+//			for (int k = 0; k < route.length; k++)
+//			{
+//				if (occupiedBlock == route[k] && j < blockingBlock)
+//				{
+//					blockingBlock = k;
+//					blockingTrain = train;
+//				}
+//			}
+//			if (blockingBlock == Integer.MAX_VALUE)
+//			{
+//				// Ugh				
+//			}
+//		}
+//		double authority = 0;
+//		for (int j = 0; j < blockingBlock; j++)
+//		{
+//			authority += route[j].getLength();
+//		}
+//		authority += route[blockingBlock].startPoint.distanceTo(blockingTrain.train.location());
+//		return authority;
+		return 5;
 	}
 	
 	public void flipSwitch(int switchID)
