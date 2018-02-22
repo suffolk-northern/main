@@ -174,6 +174,14 @@ public class Train
 		return pointMass.speed();
 	}
 
+	// Returns the engine output power.
+	//
+	// Units: Watts
+	public double power()
+	{
+		return enginePower;
+	}
+
 	// Sets the engine output power.
 	//
 	// Units: Proportion of max output power, e.g.,
@@ -190,6 +198,14 @@ public class Train
 		value *= MAX_ENGINE_POWER;
 
 		enginePower = MAX_ENGINE_POWER * value;
+	}
+
+	// Returns the service brake output.
+	//
+	// Units: Newtons
+	public double serviceBrake()
+	{
+		return serviceBrakeForce;
 	}
 
 	// Sets the service brake output.
@@ -210,14 +226,28 @@ public class Train
 		serviceBrakeForce = MAX_SERVICE_BRAKE_FORCE * value;
 	}
 
+	// Returns true if the emergency brake has been applied.
+	public boolean emergencyBrake()
+	{
+		return emergencyBrakeForce != 0.0;
+	}
+
 	// Engages the emergency brake.
 	//
 	// Irreversible. Damages the vehicle.
 	//
 	// Failure mode: Emergency brake applies no force regardless of input.
-	public void emergencyBrake()
+	public void applyEmergencyBrake()
 	{
 		emergencyBrakeForce = EMERGENCY_BRAKE_FORCE;
+	}
+
+	// Returns true if specified door(s) are open.
+	public boolean door(DoorLocation location)
+	{
+		int index = doorLocationToIndex(location);
+
+		return doors[index];
 	}
 
 	// Opens specified door(s).
