@@ -155,6 +155,7 @@ public class MyCtcUI extends javax.swing.JFrame {
 
         trackTable.getModel().addTableModelListener(trainTable);
         trackTable.setRowHeight(30);
+        trackTable.getColumnModel().getColumn(4).setPreferredWidth(100);
         
         blockSelect.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
         blockSelect.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "A1", "A2", "A3", "A4", "A5", "A6", "A7", "YARD" }));
@@ -1002,6 +1003,31 @@ public class MyCtcUI extends javax.swing.JFrame {
             
     }
     
+    protected static void updateTrackTable(Object[][] rows, int count)
+    {
+        
+        if(!trackTable.getValueAt(0,0).equals(""))
+            for(Object[] row: rows)
+            {
+                for(int i = 0; i < trackTable.getRowCount(); i++)
+                if(trackTable.getValueAt(i, 1) != null && trackTable.getValueAt(i, 1).equals(row[1]))
+                {
+                    for(int j = 1; j < trackTable.getColumnCount(); j++)
+                        trackTable.setValueAt(row[j], i, j);
+                }
+            }
+        else
+            
+            for(int i = 0; i < count; i++)
+            {
+                for(int j = 0; j < trackTable.getColumnCount(); j++)
+                    trackTable.setValueAt(rows[i][j], i, j);
+            }
+            
+            
+    }
+    
+    
     private void openTrackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openTrackActionPerformed
         // TODO add your handling code here:
         
@@ -1121,7 +1147,7 @@ public class MyCtcUI extends javax.swing.JFrame {
     private javax.swing.JRadioButton openTrack;
     private javax.swing.JButton scheduleButton;
     private javax.swing.JTextField speedSelect;
-    private javax.swing.JTable trackTable;
+    private static javax.swing.JTable trackTable;
     private javax.swing.JComboBox<String> trainSelect;
     private static javax.swing.JTable trainTable;
     

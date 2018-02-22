@@ -20,6 +20,7 @@ import java.util.StringTokenizer;
 public class MyCtc {
     
     public static final int TRAINCOLS = 8;
+    public static final int TRACKCOLS = 8;
     
     public static MyCtc ctc;
     public static MyCtcUI ui;
@@ -332,19 +333,51 @@ public class MyCtc {
         return null;
     }
     
+    private static String toCap(String str)
+    {
+        return str.substring(0,1).toUpperCase() + str.substring(1);
+    }
+    
     private static void updateTrack()
     {
         // for all track block in blue line
+        Object[][] rows = new Object[blueline.size()][TRACKCOLS];
+        
         ArrayDeque<Block> temp = blueline.clone();
-        Block bl;
-        String str = "";
+        Block block;
+        int count = 0;
         
         while(!temp.isEmpty())
         {
-            bl = temp.poll();
-            str += bl.display();
+            block = temp.poll();
             
+            if(block.section == '\0' && block.num == 0)
+                block = temp.poll();
+            
+            rows[count][0] = toCap(block.line);
+            rows[count][1] = block.section;
+            rows[count][2] = block.num;
+            rows[count][3] = toCap(String.valueOf(block.occupied));
+            
+            if(!block.hasSwitch())
+                rows[count][4] = "";
+            else
+            {
+                rows[count][4] = ""+block.sw_curr_from.section+block.sw_curr_from.num+", "+block.sw_curr_to.section+block.sw_curr_to.num; 
+            }
+            
+            rows[count][5] = "";
+            rows[count][6] = "";
+            
+            if(!block.rrxing)
+                rows[count][7] = "";
+            else
+                rows[count][7] = toCap(String.valueOf(block.rrxing_status));
+            
+            count++;
         }
+        
+        ui.updateTrackTable(rows,blueline.size());
     }
     
     private static void updateTrack(Block block)
@@ -365,7 +398,7 @@ public class MyCtc {
         {
             train = temp.poll();
             
-            rows[count][0] = train.location.line.substring(0,1).toUpperCase() + train.location.line.substring(1);
+            rows[count][0] = toCap(train.location.line);
             rows[count][1] = train.ID;
             rows[count][2] = "" + train.location.section + train.location.num;
             if(rows[count][2].equals(""+'\0'+0))
@@ -398,13 +431,72 @@ public class MyCtc {
         StringTokenizer stok = new StringTokenizer(str," ");
         String s = stok.nextToken();
         
+        
         if(s.equalsIgnoreCase("MBO"))
         {
             tellMBOSwitches();
         }
-        else if(s.equalsIgnoreCase("Track Controller"))
+        else if((s+" "+stok.nextToken()).equalsIgnoreCase("Track Controller"))
         {
             
+            s = stok.nextToken();
+            if(s.equalsIgnoreCase("Train"))
+            {
+                Train train;
+                int tid = Integer.parseInt(stok.nextToken());
+                train = getTrain(tid);
+                String line = stok.nextToken();
+                char section = stok.nextToken().charAt(0);
+                int number = Integer.parseInt(stok.nextToken());
+                Block block = getBlock(line,section,number);
+                train.setLoc(block);
+                updateTrains();
+            }
+            else if(s.equalsIgnoreCase("Block"))
+            {
+                String line = stok.nextToken();
+                char section = stok.nextToken().charAt(0);
+                int number = Integer.parseInt(stok.nextToken());
+                Block block = getBlock(line,section,number);
+                Block from;
+                Block to;
+                
+                while(stok.hasMoreTokens())
+                {
+                    s = stok.nextToken();
+                    
+                    if(s.equalsIgnoreCase("Occupancy"))
+                    {
+                        block.setOccupied(Boolean.parseBoolean(stok.nextToken()));
+                    }
+                    else if(s.equalsIgnoreCase("Switch"))
+                    {
+                        line = stok.nextToken();
+                        section = stok.nextToken().charAt(0);
+                        number = Integer.parseInt(stok.nextToken());
+                        from = getBlock(line,section,number);
+                        
+                        line = stok.nextToken();
+                        section = stok.nextToken().charAt(0);
+                        number = Integer.parseInt(stok.nextToken());
+                        to = getBlock(line,section,number);
+                        
+                        block.setSwitchPos(from, to);
+                        
+                    }
+                    else if(s.equalsIgnoreCase("RR Xing"))
+                    {
+                        block.rrxing_status = (Boolean.parseBoolean(stok.nextToken()));
+                    }
+                    else if(s.equalsIgnoreCase("Status"))
+                    {
+                        
+                    }
+                    
+                }
+                
+                updateTrack();
+            }
         }
     }
     
