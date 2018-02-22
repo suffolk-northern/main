@@ -26,7 +26,7 @@ public class MBO implements Updateable
 		for (MboRadio radio : radios) {
 			radio.send(new MovementCommand(
 				commandState ? 35 : 25,
-				2
+				50
 			));
 		}
 

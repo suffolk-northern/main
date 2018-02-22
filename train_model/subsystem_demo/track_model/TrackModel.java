@@ -70,7 +70,7 @@ public class TrackModel implements Updateable
 		circuit.send(
 			new MovementCommand(
 				10,
-				trackCircuitState ? 50 : 75
+				trackCircuitState ? 2 : 3
 			)
 		);
 	}
