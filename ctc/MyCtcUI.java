@@ -65,26 +65,22 @@ public class MyCtcUI extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        openTrack1 = new javax.swing.JRadioButton();
-        closeTrack1 = new javax.swing.JRadioButton();
         jLabel7 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         dispatchButton = new javax.swing.JButton();
         jLabel16 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         trackTable = new javax.swing.JTable();
-        jComboBox4 = new javax.swing.JComboBox<>();
         blockSelect = new javax.swing.JComboBox<>();
         jTextField3 = new javax.swing.JTextField();
         jLabel9 = new javax.swing.JLabel();
-        jLabel15 = new javax.swing.JLabel();
         jLabel19 = new javax.swing.JLabel();
-        jComboBox5 = new javax.swing.JComboBox<>();
+        multSelect = new javax.swing.JComboBox<>();
         speedSelect = new javax.swing.JTextField();
         jLabel10 = new javax.swing.JLabel();
-        jRadioButton1 = new javax.swing.JRadioButton();
+        manualMode = new javax.swing.JRadioButton();
         jLabel11 = new javax.swing.JLabel();
-        jRadioButton2 = new javax.swing.JRadioButton();
+        autoMode = new javax.swing.JRadioButton();
         trainSelect = new javax.swing.JComboBox<>();
         jLabel12 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
@@ -94,7 +90,7 @@ public class MyCtcUI extends javax.swing.JFrame {
         jLabel13 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         trainTable = new javax.swing.JTable();
-        jComboBox2 = new javax.swing.JComboBox<>();
+        blueMaintenance = new javax.swing.JComboBox<>();
         fixedBlock = new javax.swing.JRadioButton();
         jTextField5 = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
@@ -110,14 +106,13 @@ public class MyCtcUI extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        openTrack1.setText("Open Track");
-
-        closeTrack1.setText("Close Track");
-
+        jLabel7.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
         jLabel7.setText("Train Select");
 
+        jLabel6.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
         jLabel6.setText("Green Line");
 
+        dispatchButton.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
         dispatchButton.setText("Dispatch");
         dispatchButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -125,8 +120,10 @@ public class MyCtcUI extends javax.swing.JFrame {
             }
         });
 
+        jLabel16.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
         jLabel16.setText("Red Line");
 
+        trackTable.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
         trackTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {"", "", "", "", null, "", "", null},
@@ -163,47 +160,83 @@ public class MyCtcUI extends javax.swing.JFrame {
             new String [] {
                 "Line", "Section", "Number", "Occupancy", "Switch", "Signals", "Status", "RR Xing"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         jScrollPane1.setViewportView(trackTable);
 
-        jComboBox4.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Block Select", "Section A1", "Section A2" }));
-
+        blockSelect.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
         blockSelect.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "A1", "A2", "A3", "A4", "A5", "A6", "A7", "YARD" }));
 
+        jTextField3.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
         jTextField3.setText("               ");
 
+        jLabel9.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
         jLabel9.setText("Maintenance");
 
-        jLabel15.setText("Red Line");
-
+        jLabel19.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
         jLabel19.setText("Multiplier");
 
-        jComboBox5.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "x1", "x2", "x4", "x10" }));
+        multSelect.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
+        multSelect.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "x1", "x2", "x4", "x10" }));
+        multSelect.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                multSelectActionPerformed(evt);
+            }
+        });
 
-        speedSelect.setText("Enter Suggested Speed");
+        speedSelect.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
 
+        jLabel10.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
         jLabel10.setText("Throughput");
 
-        jRadioButton1.setText("Manual");
+        manualMode.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
+        manualMode.setText("Manual");
+        manualMode.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                manualModeActionPerformed(evt);
+            }
+        });
 
+        jLabel11.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
         jLabel11.setText("Clock");
 
-        jRadioButton2.setText("Automatic");
+        autoMode.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
+        autoMode.setText("Automatic");
+        autoMode.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                autoModeActionPerformed(evt);
+            }
+        });
 
+        trainSelect.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
         trainSelect.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2" }));
 
+        jLabel12.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
         jLabel12.setText("Line");
 
+        jLabel1.setFont(new java.awt.Font("Tahoma", 0, 35)); // NOI18N
         jLabel1.setText("Trains");
 
+        lineSelect.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
         lineSelect.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Blue" }));
 
+        jLabel2.setFont(new java.awt.Font("Tahoma", 0, 35)); // NOI18N
         jLabel2.setText("Track");
 
+        jTextField4.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
         jTextField4.setText("               ");
 
+        jLabel13.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
         jLabel13.setText("Control Transfer");
 
+        trainTable.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
         trainTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {"", "", "", "", "", "", "", ""},
@@ -240,11 +273,22 @@ public class MyCtcUI extends javax.swing.JFrame {
             new String [] {
                 "Line", "Train ID", "Current Block", "Destination", "Deadline", "Authority (ft)", "Suggested Speed (mph)", "Passengers"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         jScrollPane2.setViewportView(trainTable);
 
-        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Block Select", "Section A1", "Section A2" }));
+        blueMaintenance.setEditable(true);
+        blueMaintenance.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
+        blueMaintenance.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8" }));
 
+        fixedBlock.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
         fixedBlock.setText("Fixed Block");
         fixedBlock.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -252,28 +296,58 @@ public class MyCtcUI extends javax.swing.JFrame {
             }
         });
 
+        jTextField5.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
         jTextField5.setText("10:02");
 
+        jLabel3.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
         jLabel3.setText("Block");
 
+        jLabel17.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
         jLabel17.setText("passengers/hr");
 
+        MovingBlock.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
         MovingBlock.setText("Moving Block");
+        MovingBlock.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                MovingBlockActionPerformed(evt);
+            }
+        });
 
-        jLabel8.setText("Green Line");
+        jLabel8.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
+        jLabel8.setText("Blue Line");
 
+        jLabel18.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
         jLabel18.setText("passengers/hr");
 
         jLabel14.setFont(new java.awt.Font("Tahoma", 0, 40)); // NOI18N
         jLabel14.setText("CTC");
 
+        openTrack.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
         openTrack.setText("Open Track");
+        openTrack.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                openTrackActionPerformed(evt);
+            }
+        });
 
+        jLabel5.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
         jLabel5.setText("Suggested Speed");
 
+        scheduleButton.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
         scheduleButton.setText("Schedule");
+        scheduleButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                scheduleButtonActionPerformed(evt);
+            }
+        });
 
+        closeTrack.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
         closeTrack.setText("Close Track");
+        closeTrack.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                closeTrackActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -284,31 +358,25 @@ public class MyCtcUI extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addGap(77, 77, 77)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel13)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(closeTrack)
-                                .addGap(48, 48, 48)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(closeTrack1)
-                                    .addComponent(openTrack1)
-                                    .addComponent(jComboBox4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel15)))
+                            .addComponent(closeTrack)
                             .addComponent(jLabel9)
                             .addComponent(jLabel2)
                             .addComponent(openTrack)
-                            .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel8)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(fixedBlock)
                                 .addGap(94, 94, 94)
-                                .addComponent(jRadioButton1))
+                                .addComponent(manualMode))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(MovingBlock)
                                 .addGap(72, 72, 72)
-                                .addComponent(jRadioButton2)))
+                                .addComponent(autoMode))
+                            .addComponent(jLabel13)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(blueMaintenance, javax.swing.GroupLayout.Alignment.LEADING, 0, 0, Short.MAX_VALUE)
+                                .addComponent(jLabel8, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addContainerGap(37, Short.MAX_VALUE)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 660, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(38, 38, 38)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -339,11 +407,11 @@ public class MyCtcUI extends javax.swing.JFrame {
                                         .addGap(9, 9, 9)
                                         .addComponent(jLabel12)))
                                 .addGap(38, 38, 38)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(lineSelect, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(speedSelect, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(blockSelect, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(trainSelect, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                    .addComponent(blockSelect, 0, 205, Short.MAX_VALUE)
+                                    .addComponent(trainSelect, 0, 205, Short.MAX_VALUE)
+                                    .addComponent(speedSelect)))
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(165, 165, 165)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -359,7 +427,7 @@ public class MyCtcUI extends javax.swing.JFrame {
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(18, 18, 18)
-                                .addComponent(jComboBox5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                .addComponent(multSelect, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addGap(79, 79, 79))
             .addGroup(layout.createSequentialGroup()
                 .addGap(810, 810, 810)
@@ -411,7 +479,7 @@ public class MyCtcUI extends javax.swing.JFrame {
                             .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel17)
-                            .addComponent(jComboBox5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(multSelect, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(3, 3, 3)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel16)
@@ -424,33 +492,23 @@ public class MyCtcUI extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addComponent(jLabel9)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel8)
-                                .addGap(4, 4, 4)
-                                .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(openTrack)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(closeTrack))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel15)
-                                .addGap(4, 4, 4)
-                                .addComponent(jComboBox4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(openTrack1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(closeTrack1)))
+                        .addComponent(jLabel8)
+                        .addGap(4, 4, 4)
+                        .addComponent(blueMaintenance, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(openTrack)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(closeTrack)
                         .addGap(56, 56, 56)
                         .addComponent(jLabel13)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(fixedBlock)
-                            .addComponent(jRadioButton1))
+                            .addComponent(manualMode))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(MovingBlock)
-                            .addComponent(jRadioButton2))))
+                            .addComponent(autoMode))))
                 .addContainerGap())
         );
 
@@ -473,6 +531,45 @@ public class MyCtcUI extends javax.swing.JFrame {
         
         ctc.routeTrain(train, line.toLowerCase(), block, speed);
     }//GEN-LAST:event_dispatchButtonActionPerformed
+
+    private void openTrackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openTrackActionPerformed
+        // TODO add your handling code here:
+        
+        
+        
+        // inform user
+        String str = (String)blueMaintenance.getSelectedItem();
+        System.out.println("Block "+str+" opened");
+        
+    }//GEN-LAST:event_openTrackActionPerformed
+
+    private void closeTrackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeTrackActionPerformed
+        // TODO add your handling code here:
+        
+        String str = (String)blueMaintenance.getSelectedItem();
+        System.out.println("Block "+str+" closed for maintenance");
+        
+    }//GEN-LAST:event_closeTrackActionPerformed
+
+    private void scheduleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_scheduleButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_scheduleButtonActionPerformed
+
+    private void multSelectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_multSelectActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_multSelectActionPerformed
+
+    private void MovingBlockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MovingBlockActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_MovingBlockActionPerformed
+
+    private void manualModeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manualModeActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_manualModeActionPerformed
+
+    private void autoModeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoModeActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_autoModeActionPerformed
 
     /**
      * @param args the command line arguments
@@ -521,21 +618,18 @@ public class MyCtcUI extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JRadioButton MovingBlock;
+    private javax.swing.JRadioButton autoMode;
     private javax.swing.JComboBox<String> blockSelect;
+    private javax.swing.JComboBox<String> blueMaintenance;
     private javax.swing.JRadioButton closeTrack;
-    private javax.swing.JRadioButton closeTrack1;
     private javax.swing.JButton dispatchButton;
     private javax.swing.JRadioButton fixedBlock;
-    private javax.swing.JComboBox<String> jComboBox2;
-    private javax.swing.JComboBox<String> jComboBox4;
-    private javax.swing.JComboBox<String> jComboBox5;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
-    private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel18;
@@ -547,16 +641,15 @@ public class MyCtcUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
-    private javax.swing.JRadioButton jRadioButton1;
-    private javax.swing.JRadioButton jRadioButton2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextField jTextField3;
     private javax.swing.JTextField jTextField4;
     private javax.swing.JTextField jTextField5;
     private javax.swing.JComboBox<String> lineSelect;
+    private javax.swing.JRadioButton manualMode;
+    private javax.swing.JComboBox<String> multSelect;
     private javax.swing.JRadioButton openTrack;
-    private javax.swing.JRadioButton openTrack1;
     private javax.swing.JButton scheduleButton;
     private javax.swing.JTextField speedSelect;
     private javax.swing.JTable trackTable;

@@ -28,37 +28,30 @@
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace min="-2" pref="77" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="jLabel13" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Group type="102" alignment="0" attributes="0">
-                              <Component id="closeTrack" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace min="-2" pref="48" max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="closeTrack1" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="openTrack1" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="jComboBox4" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="jLabel15" alignment="0" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                          </Group>
+                          <Component id="closeTrack" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="jLabel9" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="jLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="openTrack" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jComboBox2" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLabel8" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="fixedBlock" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="-2" pref="94" max="-2" attributes="0"/>
-                              <Component id="jRadioButton1" min="-2" max="-2" attributes="0"/>
+                              <Component id="manualMode" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="MovingBlock" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="-2" pref="72" max="-2" attributes="0"/>
-                              <Component id="jRadioButton2" min="-2" max="-2" attributes="0"/>
+                              <Component id="autoMode" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <Component id="jLabel13" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
+                              <Component id="blueMaintenance" alignment="0" pref="0" max="32767" attributes="0"/>
+                              <Component id="jLabel8" alignment="0" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="1" attributes="0">
-                      <EmptySpace max="32767" attributes="0"/>
+                      <EmptySpace pref="37" max="32767" attributes="0"/>
                       <Component id="jScrollPane1" min="-2" pref="660" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="38" max="-2" attributes="0"/>
                   </Group>
@@ -98,11 +91,11 @@
                                   </Group>
                               </Group>
                               <EmptySpace min="-2" pref="38" max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
                                   <Component id="lineSelect" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="speedSelect" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="blockSelect" alignment="0" min="-2" pref="205" max="-2" attributes="0"/>
-                                  <Component id="trainSelect" alignment="0" min="-2" pref="205" max="-2" attributes="0"/>
+                                  <Component id="blockSelect" alignment="0" pref="205" max="32767" attributes="0"/>
+                                  <Component id="trainSelect" alignment="0" pref="205" max="32767" attributes="0"/>
+                                  <Component id="speedSelect" alignment="0" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
@@ -124,7 +117,7 @@
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jTextField5" min="-2" max="-2" attributes="0"/>
                               <EmptySpace type="separate" max="-2" attributes="0"/>
-                              <Component id="jComboBox5" min="-2" max="-2" attributes="0"/>
+                              <Component id="multSelect" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                   </Group>
@@ -191,7 +184,7 @@
                           <Component id="jTextField3" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="jTextField5" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="jLabel17" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="jComboBox5" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="multSelect" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace min="-2" pref="3" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
@@ -207,37 +200,24 @@
                       <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Component id="jLabel9" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="1" attributes="0">
-                          <Group type="102" alignment="1" attributes="0">
-                              <Component id="jLabel8" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
-                              <Component id="jComboBox2" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Component id="openTrack" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="closeTrack" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <Group type="102" alignment="1" attributes="0">
-                              <Component id="jLabel15" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
-                              <Component id="jComboBox4" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Component id="openTrack1" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="closeTrack1" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                      </Group>
+                      <Component id="jLabel8" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
+                      <Component id="blueMaintenance" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="openTrack" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="closeTrack" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="56" max="-2" attributes="0"/>
                       <Component id="jLabel13" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="fixedBlock" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="jRadioButton1" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="manualMode" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="MovingBlock" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="jRadioButton2" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="autoMode" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
               </Group>
@@ -247,28 +227,27 @@
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="javax.swing.JRadioButton" name="openTrack1">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Open Track"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JRadioButton" name="closeTrack1">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Close Track"/>
-      </Properties>
-    </Component>
     <Component class="javax.swing.JLabel" name="jLabel7">
       <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Tahoma" size="30" style="0"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="Train Select"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel6">
       <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Tahoma" size="30" style="0"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="Green Line"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="dispatchButton">
       <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Tahoma" size="30" style="0"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="Dispatch"/>
       </Properties>
       <Events>
@@ -277,6 +256,9 @@
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel16">
       <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Tahoma" size="30" style="0"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="Red Line"/>
       </Properties>
     </Component>
@@ -286,9 +268,12 @@
       <SubComponents>
         <Component class="javax.swing.JTable" name="trackTable">
           <Properties>
+            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+              <Font name="Tahoma" size="30" style="0"/>
+            </Property>
             <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
               <Table columnCount="8" rowCount="30">
-                <Column editable="true" title="Line" type="java.lang.Object">
+                <Column editable="false" title="Line" type="java.lang.Object">
                   <Data value=""/>
                   <Data value=""/>
                   <Data value=""/>
@@ -320,7 +305,7 @@
                   <Data value="null"/>
                   <Data value="null"/>
                 </Column>
-                <Column editable="true" title="Section" type="java.lang.Object">
+                <Column editable="false" title="Section" type="java.lang.Object">
                   <Data value=""/>
                   <Data value=""/>
                   <Data value=""/>
@@ -352,7 +337,7 @@
                   <Data value="null"/>
                   <Data value="null"/>
                 </Column>
-                <Column editable="true" title="Number" type="java.lang.Object">
+                <Column editable="false" title="Number" type="java.lang.Object">
                   <Data value=""/>
                   <Data value=""/>
                   <Data value=""/>
@@ -384,7 +369,7 @@
                   <Data value="null"/>
                   <Data value="null"/>
                 </Column>
-                <Column editable="true" title="Occupancy" type="java.lang.Object">
+                <Column editable="false" title="Occupancy" type="java.lang.Object">
                   <Data value=""/>
                   <Data value=""/>
                   <Data value=""/>
@@ -416,8 +401,8 @@
                   <Data value="null"/>
                   <Data value="null"/>
                 </Column>
-                <Column editable="true" title="Switch" type="java.lang.Object"/>
-                <Column editable="true" title="Signals" type="java.lang.Object">
+                <Column editable="false" title="Switch" type="java.lang.Object"/>
+                <Column editable="false" title="Signals" type="java.lang.Object">
                   <Data value=""/>
                   <Data value=""/>
                   <Data value=""/>
@@ -449,7 +434,7 @@
                   <Data value="null"/>
                   <Data value="null"/>
                 </Column>
-                <Column editable="true" title="Status" type="java.lang.Object">
+                <Column editable="false" title="Status" type="java.lang.Object">
                   <Data value=""/>
                   <Data value=""/>
                   <Data value=""/>
@@ -481,29 +466,18 @@
                   <Data value="null"/>
                   <Data value="null"/>
                 </Column>
-                <Column editable="true" title="RR Xing" type="java.lang.Object"/>
+                <Column editable="false" title="RR Xing" type="java.lang.Object"/>
               </Table>
             </Property>
           </Properties>
         </Component>
       </SubComponents>
     </Container>
-    <Component class="javax.swing.JComboBox" name="jComboBox4">
-      <Properties>
-        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-          <StringArray count="3">
-            <StringItem index="0" value="Block Select"/>
-            <StringItem index="1" value="Section A1"/>
-            <StringItem index="2" value="Section A2"/>
-          </StringArray>
-        </Property>
-      </Properties>
-      <AuxValues>
-        <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
-      </AuxValues>
-    </Component>
     <Component class="javax.swing.JComboBox" name="blockSelect">
       <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Tahoma" size="30" style="0"/>
+        </Property>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
           <StringArray count="8">
             <StringItem index="0" value="A1"/>
@@ -523,26 +497,33 @@
     </Component>
     <Component class="javax.swing.JTextField" name="jTextField3">
       <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Tahoma" size="30" style="0"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="               "/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel9">
       <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Tahoma" size="30" style="0"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="Maintenance"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JLabel" name="jLabel15">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Red Line"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel19">
       <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Tahoma" size="30" style="0"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="Multiplier"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JComboBox" name="jComboBox5">
+    <Component class="javax.swing.JComboBox" name="multSelect">
       <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Tahoma" size="30" style="0"/>
+        </Property>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
           <StringArray count="4">
             <StringItem index="0" value="x1"/>
@@ -552,37 +533,63 @@
           </StringArray>
         </Property>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="multSelectActionPerformed"/>
+      </Events>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
       </AuxValues>
     </Component>
     <Component class="javax.swing.JTextField" name="speedSelect">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Enter Suggested Speed"/>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Tahoma" size="30" style="0"/>
+        </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel10">
       <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Tahoma" size="30" style="0"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="Throughput"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JRadioButton" name="jRadioButton1">
+    <Component class="javax.swing.JRadioButton" name="manualMode">
       <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Tahoma" size="30" style="0"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="Manual"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="manualModeActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel11">
       <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Tahoma" size="30" style="0"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="Clock"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JRadioButton" name="jRadioButton2">
+    <Component class="javax.swing.JRadioButton" name="autoMode">
       <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Tahoma" size="30" style="0"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="Automatic"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="autoModeActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JComboBox" name="trainSelect">
       <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Tahoma" size="30" style="0"/>
+        </Property>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
           <StringArray count="2">
             <StringItem index="0" value="1"/>
@@ -596,16 +603,25 @@
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel12">
       <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Tahoma" size="30" style="0"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="Line"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel1">
       <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Tahoma" size="35" style="0"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="Trains"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JComboBox" name="lineSelect">
       <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Tahoma" size="30" style="0"/>
+        </Property>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
           <StringArray count="1">
             <StringItem index="0" value="Blue"/>
@@ -618,16 +634,25 @@
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel2">
       <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Tahoma" size="35" style="0"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="Track"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="jTextField4">
       <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Tahoma" size="30" style="0"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="               "/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel13">
       <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Tahoma" size="30" style="0"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="Control Transfer"/>
       </Properties>
     </Component>
@@ -637,9 +662,12 @@
       <SubComponents>
         <Component class="javax.swing.JTable" name="trainTable">
           <Properties>
+            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+              <Font name="Tahoma" size="30" style="0"/>
+            </Property>
             <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
               <Table columnCount="8" rowCount="30">
-                <Column editable="true" title="Line" type="java.lang.Object">
+                <Column editable="false" title="Line" type="java.lang.Object">
                   <Data value=""/>
                   <Data value="null"/>
                   <Data value="null"/>
@@ -671,7 +699,7 @@
                   <Data value="null"/>
                   <Data value="null"/>
                 </Column>
-                <Column editable="true" title="Train ID" type="java.lang.Object">
+                <Column editable="false" title="Train ID" type="java.lang.Object">
                   <Data value=""/>
                   <Data value="null"/>
                   <Data value="null"/>
@@ -703,7 +731,7 @@
                   <Data value="null"/>
                   <Data value="null"/>
                 </Column>
-                <Column editable="true" title="Current Block" type="java.lang.Object">
+                <Column editable="false" title="Current Block" type="java.lang.Object">
                   <Data value=""/>
                   <Data value="null"/>
                   <Data value="null"/>
@@ -735,7 +763,7 @@
                   <Data value="null"/>
                   <Data value="null"/>
                 </Column>
-                <Column editable="true" title="Destination" type="java.lang.Object">
+                <Column editable="false" title="Destination" type="java.lang.Object">
                   <Data value=""/>
                   <Data value="null"/>
                   <Data value="null"/>
@@ -767,7 +795,7 @@
                   <Data value="null"/>
                   <Data value="null"/>
                 </Column>
-                <Column editable="true" title="Deadline" type="java.lang.Object">
+                <Column editable="false" title="Deadline" type="java.lang.Object">
                   <Data value=""/>
                   <Data value="null"/>
                   <Data value="null"/>
@@ -799,7 +827,7 @@
                   <Data value="null"/>
                   <Data value="null"/>
                 </Column>
-                <Column editable="true" title="Authority (ft)" type="java.lang.Object">
+                <Column editable="false" title="Authority (ft)" type="java.lang.Object">
                   <Data value=""/>
                   <Data value="null"/>
                   <Data value="null"/>
@@ -831,7 +859,7 @@
                   <Data value="null"/>
                   <Data value="null"/>
                 </Column>
-                <Column editable="true" title="Suggested Speed (mph)" type="java.lang.Object">
+                <Column editable="false" title="Suggested Speed (mph)" type="java.lang.Object">
                   <Data value=""/>
                   <Data value="null"/>
                   <Data value="null"/>
@@ -863,7 +891,7 @@
                   <Data value="null"/>
                   <Data value="null"/>
                 </Column>
-                <Column editable="true" title="Passengers" type="java.lang.Object">
+                <Column editable="false" title="Passengers" type="java.lang.Object">
                   <Data value=""/>
                   <Data value="null"/>
                   <Data value="null"/>
@@ -901,13 +929,22 @@
         </Component>
       </SubComponents>
     </Container>
-    <Component class="javax.swing.JComboBox" name="jComboBox2">
+    <Component class="javax.swing.JComboBox" name="blueMaintenance">
       <Properties>
+        <Property name="editable" type="boolean" value="true"/>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Tahoma" size="30" style="0"/>
+        </Property>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-          <StringArray count="3">
-            <StringItem index="0" value="Block Select"/>
-            <StringItem index="1" value="Section A1"/>
-            <StringItem index="2" value="Section A2"/>
+          <StringArray count="8">
+            <StringItem index="0" value="A1"/>
+            <StringItem index="1" value="A2"/>
+            <StringItem index="2" value="A3"/>
+            <StringItem index="3" value="A4"/>
+            <StringItem index="4" value="A5"/>
+            <StringItem index="5" value="A6"/>
+            <StringItem index="6" value="A7"/>
+            <StringItem index="7" value="A8"/>
           </StringArray>
         </Property>
       </Properties>
@@ -917,6 +954,9 @@
     </Component>
     <Component class="javax.swing.JRadioButton" name="fixedBlock">
       <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Tahoma" size="30" style="0"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="Fixed Block"/>
       </Properties>
       <Events>
@@ -925,31 +965,52 @@
     </Component>
     <Component class="javax.swing.JTextField" name="jTextField5">
       <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Tahoma" size="30" style="0"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="10:02"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel3">
       <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Tahoma" size="30" style="0"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="Block"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel17">
       <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Tahoma" size="30" style="0"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="passengers/hr"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JRadioButton" name="MovingBlock">
       <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Tahoma" size="30" style="0"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="Moving Block"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="MovingBlockActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel8">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Green Line"/>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Tahoma" size="30" style="0"/>
+        </Property>
+        <Property name="text" type="java.lang.String" value="Blue Line"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel18">
       <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Tahoma" size="30" style="0"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="passengers/hr"/>
       </Properties>
     </Component>
@@ -963,23 +1024,44 @@
     </Component>
     <Component class="javax.swing.JRadioButton" name="openTrack">
       <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Tahoma" size="30" style="0"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="Open Track"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="openTrackActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel5">
       <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Tahoma" size="30" style="0"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="Suggested Speed"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="scheduleButton">
       <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Tahoma" size="30" style="0"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="Schedule"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="scheduleButtonActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JRadioButton" name="closeTrack">
       <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Tahoma" size="30" style="0"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="Close Track"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="closeTrackActionPerformed"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>
