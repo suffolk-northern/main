@@ -19,6 +19,8 @@ import java.util.StringTokenizer;
  */
 public class MyCtc {
     
+    public static final int TRAINCOLS = 8;
+    
     public static MyCtc ctc;
     public static MyCtcUI ui;
     
@@ -352,6 +354,37 @@ public class MyCtc {
     private static void updateTrains()
     {
         // for all trains in trains
+        Object[][] rows = new Object[trains.size()][TRAINCOLS];
+        
+        Train train;
+        ArrayDeque<Train> temp = trains.clone();
+        int count = 0;
+        
+        while(!temp.isEmpty())
+        {
+            train = temp.poll();
+            
+            rows[count][0] = train.location.line.substring(0,1).toUpperCase() + train.location.line.substring(1);
+            rows[count][1] = train.ID;
+            rows[count][2] = "" + train.location.section + train.location.num;
+            if(rows[count][2].equals(""+'\0'+0))
+                rows[count][2] = "YARD";
+            
+            if(train.route == null)
+                rows[count][3] = "";
+            else
+                rows[count][3] = "" + train.route.getLast().section + train.route.getLast().num;
+            
+            rows[count][4] = "";
+            rows[count][5] = train.authority;
+            rows[count][6] = train.setpoint_speed;
+            rows[count][7] = "";
+            
+            count++;
+        }
+        
+        ui.updateTrainTable(rows,trains.size());
+        
     }
     
     private static void updateTrain(int ID)
@@ -608,16 +641,16 @@ public class MyCtc {
         }
     }
     
-    private static class Train
+    protected static class Train
     {
-        private int ID;
-        private Block location;
-        private double authority;
-        private double setpoint_speed;
-        private ArrayDeque<Block> route;
-        private Block dest;
-        private double deadline;
-        private int passengers;
+        protected int ID;
+        protected Block location;
+        protected double authority;
+        protected double setpoint_speed;
+        protected ArrayDeque<Block> route;
+        protected Block dest;
+        protected double deadline;
+        protected int passengers;
         
         public Train()
         {
