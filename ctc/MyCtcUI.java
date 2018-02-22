@@ -257,7 +257,7 @@ public class MyCtcUI extends javax.swing.JFrame {
                 {null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "Line", "Train ID", "Current Block", "Destination", "Deadline", "Authority (ft)", "Suggested Speed (mph)", "Passengers"
+                "Line", "Train ID", "Current Block", "Destination", "Deadline", "Authority (yd)", "Suggested Speed (mph)", "Passengers"
             }
         ));
         
@@ -330,6 +330,18 @@ public class MyCtcUI extends javax.swing.JFrame {
                 closeTrackActionPerformed(evt);
             }
         });
+        
+        ButtonGroup maintenance = new ButtonGroup();
+        maintenance.add(closeTrack);
+        maintenance.add(openTrack);
+        
+        ButtonGroup fixedmoving = new ButtonGroup();
+        fixedmoving.add(fixedBlock);
+        fixedmoving.add(MovingBlock);
+        
+        ButtonGroup manOrAuto = new ButtonGroup();
+        manOrAuto.add(manualMode);
+        manOrAuto.add(autoMode);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -1030,12 +1042,21 @@ public class MyCtcUI extends javax.swing.JFrame {
     
     private void openTrackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openTrackActionPerformed
         // TODO add your handling code here:
-        
-        
-        
+       
         // inform user
         String str = (String)blueMaintenance.getSelectedItem();
         System.out.println("Block "+str+" opened");
+        
+        Object obj = "";
+
+        for(int i = 0; i < trackTable.getRowCount(); i++)
+        {
+           
+            if(trackTable.getValueAt(i, 1) != null && (trackTable.getValueAt(i, 1).toString()).equals(str.substring(0,1)) && (trackTable.getValueAt(i, 2).toString()).equals((str.substring(1))))
+            {
+                trackTable.setValueAt(obj,i,6);
+            }
+        }
         
     }//GEN-LAST:event_openTrackActionPerformed
 
@@ -1044,6 +1065,16 @@ public class MyCtcUI extends javax.swing.JFrame {
         
         String str = (String)blueMaintenance.getSelectedItem();
         System.out.println("Block "+str+" closed for maintenance");
+        
+        Object obj = "Closed";
+        
+        for(int i = 0; i < trackTable.getRowCount(); i++)
+        {
+            if(trackTable.getValueAt(i, 1) != null && (trackTable.getValueAt(i, 1).toString()).equals(str.substring(0,1)) && (trackTable.getValueAt(i, 2).toString()).equals((str.substring(1))))
+            {
+                trackTable.setValueAt(obj,i,6);
+            }
+        }
         
     }//GEN-LAST:event_closeTrackActionPerformed
 
