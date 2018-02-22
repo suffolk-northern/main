@@ -37,7 +37,8 @@ public class TestyTest
 
 		Updater updater = new Updater(objects);
 
-		for (;;) {
+		for (;;)
+		{
 			updater.iteration();
 
 			// hand-wave the timing

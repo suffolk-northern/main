@@ -210,7 +210,8 @@ public class Train implements Updateable
 	{
 		int value = -1;
 
-		switch (location) {
+		switch (location)
+		{
 			case  left: value = 0; break;
 			case right: value = 1; break;
 		}
