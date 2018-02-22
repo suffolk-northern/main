@@ -78,7 +78,7 @@ public class TestTrain
 	{
 		link.power(0.5);
 		link.serviceBrake(0.25);
-		link.emergencyBrake();
+		link.applyEmergencyBrake();
 
 		link.openDoor(DoorLocation.left);
 		link.closeDoor(DoorLocation.right);

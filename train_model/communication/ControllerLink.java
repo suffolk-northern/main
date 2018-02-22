@@ -103,9 +103,9 @@ public class ControllerLink
 	// Irreversible. Damages the vehicle.
 	//
 	// Failure mode: Emergency brake applies no force regardless of input.
-	public void emergencyBrake()
+	public void applyEmergencyBrake()
 	{
-		train.emergencyBrake();
+		train.applyEmergencyBrake();
 	}
 
 	// Opens specified door(s).
