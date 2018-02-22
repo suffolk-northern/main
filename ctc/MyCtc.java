@@ -11,6 +11,7 @@ package myctc;
  */
 
 import java.util.ArrayDeque;
+import java.util.StringTokenizer;
 
 /**
  *
@@ -339,9 +340,34 @@ public class MyCtc {
         }
     }
     
+    private static void updateTrack(Block block)
+    {
+        
+    }
+    
     private static void updateTrains()
     {
         // for all trains in trains
+    }
+    
+    private static void updateTrain(int ID)
+    {
+        
+    }
+    
+    protected void readIn(String str)
+    {
+        StringTokenizer stok = new StringTokenizer(str," ");
+        String s = stok.nextToken();
+        
+        if(s.equalsIgnoreCase("MBO"))
+        {
+            tellMBOSwitches();
+        }
+        else if(s.equalsIgnoreCase("Track Controller"))
+        {
+            
+        }
     }
     
     protected void tellMBOSwitches()
