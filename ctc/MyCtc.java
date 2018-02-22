@@ -481,6 +481,7 @@ public class MyCtc {
                     if(s.equalsIgnoreCase("Occupancy"))
                     {
                         block.setOccupied(Boolean.parseBoolean(stok.nextToken()));
+                        updateAuth(block);
                     }
                     else if(s.equalsIgnoreCase("Switch"))
                     {
@@ -562,7 +563,7 @@ public class MyCtc {
         
     }
     
-    private static void updateAuth(Block sw)
+    private static void updateAuth(Block bl)
     {
         ArrayDeque<Train> temp = trains.clone();
         
@@ -572,7 +573,7 @@ public class MyCtc {
         {
             train = temp.poll();
 
-            if(train.getRoute() != null && train.getRoute().contains(sw))
+            if(train.getRoute() != null && train.getRoute().contains(bl))
             {
                 train.setAuth(calcAuth(train.getRoute(),train.getLoc(),train.getRoute().peekLast()));
             }
