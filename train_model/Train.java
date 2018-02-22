@@ -28,8 +28,9 @@ import updater.Updateable;
 
 public class Train implements Updateable
 {
-	// watts
+	// watts, newtons
 	private static double MAX_ENGINE_POWER = 1.0;
+	private static double MAX_ENGINE_FORCE = 3.0;
 
 	// newtons
 	private static double MAX_SERVICE_BRAKE_FORCE = 1.0;
@@ -100,6 +101,9 @@ public class Train implements Updateable
 		// BS force at zero velocity
 		if (engineForce == 0.0)
 			engineForce = 0.1;
+
+		if (engineForce > MAX_ENGINE_FORCE)
+			engineForce = MAX_ENGINE_FORCE;
 
 		double netForce = engineForce
 		                  - serviceBrakeForce
