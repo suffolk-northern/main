@@ -6,6 +6,8 @@
 
 package train_model;
 
+import java.util.Observable;
+
 import track_model.GlobalCoordinates;
 import track_model.Orientation;
 import train_model.PointMass;
@@ -28,7 +30,9 @@ import updater.Updateable;
 //   mboRadio()
 //   trackCircuit()
 
-public class Train implements Updateable
+public class Train
+	extends Observable
+	implements Updateable
 {
 	// watts, newtons
 	private static double MAX_ENGINE_POWER = 1.0;
@@ -45,6 +49,9 @@ public class Train implements Updateable
 
 	// kilograms (constant for now)
 	private static final double mass = 1.0;
+
+	// notify observers once every this many updates
+	private static int NOTIFY_OBSERVERS_MOD = 2;
 
 	private final PointMass pointMass = new PointMass(mass, initialPose);
 
@@ -66,6 +73,8 @@ public class Train implements Updateable
 		new ControllerLink(relay, this);
 
 	private final MboRadio mboRadio = new MboRadio(relay);
+
+	private int notifyObserversCount = 0;
 
 	// Returns a train_model.communication.BeaconRadio suitable for
 	// communicating with this train.
@@ -130,6 +139,8 @@ public class Train implements Updateable
 		                  - emergencyBrakeForce;
 
 		pointMass.push(netForce, 100);
+
+		notifyActions();
 	}
 
 	// Returns the current location.
@@ -227,6 +238,20 @@ public class Train implements Updateable
 		int index = doorLocationToIndex(location);
 
 		doors[index] = false;
+	}
+
+	// Determines if we should notify observers this update. If so, notifes
+	// Observer objects.
+	private void notifyActions()
+	{
+		if (notifyObserversCount == 0)
+		{
+			setChanged();
+			notifyObservers();
+		}
+
+		notifyObserversCount =
+			(notifyObserversCount + 1) % NOTIFY_OBSERVERS_MOD;
 	}
 
 	// Maps door location to index number in doors[].
