@@ -482,6 +482,7 @@ public class MyCtc {
                         to = getBlock(line,section,number);
                         
                         block.setSwitchPos(from, to);
+                        updateAuth(block);
                         
                     }
                     else if(s.equalsIgnoreCase("RR Xing"))
@@ -498,6 +499,25 @@ public class MyCtc {
                 updateTrack();
             }
         }
+    }
+    
+    private static void updateAuth(Block sw)
+    {
+        ArrayDeque<Train> temp = trains.clone();
+        
+        Train train;
+        
+        while(!temp.isEmpty())
+        {
+            train = temp.poll();
+
+            if(train.getRoute() != null && train.getRoute().contains(sw))
+            {
+                train.setAuth(calcAuth(train.getRoute(),train.getLoc(),train.getRoute().peekLast()));
+            }
+        }
+        
+        updateTrains();
     }
     
     protected void tellMBOSwitches()
@@ -1029,6 +1049,7 @@ public class MyCtc {
                 sw_curr_from = currf;
                 sw_curr_to = currt;
             }
+            
         }
         
         private Block getNext()
