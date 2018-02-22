@@ -16,6 +16,8 @@ import track_model.TrackBlock;
  */
 public class MBODemo 
 {
+	private static int maxTrains = 4;
+	
 	public static void main(String[] args)
 	{
 		MBO mbo = new MBO();
@@ -23,20 +25,27 @@ public class MBODemo
 		MBODemoUI ui = new MBODemoUI();
 		ui.setVisible(true);
 		
+		int numTrains = 0;
+		GlobalCoordinates origin = new GlobalCoordinates(0, 0);
 		while (true)
-			update(ui, mbo);
+			numTrains = update(ui, mbo, numTrains, origin);
 	}
 	
-	public static void update(MBODemoUI ui, MBO mbo)
+	public static int update(MBODemoUI ui, MBO mbo, int numTrains, GlobalCoordinates origin)
 	{
 		if (ui.addedTrain)
 		{
-			GlobalCoordinates startPoint = new GlobalCoordinates(0, 0);
-			FakeTrain testTrain= new FakeTrain(startPoint, 1);
-			TrackBlock startBlock = mbo.getDefaultBlock();
-			mbo.registerTrain(testTrain, startBlock);
-			ui.addTrain(testTrain);
-			ui.addedTrain = false;
+			if (numTrains == maxTrains)
+				ui.addedTrain = false;
+			else
+			{
+				FakeTrain testTrain= new FakeTrain(origin, numTrains+1);
+				TrackBlock startBlock = mbo.getDefaultBlock();
+				mbo.registerTrain(testTrain, startBlock);
+				ui.addTrain(testTrain);
+				ui.addedTrain = false;
+				numTrains += 1;
+			}
 		}
 		
 		if (ui.switch1Flipped)
@@ -51,6 +60,16 @@ public class MBODemo
 			ui.switch2Flipped = false;
 		}
 		
+		if (ui.trainChangedID > -1)
+		{
+			double newLat = ui.latChanged;
+			double newLon = ui.lonChanged;
+			GlobalCoordinates newLoc = origin.addYards(newLat, newLon);
+			mbo.changeTrainLocation(ui.trainChangedID, newLoc);
+			ui.trainChangedID = -1;
+		}
+		
 		mbo.update();
+		return numTrains;
 	}
 }

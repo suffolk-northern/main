@@ -49,7 +49,9 @@ public class MBO implements Updateable
 			double authority = findAuthority(train);
 			train.setAuthority((int) authority);
 			train.setSuggestedSpeed(30);
-			ui.updateTrain(train.train.trainID, 'A', train.block.ID, 0, train.getAuthority());
+			GlobalCoordinates loc = train.train.location();
+			int trackDist = (int) train.block.startPoint.distanceTo(loc);
+			ui.updateTrain(train.train.trainID, 'A', train.block.ID, trackDist, train.getAuthority());
 		}
 	}
 	
@@ -96,6 +98,7 @@ public class MBO implements Updateable
 	{
 		TrainTracker trainTracking = new TrainTracker(train, block);
 		trains.add(trainTracking);
+		ui.addTrain(train);
 	}
 
 	// Removes a train from the set of objects this object communicates
@@ -151,5 +154,14 @@ public class MBO implements Updateable
 	public TrackBlock getDefaultBlock()
 	{
 		return myTrack.sections[0].blocks[0];
+	}
+	
+	public void changeTrainLocation(int trainID, GlobalCoordinates location)
+	{
+		for (TrainTracker train: trains)
+		{
+			if (train.train.trainID == trainID)
+				train.train.setLocation(location);
+		}
 	}
 }

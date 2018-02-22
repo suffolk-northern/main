@@ -9,6 +9,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.table.TableModel;
+import javax.swing.event.*;
 
 import mbo.FakeTrain;
 /**
@@ -29,9 +30,12 @@ public class MBODemoUI extends JFrame
 	private String[] tableHeader;
 	private Object[][] tableContents;
 	
-	public boolean addedTrain;
-	public boolean switch1Flipped;
-	public boolean switch2Flipped;
+	public boolean addedTrain = false;
+	public boolean switch1Flipped = false;
+	public boolean switch2Flipped = false;
+	public int trainChangedID = -1;
+	public double latChanged = 0;
+	public double lonChanged = 0;
 	
 	public MBODemoUI()
 	{
@@ -82,22 +86,31 @@ public class MBODemoUI extends JFrame
 		mainPanel.add(trainPanel);
 		trainPanel.setViewportView(trainTable);
 		
-		tableHeader = new String[] {"Train ID", "Location"};
+		tableHeader = new String[] {"Train ID", "Latitude", "Longitude"};
 		tableContents = new Object[][]
 		{
-		   {null, null}, 
-		   {null, null}, 
-		   {null, null}, 
-		   {null, null}, 
+		   {null, null, null}, 
+		   {null, null, null}, 
+		   {null, null, null}, 
+		   {null, null, null}, 
 		};
 		trainTable.setModel(new javax.swing.table.DefaultTableModel(tableContents, tableHeader)
 		{
-		   boolean[] canEdit = new boolean[] {false, true};
+		   boolean[] canEdit = new boolean[] {false, true, true};
 
 		   public boolean isCellEditable(int rowIndex, int columnIndex) 
 		   {
 			   return canEdit [columnIndex];
 		   }
+		}
+		);
+		
+		trainTable.getModel().addTableModelListener(new TableModelListener()
+		{
+			public void tableChanged(TableModelEvent evt)
+			{
+				updateLocation(evt);
+			}
 		}
 		);
 		
@@ -121,14 +134,31 @@ public class MBODemoUI extends JFrame
 		switch2Flipped = true;
 	}
 	
+	private void updateLocation(TableModelEvent evt)
+	{
+		int rowChanged = evt.getFirstRow();
+		System.out.println(rowChanged);
+		TableModel model = trainTable.getModel();
+		Object trainID = model.getValueAt(rowChanged, 0);
+		Object lat = model.getValueAt(rowChanged, 1);
+		Object lon = model.getValueAt(rowChanged, 2);
+		if (trainID != null && lat != null && lon != null)
+		{
+			trainChangedID = Integer.parseInt(trainID.toString());
+			latChanged = Double.parseDouble(lat.toString());
+			lonChanged = Double.parseDouble(lon.toString());
+		}
+	}
+	
 	public void addTrain(FakeTrain train)
 	{
 		TableModel model = trainTable.getModel();
 		model.setValueAt(train.getID(), numTrains, 0);
 		double lat = train.location().latitude();
 		double lon = train.location().longitude();
-		String locString = String.format("%f, %f", lat, lon);
-		model.setValueAt(locString, numTrains, 1);
+		// String locString = String.format("%f, %f", lat, lon);
+		model.setValueAt(String.format("%f", lat), numTrains, 1);
+		model.setValueAt(String.format("%f", lon), numTrains, 2);
 		numTrains += 1;
 	}
 		
