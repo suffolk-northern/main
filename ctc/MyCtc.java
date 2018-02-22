@@ -576,6 +576,7 @@ public class MyCtc {
             if(train.getRoute() != null && train.getRoute().contains(bl))
             {
                 train.setAuth(calcAuth(train.getRoute(),train.getLoc(),train.getRoute().peekLast()));
+                sendSpeedAuth(train,train.setpoint_speed,train.authority);
             }
         }
         
