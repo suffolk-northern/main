@@ -156,6 +156,7 @@ public class MyCtcUI extends javax.swing.JFrame {
         trackTable.getModel().addTableModelListener(trainTable);
         trackTable.setRowHeight(30);
         trackTable.getColumnModel().getColumn(4).setPreferredWidth(100);
+        trackTable.getColumnModel().getColumn(6).setPreferredWidth(100);
         
         blockSelect.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
         blockSelect.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "A1", "A2", "A3", "A4", "A5", "A6", "A7", "YARD" }));
@@ -975,6 +976,7 @@ public class MyCtcUI extends javax.swing.JFrame {
     */
     private void fixedBlockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fixedBlockActionPerformed
         // TODO add your handling code here:
+        System.out.println("Transfer control to fixed block");
     }//GEN-LAST:event_fixedBlockActionPerformed
 
     
@@ -1088,14 +1090,17 @@ public class MyCtcUI extends javax.swing.JFrame {
 
     private void MovingBlockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MovingBlockActionPerformed
         // TODO add your handling code here:
+        System.out.println("Transfer control to MBO");
     }//GEN-LAST:event_MovingBlockActionPerformed
 
     private void manualModeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manualModeActionPerformed
         // TODO add your handling code here:
+        System.out.println("Manual mode");
     }//GEN-LAST:event_manualModeActionPerformed
 
     private void autoModeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoModeActionPerformed
         // TODO add your handling code here:
+        System.out.println("Automatic mode");
     }//GEN-LAST:event_autoModeActionPerformed
 
     /**
