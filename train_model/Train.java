@@ -10,6 +10,7 @@ import java.util.Observable;
 
 import track_model.GlobalCoordinates;
 import track_model.Orientation;
+import train_model.PointHeat;
 import train_model.PointMass;
 import train_model.Pose;
 import train_model.communication.BeaconMessage;
@@ -42,6 +43,10 @@ public class Train
 	private static double MAX_SERVICE_BRAKE_FORCE = 1.0;
 	private static double   EMERGENCY_BRAKE_FORCE = 1.0;
 
+	// watts
+	private static double HEATER_POWER  = 1.0;
+	private static double COOLING_POWER = 0.5;
+
 	private static Pose initialPose = new Pose(
 		new GlobalCoordinates(0.0, 0.0),
 		Orientation.degrees(0.0)
@@ -66,6 +71,9 @@ public class Train
 	//
 	// indices mapped by doorLocationToIndex():
 	boolean doors[] = new boolean[2];
+
+	private final PointHeat pointHeat = new PointHeat();
+	private double heaterPower = 0.0;
 
 	private final Relay relay = new Relay(this);
 
@@ -139,6 +147,10 @@ public class Train
 		                  - emergencyBrakeForce;
 
 		pointMass.push(netForce, 100);
+
+		double netPower = heaterPower - COOLING_POWER;
+
+		pointHeat.conduct(netPower, 100);
 
 		notifyActions();
 	}
@@ -268,6 +280,32 @@ public class Train
 		int index = doorLocationToIndex(location);
 
 		doors[index] = false;
+	}
+
+	// Returns the temperature.
+	//
+	// Units: celsius
+	public double temperature()
+	{
+		return pointHeat.temperature();
+	}
+
+	// Returns true if the heater is on.
+	public boolean heater()
+	{
+		return heaterPower != 0.0;
+	}
+
+	// Turns the heater on.
+	public void heaterOn()
+	{
+		heaterPower = HEATER_POWER;
+	}
+
+	// Turns the heater off.
+	public void heaterOff()
+	{
+		heaterPower = 0.0;
 	}
 
 	// Determines if we should notify observers this update. If so, notifes

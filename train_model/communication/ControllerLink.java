@@ -123,4 +123,30 @@ public class ControllerLink
 	{
 		train.closeDoor(location);
 	}
+
+	// Returns the current temperature.
+	//
+	// Units: celsius
+	public double temperature()
+	{
+		return train.temperature();
+	}
+
+	// Returns true if the heater is on.
+	public boolean heater()
+	{
+		return train.heater();
+	}
+
+	// Turns the heater on.
+	public void heaterOn()
+	{
+		train.heaterOn();
+	}
+
+	// Turns the heater off.
+	public void heaterOff()
+	{
+		train.heaterOff();
+	}
 }
