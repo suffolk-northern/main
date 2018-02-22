@@ -20,7 +20,7 @@ import java.util.StringTokenizer;
 public class MyCtc {
     
     public static final int TRAINCOLS = 8;
-    public static final int TRACKCOLS = 8;
+    public static final int TRACKCOLS = 9;
     
     public static MyCtc ctc;
     public static MyCtcUI ui;
@@ -375,6 +375,10 @@ public class MyCtc {
                 rows[count][7] = "";
             else
                 rows[count][7] = toCap(String.valueOf(block.rrxing_status));
+            
+            rows[count][8] = "";
+            if(block.hasStation)
+                rows[count][8] = toCap(block.station);
             
             count++;
         }

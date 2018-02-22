@@ -117,47 +117,51 @@ public class MyCtcUI extends javax.swing.JFrame {
         trackTable.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
         trackTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {"", "", "", "", null, "", "", null},
-                {"", "", "", "", null, "", "", null},
-                {"", "", "", "", null, "", "", null},
-                {"", "", "", "", null, "", "", null},
-                {"", "", "", "", null, null, null, null},
-                {"", "", "", "", null, null, null, null},
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null}
+                {"", "", "", "", null, "", "", null,null},
+                {"", "", "", "", null, "", "", null,null},
+                {"", "", "", "", null, "", "", null,null},
+                {"", "", "", "", null, "", "", null,null},
+                {"", "", "", "", null, null, null, null,null},
+                {"", "", "", "", null, null, null, null,null},
+                {null, null, null, null, null, null, null, null,null},
+                {null, null, null, null, null, null, null, null,null},
+                {null, null, null, null, null, null, null, null,null},
+                {null, null, null, null, null, null, null, null,null},
+                {null, null, null, null, null, null, null, null,null},
+                {null, null, null, null, null, null, null, null,null},
+                {null, null, null, null, null, null, null, null,null},
+                {null, null, null, null, null, null, null, null,null},
+                {null, null, null, null, null, null, null, null,null},
+                {null, null, null, null, null, null, null, null,null},
+                {null, null, null, null, null, null, null, null,null},
+                {null, null, null, null, null, null, null, null,null},
+                {null, null, null, null, null, null, null, null,null},
+                {null, null, null, null, null, null, null, null,null},
+                {null, null, null, null, null, null, null, null,null},
+                {null, null, null, null, null, null, null, null,null},
+                {null, null, null, null, null, null, null, null,null},
+                {null, null, null, null, null, null, null, null,null},
+                {null, null, null, null, null, null, null, null,null},
+                {null, null, null, null, null, null, null, null,null},
+                {null, null, null, null, null, null, null, null,null},
+                {null, null, null, null, null, null, null, null,null},
+                {null, null, null, null, null, null, null, null,null},
+                {null, null, null, null, null, null, null, null,null}
             },
             new String [] {
-                "Line", "Section", "Number", "Occupancy", "Switch", "Signals", "Status", "RR Xing"
+                "Line", "Section", "Number", "Occupancy", "Switch", "Signals", "Status", "RR Xing", "Station"
             }
         ));
         jScrollPane1.setViewportView(trackTable);
 
         trackTable.getModel().addTableModelListener(trainTable);
         trackTable.setRowHeight(30);
-        trackTable.getColumnModel().getColumn(4).setPreferredWidth(100);
-        trackTable.getColumnModel().getColumn(6).setPreferredWidth(100);
+        trackTable.getColumnModel().getColumn(0).setMinWidth(80);
+        trackTable.getColumnModel().getColumn(3).setMinWidth(90);
+        trackTable.getColumnModel().getColumn(4).setMinWidth(95);
+        trackTable.getColumnModel().getColumn(6).setMinWidth(90);
+        trackTable.getColumnModel().getColumn(7).setMinWidth(80);
+        trackTable.getColumnModel().getColumn(8).setMinWidth(80);
         
         blockSelect.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
         blockSelect.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "A1", "A2", "A3", "A4", "A5", "A6", "A7", "YARD" }));
@@ -375,7 +379,7 @@ public class MyCtcUI extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addContainerGap(37, Short.MAX_VALUE)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 660, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 900, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(38, 38, 38)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel1)
