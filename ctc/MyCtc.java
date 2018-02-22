@@ -487,7 +487,7 @@ public class MyCtc {
                         updateAuth(block);
                         
                     }
-                    else if(s.equalsIgnoreCase("RR Xing"))
+                    else if(s.equalsIgnoreCase("RRXing"))
                     {
                         block.rrxing_status = (Boolean.parseBoolean(stok.nextToken()));
                     }
