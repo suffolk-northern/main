@@ -164,7 +164,7 @@ public class MyCtcUI extends javax.swing.JFrame {
         trackTable.getColumnModel().getColumn(8).setMinWidth(80);
         
         blockSelect.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
-        blockSelect.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "A1", "A2", "A3", "A4", "A5", "A6", "A7", "YARD" }));
+        blockSelect.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "A1", "A2", "A3", "A4", "A5", "A6", "A7","A8", "YARD" }));
 
         blueThrough.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
         blueThrough.setText("               ");

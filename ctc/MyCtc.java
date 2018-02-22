@@ -415,12 +415,16 @@ public class MyCtc {
             else
                 rows[count][3] = "" + train.route.getLast().section + train.route.getLast().num;
             
+            if(rows[count][3].equals(""+'\0'+0))
+                rows[count][3] = "YARD";
+            
             rows[count][4] = "";
             rows[count][5] = train.authority;
             rows[count][6] = train.setpoint_speed;
             rows[count][7] = train.passengers;
             
             count++;
+            
         }
         
         ui.updateTrainTable(rows,trains.size());
@@ -691,11 +695,14 @@ public class MyCtc {
     {        
         route.add(start);
         //explored.add(start);
+
         
         if(route.size() > blueline.size())
+        {
             return;
+        }
         
-        if(start.display().equals(dest.display()))
+        if(start.equals(dest))
         {
             routes.add(route);
             return;
@@ -706,7 +713,7 @@ public class MyCtc {
         
         if(block.hasSwitch() && isForwardSwitch(block))
         {
-            neighbors = block.getSwitchTo();
+            neighbors = block.getSwitchTo().clone();
         }
         else
         {
