@@ -73,14 +73,18 @@ public class ControllerUI extends JFrame
 		numTrains = 0;
 	}
 	
-	public void addTrain(FakeTrain train)
+	public void addTrain(int trainID, char section, int blockID, int location, int authority)
 	{
 		TableModel model = trainTable.getModel();
-		model.setValueAt(train.getID(), numTrains, 0);
-		double lat = train.location().latitude();
-		double lon = train.location().longitude();
-		String locString = String.format("%f, %f", lat, lon);
-		model.setValueAt(locString, numTrains, 1);
+		model.setValueAt(trainID, numTrains, 0);
+		model.setValueAt(section, numTrains, 1);
+		model.setValueAt(blockID, numTrains, 2);
+		model.setValueAt(location, numTrains, 3);
+		model.setValueAt(authority, numTrains, 4);
+//		double lat = train.location().latitude();
+//		double lon = train.location().longitude();
+//		String locString = String.format("%f, %f", lat, lon);
+//		model.setValueAt(locString, numTrains, 1);
 		numTrains += 1;
 	}
 	

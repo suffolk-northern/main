@@ -39,7 +39,7 @@ public class MBODemo
 				ui.addedTrain = false;
 			else
 			{
-				FakeTrain testTrain= new FakeTrain(origin, numTrains+1);
+				FakeTrain testTrain = new FakeTrain(origin, numTrains+1);
 				TrackBlock startBlock = mbo.getDefaultBlock();
 				mbo.registerTrain(testTrain, startBlock);
 				ui.addTrain(testTrain);

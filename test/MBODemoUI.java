@@ -137,7 +137,6 @@ public class MBODemoUI extends JFrame
 	private void updateLocation(TableModelEvent evt)
 	{
 		int rowChanged = evt.getFirstRow();
-		System.out.println(rowChanged);
 		TableModel model = trainTable.getModel();
 		Object trainID = model.getValueAt(rowChanged, 0);
 		Object lat = model.getValueAt(rowChanged, 1);

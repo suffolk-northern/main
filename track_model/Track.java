@@ -27,7 +27,7 @@ public class Track
 		blocks[6] = new TrackBlock(7, origin.addYards(50, 50), origin.addYards(50, 0), 0);
 		blocks[7] = new TrackBlock(8, origin.addYards(50, 50), origin.addYards(0, 50), 4);
 		blocks[0].setNextBlock(blocks[1]);
-		blocks[7].setPrevBlock(blocks[6]);
+		blocks[7].setPrevBlock(blocks[5]);
 		for (int i = 1; i < numBlocks-1; i++)
 		{
 			blocks[i].setNextBlock(blocks[i + 1]);
@@ -47,6 +47,7 @@ public class Track
 			{blocks[5], blocks[7]}
 		};
 		switches[1] = new TrackSwitch(switch2, 0);
+
 		sections = new TrackSection[1];
 		sections[0] = new TrackSection(numBlocks, blocks, switches);
 	}

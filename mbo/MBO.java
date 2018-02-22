@@ -41,7 +41,9 @@ public class MBO implements Updateable
 		for (int i = 0; i < trains.size(); i++) 
 		{
 			TrainTracker train = trains.get(i);
-			train.setBlock(getBlock(train.train.location()));
+			TrackBlock newBlock = getBlock(train.train.location());
+			if (newBlock != null)
+				train.block = newBlock;
 		}
 		
 		for (TrainTracker train: trains)
@@ -98,7 +100,7 @@ public class MBO implements Updateable
 	{
 		TrainTracker trainTracking = new TrainTracker(train, block);
 		trains.add(trainTracking);
-		ui.addTrain(train);
+		ui.addTrain(train.getID(), 'A', block.ID, 0, 0);
 	}
 
 	// Removes a train from the set of objects this object communicates
@@ -117,8 +119,16 @@ public class MBO implements Updateable
         
 	public double findAuthority(TrainTracker train)
 	{
-//		TrackBlock[] route = getRoute(train.getBlock());
-//		int blockingBlock = Integer.MAX_VALUE;
+		TrackBlock[] route = getRoute(train.getBlock());
+		int blockingBlock = route.length-1;
+		for (int i = 0; i < route.length; i++)
+		{
+			if (route[i] == null)
+				blockingBlock = i-1;
+			else
+				System.out.print(route[i].ID);
+		}
+		System.out.println(" ");
 //		TrainTracker blockingTrain = null;
 //		for (int j = 0; j < trains.size(); j++)
 //		{
@@ -131,17 +141,17 @@ public class MBO implements Updateable
 //					blockingTrain = train;
 //				}
 //			}
-//			if (blockingBlock == Integer.MAX_VALUE)
-//			{
-//				// Ugh				
-//			}
 //		}
-//		double authority = 0;
-//		for (int j = 0; j < blockingBlock; j++)
+//		double authority = route[0].startPoint.distanceTo(train.train.location());
+//		for (int j = 0; j < blockingBlock-1; j++)
 //		{
 //			authority += route[j].getLength();
 //		}
-//		authority += route[blockingBlock].startPoint.distanceTo(blockingTrain.train.location());
+//		if (blockingTrain == null)
+//			authority += route[blockingBlock].getLength();
+//		else
+//			authority += route[blockingBlock].startPoint.distanceTo(blockingTrain.train.location());
+//		
 //		return authority;
 		return 5;
 	}
@@ -161,7 +171,12 @@ public class MBO implements Updateable
 		for (TrainTracker train: trains)
 		{
 			if (train.train.trainID == trainID)
+			{
 				train.train.setLocation(location);
+				TrackBlock newBlock = getBlock(location);
+				if (newBlock != null)
+					train.block = newBlock;
+			}
 		}
 	}
 }
