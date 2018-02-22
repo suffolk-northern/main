@@ -309,7 +309,10 @@ public class MyCtc {
             // check switches are in correct position
             else if(block.hasSwitch())
                 if(isForwardSwitch(block) && temp.peek() != null && (!block.getSwitchCurrTo().equals(temp.peek())))
+                {
+                    auth += block.getLength();
                     return auth;
+                }
                 else if(isBackwardSwitch(block) && prev != null && !block.getSwitchCurrFrom().equals(prev))
                     return auth;
                 else
