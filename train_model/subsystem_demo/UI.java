@@ -57,9 +57,12 @@ public class UI
         double longitude = train.location().longitude();
 
         double speed = MPH_PER_MPS * train.speed();
+	double heading = train.orientation().degrees();
+	double temperature = cToF(train.temperature());
 
         boolean lDoors = train.door(DoorLocation.left);
         boolean rDoors = train.door(DoorLocation.right);
+	boolean heater = train.heater();
 
 	BeaconMessage beaconMessage = train.lastBeaconMessage();
 
@@ -83,9 +86,12 @@ public class UI
         ));
 
         pointStatsSpeed.setText(String.format("%.1f mph", speed));
+	pointStatsHeading.setText(String.format("%03.0f'", heading));
+	pointStatsTemperature.setText(String.format("%.1f 'F", temperature));
 
         cabinLDoors.setText(lDoors ? "OPEN" : "CLOSED");
         cabinRDoors.setText(rDoors ? "OPEN" : "CLOSED");
+	cabinHeater.setText(heater ? "ON" : "OFF");
 
         beaconRxString.setText("\"" + beaconMessage.string + "\"");
 
@@ -108,6 +114,12 @@ public class UI
 
         mboRxSpeed.setText(String.format("%d mph", mboMessage.speed));
         mboRxAuthority.setText(String.format("%d y", mboMessage.authority));
+    }
+
+    // Celsius to Fahrenheit
+    private static double cToF(double c)
+    {
+	    return 9.0 / 5.0 * c + 32.0;
     }
 
     /**
