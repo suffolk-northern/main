@@ -48,6 +48,8 @@ public class MBO implements Updateable
 		
 		for (TrainTracker train: trains)
 		{
+			if (train == null)
+				break;
 			double authority = findAuthority(train);
 			train.setAuthority((int) authority);
 			train.setSuggestedSpeed(30);
@@ -124,36 +126,46 @@ public class MBO implements Updateable
 		for (int i = 0; i < route.length; i++)
 		{
 			if (route[i] == null)
+			{
 				blockingBlock = i-1;
-			else
-				System.out.print(route[i].ID);
+				break;
+			}
+			// else
+				// System.out.print(route[i].ID);
 		}
-		System.out.println(" ");
-//		TrainTracker blockingTrain = null;
-//		for (int j = 0; j < trains.size(); j++)
-//		{
-//			TrackBlock occupiedBlock = train.getBlock();
-//			for (int k = 0; k < route.length; k++)
-//			{
-//				if (occupiedBlock == route[k] && j < blockingBlock)
-//				{
-//					blockingBlock = k;
-//					blockingTrain = train;
-//				}
-//			}
-//		}
-//		double authority = route[0].startPoint.distanceTo(train.train.location());
-//		for (int j = 0; j < blockingBlock-1; j++)
-//		{
-//			authority += route[j].getLength();
-//		}
-//		if (blockingTrain == null)
-//			authority += route[blockingBlock].getLength();
-//		else
-//			authority += route[blockingBlock].startPoint.distanceTo(blockingTrain.train.location());
-//		
-//		return authority;
-		return 5;
+		// System.out.println(" ");
+		TrainTracker blockingTrain = null;
+		for (int j = 0; j < trains.size(); j++)
+		{
+			TrackBlock occupiedBlock = trains.get(j).getBlock();
+			for (int k = 0; k < route.length; k++)
+			{
+				if (occupiedBlock == route[k] && k < blockingBlock)
+				{
+					blockingBlock = k;
+					blockingTrain = trains.get(j);
+				}
+			}
+		}
+		double authority = 0;
+		if (route[0] != null)
+		{
+			authority = route[0].startPoint.distanceTo(train.train.location());
+			for (int j = 0; j < blockingBlock; j++)
+			{
+				authority += route[j+1].getLength();
+			}
+			if (blockingTrain == null)
+				authority += route[blockingBlock].getLength();
+			else
+				authority += route[blockingBlock].startPoint.distanceTo(blockingTrain.train.location());
+		}
+		else
+			authority = train.block.endPoint.distanceTo(train.train.location());
+		
+		// System.out.println(String.format("Train %d, blockingBlock %d", train.train.getID(), route[blockingBlock].ID));
+	
+		return authority;
 	}
 	
 	public void flipSwitch(int switchID)

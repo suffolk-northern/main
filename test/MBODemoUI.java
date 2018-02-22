@@ -25,10 +25,14 @@ public class MBODemoUI extends JFrame
 	private JButton addTrainButton;
 	private JButton switch1;
 	private JButton switch2;
+	private JLabel switch1Label;
+	private JLabel switch2Label;
 	
 	private int numTrains;
 	private String[] tableHeader;
 	private Object[][] tableContents;
+	private int switch1State;
+	private int switch2State;
 	
 	public boolean addedTrain = false;
 	public boolean switch1Flipped = false;
@@ -48,6 +52,8 @@ public class MBODemoUI extends JFrame
 		trainTable = new JTable();
 		switch1 = new JButton();
 		switch2 = new JButton();
+		switch1Label = new JLabel();
+		switch2Label = new JLabel();
 		
 		addTrainButton.setText("Add new train");
 		addTrainButton.setPreferredSize(new Dimension(200, 100));
@@ -71,7 +77,7 @@ public class MBODemoUI extends JFrame
 		
 		switch2.setText("Flip switch 2");
 		switch2.setPreferredSize(new Dimension(200, 100));
-		switch1.addActionListener(new ActionListener()
+		switch2.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent evt)
 			{
@@ -79,9 +85,16 @@ public class MBODemoUI extends JFrame
 			}
 		});
 		
+		switch1Label.setText("Switch 1 connects blocks 1 and 2");
+		switch2Label.setText("Switch 2 connects blocks 6 and 7");
+		switch1State = 0;
+		switch2State = 0;
+		
 		mainPanel.add(addTrainButton, BorderLayout.CENTER);
 		mainPanel.add(switch1, BorderLayout.CENTER);
 		mainPanel.add(switch2, BorderLayout.CENTER);
+		mainPanel.add(switch1Label, BorderLayout.CENTER);
+		mainPanel.add(switch2Label, BorderLayout.CENTER);
 		
 		mainPanel.add(trainPanel);
 		trainPanel.setViewportView(trainTable);
@@ -127,11 +140,31 @@ public class MBODemoUI extends JFrame
 	private void switch1Pressed(ActionEvent evt)
 	{
 		switch1Flipped = true;
+		if (switch1State == 0)
+		{
+			switch1Label.setText("Switch 1 connects blocks 7 and 2");
+			switch1State = 1;
+		}
+		else
+		{
+			switch1Label.setText("Switch 1 connects blocks 1 and 2");
+			switch1State = 0;
+		}
 	}
 	
 	private void switch2Pressed(ActionEvent evt)
 	{
 		switch2Flipped = true;
+		if (switch2State == 0)
+		{
+			switch2Label.setText("Switch 2 connects blocks 6 and 8");
+			switch2State = 1;
+		}
+		else
+		{
+			switch2Label.setText("Switch 2 connects blocks 6 and 7");
+			switch2State = 0;
+		}
 	}
 	
 	private void updateLocation(TableModelEvent evt)
