@@ -16,6 +16,7 @@ import track_model.TrackBlock;
 import track_model.TrackSection;
 import train_model.Train;
 import track_model.Orientation;
+import controller.MBOController;
 
 // Main MBO model
 
@@ -23,10 +24,13 @@ public class MBO implements Updateable
 {
 	private ArrayList<TrainTracker> trains = new ArrayList<TrainTracker>();
 	private Track myTrack;
+	private MBOController ui;
 	
 	public MBO()
 	{
 		myTrack = new Track();
+		ui = new MBOController();
+		ui.setVisible(true);
 	}
 
 	// Updates this object.
@@ -86,11 +90,11 @@ public class MBO implements Updateable
 		return blocks;
 	}
 	
-	// Adds a FakeTrainto the set of objects this object communicates with.
+	// Adds a FakeTrain to the set of objects this object communicates with.
 	public void registerTrain(FakeTrain train, TrackBlock block)
 	{
-		TrainTracker trainTrack = new TrainTracker(train, block);
-		trains.add(trainTrack);
+		TrainTracker trainTracking = new TrainTracker(train, block);
+		trains.add(trainTracking);
 	}
 
 	// Removes a train from the set of objects this object communicates
@@ -120,7 +124,7 @@ public class MBO implements Updateable
 				if (occupiedBlock == route[k] && j < blockingBlock)
 				{
 					blockingBlock = k;
-					blockingTrain = trains.get(i);
+					blockingTrain = train;
 				}
 			}
 			if (blockingBlock == Integer.MAX_VALUE)
@@ -140,5 +144,10 @@ public class MBO implements Updateable
 	public void setSwitch(int switchID, int switchState)
 	{
 		myTrack.sections[0].switches[switchID].setSwitch(switchState);
+	}
+	
+	public TrackBlock getDefaultBlock()
+	{
+		return myTrack.sections[0].blocks[0];
 	}
 }

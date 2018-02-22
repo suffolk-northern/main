@@ -13,9 +13,21 @@ import track_model.GlobalCoordinates;
  */
 public class FakeTrain {
 	GlobalCoordinates location;
+	int trainID;
 	
-	public FakeTrain(GlobalCoordinates newLocation)
+	public FakeTrain(GlobalCoordinates newLocation, int newID)
 	{
 		location = newLocation;
+		trainID = newID;
+	}
+	
+	public GlobalCoordinates location()
+	{
+		return location;
+	}
+	
+	public int getID()
+	{
+		return trainID;
 	}
 }

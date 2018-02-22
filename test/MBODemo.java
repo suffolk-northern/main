@@ -6,7 +6,9 @@
 package test;
 
 import mbo.MBO;
-import train_model.Train;
+import mbo.FakeTrain;
+import track_model.GlobalCoordinates;
+import track_model.TrackBlock;
 
 /**
  *
@@ -17,7 +19,24 @@ public class MBODemo
 	public static void main(String[] args)
 	{
 		MBO mbo = new MBO();
-		FakeTraintestFakeTrain= new Train();
+
 		
+		MBODemoUI ui = new MBODemoUI();
+		ui.setVisible(true);
+		
+		while (true)
+			update(ui, mbo);
+	}
+	
+	public static void update(MBODemoUI ui, MBO mbo)
+	{
+		if (ui.addedTrain)
+		{
+			GlobalCoordinates startPoint = new GlobalCoordinates(0, 0);
+			FakeTrain testTrain= new FakeTrain(startPoint, 1);
+			TrackBlock startBlock = mbo.getDefaultBlock();
+			mbo.registerTrain(testTrain, startBlock);
+			ui.addedTrain = false;
+		}
 	}
 }
