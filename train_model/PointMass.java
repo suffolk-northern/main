@@ -89,7 +89,8 @@ public class PointMass
 
 	// Simulates pushing with a constant force for an amount of time.
 	//
-	// Updates position and velocity.
+	// Updates position and velocity. Speed in the forward direction is
+	// clippped to [0, infinity).
 	//
 	// Does the math and returns immediately, i.e., does not sleep.
 	//
@@ -113,9 +114,11 @@ public class PointMass
 
 		// meters
 		double displacementXChange =
-			speedAverage * Math.sin(pose.orientation.radians());
+			speedAverage * Math.sin(pose.orientation.radians())
+			* timeSeconds;
 		double displacementYChange =
-			speedAverage * Math.cos(pose.orientation.radians());
+			speedAverage * Math.cos(pose.orientation.radians())
+			* timeSeconds;
 
 		// yards
 		double displacementXChangeYards =
@@ -129,6 +132,8 @@ public class PointMass
 		);
 
 		speed = speedFinal;
+
+		if (speed < 0.0) speed = 0.0;
 	}
 
 	// How much mass (in kilograms) weighs this many pounds
