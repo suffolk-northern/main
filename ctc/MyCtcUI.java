@@ -62,7 +62,7 @@ public class MyCtcUI extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         trackTable = new javax.swing.JTable();
         blockSelect = new javax.swing.JComboBox<>();
-        jTextField3 = new javax.swing.JTextField();
+        blueThrough = new javax.swing.JTextField();
         jLabel9 = new javax.swing.JLabel();
         jLabel19 = new javax.swing.JLabel();
         multSelect = new javax.swing.JComboBox<>();
@@ -161,8 +161,8 @@ public class MyCtcUI extends javax.swing.JFrame {
         blockSelect.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
         blockSelect.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "A1", "A2", "A3", "A4", "A5", "A6", "A7", "YARD" }));
 
-        jTextField3.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
-        jTextField3.setText("               ");
+        blueThrough.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
+        blueThrough.setText("               ");
 
         jLabel9.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
         jLabel9.setText("Maintenance");
@@ -390,7 +390,7 @@ public class MyCtcUI extends javax.swing.JFrame {
                                         .addGap(18, 18, 18)
                                         .addComponent(jLabel18))
                                     .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(blueThrough, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addGap(18, 18, 18)
                                         .addComponent(jLabel17))))
                             .addGroup(layout.createSequentialGroup()
@@ -471,7 +471,7 @@ public class MyCtcUI extends javax.swing.JFrame {
                         .addGap(1, 1, 1)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel6)
-                            .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(blueThrough, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel17)
                             .addComponent(multSelect, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -983,10 +983,14 @@ public class MyCtcUI extends javax.swing.JFrame {
     
     private void dispatchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dispatchButtonActionPerformed
         // TODO add your handling code here:
+        double speed;
         String line = (String)lineSelect.getSelectedItem();
         String block = (String)blockSelect.getSelectedItem();
         String train = (String)trainSelect.getSelectedItem();
-        double speed = Double.parseDouble(speedSelect.getText());
+        if(speedSelect.getText() == null || speedSelect.getText().equals(""))
+            speed = 0;
+        else
+            speed = Double.parseDouble(speedSelect.getText());
         
         
         ctc.routeTrain(train, line.toLowerCase(), block, speed);
@@ -1039,6 +1043,11 @@ public class MyCtcUI extends javax.swing.JFrame {
             }
             
             
+    }
+    
+    protected void updateThroughput(double through)
+    {
+        blueThrough.setText(Double.toString(through));
     }
     
     
@@ -1174,7 +1183,7 @@ public class MyCtcUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTextField jTextField3;
+    private javax.swing.JTextField blueThrough;
     private javax.swing.JTextField jTextField4;
     private javax.swing.JTextField jTextField5;
     private javax.swing.JComboBox<String> lineSelect;

@@ -29,6 +29,8 @@ public class MyCtc {
     public static ArrayDeque<Block> blueline = new ArrayDeque<Block>();
     public static ArrayDeque<Block> switches = new ArrayDeque<Block>();
     
+    public static double through = 0;
+    
     public static void showUI()
     {
         ui.showUI();
@@ -412,7 +414,7 @@ public class MyCtc {
             rows[count][4] = "";
             rows[count][5] = train.authority;
             rows[count][6] = train.setpoint_speed;
-            rows[count][7] = "";
+            rows[count][7] = train.passengers;
             
             count++;
         }
@@ -500,9 +502,53 @@ public class MyCtc {
             }
             else if(s.equalsIgnoreCase("Ticket"))
             {
+                String stat = stok.nextToken();
+                Block block = getStation(stat);
+                Train train = getTrain(block);
+                train.passengers += Integer.parseInt(stok.nextToken());
                 
+                updateTrains();
+                calcThroughput();
             }
         }
+    }
+    
+    private static Train getTrain(Block location)
+    {
+        Train train = null;
+        ArrayDeque<Train> temp = trains.clone();
+        
+        while(!temp.isEmpty())
+        {
+            train = temp.poll();
+            
+            if(train.getLoc().equals(location))
+            {
+                return train;
+            }
+        }
+        
+        return train;
+    }
+    
+    private static Block getStation(String name)
+    {
+        ArrayDeque<Block> temp = blueline.clone();
+        Block block;
+        
+        while(!temp.isEmpty())
+        {
+            block = temp.poll();
+            
+            if(block.hasStation)
+            {
+                if(block.station.equalsIgnoreCase(name))
+                    return block;
+            }
+        }
+        
+        return null;
+        
     }
     
     private static void updateAuth(Block sw)
@@ -594,7 +640,15 @@ public class MyCtc {
     
     private static void calcThroughput()
     {
+        ArrayDeque<Train> temp = trains.clone();
+        through = 0;
         
+        while(!temp.isEmpty())
+        {
+            through += temp.poll().passengers;
+        }
+        
+        ui.updateThroughput(through);
     }
     
     private static ArrayDeque<Block> explored;
