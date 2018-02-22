@@ -153,6 +153,9 @@ public class MyCtcUI extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(trackTable);
 
+        trackTable.getModel().addTableModelListener(trainTable);
+        trackTable.setRowHeight(30);
+        
         blockSelect.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
         blockSelect.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "A1", "A2", "A3", "A4", "A5", "A6", "A7", "YARD" }));
 
@@ -982,7 +985,7 @@ public class MyCtcUI extends javax.swing.JFrame {
             for(Object[] row: rows)
             {
                 for(int i = 0; i < trainTable.getRowCount(); i++)
-                if(trainTable.getValueAt(i, 1).equals(row[1]))
+                if(trainTable.getValueAt(i, 1) != null && trainTable.getValueAt(i, 1).equals(row[1]))
                 {
                     for(int j = 1; j < trainTable.getColumnCount(); j++)
                         trainTable.setValueAt(row[j], i, j);

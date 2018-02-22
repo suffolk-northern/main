@@ -217,6 +217,7 @@ public class MyCtc {
         train.setSpeed(speed);
         train.setAuth(auth);
         sendSpeedAuth(train,speed,auth);
+        updateTrains();
     }
     
     private static void printSwitchesOnRoute(ArrayDeque<SwitchAndPos> swpos)
