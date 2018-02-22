@@ -15,7 +15,7 @@ package train_model;
 public class PointHeat
 {
 	// Joule per celsius
-	private final double heatInertia = 1.0;
+	private final double heatInertia = 10.0;
 
 	private double temperature = 20.0;
 
