@@ -65,25 +65,6 @@ public class MyCtcUI extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        blockSelect = new javax.swing.JComboBox<>();
-        jTextField3 = new javax.swing.JTextField();
-        jLabel9 = new javax.swing.JLabel();
-        jLabel15 = new javax.swing.JLabel();
-        jLabel19 = new javax.swing.JLabel();
-        arrivalSelect = new javax.swing.JTextField();
-        jComboBox5 = new javax.swing.JComboBox<>();
-        speedSelect = new javax.swing.JTextField();
-        jLabel10 = new javax.swing.JLabel();
-        jRadioButton1 = new javax.swing.JRadioButton();
-        jComboBox2 = new javax.swing.JComboBox<>();
-        fixedBlock = new javax.swing.JRadioButton();
-        jTextField5 = new javax.swing.JTextField();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel17 = new javax.swing.JLabel();
-        MovingBlock = new javax.swing.JRadioButton();
-        jLabel8 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel18 = new javax.swing.JLabel();
         openTrack1 = new javax.swing.JRadioButton();
         closeTrack1 = new javax.swing.JRadioButton();
         jLabel7 = new javax.swing.JLabel();
@@ -92,15 +73,19 @@ public class MyCtcUI extends javax.swing.JFrame {
         jLabel16 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         trackTable = new javax.swing.JTable();
-        jLabel14 = new javax.swing.JLabel();
-        openTrack = new javax.swing.JRadioButton();
         jComboBox4 = new javax.swing.JComboBox<>();
+        blockSelect = new javax.swing.JComboBox<>();
+        jTextField3 = new javax.swing.JTextField();
+        jLabel9 = new javax.swing.JLabel();
+        jLabel15 = new javax.swing.JLabel();
+        jLabel19 = new javax.swing.JLabel();
+        jComboBox5 = new javax.swing.JComboBox<>();
+        speedSelect = new javax.swing.JTextField();
+        jLabel10 = new javax.swing.JLabel();
+        jRadioButton1 = new javax.swing.JRadioButton();
         jLabel11 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
         jRadioButton2 = new javax.swing.JRadioButton();
-        scheduleButton = new javax.swing.JButton();
         trainSelect = new javax.swing.JComboBox<>();
-        closeTrack = new javax.swing.JRadioButton();
         jLabel12 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         lineSelect = new javax.swing.JComboBox<>();
@@ -109,51 +94,21 @@ public class MyCtcUI extends javax.swing.JFrame {
         jLabel13 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         trainTable = new javax.swing.JTable();
+        jComboBox2 = new javax.swing.JComboBox<>();
+        fixedBlock = new javax.swing.JRadioButton();
+        jTextField5 = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel17 = new javax.swing.JLabel();
+        MovingBlock = new javax.swing.JRadioButton();
+        jLabel8 = new javax.swing.JLabel();
+        jLabel18 = new javax.swing.JLabel();
+        jLabel14 = new javax.swing.JLabel();
+        openTrack = new javax.swing.JRadioButton();
+        jLabel5 = new javax.swing.JLabel();
+        scheduleButton = new javax.swing.JButton();
+        closeTrack = new javax.swing.JRadioButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
-        blockSelect.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "YARD", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8" }));
-
-        jTextField3.setText("               ");
-
-        jLabel9.setText("Maintenance");
-
-        jLabel15.setText("Red Line");
-
-        jLabel19.setText("Multiplier");
-
-        arrivalSelect.setText("Enter Arrival Time");
-
-        jComboBox5.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "x1", "x2", "x4", "x10" }));
-
-        speedSelect.setText("Enter Suggested Speed");
-
-        jLabel10.setText("Throughput");
-
-        jRadioButton1.setText("Manual");
-
-        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Block Select", "Section A1", "Section A2" }));
-
-        fixedBlock.setText("Fixed Block");
-        fixedBlock.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                fixedBlockActionPerformed(evt);
-            }
-        });
-
-        jTextField5.setText("10:02");
-
-        jLabel3.setText("Block");
-
-        jLabel17.setText("passengers/hr");
-
-        MovingBlock.setText("Moving Block");
-
-        jLabel8.setText("Green Line");
-
-        jLabel4.setText("Arrival Time");
-
-        jLabel18.setText("passengers/hr");
 
         openTrack1.setText("Open Track");
 
@@ -174,67 +129,74 @@ public class MyCtcUI extends javax.swing.JFrame {
 
         trackTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {"Green", "A", "1", "", "", "No"},
-                {"Green", "A ", "2", "Broken", "", "No"},
-                {"Green", "A", "3", "", "RR Xing", "Yes"},
-                {"Red", "A ", "1", "", "", "No"},
-                {"Red", "A ", "2", null, null, "No"},
-                {"Red", "A", "3", null, null, "No"},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null}
+                {"", "", "", "", null, "", "", null},
+                {"", "", "", "", null, "", "", null},
+                {"", "", "", "", null, "", "", null},
+                {"", "", "", "", null, "", "", null},
+                {"", "", "", "", null, null, null, null},
+                {"", "", "", "", null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "Line", "Section", "Number", "Status", "Signals", "Occupancy"
+                "Line", "Section", "Number", "Occupancy", "Switch", "Signals", "Status", "RR Xing"
             }
         ));
         jScrollPane1.setViewportView(trackTable);
 
-        jLabel14.setFont(new java.awt.Font("Tahoma", 0, 40)); // NOI18N
-        jLabel14.setText("CTC");
-
-        openTrack.setText("Open Track");
-
         jComboBox4.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Block Select", "Section A1", "Section A2" }));
+
+        blockSelect.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "A1", "A2", "A3", "A4", "A5", "A6", "A7", "YARD" }));
+
+        jTextField3.setText("               ");
+
+        jLabel9.setText("Maintenance");
+
+        jLabel15.setText("Red Line");
+
+        jLabel19.setText("Multiplier");
+
+        jComboBox5.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "x1", "x2", "x4", "x10" }));
+
+        speedSelect.setText("Enter Suggested Speed");
+
+        jLabel10.setText("Throughput");
+
+        jRadioButton1.setText("Manual");
 
         jLabel11.setText("Clock");
 
-        jLabel5.setText("Suggested Speed");
-
         jRadioButton2.setText("Automatic");
 
-        scheduleButton.setText("Schedule");
-
         trainSelect.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2" }));
-
-        closeTrack.setText("Close Track");
 
         jLabel12.setText("Line");
 
         jLabel1.setText("Trains");
 
-        lineSelect.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Green", "Red", "Blue" }));
+        lineSelect.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Blue" }));
 
         jLabel2.setText("Track");
 
@@ -244,7 +206,7 @@ public class MyCtcUI extends javax.swing.JFrame {
 
         trainTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {"Green", "1", "A3", "B2", "13:00", "8000", "20", "42"},
+                {"", "", "", "", "", "", "", ""},
                 {null, null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null, null},
@@ -280,6 +242,38 @@ public class MyCtcUI extends javax.swing.JFrame {
             }
         ));
         jScrollPane2.setViewportView(trainTable);
+
+        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Block Select", "Section A1", "Section A2" }));
+
+        fixedBlock.setText("Fixed Block");
+        fixedBlock.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                fixedBlockActionPerformed(evt);
+            }
+        });
+
+        jTextField5.setText("10:02");
+
+        jLabel3.setText("Block");
+
+        jLabel17.setText("passengers/hr");
+
+        MovingBlock.setText("Moving Block");
+
+        jLabel8.setText("Green Line");
+
+        jLabel18.setText("passengers/hr");
+
+        jLabel14.setFont(new java.awt.Font("Tahoma", 0, 40)); // NOI18N
+        jLabel14.setText("CTC");
+
+        openTrack.setText("Open Track");
+
+        jLabel5.setText("Suggested Speed");
+
+        scheduleButton.setText("Schedule");
+
+        closeTrack.setText("Close Track");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -339,7 +333,6 @@ public class MyCtcUI extends javax.swing.JFrame {
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel3)
-                                    .addComponent(jLabel4)
                                     .addComponent(jLabel5)
                                     .addComponent(jLabel7)
                                     .addGroup(layout.createSequentialGroup()
@@ -348,10 +341,8 @@ public class MyCtcUI extends javax.swing.JFrame {
                                 .addGap(38, 38, 38)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(lineSelect, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                        .addComponent(speedSelect)
-                                        .addComponent(arrivalSelect)
-                                        .addComponent(blockSelect, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(speedSelect, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(blockSelect, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(trainSelect, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)))
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(165, 165, 165)
@@ -406,15 +397,11 @@ public class MyCtcUI extends javax.swing.JFrame {
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                     .addComponent(jLabel3)
                                     .addComponent(blockSelect, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(33, 33, 33)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jLabel4)
-                                    .addComponent(arrivalSelect, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(34, 34, 34)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                     .addComponent(jLabel5)
                                     .addComponent(speedSelect, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(57, 57, 57)
+                                .addGap(135, 135, 135)
                                 .addComponent(dispatchButton)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(scheduleButton)))
@@ -474,12 +461,15 @@ public class MyCtcUI extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_fixedBlockActionPerformed
 
+    
+    
     private void dispatchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dispatchButtonActionPerformed
         // TODO add your handling code here:
         String line = (String)lineSelect.getSelectedItem();
         String block = (String)blockSelect.getSelectedItem();
         String train = (String)trainSelect.getSelectedItem();
         double speed = Double.parseDouble(speedSelect.getText());
+        
         
         ctc.routeTrain(train, line.toLowerCase(), block, speed);
     }//GEN-LAST:event_dispatchButtonActionPerformed
@@ -531,7 +521,6 @@ public class MyCtcUI extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JRadioButton MovingBlock;
-    private javax.swing.JTextField arrivalSelect;
     private javax.swing.JComboBox<String> blockSelect;
     private javax.swing.JRadioButton closeTrack;
     private javax.swing.JRadioButton closeTrack1;
@@ -553,7 +542,6 @@ public class MyCtcUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;

@@ -224,6 +224,10 @@ public class MyCtc {
         Block block;
         
         ArrayDeque<SwitchAndPos> temp2 = swpos.clone();
+        
+        if(temp2.isEmpty())
+            System.out.println("none");
+        
         SwitchAndPos curr = null;
         int swID;
         Block f;
@@ -400,14 +404,25 @@ public class MyCtc {
         Block loc = train.getLoc();
         
         SwitchAndPos swpos = getSwitches(train.getRoute()).peek();
-        Block sw = swpos.getBlock();
-        Block from = swpos.getFrom();
-        Block to = swpos.getTo();
+        
+        Block sw = null;
+        Block from = null;
+        Block to = null;
+        
+        if(swpos != null)
+        {
+            sw = swpos.getBlock();
+            from = swpos.getFrom();
+            to = swpos.getTo();
+        }
         
         System.out.println("To Track Controller");
         System.out.println("Train "+train.getID()+" at location "+loc.display());
         System.out.println("Send speed = " + speed + ", authority = "+ auth);
-        System.out.println("Next switch position, in block: "+sw.display()+" from: "+from.display()+" to: "+to.display());
+        if(swpos != null)
+            System.out.println("Next switch position, in block: "+sw.display()+" from: "+from.display()+" to: "+to.display());
+        
+        System.out.println();
     }
     
     private static void setSwitch(Block swBlock, Block from, Block to)
@@ -520,8 +535,10 @@ public class MyCtc {
         
         do
         {
+            
             if(curr.hasSwitch())
             {
+                
                 if(curr.getSwitchFrom().contains(curr))
                 {
                     from = curr;
