@@ -21,6 +21,10 @@ public class Controller implements Updateable
 	private int doorCounter = 0;
 	private boolean doorState = false;
 
+	private final int HEATER_MOD = 100;
+	private int heaterCounter = 0;
+	private boolean heaterState = false;
+
 	// real implementation won't have this
 	private final Train train;
 	private static GlobalCoordinates origin =
@@ -95,5 +99,15 @@ public class Controller implements Updateable
 			link.closeDoor(DoorLocation.right);
 
 		doorCounter = (doorCounter + 1) % DOOR_MOD;
+
+		if (heaterCounter == 0)
+			heaterState = !heaterState;
+
+		if (heaterState)
+			link.heaterOn();
+		else
+			link.heaterOff();
+
+		heaterCounter = (heaterCounter + 1) % HEATER_MOD;
 	}
 }
