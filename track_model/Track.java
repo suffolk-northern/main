@@ -18,14 +18,14 @@ public class Track
 		int numBlocks = 8;
 		TrackBlock blocks[] = new TrackBlock[numBlocks]; 
 		GlobalCoordinates origin = new GlobalCoordinates(0, 0);
-		blocks[0] = new TrackBlock(1, origin, origin.addYards(50, 0), 4);
-		blocks[1] = new TrackBlock(2, origin.addYards(50, 0), origin.addYards(100, 0), 1);
-		blocks[2] = new TrackBlock(3, origin.addYards(100, 0), origin.addYards(150, 0), 2);
-		blocks[3] = new TrackBlock(4, origin.addYards(150, 0), origin.addYards(150, 50), 0);
-		blocks[4] = new TrackBlock(5, origin.addYards(150, 50), origin.addYards(100, 50), 3);
-		blocks[5] = new TrackBlock(6, origin.addYards(100, 50), origin.addYards(50, 50), 1);
-		blocks[6] = new TrackBlock(7, origin.addYards(50, 50), origin.addYards(50, 0), 0);
-		blocks[7] = new TrackBlock(8, origin.addYards(50, 50), origin.addYards(0, 50), 4);
+		blocks[0] = new TrackBlock(1, origin, origin.addYards(50, 0), 4, 30);
+		blocks[1] = new TrackBlock(2, origin.addYards(50, 0), origin.addYards(100, 0), 1, 30);
+		blocks[2] = new TrackBlock(3, origin.addYards(100, 0), origin.addYards(150, 0), 2, 30);
+		blocks[3] = new TrackBlock(4, origin.addYards(150, 0), origin.addYards(150, 50), 0, 10);
+		blocks[4] = new TrackBlock(5, origin.addYards(150, 50), origin.addYards(100, 50), 3, 30);
+		blocks[5] = new TrackBlock(6, origin.addYards(100, 50), origin.addYards(50, 50), 1, 30);
+		blocks[6] = new TrackBlock(7, origin.addYards(50, 50), origin.addYards(50, 0), 0, 10);
+		blocks[7] = new TrackBlock(8, origin.addYards(50, 50), origin.addYards(0, 50), 4, 30);
 
 		for (int i = 1; i < numBlocks-1; i++)
 		{

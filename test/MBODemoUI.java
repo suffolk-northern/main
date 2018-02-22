@@ -27,6 +27,7 @@ public class MBODemoUI extends JFrame
 	private JButton switch2;
 	private JLabel switch1Label;
 	private JLabel switch2Label;
+	private JLabel errorLabel;
 	
 	private int numTrains;
 	private String[] tableHeader;
@@ -54,6 +55,7 @@ public class MBODemoUI extends JFrame
 		switch2 = new JButton();
 		switch1Label = new JLabel();
 		switch2Label = new JLabel();
+		errorLabel = new JLabel();
 		
 		addTrainButton.setText("Add new train");
 		addTrainButton.setPreferredSize(new Dimension(200, 100));
@@ -90,11 +92,14 @@ public class MBODemoUI extends JFrame
 		switch1State = 0;
 		switch2State = 0;
 		
+		errorLabel.setText(" ");
+		
 		mainPanel.add(addTrainButton, BorderLayout.CENTER);
 		mainPanel.add(switch1, BorderLayout.CENTER);
 		mainPanel.add(switch2, BorderLayout.CENTER);
 		mainPanel.add(switch1Label, BorderLayout.CENTER);
 		mainPanel.add(switch2Label, BorderLayout.CENTER);
+		mainPanel.add(errorLabel, BorderLayout.PAGE_END);
 		
 		mainPanel.add(trainPanel);
 		trainPanel.setViewportView(trainTable);
@@ -192,6 +197,11 @@ public class MBODemoUI extends JFrame
 		model.setValueAt(String.format("%f", lat), numTrains, 1);
 		model.setValueAt(String.format("%f", lon), numTrains, 2);
 		numTrains += 1;
+	}
+	
+	public void setError(String errMessage)
+	{
+		errorLabel.setText(errMessage);
 	}
 		
 	public static void main(String args[]) {

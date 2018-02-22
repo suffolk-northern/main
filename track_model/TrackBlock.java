@@ -11,6 +11,7 @@ package track_model;
  */
 public class TrackBlock 
 {
+	private int speedLimit;
 	public int ID;
 	public GlobalCoordinates startPoint;
 	public GlobalCoordinates endPoint;
@@ -20,7 +21,7 @@ public class TrackBlock
 	TrackBlock prevBlock;
 	
 	public TrackBlock(int newID, GlobalCoordinates start, 
-		GlobalCoordinates end, int structure)
+		GlobalCoordinates end, int structure, int newSpeed)
 	{
 		startPoint = start;
 		endPoint = end;
@@ -28,6 +29,12 @@ public class TrackBlock
 		hasStructure = structure;
 		ID = newID;
 		length = startPoint.distanceTo(endPoint);
+		speedLimit = newSpeed;
+	}
+	
+	public int getSpeedLimit()
+	{
+		return speedLimit;
 	}
 	
 	public TrackBlock getNextBlock()

@@ -65,7 +65,11 @@ public class MBODemo
 			double newLat = ui.latChanged;
 			double newLon = ui.lonChanged;
 			GlobalCoordinates newLoc = origin.addYards(newLat, newLon);
-			mbo.changeTrainLocation(ui.trainChangedID, newLoc);
+			int error = mbo.changeTrainLocation(ui.trainChangedID, newLoc);
+			if (error == 1)
+				ui.setError("Not a valid train location, using old location");
+			else
+				ui.setError(" ");
 			ui.trainChangedID = -1;
 		}
 		
