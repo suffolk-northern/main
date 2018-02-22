@@ -494,7 +494,7 @@ public class MyCtc {
                     }
                     
                 }
-                
+                                
                 updateTrack();
             }
         }
@@ -1024,8 +1024,11 @@ public class MyCtc {
         
         private void setSwitchPos(Block currf, Block currt)
         {
-            sw_curr_from = currf;
-            sw_curr_to = currt;
+            if(sw_from.contains(currf) && sw_to.contains(currt))
+            {
+                sw_curr_from = currf;
+                sw_curr_to = currt;
+            }
         }
         
         private Block getNext()

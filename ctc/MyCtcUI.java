@@ -717,7 +717,7 @@ public class MyCtcUI extends javax.swing.JFrame {
                 {null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "Line", "Train ID", "Current Block", "Destination", "Deadline", "Authority (ft)", "Suggested Speed (mph)", "Passengers"
+                "Line", "Train ID", "Current Block", "Destination", "Deadline", "Authority (yd)", "Suggested Speed (mph)", "Passengers"
             }
         ) {
             boolean[] canEdit = new boolean [] {
@@ -1007,13 +1007,13 @@ public class MyCtcUI extends javax.swing.JFrame {
     {
         
         if(!trackTable.getValueAt(0,0).equals(""))
-            for(Object[] row: rows)
+            for(int k = 0; k < count; k++)
             {
                 for(int i = 0; i < trackTable.getRowCount(); i++)
-                if(trackTable.getValueAt(i, 1) != null && trackTable.getValueAt(i, 1).equals(row[1]))
+                if(trackTable.getValueAt(i, 1) != null && (trackTable.getValueAt(i, 1)).equals(rows[k][1]) && (trackTable.getValueAt(i, 2)).equals((rows[k][2])))
                 {
                     for(int j = 1; j < trackTable.getColumnCount(); j++)
-                        trackTable.setValueAt(row[j], i, j);
+                        trackTable.setValueAt(rows[k][j], i, j);
                 }
             }
         else
