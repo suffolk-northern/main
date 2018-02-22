@@ -36,7 +36,22 @@ public class MBODemo
 			FakeTrain testTrain= new FakeTrain(startPoint, 1);
 			TrackBlock startBlock = mbo.getDefaultBlock();
 			mbo.registerTrain(testTrain, startBlock);
+			ui.addTrain(testTrain);
 			ui.addedTrain = false;
 		}
+		
+		if (ui.switch1Flipped)
+		{
+			mbo.flipSwitch(0);
+			ui.switch1Flipped = false;
+		}
+		
+		if (ui.switch2Flipped)
+		{
+			mbo.flipSwitch(1);
+			ui.switch2Flipped = false;
+		}
+		
+		mbo.update();
 	}
 }

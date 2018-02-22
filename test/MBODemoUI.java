@@ -8,6 +8,7 @@ package test;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import javax.swing.table.TableModel;
 
 import mbo.FakeTrain;
 /**
@@ -29,6 +30,8 @@ public class MBODemoUI extends JFrame
 	private Object[][] tableContents;
 	
 	public boolean addedTrain;
+	public boolean switch1Flipped;
+	public boolean switch2Flipped;
 	
 	public MBODemoUI()
 	{
@@ -53,9 +56,24 @@ public class MBODemoUI extends JFrame
         });
 		
 		switch1.setText("Flip switch 1");
-		switch1.setPreferredSize(new Dimension(200, 100));		
+		switch1.setPreferredSize(new Dimension(200, 100));	
+		switch1.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent evt)
+			{
+				switch1Pressed(evt);
+			}
+		});
+		
 		switch2.setText("Flip switch 2");
 		switch2.setPreferredSize(new Dimension(200, 100));
+		switch1.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent evt)
+			{
+				switch2Pressed(evt);
+			}
+		});
 		
 		mainPanel.add(addTrainButton, BorderLayout.CENTER);
 		mainPanel.add(switch1, BorderLayout.CENTER);
@@ -72,20 +90,7 @@ public class MBODemoUI extends JFrame
 		   {null, null}, 
 		   {null, null}, 
 		};
-		table.TableModel newModel = table.DefaultTableModel(tableContents, tableHeader);
-		javax.swing.table.TableModel
-		
-		trainTable.setModel(new javax.swing.table.DefaultTableModel
-		(
-		   new Object [][] 
-			{
-			   {null, null}, 
-			   {null, null}, 
-			   {null, null}, 
-			   {null, null}, 
-			},
-		   new String [] {"Train ID", "Location"}
-		) 
+		trainTable.setModel(new javax.swing.table.DefaultTableModel(tableContents, tableHeader)
 		{
 		   boolean[] canEdit = new boolean[] {false, true};
 
@@ -106,9 +111,25 @@ public class MBODemoUI extends JFrame
 		addedTrain = true;
     }          
 	
+	private void switch1Pressed(ActionEvent evt)
+	{
+		switch1Flipped = true;
+	}
+	
+	private void switch2Pressed(ActionEvent evt)
+	{
+		switch2Flipped = true;
+	}
+	
 	public void addTrain(FakeTrain train)
 	{
-		trainTable.set
+		TableModel model = trainTable.getModel();
+		model.setValueAt(train.getID(), numTrains, 0);
+		double lat = train.location().latitude();
+		double lon = train.location().longitude();
+		String locString = String.format("%f, %f", lat, lon);
+		model.setValueAt(locString, numTrains, 1);
+		numTrains += 1;
 	}
 		
 	public static void main(String args[]) {

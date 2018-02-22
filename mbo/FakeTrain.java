@@ -6,6 +6,7 @@
 package mbo;
 
 import track_model.GlobalCoordinates;
+import mbo.MBO;
 
 /**
  *
@@ -19,6 +20,11 @@ public class FakeTrain {
 	{
 		location = newLocation;
 		trainID = newID;
+	}
+	
+	public void setLocation(GlobalCoordinates newLoc)
+	{
+		location = newLoc;
 	}
 	
 	public GlobalCoordinates location()

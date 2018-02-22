@@ -22,10 +22,18 @@ public class TrackSwitch
 		possibleStates[state][1].setPrevBlock(possibleStates[state][0]);
 	}
 	
-	public void setSwitch(int newState)
+	public void flipSwitch()
 	{
-		state = newState;
 		possibleStates[state][0].setNextBlock(possibleStates[state][1]);
 		possibleStates[state][1].setPrevBlock(possibleStates[state][0]);
+		if (state == 0)
+			state = 1;
+		if (state == 1)
+			state = 0;
+	}
+	
+	public TrackBlock[] getState()
+	{
+		return possibleStates[state];
 	}
 }

@@ -141,9 +141,9 @@ public class MBO implements Updateable
 		return authority;
 	}
 	
-	public void setSwitch(int switchID, int switchState)
+	public void flipSwitch(int switchID)
 	{
-		myTrack.sections[0].switches[switchID].setSwitch(switchState);
+		myTrack.sections[0].switches[switchID].flipSwitch();
 	}
 	
 	public TrackBlock getDefaultBlock()
