@@ -10,9 +10,11 @@ import track_model.GlobalCoordinates;
 import track_model.Orientation;
 import train_model.PointMass;
 import train_model.Pose;
+import train_model.communication.BeaconMessage;
 import train_model.communication.BeaconRadio;
 import train_model.communication.ControllerLink;
 import train_model.communication.MboRadio;
+import train_model.communication.MovementCommand;
 import train_model.communication.Relay;
 import train_model.communication.TrackCircuit;
 import updater.Updateable;
@@ -91,6 +93,24 @@ public class Train implements Updateable
 	public TrackCircuit trackCircuit()
 	{
 		return new TrackCircuit(relay);
+	}
+
+	// Returns the last received beacon message.
+	public BeaconMessage lastBeaconMessage()
+	{
+		return relay.lastBeaconMessage();
+	}
+
+	// Returns the last received MBO message.
+	public MovementCommand lastMboMessage()
+	{
+		return relay.lastMboMessage();
+	}
+
+	// Returns the last received track message.
+	public MovementCommand lastTrackMessage()
+	{
+		return relay.lastTrackMessage();
 	}
 
 	// Updates this object.

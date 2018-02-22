@@ -22,9 +22,14 @@ public class Relay
 	private final Train train;
 
 	// most recent incoming message from beacon, MBO, track circuit
-	private   BeaconMessage beaconMessage = null;
-	private MovementCommand    mboMessage = null;
-	private MovementCommand  trackMessage = null;
+	private   BeaconMessage beaconMessageLast = new BeaconMessage("none");
+	private MovementCommand    mboMessageLast = new MovementCommand(0, 0);
+	private MovementCommand  trackMessageLast = new MovementCommand(0, 0);
+
+	// like most recent, but set to null after read
+	private   BeaconMessage beaconMessageCached = null;
+	private MovementCommand    mboMessageCached = null;
+	private MovementCommand  trackMessageCached = null;
 
 	// Constructs a Relay associated that interacts with a Train.
 	public Relay(Train train)
@@ -35,19 +40,22 @@ public class Relay
 	// Triggers actions for a message received from a beacon.
 	public void onRXBeacon(BeaconMessage message)
 	{
-		beaconMessage = new BeaconMessage(message);
+		beaconMessageCached = new BeaconMessage(message);
+		beaconMessageLast   = new BeaconMessage(message);
 	}
 
 	// Triggers actions for a message received from the MBO.
 	public void onRXMbo(MovementCommand message)
 	{
-		mboMessage = new MovementCommand(message);
+		mboMessageCached = new MovementCommand(message);
+		mboMessageLast   = new MovementCommand(message);
 	}
 
 	// Triggers actions for a message received from the track circuit.
 	public void onRXTrack(MovementCommand message)
 	{
-		trackMessage = new MovementCommand(message);
+		trackMessageCached = new MovementCommand(message);
+		trackMessageLast   = new MovementCommand(message);
 	}
 
 	// Returns the current location as should be reported to MBO.
@@ -64,8 +72,8 @@ public class Relay
 	// that message. Else returns null.
 	public BeaconMessage beaconMessage()
 	{
-		BeaconMessage value = beaconMessage;
-		beaconMessage = null;
+		BeaconMessage value = beaconMessageCached;
+		beaconMessageCached = null;
 		return value;
 	}
 
@@ -73,8 +81,8 @@ public class Relay
 	// message. Else returns null.
 	public MovementCommand mboMessage()
 	{
-		MovementCommand value = mboMessage;
-		mboMessage = null;
+		MovementCommand value = mboMessageCached;
+		mboMessageCached = null;
 		return value;
 	}
 
@@ -82,8 +90,26 @@ public class Relay
 	// returns that message. Else returns null.
 	public MovementCommand trackMessage()
 	{
-		MovementCommand value = trackMessage;
-		trackMessage = null;
+		MovementCommand value = trackMessageCached;
+		trackMessageCached = null;
 		return value;
+	}
+
+	// Returns the last received beacon message.
+	public BeaconMessage lastBeaconMessage()
+	{
+		return new BeaconMessage(beaconMessageLast);
+	}
+
+	// Returns the last received MBO message.
+	public MovementCommand lastMboMessage()
+	{
+		return new MovementCommand(mboMessageLast);
+	}
+
+	// Returns the last received track message.
+	public MovementCommand lastTrackMessage()
+	{
+		return new MovementCommand(trackMessageLast);
 	}
 }
