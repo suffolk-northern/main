@@ -11,6 +11,7 @@ package myctc;
  */
 
 import java.util.ArrayDeque;
+import java.util.StringTokenizer;
 
 /**
  *
@@ -18,12 +19,17 @@ import java.util.ArrayDeque;
  */
 public class MyCtc {
     
+    public static final int TRAINCOLS = 8;
+    public static final int TRACKCOLS = 9;
+    
     public static MyCtc ctc;
     public static MyCtcUI ui;
     
     public static ArrayDeque<Train> trains = new ArrayDeque<Train>();
     public static ArrayDeque<Block> blueline = new ArrayDeque<Block>();
     public static ArrayDeque<Block> switches = new ArrayDeque<Block>();
+    
+    public static double through = 0;
     
     public static void showUI()
     {
@@ -214,6 +220,7 @@ public class MyCtc {
         train.setSpeed(speed);
         train.setAuth(auth);
         sendSpeedAuth(train,speed,auth);
+        updateTrains();
     }
     
     private static void printSwitchesOnRoute(ArrayDeque<SwitchAndPos> swpos)
@@ -223,6 +230,10 @@ public class MyCtc {
         Block block;
         
         ArrayDeque<SwitchAndPos> temp2 = swpos.clone();
+        
+        if(temp2.isEmpty())
+            System.out.println("none");
+        
         SwitchAndPos curr = null;
         int swID;
         Block f;
@@ -298,7 +309,10 @@ public class MyCtc {
             // check switches are in correct position
             else if(block.hasSwitch())
                 if(isForwardSwitch(block) && temp.peek() != null && (!block.getSwitchCurrTo().equals(temp.peek())))
+                {
+                    auth += block.getLength();
                     return auth;
+                }
                 else if(isBackwardSwitch(block) && prev != null && !block.getSwitchCurrFrom().equals(prev))
                     return auth;
                 else
@@ -324,24 +338,249 @@ public class MyCtc {
         return null;
     }
     
+    private static String toCap(String str)
+    {
+        return str.substring(0,1).toUpperCase() + str.substring(1);
+    }
+    
     private static void updateTrack()
     {
         // for all track block in blue line
+        Object[][] rows = new Object[blueline.size()][TRACKCOLS];
+        
         ArrayDeque<Block> temp = blueline.clone();
-        Block bl;
-        String str = "";
+        Block block;
+        int count = 0;
         
         while(!temp.isEmpty())
         {
-            bl = temp.poll();
-            str += bl.display();
+            block = temp.poll();
             
+            if(block.section == '\0' && block.num == 0)
+                block = temp.poll();
+            
+            rows[count][0] = toCap(block.line);
+            rows[count][1] = block.section;
+            rows[count][2] = block.num;
+            rows[count][3] = toCap(String.valueOf(block.occupied));
+            
+            if(!block.hasSwitch())
+                rows[count][4] = "";
+            else
+            {
+                rows[count][4] = ""+block.sw_curr_from.section+block.sw_curr_from.num+", "+block.sw_curr_to.section+block.sw_curr_to.num; 
+            }
+            
+            rows[count][5] = "";
+            rows[count][6] = "";
+            
+            if(!block.rrxing)
+                rows[count][7] = "";
+            else
+                rows[count][7] = toCap(String.valueOf(block.rrxing_status));
+            
+            rows[count][8] = "";
+            if(block.hasStation)
+                rows[count][8] = toCap(block.station);
+            
+            count++;
         }
+        
+        ui.updateTrackTable(rows,blueline.size());
+    }
+    
+    private static void updateTrack(Block block)
+    {
+        
     }
     
     private static void updateTrains()
     {
         // for all trains in trains
+        Object[][] rows = new Object[trains.size()][TRAINCOLS];
+        
+        Train train;
+        ArrayDeque<Train> temp = trains.clone();
+        int count = 0;
+        
+        while(!temp.isEmpty())
+        {
+            train = temp.poll();
+            
+            rows[count][0] = toCap(train.location.line);
+            rows[count][1] = train.ID;
+            rows[count][2] = "" + train.location.section + train.location.num;
+            if(rows[count][2].equals(""+'\0'+0))
+                rows[count][2] = "YARD";
+            
+            if(train.route == null)
+                rows[count][3] = "";
+            else
+                rows[count][3] = "" + train.route.getLast().section + train.route.getLast().num;
+            
+            if(rows[count][3].equals(""+'\0'+0))
+                rows[count][3] = "YARD";
+            
+            rows[count][4] = "";
+            rows[count][5] = train.authority;
+            rows[count][6] = train.setpoint_speed;
+            rows[count][7] = train.passengers;
+            
+            count++;
+            
+        }
+        
+        ui.updateTrainTable(rows,trains.size());
+        
+    }
+    
+    private static void updateTrain(int ID)
+    {
+        
+    }
+    
+    protected void readIn(String str)
+    {
+        StringTokenizer stok = new StringTokenizer(str," ");
+        String s = stok.nextToken();
+        
+        
+        if(s.equalsIgnoreCase("MBO"))
+        {
+            tellMBOSwitches();
+        }
+        else if((s+" "+stok.nextToken()).equalsIgnoreCase("Track Controller"))
+        {
+            
+            s = stok.nextToken();
+            if(s.equalsIgnoreCase("Train"))
+            {
+                Train train;
+                int tid = Integer.parseInt(stok.nextToken());
+                train = getTrain(tid);
+                String line = stok.nextToken();
+                char section = stok.nextToken().charAt(0);
+                int number = Integer.parseInt(stok.nextToken());
+                Block block = getBlock(line,section,number);
+                train.setLoc(block);
+                updateTrains();
+            }
+            else if(s.equalsIgnoreCase("Block"))
+            {
+                String line = stok.nextToken();
+                char section = stok.nextToken().charAt(0);
+                int number = Integer.parseInt(stok.nextToken());
+                Block block = getBlock(line,section,number);
+                Block from;
+                Block to;
+                
+                while(stok.hasMoreTokens())
+                {
+                    s = stok.nextToken();
+                    
+                    if(s.equalsIgnoreCase("Occupancy"))
+                    {
+                        block.setOccupied(Boolean.parseBoolean(stok.nextToken()));
+                        updateAuth(block);
+                    }
+                    else if(s.equalsIgnoreCase("Switch"))
+                    {
+                        line = stok.nextToken();
+                        section = stok.nextToken().charAt(0);
+                        number = Integer.parseInt(stok.nextToken());
+                        from = getBlock(line,section,number);
+                        
+                        line = stok.nextToken();
+                        section = stok.nextToken().charAt(0);
+                        number = Integer.parseInt(stok.nextToken());
+                        to = getBlock(line,section,number);
+                        
+                        block.setSwitchPos(from, to);
+                        updateAuth(block);
+                        
+                    }
+                    else if(s.equalsIgnoreCase("RRXing"))
+                    {
+                        block.rrxing_status = (Boolean.parseBoolean(stok.nextToken()));
+                    }
+                    else if(s.equalsIgnoreCase("Status"))
+                    {
+                        
+                    }
+                    
+                }
+                                
+                updateTrack();
+            }
+            else if(s.equalsIgnoreCase("Ticket"))
+            {
+                String stat = stok.nextToken();
+                Block block = getStation(stat);
+                Train train = getTrain(block);
+                train.passengers += Integer.parseInt(stok.nextToken());
+                
+                updateTrains();
+                calcThroughput();
+            }
+        }
+    }
+    
+    private static Train getTrain(Block location)
+    {
+        Train train = null;
+        ArrayDeque<Train> temp = trains.clone();
+        
+        while(!temp.isEmpty())
+        {
+            train = temp.poll();
+            
+            if(train.getLoc().equals(location))
+            {
+                return train;
+            }
+        }
+        
+        return train;
+    }
+    
+    private static Block getStation(String name)
+    {
+        ArrayDeque<Block> temp = blueline.clone();
+        Block block;
+        
+        while(!temp.isEmpty())
+        {
+            block = temp.poll();
+            
+            if(block.hasStation)
+            {
+                if(block.station.equalsIgnoreCase(name))
+                    return block;
+            }
+        }
+        
+        return null;
+        
+    }
+    
+    private static void updateAuth(Block bl)
+    {
+        ArrayDeque<Train> temp = trains.clone();
+        
+        Train train;
+        
+        while(!temp.isEmpty())
+        {
+            train = temp.poll();
+
+            if(train.getRoute() != null && train.getRoute().contains(bl))
+            {
+                train.setAuth(calcAuth(train.getRoute(),train.getLoc(),train.getRoute().peekLast()));
+                sendSpeedAuth(train,train.setpoint_speed,train.authority);
+            }
+        }
+        
+        updateTrains();
     }
     
     protected void tellMBOSwitches()
@@ -374,14 +613,25 @@ public class MyCtc {
         Block loc = train.getLoc();
         
         SwitchAndPos swpos = getSwitches(train.getRoute()).peek();
-        Block sw = swpos.getBlock();
-        Block from = swpos.getFrom();
-        Block to = swpos.getTo();
+        
+        Block sw = null;
+        Block from = null;
+        Block to = null;
+        
+        if(swpos != null)
+        {
+            sw = swpos.getBlock();
+            from = swpos.getFrom();
+            to = swpos.getTo();
+        }
         
         System.out.println("To Track Controller");
         System.out.println("Train "+train.getID()+" at location "+loc.display());
         System.out.println("Send speed = " + speed + ", authority = "+ auth);
-        System.out.println("Next switch position, in block: "+sw.display()+" from: "+from.display()+" to: "+to.display());
+        if(swpos != null)
+            System.out.println("Next switch position, in block: "+sw.display()+" from: "+from.display()+" to: "+to.display());
+        
+        System.out.println();
     }
     
     private static void setSwitch(Block swBlock, Block from, Block to)
@@ -403,7 +653,15 @@ public class MyCtc {
     
     private static void calcThroughput()
     {
+        ArrayDeque<Train> temp = trains.clone();
+        through = 0;
         
+        while(!temp.isEmpty())
+        {
+            through += temp.poll().passengers;
+        }
+        
+        ui.updateThroughput(through);
     }
     
     private static ArrayDeque<Block> explored;
@@ -442,11 +700,14 @@ public class MyCtc {
     {        
         route.add(start);
         //explored.add(start);
+
         
         if(route.size() > blueline.size())
+        {
             return;
+        }
         
-        if(start.display().equals(dest.display()))
+        if(start.equals(dest))
         {
             routes.add(route);
             return;
@@ -457,7 +718,7 @@ public class MyCtc {
         
         if(block.hasSwitch() && isForwardSwitch(block))
         {
-            neighbors = block.getSwitchTo();
+            neighbors = block.getSwitchTo().clone();
         }
         else
         {
@@ -494,8 +755,10 @@ public class MyCtc {
         
         do
         {
+            
             if(curr.hasSwitch())
             {
+                
                 if(curr.getSwitchFrom().contains(curr))
                 {
                     from = curr;
@@ -565,16 +828,16 @@ public class MyCtc {
         }
     }
     
-    private static class Train
+    protected static class Train
     {
-        private int ID;
-        private Block location;
-        private double authority;
-        private double setpoint_speed;
-        private ArrayDeque<Block> route;
-        private Block dest;
-        private double deadline;
-        private int passengers;
+        protected int ID;
+        protected Block location;
+        protected double authority;
+        protected double setpoint_speed;
+        protected ArrayDeque<Block> route;
+        protected Block dest;
+        protected double deadline;
+        protected int passengers;
         
         public Train()
         {
@@ -855,8 +1118,12 @@ public class MyCtc {
         
         private void setSwitchPos(Block currf, Block currt)
         {
-            sw_curr_from = currf;
-            sw_curr_to = currt;
+            if(sw_from.contains(currf) && sw_to.contains(currt))
+            {
+                sw_curr_from = currf;
+                sw_curr_to = currt;
+            }
+            
         }
         
         private Block getNext()

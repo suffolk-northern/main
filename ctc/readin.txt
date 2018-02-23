@@ -1,0 +1,10 @@
+Track Controller Block blue A 2 Switch blue A 7 blue A 2
+Track Controller Block blue A 2 Switch blue A 1 blue A 2
+
+MBO
+
+Track Controller Train 1 blue A 3
+Track Controller Block blue A 3 Occupancy true
+Track Controller Ticket Cathy 20
+
+Track Controller Block blue A 5 RRXing true
