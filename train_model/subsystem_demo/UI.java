@@ -16,7 +16,8 @@ import java.util.Observer;
 import train_model.DoorLocation;
 import train_model.Train;
 import train_model.communication.BeaconMessage;
-import train_model.communication.MovementCommand;
+import train_model.communication.MboMovementCommand;
+import train_model.communication.TrackMovementCommand;
 
 /**
  *
@@ -67,8 +68,8 @@ public class UI
 
         BeaconMessage beaconMessage = train.lastBeaconMessage();
 
-        MovementCommand trackMessage = train.lastTrackMessage();
-        MovementCommand mboMessage   = train.lastMboMessage();
+        TrackMovementCommand trackMessage = train.lastTrackMessage();
+	  MboMovementCommand   mboMessage = train.lastMboMessage();
 
         controlPower.setText(String.format("%.0f u hp", power));
         controlSBrake.setText(String.format("%.0f m lb", sBrake));
@@ -98,7 +99,14 @@ public class UI
         beaconRxString.setText("\"" + beaconMessage.string + "\"");
 
         trackRxSpeed.setText(String.format("%d mph", trackMessage.speed));
-        trackRxAuthority.setText(String.format("%d block", trackMessage.authority));
+        trackRxAuthority.setText(
+		String.format(
+			"%2x / %2x / %2x",
+			boolArrayToInt(trackMessage.commonAuthority.blocks),
+			boolArrayToInt(trackMessage.  leftAuthority.blocks),
+			boolArrayToInt(trackMessage. rightAuthority.blocks)
+		)
+	);
 
         // TODO: use real interface for this
         mboTxLatitude.setText(String.format(
@@ -122,6 +130,17 @@ public class UI
     private static double cToF(double c)
     {
         return 9.0 / 5.0 * c + 32.0;
+    }
+
+    // boolean array to integer
+    private static int boolArrayToInt(boolean[] array)
+    {
+	    int result = 0;
+
+	    for (int i = 0; i < array.length; ++i)
+		    result |= (array[i] ? 1 : 0) << i;
+
+	    return result;
     }
 
     /**

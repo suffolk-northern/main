@@ -6,7 +6,7 @@
 
 package train_model.communication;
 
-import train_model.communication.MovementCommand;
+import train_model.communication.TrackMovementCommand;
 import train_model.communication.Relay;
 
 // Train-Track communication simulation
@@ -28,7 +28,7 @@ public class TrackCircuit
 	}
 
 	// Sends a message to the associated train.
-	public void send(MovementCommand message)
+	public void send(TrackMovementCommand message)
 	{
 		relay.onRXTrack(message);
 	}

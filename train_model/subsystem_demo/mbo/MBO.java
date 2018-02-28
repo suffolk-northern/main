@@ -9,7 +9,7 @@ package train_model.subsystem_demo.mbo;
 import java.util.ArrayList;
 
 import train_model.communication.MboRadio;
-import train_model.communication.MovementCommand;
+import train_model.communication.MboMovementCommand;
 import updater.Updateable;
 
 public class MBO implements Updateable
@@ -24,7 +24,7 @@ public class MBO implements Updateable
 	public void update()
 	{
 		for (MboRadio radio : radios) {
-			radio.send(new MovementCommand(
+			radio.send(new MboMovementCommand(
 				commandState ? 35 : 25,
 				50
 			));
