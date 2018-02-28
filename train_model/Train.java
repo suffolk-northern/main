@@ -17,9 +17,10 @@ import train_model.communication.BeaconMessage;
 import train_model.communication.BeaconRadio;
 import train_model.communication.ControllerLink;
 import train_model.communication.MboRadio;
-import train_model.communication.MovementCommand;
+import train_model.communication.MboMovementCommand;
 import train_model.communication.Relay;
 import train_model.communication.TrackCircuit;
+import train_model.communication.TrackMovementCommand;
 import updater.Updateable;
 
 // Physical simulation of a train vehicle
@@ -121,13 +122,13 @@ public class Train
 	}
 
 	// Returns the last received MBO message.
-	public MovementCommand lastMboMessage()
+	public MboMovementCommand lastMboMessage()
 	{
 		return relay.lastMboMessage();
 	}
 
 	// Returns the last received track message.
-	public MovementCommand lastTrackMessage()
+	public TrackMovementCommand lastTrackMessage()
 	{
 		return relay.lastTrackMessage();
 	}

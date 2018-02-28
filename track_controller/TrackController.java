@@ -14,7 +14,7 @@ import track_controller.communication.ControllerLink;
 import track_controller.communication.CtcLink;
 import track_controller.communication.Program;
 import track_controller.communication.Speed;
-import train_model.communication.MovementCommand;
+import train_model.communication.TrackMovementCommand;
 import updater.Updateable;
 
 // A configurable (programmable logic) track controller box which controls
@@ -243,7 +243,7 @@ public class TrackController implements Updateable
 		//
 		// Check occupancy from track model.
 		//
-		// Send MovementCommands to track blocks.
+		// Send TrackMovementCommands to track blocks.
 		//
 		// Flip switches.
 	}
