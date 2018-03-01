@@ -213,10 +213,10 @@ public class TestFrame extends javax.swing.JFrame {
         String message = JOptionPane.showInputDialog(this, "Set beacon message for " + jComboBox2.getSelectedItem().toString() + ".");
         if (message != null) {
 
-        String line = jComboBox2.getSelectedItem().toString().split(",")[0];
-        line = line.substring(line.lastIndexOf(" "), line.length()).trim();
-        String block = jComboBox2.getSelectedItem().toString().split(",")[1];
-        block = block.substring(block.lastIndexOf(" "), block.length() - 1).trim();
+            String line = jComboBox2.getSelectedItem().toString().split(",")[0];
+            line = line.substring(line.lastIndexOf(" "), line.length()).trim();
+            String block = jComboBox2.getSelectedItem().toString().split(",")[1];
+            block = block.substring(block.lastIndexOf(" "), block.length() - 1).trim();
 
             for (int i = 0; i < tmf.jTable6.getRowCount(); i++) {
                 if (tmf.jTable6.getValueAt(i, 2).toString().equalsIgnoreCase(block) && tmf.jTable1.getValueAt(i, 0).toString().equalsIgnoreCase(line)) {
@@ -259,24 +259,7 @@ public class TestFrame extends javax.swing.JFrame {
         String block = jComboBox1.getSelectedItem().toString().split(",")[2];
         block = block.substring(block.lastIndexOf(" "), block.length()).trim();
 
-        for (int i = 0; i < tmf.jTable1.getRowCount(); i++) {
-            if (tmf.jTable1.getValueAt(i, 2).toString().equalsIgnoreCase(block) && tmf.jTable1.getValueAt(i, 0).toString().equalsIgnoreCase(line)) {
-                JOptionPane.showMessageDialog(tmf,
-                        "Line: " + tmf.jTable1.getValueAt(i, 0) + "\n"
-                        + "Section: " + tmf.jTable1.getValueAt(i, 1) + "\n"
-                        + "Block: " + tmf.jTable1.getValueAt(i, 2) + "\n"
-                        + "Length: " + tmf.jTable1.getValueAt(i, 3) + "\n"
-                        + "Grade: " + tmf.jTable1.getValueAt(i, 4) + "\n"
-                        + "Speed Limit: " + tmf.jTable1.getValueAt(i, 6) + "\n"
-                        + "Underground: " + tmf.jTable1.getValueAt(i, 7) + "\n"
-                        + "Power Status: " + tmf.jTable1.getValueAt(i, 8) + "\n"
-                        + "Occupied: " + tmf.jTable1.getValueAt(i, 9) + "\n"
-                        + "Heater Status: " + tmf.jTable1.getValueAt(i, 10) + "\n"
-                        + "Message: " + tmf.jTable1.getValueAt(i, 11) + "\n\n"
-                        + "Connected Blocks: "
-                );
-            }
-        }
+        JOptionPane.showMessageDialog(tmf, TrackModel.getBlock(line, Integer.parseInt(block)).toString());
         tmf.scanOccupiedBlocks();
     }
 

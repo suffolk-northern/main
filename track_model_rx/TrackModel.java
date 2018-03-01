@@ -28,11 +28,12 @@ public class TrackModel {
         tmf.setLocationRelativeTo(null);
         tmf.setVisible(true);
         if (doTablesExist()) {
-            TestFrame tf = new TestFrame(tmf);
-            tf.setVisible(true);
+//            TestFrame tf = new TestFrame(tmf);
+//            tf.setVisible(true);
         }
 //        for (int i = 1; i < 2; i++) {
-//            getBlock("Green", 2);
+//            TrackBlock tb = getBlock("Green", 2);
+//            System.out.println(tb.toString());
 //            System.out.println("-------------------");
 //        }
 //        for (int i = 1; i < 77; i++) {
@@ -70,6 +71,9 @@ public class TrackModel {
     }
 
     public static TrackBlock getBlock(String line, int block) {
+        if (!doTablesExist()) {
+            return null;
+        }
         TrackBlock tb = null;
         try {
             Connection conn = DriverManager.getConnection("jdbc:sqlite:test.db");
@@ -90,14 +94,14 @@ public class TrackModel {
                 tb.setIsPowerOn(rs.getBoolean(10));
                 tb.setIsOccupied(rs.getBoolean(11));
                 tb.setIsHeaterOn(rs.getBoolean(12));
-                
+
                 rs = stat.executeQuery("SELECT * FROM SWITCHES " + "WHERE LINE='" + line + "' AND ID=" + block + ";");
                 tb.setIsSwitch(rs.next());
                 rs = stat.executeQuery("SELECT * FROM CROSSINGS " + "WHERE LINE='" + line + "' AND ID=" + block + ";");
                 tb.setIsCrossing(rs.next());
                 rs = stat.executeQuery("SELECT * FROM STATIONS " + "WHERE LINE='" + line + "' AND ID=" + block + ";");
                 tb.setIsStation(rs.next());
-                
+
                 getConnections(line, block);
             } else {
                 System.out.println("Invalid block.");
@@ -109,6 +113,9 @@ public class TrackModel {
         return tb;
     }
 
+    /*
+    * FOR EXPERIMENTAL PURPOSES AT THE MOMENT
+     */
     public static String getConnections(String line, int block) {
         try {
             Connection conn = DriverManager.getConnection("jdbc:sqlite:test.db");

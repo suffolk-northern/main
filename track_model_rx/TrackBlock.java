@@ -162,4 +162,17 @@ public class TrackBlock {
     public void setIsOccupied(boolean isOccupied) {
         this.isOccupied = isOccupied;
     }
+
+    @Override
+    public String toString() {
+        return "Hi, I'm Block " + block + " of the " + line + " Line, Section " + section + ".\n"
+                + "\tLength: " + length + "\n"
+                + "\tCurvature: " + curvature + "\n"
+                + "\tGrade: " + grade + "\n"
+                + "\tDirection: " + direction + "\n"
+                + "\tUnderground: " + isUnderground + "\n"
+                + "\tPower: " + isPowerOn + "\n"
+                + "\tOccupied: " + isOccupied + "\n"
+                + "\tHeater: " + isHeaterOn;
+    }
 }
