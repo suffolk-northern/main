@@ -145,7 +145,7 @@ public class MurphFrame extends javax.swing.JFrame {
 
             ResultSet rs = stat.executeQuery("SELECT * FROM BLOCKS;");
             while (rs.next()) {
-                blockList.add("Line: " + rs.getString(2) + ", Section: " + rs.getString(3) + ", Block: " + rs.getInt(1));
+                blockList.add("Line: " + rs.getString(1) + ", Section: " + rs.getString(2) + ", Block: " + rs.getInt(3));
             }
             jComboBox1.setModel(new DefaultComboBoxModel(blockList.toArray()));
             conn.close();

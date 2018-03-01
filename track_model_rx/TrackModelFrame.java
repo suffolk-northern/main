@@ -315,9 +315,9 @@ public class TrackModelFrame extends javax.swing.JFrame {
             stat.executeUpdate("DROP TABLE IF EXISTS STATIONS;");
 
             stat.executeUpdate("CREATE TABLE BLOCKS (\n"
-                    + "	id integer,\n"
                     + "	line text NOT NULL,\n"
                     + "	section varchar(1) NOT NULL,\n"
+                    + "	block integer,\n"
                     + "	length float,\n"
                     + " curvature float,\n"
                     + "	grade float,\n"
@@ -328,12 +328,12 @@ public class TrackModelFrame extends javax.swing.JFrame {
                     + "	occupied boolean,\n"
                     + "	heater boolean,\n"
                     + " message varchar(128),\n"
-                    + " PRIMARY KEY (line, id)\n"
+                    + " PRIMARY KEY (line, block)\n"
                     + ");");
             stat.executeUpdate("CREATE TABLE SWITCHES (\n"
-                    + "	id integer,\n"
                     + "	line text NOT NULL,\n"
                     + "	section varchar(1) NOT NULL,\n"
+                    + "	block integer,\n"
                     + "	section_out_a varchar(1),\n"
                     + "	block_out_a integer,\n"
                     + "	direction_out_a integer,\n"
@@ -341,25 +341,25 @@ public class TrackModelFrame extends javax.swing.JFrame {
                     + "	block_out_b integer,\n"
                     + "	direction_out_b varchar(1),\n"
                     + " current_setting text,\n"
-                    + " PRIMARY KEY (line, id)\n"
+                    + " PRIMARY KEY (line, block)\n"
                     + ");");
             stat.executeUpdate("CREATE TABLE CROSSINGS (\n"
-                    + "	id integer,\n"
                     + "	line text NOT NULL,\n"
                     + "	section varchar(1) NOT NULL,\n"
+                    + "	block integer,\n"
                     + "	length float,\n"
                     + "	occupied boolean,\n"
                     + "	signal boolean,\n"
-                    + " PRIMARY KEY (line, id)\n"
+                    + " PRIMARY KEY (line, block)\n"
                     + ");");
             stat.executeUpdate("CREATE TABLE STATIONS (\n"
-                    + "	id integer,\n"
                     + "	line text NOT NULL,\n"
                     + "	section varchar(1) NOT NULL,\n"
+                    + "	block integer,\n"
                     + "	name text,\n"
                     + "	passengers integer,\n"
                     + " message varchar(128),\n"
-                    + " PRIMARY KEY (line, id)\n"
+                    + " PRIMARY KEY (line, block)\n"
                     + ");");
             conn.close();
         } catch (Exception e) {
@@ -387,9 +387,9 @@ public class TrackModelFrame extends javax.swing.JFrame {
                     continue;
                 }
                 List<String> items = Arrays.asList(line.split(","));
-                blockStmt.setInt(1, Integer.parseInt(items.get(2)));
-                blockStmt.setString(2, items.get(0));
-                blockStmt.setString(3, items.get(1));
+                blockStmt.setString(1, items.get(0));
+                blockStmt.setString(2, items.get(1));
+                blockStmt.setInt(3, Integer.parseInt(items.get(2)));
                 blockStmt.setFloat(4, Float.parseFloat(items.get(3)));
                 blockStmt.setFloat(5, Float.parseFloat(items.get(4)));
                 blockStmt.setFloat(6, Float.parseFloat(items.get(5)));
@@ -402,9 +402,9 @@ public class TrackModelFrame extends javax.swing.JFrame {
                 blockStmt.setString(13, "");
                 blockStmt.addBatch();
                 if (line.contains("SWITCH")) {
-                    switchStmt.setInt(1, Integer.parseInt(items.get(2)));
-                    switchStmt.setString(2, items.get(0));
-                    switchStmt.setString(3, items.get(1));
+                    switchStmt.setString(1, items.get(0));
+                    switchStmt.setString(2, items.get(1));
+                    switchStmt.setInt(3, Integer.parseInt(items.get(2)));
                     switchStmt.setString(4, items.get(11));
                     switchStmt.setInt(5, Integer.parseInt(items.get(12)));
                     switchStmt.setInt(6, Integer.parseInt(items.get(13)));
@@ -414,19 +414,19 @@ public class TrackModelFrame extends javax.swing.JFrame {
                     switchStmt.addBatch();
                 }
                 if (line.contains("CROSSING")) {
-                    crossingStmt.setInt(1, Integer.parseInt(items.get(2)));
-                    crossingStmt.setString(2, items.get(0));
-                    crossingStmt.setString(3, items.get(1));
+                    crossingStmt.setString(1, items.get(0));
+                    crossingStmt.setString(2, items.get(1));
+                    crossingStmt.setInt(3, Integer.parseInt(items.get(2)));
                     crossingStmt.setFloat(4, Float.parseFloat(items.get(3)));
                     crossingStmt.setBoolean(5, false);
                     crossingStmt.setBoolean(6, false);
                     crossingStmt.addBatch();
                 }
                 if (line.contains("STATION")) {
-                    List<String> swag = Arrays.asList(items.get(7).split(";"));
-                    stationStmt.setInt(1, Integer.parseInt(items.get(2)));
-                    stationStmt.setString(2, items.get(0));
-                    stationStmt.setString(3, items.get(1));
+                    List<String> swag = Arrays.asList(items.get(8).split(";"));
+                    stationStmt.setString(1, items.get(0));
+                    stationStmt.setString(2, items.get(1));
+                    stationStmt.setInt(3, Integer.parseInt(items.get(2)));
                     stationStmt.setString(4, swag.size() > 1 ? swag.get(1).trim() : "");
                     stationStmt.setInt(5, rand.nextInt(20) + 1);
                     stationStmt.setString(6, "");
@@ -485,26 +485,26 @@ public class TrackModelFrame extends javax.swing.JFrame {
 
             ResultSet rs = stat.executeQuery("SELECT * FROM BLOCKS;");
             while (rs.next()) {
-                Object rowData[] = {rs.getString(2), rs.getString(3), rs.getInt(1), rs.getFloat(4), rs.getFloat(5), rs.getFloat(6), rs.getInt(7), rs.getInt(8), rs.getBoolean(9), rs.getBoolean(10),
+                Object rowData[] = {rs.getString(1), rs.getString(2), rs.getInt(3), rs.getFloat(4), rs.getFloat(5), rs.getFloat(6), rs.getInt(7), rs.getInt(8), rs.getBoolean(9), rs.getBoolean(10),
                     (boolean) rs.getBoolean(11), (boolean) rs.getBoolean(12) ? "ON" : "OFF", rs.getString(13)};
                 model.addRow(rowData);
             }
 
             rs = stat.executeQuery("SELECT * FROM SWITCHES;");
             while (rs.next()) {
-                Object rowData2[] = {rs.getString(2), rs.getString(3), rs.getInt(1), rs.getString(4), rs.getInt(5), rs.getInt(6), rs.getString(7), rs.getInt(8), rs.getString(9), rs.getInt(5)};
+                Object rowData2[] = {rs.getString(1), rs.getString(2), rs.getInt(3), rs.getString(4), rs.getInt(5), rs.getInt(6), rs.getString(7), rs.getInt(8), rs.getString(9), rs.getInt(5)};
                 model2.addRow(rowData2);
             }
 
             rs = stat.executeQuery("SELECT * FROM CROSSINGS;");
             while (rs.next()) {
-                Object rowData[] = {rs.getString(2), rs.getString(3), rs.getInt(1), rs.getFloat(4), rs.getBoolean(5), rs.getBoolean(6)};
+                Object rowData[] = {rs.getString(1), rs.getString(2), rs.getInt(3), rs.getFloat(4), rs.getBoolean(5), rs.getBoolean(6)};
                 model3.addRow(rowData);
             }
 
             rs = stat.executeQuery("SELECT * FROM STATIONS;");
             while (rs.next()) {
-                Object rowData[] = {rs.getString(2), rs.getString(3), rs.getInt(1), rs.getString(4), rs.getInt(5)};
+                Object rowData[] = {rs.getString(1), rs.getString(2), rs.getInt(3), rs.getString(4), rs.getInt(5)};
                 model4.addRow(rowData);
             }
 
@@ -529,7 +529,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
                     Object value, boolean isSelected, boolean hasFocus, int row, int col) {
                 super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
                 boolean status = (boolean) table.getModel().getValueAt(row, colIndex);
-                boolean outage = colIndex == 4 ? false : table.getModel().getValueAt(row, 8).toString().equalsIgnoreCase("OUTAGE");
+                boolean outage = colIndex == 4 ? false : table.getModel().getValueAt(row, 9).toString().equalsIgnoreCase("OUTAGE");
                 if (status) {
                     setBackground(Color.RED);
                     setForeground(Color.WHITE);

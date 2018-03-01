@@ -34,7 +34,7 @@ public class TrackModel {
             TestFrame tf = new TestFrame(tmf);
             tf.setVisible(true);
         }
-//        setBlockMessage("Green", 6, "Jews");
+        setBlockMessage("Green", -6, "Jews");
 //        for (int i = 1; i < 2; i++) {
 //            TrackBlock tb = getBlock("Green", 2);
 //            System.out.println(tb.toString());
@@ -95,10 +95,10 @@ public class TrackModel {
             Connection conn = DriverManager.getConnection("jdbc:sqlite:test.db");
             Statement stat = conn.createStatement();
 
-            ResultSet rs = stat.executeQuery("SELECT * FROM BLOCKS WHERE LINE='" + line + "' AND ID=" + block + ";");
+            ResultSet rs = stat.executeQuery("SELECT * FROM BLOCKS WHERE LINE='" + line + "' AND BLOCK=" + block + ";");
             if (rs.next()) {
                 tb = new TrackBlock(line, block);
-                tb.setSection(rs.getString(3).charAt(0));
+                tb.setSection(rs.getString(2).charAt(0));
                 tb.setLength(rs.getFloat(4));
                 tb.setCurvature(rs.getFloat(5));
                 tb.setGrade(rs.getFloat(6));
@@ -110,11 +110,11 @@ public class TrackModel {
                 tb.setIsHeaterOn(rs.getBoolean(12));
                 tb.setMessage(rs.getString(13));
 
-                rs = stat.executeQuery("SELECT * FROM SWITCHES WHERE LINE='" + line + "' AND ID=" + block + ";");
+                rs = stat.executeQuery("SELECT * FROM SWITCHES WHERE LINE='" + line + "' AND BLOCK=" + block + ";");
                 tb.setIsSwitch(rs.next());
-                rs = stat.executeQuery("SELECT * FROM CROSSINGS WHERE LINE='" + line + "' AND ID=" + block + ";");
+                rs = stat.executeQuery("SELECT * FROM CROSSINGS WHERE LINE='" + line + "' AND BLOCK=" + block + ";");
                 tb.setIsCrossing(rs.next());
-                rs = stat.executeQuery("SELECT * FROM STATIONS WHERE LINE='" + line + "' AND ID=" + block + ";");
+                rs = stat.executeQuery("SELECT * FROM STATIONS WHERE LINE='" + line + "' AND BLOCK=" + block + ";");
                 tb.setIsStation(rs.next());
 
                 getConnections(line, block);
@@ -134,7 +134,7 @@ public class TrackModel {
             try {
                 Connection conn = DriverManager.getConnection("jdbc:sqlite:test.db");
 
-                String query = "UPDATE BLOCKS SET MESSAGE = ? WHERE LINE = ? AND ID = ?";
+                String query = "UPDATE BLOCKS SET MESSAGE=? WHERE LINE=? AND BLOCK=?";
                 PreparedStatement preparedStmt = conn.prepareStatement(query);
                 preparedStmt.setString(1, message);
                 preparedStmt.setString(2, line);
@@ -149,6 +149,26 @@ public class TrackModel {
         }
     }
 
+    public static void setHeater(String line, int block, boolean on) {
+        if (doTablesExist()) {
+            try {
+                Connection conn = DriverManager.getConnection("jdbc:sqlite:test.db");
+
+                String query = "UPDATE BLOCKS SET HEATER=? WHERE LINE=? AND BLOCK=?";
+                PreparedStatement preparedStmt = conn.prepareStatement(query);
+                preparedStmt.setBoolean(1, on);
+                preparedStmt.setString(2, line);
+                preparedStmt.setInt(3, block);
+                preparedStmt.executeUpdate();
+                
+                tmf.populateTables();
+                conn.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(TrackModel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+    
     /*
     * FOR EXPERIMENTAL PURPOSES AT THE MOMENT
      */
@@ -158,7 +178,7 @@ public class TrackModel {
             Statement stat = conn.createStatement();
 
             ResultSet rs = stat.executeQuery("SELECT DIRECTION FROM BLOCKS "
-                    + "WHERE LINE='" + line + "' AND ID=" + block + ";");
+                    + "WHERE LINE='" + line + "' AND BLOCK=" + block + ";");
             if (rs.next()) {
                 if (rs.getInt(1) == 0 || rs.getInt(1) == 1) {
                     System.out.println(block + 1);
@@ -166,7 +186,7 @@ public class TrackModel {
                 if (rs.getInt(1) == 0 || rs.getInt(1) == -1) {
                     System.out.println(block - 1);
                 }
-                String swit = "SELECT * FROM SWITCHES WHERE LINE='%s' AND (ID=%s OR BLOCK_OUT_A=%s OR BLOCK_OUT_B = %s);";
+                String swit = "SELECT * FROM SWITCHES WHERE LINE='%s' AND (BLOCK=%s OR BLOCK_OUT_A=%s OR BLOCK_OUT_B = %s);";
                 swit = String.format(swit, line, block, block, block);
                 rs = stat.executeQuery(swit);
                 if (rs.next()) {

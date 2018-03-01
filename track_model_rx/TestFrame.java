@@ -232,13 +232,13 @@ public class TestFrame extends javax.swing.JFrame {
 
             ResultSet rs = stat.executeQuery("SELECT * FROM BLOCKS;");
             while (rs.next()) {
-                blockList.add("Line: " + rs.getString(2) + ", Section: " + rs.getString(3) + ", Block: " + rs.getInt(1));
+                blockList.add("Line: " + rs.getString(1) + ", Section: " + rs.getString(2) + ", Block: " + rs.getInt(3));
             }
             jComboBox1.setModel(new DefaultComboBoxModel(blockList.toArray()));
             rs = stat.executeQuery("SELECT * FROM STATIONS;");
             blockList = new ArrayList<>();
             while (rs.next()) {
-                blockList.add("Station: " + rs.getString(4) + " (Line: " + rs.getString(2) + ", Block: " + rs.getInt(1) + ")");
+                blockList.add("Station: " + rs.getString(4) + " (Line: " + rs.getString(1) + ", Block: " + rs.getInt(3) + ")");
             }
             jComboBox2.setModel(new DefaultComboBoxModel(blockList.toArray()));
             rs.close();
@@ -265,11 +265,7 @@ public class TestFrame extends javax.swing.JFrame {
         String block = jComboBox1.getSelectedItem().toString().split(",")[2];
         block = block.substring(block.lastIndexOf(" "), block.length()).trim();
 
-        for (int i = 0; i < tmf.jTable1.getRowCount(); i++) {
-            if (tmf.jTable1.getValueAt(i, 2).toString().equalsIgnoreCase(block) && tmf.jTable1.getValueAt(i, 0).toString().equalsIgnoreCase(line)) {
-                tmf.jTable1.setValueAt("ON", i, 10);
-            }
-        }
+        TrackModel.setHeater(line, Integer.parseInt(block), true);
         tmf.scanOccupiedBlocks();
     }
 
