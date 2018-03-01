@@ -201,11 +201,7 @@ public class TestFrame extends javax.swing.JFrame {
             String block = jComboBox1.getSelectedItem().toString().split(",")[2];
             block = block.substring(block.lastIndexOf(" "), block.length()).trim();
 
-            for (int i = 0; i < tmf.jTable1.getRowCount(); i++) {
-                if (tmf.jTable1.getValueAt(i, 2).toString().equalsIgnoreCase(block) && tmf.jTable1.getValueAt(i, 0).toString().equalsIgnoreCase(line)) {
-                    tmf.jTable1.setValueAt(message, i, 11);
-                }
-            }
+            TrackModel.setBlockMessage(line, Integer.parseInt(block), message);
         }
     }//GEN-LAST:event_jButton5ActionPerformed
 

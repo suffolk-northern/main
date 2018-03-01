@@ -14,6 +14,7 @@ public class TrackBlock {
     public boolean isPowerOn;
     public boolean isOccupied;
     public boolean isHeaterOn;
+    public String message;
 
     public boolean isSwitch;
     public boolean isStation;
@@ -163,6 +164,14 @@ public class TrackBlock {
         this.isOccupied = isOccupied;
     }
 
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
     @Override
     public String toString() {
         return "Hi, I'm Block " + block + " of the " + line + " Line, Section " + section + ".\n"
@@ -173,6 +182,7 @@ public class TrackBlock {
                 + "\tUnderground: " + isUnderground + "\n"
                 + "\tPower: " + isPowerOn + "\n"
                 + "\tOccupied: " + isOccupied + "\n"
-                + "\tHeater: " + isHeaterOn;
+                + "\tHeater: " + isHeaterOn + "\n"
+                + "\tMessage: " + message;
     }
 }

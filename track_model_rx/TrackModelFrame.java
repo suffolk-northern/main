@@ -446,7 +446,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
         }
     }
 
-    private void populateTables() {
+    protected void populateTables() {
         Object[] columnNames = {"Line", "Section", "Block #", "Length (yd)", "Curvature", "Grade", "Direction", "Speed Limit (mph)", "Underground", "Power", "Occupied", "Heater", "Message"};
         Object[] columnNames2 = {"Line", "Section In", "Block In", "Section Out A", "Block Out A", "Direction Out A", "Section Out B", "Block Out B", "Direction Out B", "Current Setting"};
         Object[] columnNames3 = {"Line", "Section", "Block #", "Length", "Occupied", "Signal"};
@@ -485,8 +485,8 @@ public class TrackModelFrame extends javax.swing.JFrame {
 
             ResultSet rs = stat.executeQuery("SELECT * FROM BLOCKS;");
             while (rs.next()) {
-                Object rowData[] = {rs.getString(2), rs.getString(3), rs.getInt(1), rs.getFloat(4), rs.getFloat(5), rs.getFloat(6), rs.getInt(7), rs.getInt(8), rs.getBoolean(9), rs.getBoolean(10), rs.getBoolean(11),
-                    (boolean) rs.getBoolean(11) ? "ON" : "OFF", rs.getString(12)};
+                Object rowData[] = {rs.getString(2), rs.getString(3), rs.getInt(1), rs.getFloat(4), rs.getFloat(5), rs.getFloat(6), rs.getInt(7), rs.getInt(8), rs.getBoolean(9), rs.getBoolean(10),
+                    (boolean) rs.getBoolean(11), (boolean) rs.getBoolean(12) ? "ON" : "OFF", rs.getString(13)};
                 model.addRow(rowData);
             }
 

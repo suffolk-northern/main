@@ -8,6 +8,7 @@ package trackmodel;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -20,17 +21,20 @@ import java.util.logging.Logger;
  */
 public class TrackModel {
 
+    private static TrackModelFrame tmf;
+
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        TrackModelFrame tmf = new TrackModelFrame();
+        tmf = new TrackModelFrame();
         tmf.setLocationRelativeTo(null);
         tmf.setVisible(true);
         if (doTablesExist()) {
-//            TestFrame tf = new TestFrame(tmf);
-//            tf.setVisible(true);
+            TestFrame tf = new TestFrame(tmf);
+            tf.setVisible(true);
         }
+//        setBlockMessage("Green", 6, "Jews");
 //        for (int i = 1; i < 2; i++) {
 //            TrackBlock tb = getBlock("Green", 2);
 //            System.out.println(tb.toString());
@@ -42,7 +46,12 @@ public class TrackModel {
 //        }
     }
 
-    public static boolean doTablesExist() {
+    /**
+     * Checks if database tables exist.
+     *
+     * @return
+     */
+    protected static boolean doTablesExist() {
         try {
             Class.forName("org.sqlite.JDBC");
             Connection conn = DriverManager.getConnection("jdbc:sqlite:test.db");
@@ -70,6 +79,13 @@ public class TrackModel {
         return true;
     }
 
+    /**
+     * Retrieves specific information related to a block on a line.
+     *
+     * @param line
+     * @param block
+     * @return Track block object
+     */
     public static TrackBlock getBlock(String line, int block) {
         if (!doTablesExist()) {
             return null;
@@ -79,10 +95,8 @@ public class TrackModel {
             Connection conn = DriverManager.getConnection("jdbc:sqlite:test.db");
             Statement stat = conn.createStatement();
 
-            ResultSet rs = stat.executeQuery("SELECT * FROM BLOCKS "
-                    + "WHERE LINE='" + line + "' AND ID=" + block + ";");
+            ResultSet rs = stat.executeQuery("SELECT * FROM BLOCKS WHERE LINE='" + line + "' AND ID=" + block + ";");
             if (rs.next()) {
-                System.out.println("HI I'M BLOCK: " + block);
                 tb = new TrackBlock(line, block);
                 tb.setSection(rs.getString(3).charAt(0));
                 tb.setLength(rs.getFloat(4));
@@ -94,23 +108,45 @@ public class TrackModel {
                 tb.setIsPowerOn(rs.getBoolean(10));
                 tb.setIsOccupied(rs.getBoolean(11));
                 tb.setIsHeaterOn(rs.getBoolean(12));
+                tb.setMessage(rs.getString(13));
 
-                rs = stat.executeQuery("SELECT * FROM SWITCHES " + "WHERE LINE='" + line + "' AND ID=" + block + ";");
+                rs = stat.executeQuery("SELECT * FROM SWITCHES WHERE LINE='" + line + "' AND ID=" + block + ";");
                 tb.setIsSwitch(rs.next());
-                rs = stat.executeQuery("SELECT * FROM CROSSINGS " + "WHERE LINE='" + line + "' AND ID=" + block + ";");
+                rs = stat.executeQuery("SELECT * FROM CROSSINGS WHERE LINE='" + line + "' AND ID=" + block + ";");
                 tb.setIsCrossing(rs.next());
-                rs = stat.executeQuery("SELECT * FROM STATIONS " + "WHERE LINE='" + line + "' AND ID=" + block + ";");
+                rs = stat.executeQuery("SELECT * FROM STATIONS WHERE LINE='" + line + "' AND ID=" + block + ";");
                 tb.setIsStation(rs.next());
 
                 getConnections(line, block);
             } else {
                 System.out.println("Invalid block.");
             }
+            conn.close();
         } catch (SQLException ex) {
             Logger.getLogger(TrackModel.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return tb;
+    }
+
+    public static void setBlockMessage(String line, int block, String message) {
+        if (doTablesExist()) {
+            try {
+                Connection conn = DriverManager.getConnection("jdbc:sqlite:test.db");
+
+                String query = "UPDATE BLOCKS SET MESSAGE = ? WHERE LINE = ? AND ID = ?";
+                PreparedStatement preparedStmt = conn.prepareStatement(query);
+                preparedStmt.setString(1, message);
+                preparedStmt.setString(2, line);
+                preparedStmt.setInt(3, block);
+                preparedStmt.executeUpdate();
+                
+                tmf.populateTables();
+                conn.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(TrackModel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 
     /*
