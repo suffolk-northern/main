@@ -358,7 +358,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
                     + "	direction integer,\n"
                     + "	speed_limit integer,\n"
                     + "	underground boolean,\n"
-                    + " power text,\n"
+                    + " power boolean,\n"
                     + "	occupied boolean,\n"
                     + "	heater boolean,\n"
                     + " message varchar(128),\n"
@@ -430,7 +430,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
                 blockStmt.setInt(7, Integer.parseInt(items.get(6)));
                 blockStmt.setInt(8, Integer.parseInt(items.get(7)));
                 blockStmt.setBoolean(9, line.contains("UNDERGROUND"));
-                blockStmt.setString(10, "GOOD");
+                blockStmt.setBoolean(10, true);
                 blockStmt.setBoolean(11, false);
                 blockStmt.setBoolean(12, false);
                 blockStmt.setString(13, "");
@@ -521,7 +521,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
 
             ResultSet rs = stat.executeQuery("SELECT * FROM BLOCKS;");
             while (rs.next()) {
-                Object rowData[] = {rs.getString(2), rs.getString(3), rs.getInt(1), rs.getFloat(4), rs.getFloat(5), rs.getFloat(6), rs.getInt(7), rs.getInt(8), rs.getBoolean(9), rs.getString(10), rs.getBoolean(11),
+                Object rowData[] = {rs.getString(2), rs.getString(3), rs.getInt(1), rs.getFloat(4), rs.getFloat(5), rs.getFloat(6), rs.getInt(7), rs.getInt(8), rs.getBoolean(9), rs.getBoolean(10), rs.getBoolean(11),
                     (boolean) rs.getBoolean(11) ? "ON" : "OFF", rs.getString(12)};
                 model.addRow(rowData);
             }

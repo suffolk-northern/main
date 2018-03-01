@@ -24,21 +24,21 @@ public class TrackModel {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-//        TrackModelFrame tmf = new TrackModelFrame();
-//        tmf.setLocationRelativeTo(null);
-//        tmf.setVisible(true);
-//        if (doTablesExist()) {
-//            TestFrame tf = new TestFrame(tmf);
-//            tf.setVisible(true);
-//        }
-//        for (int i = 1; i < 151; i++) {
-//            getBlock("Green", i);
+        TrackModelFrame tmf = new TrackModelFrame();
+        tmf.setLocationRelativeTo(null);
+        tmf.setVisible(true);
+        if (doTablesExist()) {
+            TestFrame tf = new TestFrame(tmf);
+            tf.setVisible(true);
+        }
+//        for (int i = 1; i < 2; i++) {
+//            getBlock("Green", 2);
 //            System.out.println("-------------------");
 //        }
-        for (int i = 1; i < 77; i++) {
-            getBlock("Red", i);
-            System.out.println("-------------------");
-        }
+//        for (int i = 1; i < 77; i++) {
+//            getBlock("Red", i);
+//            System.out.println("-------------------");
+//        }
     }
 
     public static boolean doTablesExist() {
@@ -69,7 +69,8 @@ public class TrackModel {
         return true;
     }
 
-    public static String getBlock(String line, int block) {
+    public static TrackBlock getBlock(String line, int block) {
+        TrackBlock tb = null;
         try {
             Connection conn = DriverManager.getConnection("jdbc:sqlite:test.db");
             Statement stat = conn.createStatement();
@@ -77,17 +78,35 @@ public class TrackModel {
             ResultSet rs = stat.executeQuery("SELECT * FROM BLOCKS "
                     + "WHERE LINE='" + line + "' AND ID=" + block + ";");
             if (rs.next()) {
-                Object rowData[] = {rs.getString(2), rs.getString(3), rs.getInt(1), rs.getFloat(4), rs.getFloat(5), rs.getFloat(6), rs.getInt(7), rs.getInt(8), rs.getBoolean(9), rs.getString(10), rs.getBoolean(11),
-                    (boolean) rs.getBoolean(11) ? "ON" : "OFF", rs.getString(12)};
-                System.out.println("HI I'M BLOCK: " + rowData[2]);
+                System.out.println("HI I'M BLOCK: " + block);
+                tb = new TrackBlock(line, block);
+                tb.setSection(rs.getString(3).charAt(0));
+                tb.setLength(rs.getFloat(4));
+                tb.setCurvature(rs.getFloat(5));
+                tb.setGrade(rs.getFloat(6));
+                tb.setDirection(rs.getInt(7));
+                tb.setSpeedLimit(rs.getInt(8));
+                tb.setIsUnderground(rs.getBoolean(9));
+                tb.setIsPowerOn(rs.getBoolean(10));
+                tb.setIsOccupied(rs.getBoolean(11));
+                tb.setIsHeaterOn(rs.getBoolean(12));
+                
+                rs = stat.executeQuery("SELECT * FROM SWITCHES " + "WHERE LINE='" + line + "' AND ID=" + block + ";");
+                tb.setIsSwitch(rs.next());
+                rs = stat.executeQuery("SELECT * FROM CROSSINGS " + "WHERE LINE='" + line + "' AND ID=" + block + ";");
+                tb.setIsCrossing(rs.next());
+                rs = stat.executeQuery("SELECT * FROM STATIONS " + "WHERE LINE='" + line + "' AND ID=" + block + ";");
+                tb.setIsStation(rs.next());
+                
                 getConnections(line, block);
             } else {
-                System.out.println("PENIS");
+                System.out.println("Invalid block.");
             }
         } catch (SQLException ex) {
             Logger.getLogger(TrackModel.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return null;
+
+        return tb;
     }
 
     public static String getConnections(String line, int block) {
@@ -109,17 +128,17 @@ public class TrackModel {
                 rs = stat.executeQuery(swit);
                 if (rs.next()) {
                     if (rs.getInt(1) == block && rs.getInt(9) == 1) {
-                        System.out.println(rs.getInt(8));
+                        System.out.println("OUT B: " + rs.getInt(8));
                     } else if (rs.getInt(8) == block) {
-                        System.out.println(rs.getInt(1));
+                        System.out.println("CAN GO TO: " + rs.getInt(1));
                     } else {
-                        System.out.println("MY ANUS ITCHES");
+                        System.out.println("UNAFFECTED");
                     }
                 } else {
-                    System.out.println("PENIX");
+                    System.out.println("no switch");
                 }
             } else {
-                System.out.println("PENIS");
+                System.out.println("problem");
             }
         } catch (SQLException ex) {
             Logger.getLogger(TrackModel.class.getName()).log(Level.SEVERE, null, ex);
