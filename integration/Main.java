@@ -18,14 +18,12 @@ import java.awt.EventQueue;
 //
 // FIXME: naming convention: pick Ctc and Mbo or CTC and MBO
 //
-// FIXME: naming convention: use TrainModel
-//
 //import ctc.Ctc;
 //import mbo.Mbo;
 import track_controller.TrackController;
 //import track_model.TrackModel;
 //import train_controller.trainController;
-//import train_model.TrainModel;
+import train_model.TrainModel;
 import updater.Updateable;
 import updater.Updater;
 
@@ -72,9 +70,9 @@ public class Main
 		//	new trainController(),
 		//};
 
-		//TrainModel[] trainModels = {
-		//	new Train(),
-		//};
+		TrainModel[] trainModels = {
+			new TrainModel(),
+		};
 
 		//if (trainControllers.length != trainModels.length)
 		//	throw new RuntimeError("mismatched train modules");
@@ -117,7 +115,7 @@ public class Main
 		updateables.addAll(Arrays.asList(trackControllers));
 		//updateables.add(trackModel);
 		//updateables.addAll(Arrays.asList(trainControllers));
-		//updateables.addAll(Arrays.asList(trainModels));
+		updateables.addAll(Arrays.asList(trainModels));
 	}
 
 	// Starts the user interface.

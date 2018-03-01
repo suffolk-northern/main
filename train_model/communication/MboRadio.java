@@ -14,7 +14,7 @@ import train_model.communication.Relay;
 //
 // From the POV of the MBO
 //
-// Is associated with a Train.
+// Is associated with a TrainModel.
 //
 // Sending from multiple instances is well-defined (but not thread-safe).
 //

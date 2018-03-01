@@ -8,7 +8,7 @@ package train_model.communication;
 
 import track_controller.communication.Authority;
 import track_model.GlobalCoordinates;
-import train_model.Train;
+import train_model.TrainModel;
 import train_model.communication.BeaconMessage;
 import train_model.communication.MboMovementCommand;
 import train_model.communication.TrackMovementCommand;
@@ -21,7 +21,7 @@ import train_model.communication.TrackMovementCommand;
 
 public class Relay
 {
-	private final Train train;
+	private final TrainModel train;
 
 	// most recent incoming message from beacon, MBO, track circuit
 	private BeaconMessage beaconMessageLast = new BeaconMessage("none");
@@ -40,8 +40,8 @@ public class Relay
 	private   MboMovementCommand    mboMessageCached = null;
 	private TrackMovementCommand  trackMessageCached = null;
 
-	// Constructs a Relay associated that interacts with a Train.
-	public Relay(Train train)
+	// Constructs a Relay associated that interacts with a TrainModel.
+	public Relay(TrainModel train)
 	{
 		this.train = train;
 	}

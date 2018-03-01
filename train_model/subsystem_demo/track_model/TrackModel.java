@@ -9,7 +9,7 @@ package train_model.subsystem_demo.track_model;
 import java.util.ArrayList;
 
 import track_controller.communication.Authority;
-import train_model.Train;
+import train_model.TrainModel;
 import train_model.communication.BeaconMessage;
 import train_model.communication.BeaconRadio;
 import train_model.communication.TrackMovementCommand;
@@ -43,8 +43,8 @@ public class TrackModel implements Updateable
 		updateCounters();
 	}
 
-	// Adds a Train to get orientation updates.
-	public void registerTrain(Train train)
+	// Adds a TrainModel to get orientation updates.
+	public void registerTrain(TrainModel train)
 	{
 		steerers.add(new Steerer(train));
 	}

@@ -9,7 +9,7 @@ package test;
 import mbo.MBO;
 import patrick.Patrick;
 import spongebob.Spongebob;
-import train_model.Train;
+import train_model.TrainModel;
 import updater.Updateable;
 import updater.Updater;
 
@@ -19,8 +19,8 @@ public class TestyTest
 	{
 		Spongebob spongebob = new Spongebob();
 		Patrick patrick = new Patrick();
-		Train train0 = new Train();
-		Train train1 = new Train();
+		TrainModel train0 = new TrainModel();
+		TrainModel train1 = new TrainModel();
 		MBO mbo = new MBO();
 
 		patrick.registerSpongebob(spongebob);

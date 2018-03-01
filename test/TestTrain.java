@@ -1,14 +1,14 @@
 /*
  * Ryan Matthews
  *
- * Basic demonstration of Train and related inter-module communication
+ * Basic demonstration of TrainModel and related inter-module communication
  */
 
 package test;
 
 import track_controller.communication.Authority;
 import train_model.DoorLocation;
-import train_model.Train;
+import train_model.TrainModel;
 import train_model.communication.BeaconMessage;
 import train_model.communication.BeaconRadio;
 import train_model.communication.ControllerLink;
@@ -21,7 +21,7 @@ public class TestTrain
 {
 	public static void main(String[] args)
 	{
-		Train train = new Train();
+		TrainModel train = new TrainModel();
 
 		sendBeacon(train.beaconRadio());
 		sendMboMessage(train.mboRadio());
@@ -97,7 +97,7 @@ public class TestTrain
 	}
 
 	// Demonstrates movement as a PointMass.
-	public static void move(Train train)
+	public static void move(TrainModel train)
 	{
 		final int iterations = 10 * 10;
 

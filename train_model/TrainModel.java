@@ -32,7 +32,7 @@ import updater.Updateable;
 //   mboRadio()
 //   trackCircuit()
 
-public class Train
+public class TrainModel
 	extends Observable
 	implements Updateable
 {

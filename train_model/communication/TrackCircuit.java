@@ -13,7 +13,7 @@ import train_model.communication.Relay;
 //
 // From the POV of the track
 //
-// Is associated with a Train.
+// Is associated with a TrainModel.
 //
 // Is stateless, so any number of instances may be used.
 

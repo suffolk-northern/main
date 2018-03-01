@@ -9,7 +9,7 @@ package train_model.subsystem_demo.train_controller;
 import track_model.GlobalCoordinates;
 import track_model.Orientation;
 import train_model.DoorLocation;
-import train_model.Train;
+import train_model.TrainModel;
 import train_model.communication.ControllerLink;
 import updater.Updateable;
 
@@ -30,7 +30,7 @@ public class Controller implements Updateable
 	private boolean lightsState = false;
 
 	// real implementation won't have this
-	private final Train train;
+	private final TrainModel train;
 	private static GlobalCoordinates origin =
 		new GlobalCoordinates(0.0, 0.0);
 	private int block = 0;
@@ -38,8 +38,8 @@ public class Controller implements Updateable
 
 	// Constructs a Controller linked to a train.
 	//
-	// Real implementation won't have a Train reference.
-	public Controller(ControllerLink link, Train train)
+	// Real implementation won't have a TrainModel reference.
+	public Controller(ControllerLink link, TrainModel train)
 	{
 		this.link = link;
 		this.train = train;

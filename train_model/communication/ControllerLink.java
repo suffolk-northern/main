@@ -7,7 +7,7 @@
 package train_model.communication;
 
 import train_model.DoorLocation;
-import train_model.Train;
+import train_model.TrainModel;
 import train_model.communication.MboMovementCommand;
 import train_model.communication.TrackMovementCommand;
 
@@ -15,7 +15,7 @@ import train_model.communication.TrackMovementCommand;
 //
 // From the POV of the controller
 //
-// Is associated with a Train.
+// Is associated with a TrainModel.
 //
 // Operating on multiple instances is well-defined (but not thread-safe).
 //
@@ -24,10 +24,11 @@ import train_model.communication.TrackMovementCommand;
 public class ControllerLink
 {
 	private final Relay relay;
-	private final Train train;
+	private final TrainModel train;
 
-	// Constructs a TrackCircuit that interacts with a Relay and its Train.
-	public ControllerLink(Relay relay, Train train)
+	// Constructs a TrackCircuit that interacts with a Relay and its
+	// TrainModel.
+	public ControllerLink(Relay relay, TrainModel train)
 	{
 		this.relay = relay;
 		this.train = train;
