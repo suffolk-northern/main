@@ -308,6 +308,22 @@ public class MyCtc {
 		
 		return null;
 	}
+	
+	private static TrackCon getTrackCon(int id)
+	{
+		ArrayDeque<TrackCon> temp = trackcons.clone();
+		
+		TrackCon tc = null;
+		
+		while(!temp.isEmpty())
+		{
+			tc = temp.poll();
+			if(tc.ID == id)
+				return tc;
+		}
+		
+		return null;
+	}
 
 	private static Block getBlock(String line, char sec, int num) {
 		ArrayDeque<Block> temp = blueline.clone();
@@ -581,11 +597,83 @@ public class MyCtc {
 		System.out.println();
 	}
 	
-	private static boolean[][] routeToBool(ArrayDeque<Block> r)
+	private static void combineAuth(TrackCon tc, boolean[] s, boolean[] l, boolean[] r)
 	{
-		boolean[][] route = null;
+		// either combine route with current track con authority or just send route as pieces
 		
-		return route;
+	}
+	
+	private static void routeToBool(ArrayDeque<Block> r)
+	{
+		ArrayDeque<Block> route = r.clone();
+		TrackCon tc = getTrackCon(route.peek());
+		ArrayDeque<Block> tc_track;
+		Block tc_block;
+		Block r_block = route.poll();
+		char status;
+		
+		boolean[] straight_array = new boolean[tc.nstraight];
+		boolean[] left_array = new boolean[tc.nleft];
+		boolean[] right_array = new boolean[tc.nright];
+		
+		
+		int count = 0;
+		
+		while(r_block != null)
+		{
+			count = 0;
+			
+			if(!tc.hasBlock(r_block))
+			{
+				combineAuth(tc,straight_array,left_array,right_array);
+				tc = getTrackCon(r_block);
+				straight_array = new boolean[tc.nstraight];
+				left_array = new boolean[tc.nleft];
+				right_array = new boolean[tc.nright];
+			}
+			
+			if(tc.straight.contains(r_block))
+			{
+				tc_track = tc.straight.clone();
+				status = 's';
+			}
+			else if(tc.left.contains(r_block))
+			{
+				tc_track = tc.left.clone();
+				status = 'l';
+			}
+			else
+			{
+				tc_track = tc.right.clone();
+				status = 'r';
+			}
+			
+			while(!tc_track.isEmpty())
+			{
+				tc_block = tc_track.poll();
+				if(tc_block.equals(r_block))
+				{
+					switch(status)
+					{
+						case 's':
+							straight_array[count] = true;
+							break;
+						case 'l':
+							left_array[count] = true;
+							break;
+						case 'r':
+							right_array[count] = true;
+							break;	
+					}
+
+					r_block = route.poll();
+				}
+
+				count++;
+			}
+		}
+		
+
 	}
 
 	private static void setSwitch(Block swBlock, Block from, Block to) {
@@ -729,6 +817,9 @@ public class MyCtc {
 		private int nstraight;
 		private int nleft;
 		private int nright;
+		private boolean[] straight_auth;
+		private boolean[] left_auth;
+		private boolean[] right_auth;
 		
 		public TrackCon(int id)
 		{
@@ -739,6 +830,9 @@ public class MyCtc {
 			nstraight = 0;
 			nleft = 0;
 			nright = 0;
+			straight_auth = new boolean[nstraight];
+			left_auth = new boolean[nleft];
+			right_auth = new boolean[nright];
 		}
 		
 		public TrackCon(int id, ArrayDeque<Block> s, ArrayDeque<Block> l, ArrayDeque<Block> r)
@@ -750,6 +844,9 @@ public class MyCtc {
 			nstraight = straight.size();
 			nleft = left.size();
 			nright = right.size();
+			straight_auth = new boolean[nstraight];
+			left_auth = new boolean[nleft];
+			right_auth = new boolean[nright];
 		}
 		
 		public boolean hasBlock(Block block)
