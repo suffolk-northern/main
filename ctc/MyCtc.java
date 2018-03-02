@@ -27,6 +27,7 @@ public class MyCtc {
 	public static ArrayDeque<Train> trains = new ArrayDeque<Train>();
 	public static ArrayDeque<Block> blueline = new ArrayDeque<Block>();
 	public static ArrayDeque<Block> switches = new ArrayDeque<Block>();
+	public static ArrayDeque<TrackCon> trackcons = new ArrayDeque<TrackCon>();
 
 	public static double through = 0;
 
@@ -114,27 +115,12 @@ public class MyCtc {
 		updateTrack();
 		updateTrains();
 
-		/*
-        
-        routeTrain(train,getBlock("blue",'A',3),0);
-        
-        train.setLoc(getBlock("blue",'A',3));
-        getBlock("blue",'A',3).setOccupied(true);
-        
-        routeTrain(train,getBlock("blue",'\0',0),0);
-        
-        getTrain(1).setLoc(getBlock("blue",'\0',0));
-        getTrain(2).setLoc(getBlock("blue",'A',3));
-        getBlock("blue",'A',3).setOccupied(true);
-        getBlock("blue",'A',2).setSwitchPos(getBlock("blue",'A',1), getBlock("blue",'A',2));
-        
-        routeTrain(getTrain(1),getBlock("blue",'A',5),0);
 
-        
-        getTrain(1).setLoc(getBlock("blue",'\0',0));
-        getTrain(2).setLoc(getBlock("blue",'\0',0));
-        getBlock("blue",'A',3).setOccupied(false);
-		 */
+	}
+	
+	public void update()
+	{
+		
 	}
 
 	private static Train getTrain(int ID) {
@@ -306,6 +292,22 @@ public class MyCtc {
 
 		return auth;
 	}
+	
+	private static TrackCon getTrackCon(Block block)
+	{
+		ArrayDeque<TrackCon> temp = trackcons.clone();
+		
+		TrackCon tc = null;
+		
+		while(!temp.isEmpty())
+		{
+			tc = temp.poll();
+			if(tc.hasBlock(block))
+				return tc;
+		}
+		
+		return null;
+	}
 
 	private static Block getBlock(String line, char sec, int num) {
 		ArrayDeque<Block> temp = blueline.clone();
@@ -370,9 +372,6 @@ public class MyCtc {
 		ui.updateTrackTable(rows, blueline.size());
 	}
 
-	private static void updateTrack(Block block) {
-
-	}
 
 	private static void updateTrains() {
 		// for all trains in trains
@@ -415,9 +414,6 @@ public class MyCtc {
 
 	}
 
-	private static void updateTrain(int ID) {
-
-	}
 
 	protected void readIn(String str) {
 		StringTokenizer stok = new StringTokenizer(str, " ");
@@ -576,11 +572,20 @@ public class MyCtc {
 		System.out.println("To Track Controller");
 		System.out.println("Train " + train.getID() + " at location " + loc.display());
 		System.out.println("Send speed = " + speed + ", authority = " + auth);
+		/*
 		if (swpos != null) {
 			System.out.println("Next switch position, in block: " + sw.display() + " from: " + from.display() + " to: " + to.display());
 		}
+		*/
 
 		System.out.println();
+	}
+	
+	private static boolean[][] routeToBool(ArrayDeque<Block> r)
+	{
+		boolean[][] route = null;
+		
+		return route;
 	}
 
 	private static void setSwitch(Block swBlock, Block from, Block to) {
@@ -713,6 +718,44 @@ public class MyCtc {
 		} while (!temp.isEmpty());
 
 		return switches;
+	}
+	
+	private static class TrackCon
+	{
+		private int ID;
+		private ArrayDeque<Block> straight;
+		private ArrayDeque<Block> left;
+		private ArrayDeque<Block> right;
+		private int nstraight;
+		private int nleft;
+		private int nright;
+		
+		public TrackCon(int id)
+		{
+			ID = id;
+			straight = null;
+			left = null;
+			right = null;
+			nstraight = 0;
+			nleft = 0;
+			nright = 0;
+		}
+		
+		public TrackCon(int id, ArrayDeque<Block> s, ArrayDeque<Block> l, ArrayDeque<Block> r)
+		{
+			ID = id;
+			straight = s;
+			left = l;
+			right = r;
+			nstraight = straight.size();
+			nleft = left.size();
+			nright = right.size();
+		}
+		
+		public boolean hasBlock(Block block)
+		{
+			return straight.contains(block) || left.contains(block) || right.contains(block);
+		}
 	}
 
 	private static class SwitchAndPos {
