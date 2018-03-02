@@ -8,10 +8,11 @@ package train_model.subsystem_demo.track_model;
 
 import java.util.ArrayList;
 
-import train_model.Train;
+import track_controller.communication.Authority;
+import train_model.TrainModel;
 import train_model.communication.BeaconMessage;
 import train_model.communication.BeaconRadio;
-import train_model.communication.MovementCommand;
+import train_model.communication.TrackMovementCommand;
 import train_model.communication.TrackCircuit;
 import train_model.subsystem_demo.track_model.Steerer;
 import updater.Updateable;
@@ -42,8 +43,8 @@ public class TrackModel implements Updateable
 		updateCounters();
 	}
 
-	// Adds a Train to get orientation updates.
-	public void registerTrain(Train train)
+	// Adds a TrainModel to get orientation updates.
+	public void registerTrain(TrainModel train)
 	{
 		steerers.add(new Steerer(train));
 	}
@@ -68,9 +69,25 @@ public class TrackModel implements Updateable
 			return;
 
 		circuit.send(
-			new MovementCommand(
+			new TrackMovementCommand(
 				10,
-				trackCircuitState ? 2 : 3
+				new Authority(
+					new boolean[] {  true,  true,  true }
+				),
+				trackCircuitState ?
+					new Authority(
+						new boolean[] {  true,  true }
+					) :
+					new Authority(
+						new boolean[] { false, false }
+					),
+				trackCircuitState ?
+					new Authority(
+						new boolean[] { false, false }
+					) :
+					new Authority(
+						new boolean[] {  true,  true }
+					)
 			)
 		);
 	}

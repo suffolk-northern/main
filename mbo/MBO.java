@@ -14,7 +14,7 @@ import track_model.GlobalCoordinates;
 import track_model.Track;
 import track_model.TrackBlock;
 import track_model.TrackSection;
-import train_model.Train;
+import train_model.TrainModel;
 import track_model.Orientation;
 import controller.ControllerUI;
 

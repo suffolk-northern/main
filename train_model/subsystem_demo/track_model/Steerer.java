@@ -8,7 +8,7 @@ package train_model.subsystem_demo.track_model;
 
 import track_model.GlobalCoordinates;
 import track_model.Orientation;
-import train_model.Train;
+import train_model.TrainModel;
 
 // Steers a train to follow a hard-coded track
 
@@ -17,12 +17,12 @@ public class Steerer
 	private static GlobalCoordinates origin =
 		new GlobalCoordinates(0.0, 0.0);
 
-	public Train train;
+	public TrainModel train;
 	private int block = 0;
 	private boolean stopped = false;
 
 	// Constructs a Steerer for a train.
-	public Steerer(Train train)
+	public Steerer(TrainModel train)
 	{
 		this.train = train;
 	}

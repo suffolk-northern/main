@@ -7,14 +7,14 @@
 package train_model.communication;
 
 import track_model.GlobalCoordinates;
-import train_model.communication.MovementCommand;
+import train_model.communication.MboMovementCommand;
 import train_model.communication.Relay;
 
 // Train-MBO wireless communication simulation
 //
 // From the POV of the MBO
 //
-// Is associated with a Train.
+// Is associated with a TrainModel.
 //
 // Sending from multiple instances is well-defined (but not thread-safe).
 //
@@ -31,7 +31,7 @@ public class MboRadio
 	}
 
 	// Sends a message to the associated train.
-	public void send(MovementCommand message)
+	public void send(MboMovementCommand message)
 	{
 		relay.onRXMbo(message);
 	}

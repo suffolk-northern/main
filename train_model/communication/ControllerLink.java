@@ -7,14 +7,15 @@
 package train_model.communication;
 
 import train_model.DoorLocation;
-import train_model.Train;
-import train_model.communication.MovementCommand;
+import train_model.TrainModel;
+import train_model.communication.MboMovementCommand;
+import train_model.communication.TrackMovementCommand;
 
 // Train model-controller communication simulation
 //
 // From the POV of the controller
 //
-// Is associated with a Train.
+// Is associated with a TrainModel.
 //
 // Operating on multiple instances is well-defined (but not thread-safe).
 //
@@ -23,10 +24,11 @@ import train_model.communication.MovementCommand;
 public class ControllerLink
 {
 	private final Relay relay;
-	private final Train train;
+	private final TrainModel train;
 
-	// Constructs a TrackCircuit that interacts with a Relay and its Train.
-	public ControllerLink(Relay relay, Train train)
+	// Constructs a TrackCircuit that interacts with a Relay and its
+	// TrainModel.
+	public ControllerLink(Relay relay, TrainModel train)
 	{
 		this.relay = relay;
 		this.train = train;
@@ -47,7 +49,7 @@ public class ControllerLink
 	// Receives a message from the MBO.
 	//
 	// If no new message is available since last call, returns null.
-	public MovementCommand receiveFromMbo()
+	public MboMovementCommand receiveFromMbo()
 	{
 		return relay.mboMessage();
 	}
@@ -59,7 +61,7 @@ public class ControllerLink
 	// A message is never received from more than one track circuit at
 	// once. If multiple messages are received between calls, the latest
 	// overwrites previous messages.
-	public MovementCommand receiveFromTrack()
+	public TrackMovementCommand receiveFromTrack()
 	{
 		return relay.trackMessage();
 	}

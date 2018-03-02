@@ -6,10 +6,12 @@
 
 package train_model.communication;
 
+import track_controller.communication.Authority;
 import track_model.GlobalCoordinates;
-import train_model.Train;
+import train_model.TrainModel;
 import train_model.communication.BeaconMessage;
-import train_model.communication.MovementCommand;
+import train_model.communication.MboMovementCommand;
+import train_model.communication.TrackMovementCommand;
 
 // Message forwarder between communication interfaces
 //
@@ -19,20 +21,27 @@ import train_model.communication.MovementCommand;
 
 public class Relay
 {
-	private final Train train;
+	private final TrainModel train;
 
 	// most recent incoming message from beacon, MBO, track circuit
-	private   BeaconMessage beaconMessageLast = new BeaconMessage("none");
-	private MovementCommand    mboMessageLast = new MovementCommand(0, 0);
-	private MovementCommand  trackMessageLast = new MovementCommand(0, 0);
+	private BeaconMessage beaconMessageLast = new BeaconMessage("none");
+	private MboMovementCommand mboMessageLast =
+		new MboMovementCommand(0, 0);
+	private TrackMovementCommand trackMessageLast =
+		new TrackMovementCommand(
+			0,
+			new Authority(new boolean[] { false }),
+			new Authority(new boolean[] { false }),
+			new Authority(new boolean[] { false })
+		);
 
 	// like most recent, but set to null after read
-	private   BeaconMessage beaconMessageCached = null;
-	private MovementCommand    mboMessageCached = null;
-	private MovementCommand  trackMessageCached = null;
+	private BeaconMessage beaconMessageCached = null;
+	private   MboMovementCommand    mboMessageCached = null;
+	private TrackMovementCommand  trackMessageCached = null;
 
-	// Constructs a Relay associated that interacts with a Train.
-	public Relay(Train train)
+	// Constructs a Relay associated that interacts with a TrainModel.
+	public Relay(TrainModel train)
 	{
 		this.train = train;
 	}
@@ -45,17 +54,17 @@ public class Relay
 	}
 
 	// Triggers actions for a message received from the MBO.
-	public void onRXMbo(MovementCommand message)
+	public void onRXMbo(MboMovementCommand message)
 	{
-		mboMessageCached = new MovementCommand(message);
-		mboMessageLast   = new MovementCommand(message);
+		mboMessageCached = new MboMovementCommand(message);
+		mboMessageLast   = new MboMovementCommand(message);
 	}
 
 	// Triggers actions for a message received from the track circuit.
-	public void onRXTrack(MovementCommand message)
+	public void onRXTrack(TrackMovementCommand message)
 	{
-		trackMessageCached = new MovementCommand(message);
-		trackMessageLast   = new MovementCommand(message);
+		trackMessageCached = new TrackMovementCommand(message);
+		trackMessageLast   = new TrackMovementCommand(message);
 	}
 
 	// Returns the current location as should be reported to MBO.
@@ -79,18 +88,18 @@ public class Relay
 
 	// If a message was received from the MBO since last call, returns that
 	// message. Else returns null.
-	public MovementCommand mboMessage()
+	public MboMovementCommand mboMessage()
 	{
-		MovementCommand value = mboMessageCached;
+		MboMovementCommand value = mboMessageCached;
 		mboMessageCached = null;
 		return value;
 	}
 
 	// If a message was received from a track circuit since last call,
 	// returns that message. Else returns null.
-	public MovementCommand trackMessage()
+	public TrackMovementCommand trackMessage()
 	{
-		MovementCommand value = trackMessageCached;
+		TrackMovementCommand value = trackMessageCached;
 		trackMessageCached = null;
 		return value;
 	}
@@ -102,14 +111,14 @@ public class Relay
 	}
 
 	// Returns the last received MBO message.
-	public MovementCommand lastMboMessage()
+	public MboMovementCommand lastMboMessage()
 	{
-		return new MovementCommand(mboMessageLast);
+		return new MboMovementCommand(mboMessageLast);
 	}
 
 	// Returns the last received track message.
-	public MovementCommand lastTrackMessage()
+	public TrackMovementCommand lastTrackMessage()
 	{
-		return new MovementCommand(trackMessageLast);
+		return new TrackMovementCommand(trackMessageLast);
 	}
 }

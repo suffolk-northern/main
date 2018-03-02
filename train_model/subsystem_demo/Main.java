@@ -9,7 +9,7 @@ package train_model.subsystem_demo;
 import java.awt.EventQueue;
 
 import track_model.GlobalCoordinates;
-import train_model.Train;
+import train_model.TrainModel;
 import train_model.subsystem_demo.UI;
 import train_model.subsystem_demo.train_controller.Controller;
 import train_model.subsystem_demo.mbo.MBO;
@@ -24,7 +24,7 @@ public class Main
 	public static void main(String[] args)
 	{
 		TrackModel track = new TrackModel();
-		Train train = new Train();
+		TrainModel train = new TrainModel();
 		MBO mbo = new MBO();
 
 		// in real implemenation, won't be passing the train here
@@ -68,7 +68,7 @@ public class Main
 		}
 	}
 
-	private static void printTrainState(Train train)
+	private static void printTrainState(TrainModel train)
 	{
 		if (!print)
 			return;
