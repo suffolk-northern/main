@@ -12,17 +12,15 @@ import java.util.Scanner;
  * @author missm
  */
 public class CtcDriver {
-    
-    public static void main(String[] args)
-    {
-        MyCtc ctc = new MyCtc();
-        Scanner scan = new Scanner(System.in);
-        String str = scan.nextLine();
-        while(true)
-        {
-            ctc.readIn(str);
-            str = scan.nextLine();
-        }
-    }
-    
+
+	public static void main(String[] args) {
+		MyCtc ctc = new MyCtc();
+		Scanner scan = new Scanner(System.in);
+		String str = scan.nextLine();
+		while (true) {
+			ctc.readIn(str);
+			str = scan.nextLine();
+		}
+	}
+
 }
