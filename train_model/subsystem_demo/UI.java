@@ -51,8 +51,8 @@ public class UI
 
         TrainModel train = (TrainModel) o;
 
-        double power = 1e6 * HP_PER_WATT * train.power();
-        double sBrake = 1e3 * POUND_PER_NEWTON * train.serviceBrake();
+        double power = HP_PER_WATT * train.power();
+        double sBrake = 1e-3 * POUND_PER_NEWTON * train.serviceBrake();
 
         double latitude  = train.location().latitude();
         double longitude = train.location().longitude();
@@ -71,8 +71,8 @@ public class UI
         TrackMovementCommand trackMessage = train.lastTrackMessage();
 	  MboMovementCommand   mboMessage = train.lastMboMessage();
 
-        controlPower.setText(String.format("%.0f u hp", power));
-        controlSBrake.setText(String.format("%.0f m lb", sBrake));
+        controlPower.setText(String.format("%.0f hp", power));
+        controlSBrake.setText(String.format("%.2f M lb", sBrake));
 
         pointStatsLatitude.setText(String.format(
             "%03.0f'%02.0f'%05.2f\"",
