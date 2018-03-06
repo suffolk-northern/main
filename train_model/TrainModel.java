@@ -235,8 +235,6 @@ public class TrainModel
 		if (value < 0.0 || value > 1.0)
 			throw new IllegalArgumentException("power range");
 
-		value *= MAX_ENGINE_POWER;
-
 		enginePower = MAX_ENGINE_POWER * value;
 	}
 
