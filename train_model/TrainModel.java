@@ -36,30 +36,53 @@ public class TrainModel
 	extends Observable
 	implements Updateable
 {
+	// conversions
+	private static final double KILOGRAMS_PER_TON = 907.185;
+	private static final double MPS_PER_KPH = 0.277778;
+
+	// datasheet constants
+	private static final double DATASHEET_ACCEL_MPSPS   =  0.50;
+	private static final double DATASHEET_SDECEL_MPSPS  =  1.20;
+	private static final double DATASHEET_EDECEL_MPSPS  =  2.73;
+	private static final double DATASHEET_MID_SPEED_KPH = 35.00;
+	private static final double DATASHEET_MID_MASS_TON  = 50.00;
+
+	// kilograms (constant for now)
+	private static final double MASS_EMPTY =
+		KILOGRAMS_PER_TON * DATASHEET_MID_MASS_TON;
+
+	// derived constants from datasheet constants (SI units)
+	private static final double DERIVED_MID_SPEED =
+		MPS_PER_KPH * DATASHEET_MID_SPEED_KPH;
+	private static final double DERIVED_MID_ENGINE_FORCE =
+		MASS_EMPTY * DATASHEET_ACCEL_MPSPS;
+
 	// watts, newtons
-	private static double MAX_ENGINE_POWER = 1.0;
-	private static double MAX_ENGINE_FORCE = 3.0;
+	private static final double MAX_ENGINE_POWER =
+		DERIVED_MID_ENGINE_FORCE * DERIVED_MID_SPEED;
+	private static final double MAX_ENGINE_FORCE =
+		2.0 * DERIVED_MID_ENGINE_FORCE;
 
 	// newtons
-	private static double MAX_SERVICE_BRAKE_FORCE = 1.0;
-	private static double   EMERGENCY_BRAKE_FORCE = 1.0;
+	private static final double MAX_SERVICE_BRAKE_FORCE =
+		MASS_EMPTY * DATASHEET_SDECEL_MPSPS;
+	private static final double   EMERGENCY_BRAKE_FORCE =
+		MASS_EMPTY * DATASHEET_EDECEL_MPSPS;
 
 	// watts
-	private static double HEATER_POWER  = 1.0;
-	private static double COOLING_POWER = 0.5;
+	private static final double HEATER_POWER  = 1.0;
+	private static final double COOLING_POWER = 0.5;
 
-	private static Pose initialPose = new Pose(
+	private static final Pose INITIAL_POSE = new Pose(
 		new GlobalCoordinates(0.0, 0.0),
 		Orientation.degrees(0.0)
 	);
 
-	// kilograms (constant for now)
-	private static final double mass = 1.0;
-
 	// notify observers once every this many updates
 	private static int NOTIFY_OBSERVERS_MOD = 2;
 
-	private final PointMass pointMass = new PointMass(mass, initialPose);
+	private final PointMass pointMass =
+		new PointMass(MASS_EMPTY, INITIAL_POSE);
 
 	// watts
 	private double enginePower = 0.0;
@@ -204,13 +227,13 @@ public class TrainModel
 	//   0.5 = 50% output power
 	//
 	// Failure mode: Engine output is zero regardless of input.
+	//
+	// Throws IllegalArgumentException if value not in [0.0, 1.0].
 	public void power(double value)
 		throws IllegalArgumentException
 	{
 		if (value < 0.0 || value > 1.0)
 			throw new IllegalArgumentException("power range");
-
-		value *= MAX_ENGINE_POWER;
 
 		enginePower = MAX_ENGINE_POWER * value;
 	}
