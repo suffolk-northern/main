@@ -22,7 +22,7 @@ public class Spongebob implements Updateable
 	}
 
 	// Updates this object.
-	public void update()
+	public void update(int time)
 	{
 		readyToRumble = !readyToRumble;
 	}

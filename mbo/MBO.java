@@ -34,8 +34,10 @@ public class MBO implements Updateable
 	}
 
 	// Updates this object.
-	public void update()
+	public void update(int time)
 	{
+		// TODO: parameter time not used
+
 		int index = 0;
 
 		for (int i = 0; i < trains.size(); i++) 

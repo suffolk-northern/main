@@ -52,8 +52,7 @@ public class Main
 
 		for (;;)
 		{
-			for (int i = 0; i < objects.length; ++i)
-				updater.iteration();
+			updater.iteration();
 
 			printTrainState(train);
 

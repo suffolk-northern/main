@@ -102,6 +102,6 @@ public class TestTrain
 		final int iterations = 10 * 10;
 
 		for (int i = 0; i < iterations; ++i)
-			train.update();
+			train.update(100);
 	}
 }

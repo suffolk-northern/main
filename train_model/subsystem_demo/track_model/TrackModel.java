@@ -32,7 +32,7 @@ public class TrackModel implements Updateable
 	private ArrayList<Steerer> steerers = new ArrayList<Steerer>();
 
 	// Updates this object.
-	public void update()
+	public void update(int time)
 	{
 		for (Steerer steerer : steerers) {
 			steerer.steer();

@@ -157,7 +157,7 @@ public class TrainModel
 	}
 
 	// Updates this object.
-	public void update()
+	public void update(int time)
 	{
 		double engineForce = pointMass.forceForPower(enginePower);
 
@@ -172,11 +172,11 @@ public class TrainModel
 		                  - serviceBrakeForce
 		                  - emergencyBrakeForce;
 
-		pointMass.push(netForce, 100);
+		pointMass.push(netForce, time);
 
 		double netPower = heaterPower - COOLING_POWER;
 
-		pointHeat.conduct(netPower, 100);
+		pointHeat.conduct(netPower, time);
 
 		notifyActions();
 	}
