@@ -204,6 +204,8 @@ public class TrainModel
 	//   0.5 = 50% output power
 	//
 	// Failure mode: Engine output is zero regardless of input.
+	//
+	// Throws IllegalArgumentException if value not in [0.0, 1.0].
 	public void power(double value)
 		throws IllegalArgumentException
 	{
