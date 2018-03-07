@@ -2,26 +2,29 @@ package trackmodel;
 
 public class TrackBlock {
 
-    public String line;
-    public char section;
-    public int block;
-    public double length;
-    public double curvature;
-    public double grade;
-    public int direction;
-    public int speedLimit;
-    public boolean isUnderground;
-    public boolean isPowerOn;
-    public boolean isOccupied;
-    public boolean isHeaterOn;
-    public String message;
+    private String line;
+    private char section;
+    private int block;
+    private double length;
+    private double curvature;
+    private double grade;
+    private int direction;
+    private int speedLimit;
+    private boolean isUnderground;
+    private boolean isPowerOn;
+    private boolean isOccupied;
+    private boolean isHeaterOn;
+    private String message;
+    private GlobalCoordinates start, end;
 
-    public boolean isSwitch;
-    public boolean isStation;
-    public boolean isCrossing;
+    private boolean isSwitch;
+    private boolean isStation;
+    private boolean isCrossing;
 
-    TrackBlock nextBlock;
-    TrackBlock prevBlock;
+    public TrackBlock nextBlock;
+    public TrackBlock prevBlock;
+
+    private static final double YARD_MULTIPLIER = 1.09361;
 
     public TrackBlock(String line, int block) {
         this.line = line;
@@ -170,6 +173,25 @@ public class TrackBlock {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public void setStartCoordinates(double x, double y) {
+        start = GlobalCoordinates.ORIGIN.addYards(y * YARD_MULTIPLIER, x * YARD_MULTIPLIER);
+        System.out.println(start.latitude() + " " + start.longitude());
+    }
+
+    public void setEndCoordinates(double x, double y) {
+        end = GlobalCoordinates.ORIGIN.addYards(y * YARD_MULTIPLIER, x * YARD_MULTIPLIER);
+                System.out.println(end.latitude() + " " + end.longitude());
+
+    }
+
+    public GlobalCoordinates getStart() {
+        return start;
+    }
+
+    public GlobalCoordinates getEnd() {
+        return end;
     }
 
     @Override
