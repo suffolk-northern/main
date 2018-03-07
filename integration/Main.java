@@ -11,8 +11,7 @@ import java.util.Arrays;
 
 import java.awt.EventQueue;
 
-// FIXME: package names don't match directory names: ctc, track_model,
-// train_controller
+// FIXME: package names don't match directory names: ctc, train_controller
 //
 // FIXME: naming convention: trainController should be TrainController
 //
@@ -21,7 +20,7 @@ import java.awt.EventQueue;
 //import ctc.Ctc;
 //import mbo.Mbo;
 import track_controller.TrackController;
-//import track_model.TrackModel;
+import track_model.TrackModel;
 //import train_controller.trainController;
 import train_model.TrainModel;
 import updater.Updateable;
@@ -35,7 +34,7 @@ public class Main
 	// FIXME: see imports and initialize()
 	//private static Ctc ctc;
 	//private static Mbo mbo;
-	//private static TrackModel trackModel;
+	private static TrackModel trackModel;
 
 	public static void main(String[] args)
 	{
@@ -62,8 +61,7 @@ public class Main
 			new TrackController(),
 		};
 
-		// FIXME: see imports above
-		//trackModel = new TrackModel();
+		trackModel = new TrackModel();
 
 		// FIXME: see imports above
 		//TrainController[] trainControllers = {
