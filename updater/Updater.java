@@ -16,7 +16,7 @@ import java.util.TimerTask;
 public class Updater
 {
 	// milliseconds
-	private static int period = 100;
+	private static int period;
 
 	private Updateable[] objects;
 
@@ -24,7 +24,10 @@ public class Updater
 	private TimerTask task = new Task(this);
 
 	// Constructs an Updater which updates a list of objects in order.
-	public Updater(Updateable[] objects)
+	//
+	// Parameter period is the length of one update in simulation time, in
+	// milliseconds.
+	public Updater(int period, Updateable[] objects)
 	{
 		this.objects = objects;
 	}

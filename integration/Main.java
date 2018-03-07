@@ -135,8 +135,10 @@ public class Main
 	// interrupting/killing the program.
 	private static void scheduleUpdates()
 	{
-		Updater updater =
-			new Updater(updateables.toArray(new Updateable[0]));
+		Updater updater = new Updater(
+			100,
+			updateables.toArray(new Updateable[0])
+		);
 
 		updater.scheduleAtFixedRate(100);
 	}
