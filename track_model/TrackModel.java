@@ -27,19 +27,19 @@ public class TrackModel {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-//        tmf = new TrackModelFrame();
-//        tmf.setLocationRelativeTo(null);
-//        tmf.setVisible(true);
-//        if (doTablesExist()) {
-//            TestFrame tf = new TestFrame(tmf);
-//            tf.setVisible(true);
-//        }
+        tmf = new TrackModelFrame();
+        tmf.setLocationRelativeTo(null);
+        tmf.setVisible(true);
+        if (doTablesExist()) {
+            TestFrame tf = new TestFrame(tmf);
+            tf.setVisible(true);
+        }
 //        getStation("Green", 3);
-//        for (int i = 1; i < 151; i++) {
-//            TrackBlock tb = getBlock("Green", i);
-////            System.out.println(tb.toString());
-//            System.out.println("-------------------");
-//        }
+        for (int i = 1; i < 151; i++) {
+            TrackBlock tb = getBlock("Green", i);
+//            System.out.println(tb.toString());
+            System.out.println("-------------------");
+        }
 //        for (int i = 1; i < 77; i++) {
 //            getBlock("Red", i);
 //            System.out.println("-------------------");
@@ -109,7 +109,7 @@ public class TrackModel {
                 tb.setIsHeaterOn(rs.getBoolean(11));
                 tb.setMessage(rs.getString(12));
                 tb.setStartCoordinates(rs.getDouble(13), rs.getDouble(14));
-                
+
                 rs = stat.executeQuery("SELECT NEXT_BLOCK FROM CONNECTIONS WHERE LINE='" + line + "' AND BLOCK=" + block + ";");
                 rs = stat.executeQuery("SELECT X, Y FROM BLOCKS WHERE LINE='" + line + "' AND BLOCK=" + rs.getInt(1) + ";");
                 tb.setEndCoordinates(rs.getDouble(1), rs.getDouble(2));
@@ -121,7 +121,7 @@ public class TrackModel {
                 rs = stat.executeQuery("SELECT * FROM STATIONS WHERE LINE='" + line + "' AND BLOCK=" + block + ";");
                 tb.setIsStation(rs.next());
 
-//                getConnections(line, block);
+                getConnections(line, block);
             } else {
                 System.out.println("Invalid block.");
             }
@@ -203,41 +203,40 @@ public class TrackModel {
     /*
     * FOR EXPERIMENTAL PURPOSES AT THE MOMENT
      */
-    public static String getConnections(String line, int block) {
+    public static void getConnections(String line, int block) {
+        System.out.println(block);
         try {
             Connection conn = DriverManager.getConnection("jdbc:sqlite:test.db");
             Statement stat = conn.createStatement();
 
-            ResultSet rs = stat.executeQuery("SELECT DIRECTION FROM BLOCKS "
-                    + "WHERE LINE='" + line + "' AND BLOCK=" + block + ";");
+            ResultSet rs = stat.executeQuery("SELECT * FROM CONNECTIONS WHERE LINE='" + line + "' AND BLOCK=" + block);
             if (rs.next()) {
-                if (rs.getInt(1) == 0 || rs.getInt(1) == 1) {
-                    System.out.println(block + 1);
+                if (rs.getInt(5) == 1) {
+                    System.out.println("PREV: " + rs.getInt(4));
                 }
-                if (rs.getInt(1) == 0 || rs.getInt(1) == -1) {
-                    System.out.println(block - 1);
+                if (rs.getInt(7) == 1) {
+                    System.out.println("NEXT: " + rs.getInt(6));
                 }
-                String swit = "SELECT * FROM CONNECTIONS WHERE LINE='%s' AND (BLOCK=%s OR BLOCK_OUT_A=%s OR BLOCK_OUT_B = %s);";
-                swit = String.format(swit, line, block, block, block);
-                rs = stat.executeQuery(swit);
-                if (rs.next()) {
-                    if (rs.getInt(1) == block && rs.getInt(9) == 1) {
-                        System.out.println("OUT B: " + rs.getInt(8));
-                    } else if (rs.getInt(8) == block) {
-                        System.out.println("CAN GO TO: " + rs.getInt(1));
-                    } else {
-                        System.out.println("UNAFFECTED");
+                if (rs.getObject(9) != null) {
+                    switch (rs.getInt(9)) {
+                        case -1:
+                            System.out.println("Going backwards: " + rs.getInt(8));
+                            break;
+                        case 1:
+                            System.out.println("Going forwards: " + rs.getInt(8));
+                            break;
+                        default:
+                            System.out.println("Only re-entries switch");
+                            break;
                     }
-                } else {
-                    System.out.println("no switch");
                 }
             } else {
-                System.out.println("problem");
+                System.out.println("Invalid line or block.");
             }
+            conn.close();
         } catch (SQLException ex) {
             Logger.getLogger(TrackModel.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return null;
     }
 
     public int[] getDefaultGreenLine() {

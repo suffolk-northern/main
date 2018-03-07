@@ -177,13 +177,10 @@ public class TrackBlock {
 
     public void setStartCoordinates(double x, double y) {
         start = GlobalCoordinates.ORIGIN.addYards(y * YARD_MULTIPLIER, x * YARD_MULTIPLIER);
-        System.out.println(start.latitude() + " " + start.longitude());
     }
 
     public void setEndCoordinates(double x, double y) {
         end = GlobalCoordinates.ORIGIN.addYards(y * YARD_MULTIPLIER, x * YARD_MULTIPLIER);
-                System.out.println(end.latitude() + " " + end.longitude());
-
     }
 
     public GlobalCoordinates getStart() {

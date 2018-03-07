@@ -328,6 +328,8 @@ public class TrackModelFrame extends javax.swing.JFrame {
                     + " message varchar(128),\n"
                     + " x float,\n"
                     + " y float,\n"
+                    + " track_controller integer,\n"
+                    + " tc_orientation,\n"
                     + " PRIMARY KEY (line, block)\n"
                     + ");");
             stat.executeUpdate("CREATE TABLE CONNECTIONS (\n"
@@ -376,7 +378,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
             Class.forName("org.sqlite.JDBC");
             Connection conn = DriverManager.getConnection("jdbc:sqlite:test.db");
             conn.setAutoCommit(false);
-            PreparedStatement blockStmt = conn.prepareStatement("INSERT INTO BLOCKS VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+            PreparedStatement blockStmt = conn.prepareStatement("INSERT INTO BLOCKS VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
             PreparedStatement connStmt = conn.prepareStatement("INSERT INTO CONNECTIONS VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
             PreparedStatement crossingStmt = conn.prepareStatement("INSERT INTO CROSSINGS VALUES(?, ?, ?, ?, ?, ?);");
             PreparedStatement stationStmt = conn.prepareStatement("INSERT INTO STATIONS VALUES(?, ?, ?, ?, ?, ?);");
@@ -401,6 +403,8 @@ public class TrackModelFrame extends javax.swing.JFrame {
                 blockStmt.setString(12, "");
                 blockStmt.setFloat(13, Float.parseFloat(items.get(10)));
                 blockStmt.setFloat(14, Float.parseFloat(items.get(11)));
+                blockStmt.setInt(15, Integer.parseInt(items.get(18)));
+                blockStmt.setInt(16, Integer.parseInt(items.get(19)));
                 blockStmt.addBatch();
 
                 connStmt.setString(1, items.get(0));
