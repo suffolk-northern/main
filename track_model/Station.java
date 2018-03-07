@@ -1,4 +1,4 @@
-package trackmodel;
+package track_model;
 
 public class Station {
 

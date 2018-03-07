@@ -3,7 +3,7 @@
  *
  * Geometry
  */
-package trackmodel;
+package track_model;
 
 // Location of an object on the globe of the Earth
 public class GlobalCoordinates {

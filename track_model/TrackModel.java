@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package trackmodel;
+package track_model;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -35,11 +35,11 @@ public class TrackModel {
 //            tf.setVisible(true);
 //        }
 //        getStation("Green", 3);
-        for (int i = 1; i < 151; i++) {
-            TrackBlock tb = getBlock("Green", i);
-//            System.out.println(tb.toString());
-            System.out.println("-------------------");
-        }
+//        for (int i = 1; i < 151; i++) {
+//            TrackBlock tb = getBlock("Green", i);
+////            System.out.println(tb.toString());
+//            System.out.println("-------------------");
+//        }
 //        for (int i = 1; i < 77; i++) {
 //            getBlock("Red", i);
 //            System.out.println("-------------------");

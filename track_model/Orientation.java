@@ -4,7 +4,7 @@
  * Geometry
  */
 
-package trackmodel;
+package track_model;
 
 // Direction of an object on the surface of a globe
 
