@@ -147,11 +147,15 @@ public class Main
 	// interrupting/killing the program.
 	private static void scheduleUpdates()
 	{
+		// milliseconds
+		final int simulationUpdatePeriod = 100;
+		final int       wallUpdatePeriod = 100;
+
 		Updater updater = new Updater(
-			100,
+			simulationUpdatePeriod,
 			updateables.toArray(new Updateable[0])
 		);
 
-		updater.scheduleAtFixedRate(100);
+		updater.scheduleAtFixedRate(wallUpdatePeriod);
 	}
 }
