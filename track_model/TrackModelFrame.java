@@ -564,7 +564,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
     }
 
     public void scanOccupiedBlocks() {
-        colorRows(jTable1, 10);
+        colorRows(jTable1, 9);
         colorRows(jTable3, 4);
         jTable1.repaint();
         jTable3.repaint();
@@ -572,24 +572,20 @@ public class TrackModelFrame extends javax.swing.JFrame {
 
     public void colorRows(JTable table, int colIndex) {
         table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
-//            @Override
-//            public Component getTableCellRendererComponent(JTable table,
-//                    Object value, boolean isSelected, boolean hasFocus, int row, int col) {
-//                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
-//                boolean status = (boolean) table.getModel().getValueAt(row, colIndex);
-//                boolean outage = colIndex == 4 ? false : table.getModel().getValueAt(row, 9).toString().equalsIgnoreCase("OUTAGE");
-//                if (status) {
-//                    setBackground(Color.RED);
-//                    setForeground(Color.WHITE);
-//                } else if (outage) {
-//                    setBackground(Color.ORANGE);
-//                    setForeground(Color.WHITE);
-//                } else {
-//                    setBackground(table.getBackground());
-//                    setForeground(table.getForeground());
-//                }
-//                return this;
-//            }
+            @Override
+            public Component getTableCellRendererComponent(JTable table,
+                    Object value, boolean isSelected, boolean hasFocus, int row, int col) {
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
+                boolean status = ((String) table.getModel().getValueAt(row, colIndex)).length() > 0;
+                if (status) {
+                    setBackground(Color.RED);
+                    setForeground(Color.WHITE);
+                } else {
+                    setBackground(table.getBackground());
+                    setForeground(table.getForeground());
+                }
+                return this;
+            }
         });
     }
 

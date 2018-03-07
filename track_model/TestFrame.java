@@ -5,18 +5,19 @@
  */
 package track_model;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
+import javax.swing.Timer;
 
 /**
  *
@@ -256,7 +257,6 @@ public class TestFrame extends javax.swing.JFrame {
         block = block.substring(block.lastIndexOf(" "), block.length()).trim();
 
         JOptionPane.showMessageDialog(tmf, TrackModel.getBlock(line, Integer.parseInt(block)).toString());
-        tmf.scanOccupiedBlocks();
     }
 
     private void heat() {
@@ -266,7 +266,6 @@ public class TestFrame extends javax.swing.JFrame {
         block = block.substring(block.lastIndexOf(" "), block.length()).trim();
 
         TrackModel.setHeater(line, Integer.parseInt(block), true);
-        tmf.scanOccupiedBlocks();
     }
 
     private void getSomething2() {
@@ -292,37 +291,30 @@ public class TestFrame extends javax.swing.JFrame {
     private final ArrayList<Integer> trainz = new ArrayList<>();
 
     private void runTrain() {
-        int[] blocks = new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+        ArrayList<Integer> blocks = TrackModel.getDefaultGreenLine();
         trainz.add(0);
         int counter = trainz.size() - 1;
-        Timer timer = new Timer();
-
-        timer.scheduleAtFixedRate(new TimerTask() {
+        Timer timer = new Timer(0, new ActionListener()  {
             @Override
-            public void run() {
-                String line = "GREEN";
-                String block = Integer.toString(blocks[trainz.get(counter) % 12]);
+            public void actionPerformed(ActionEvent e)  {
+                 String line = "Green";
+                int pos = trainz.get(counter);
+                int block = blocks.get(pos);
 
-                for (int i = 0; i < tmf.jTable1.getRowCount(); i++) {
-                    if (tmf.jTable1.getValueAt(i, 2).toString().equalsIgnoreCase(block) && tmf.jTable1.getValueAt(i, 0).toString().equalsIgnoreCase(line)) {
-                        tmf.jTable1.setValueAt(false, i != 0 ? (i - 1) % 12 : 11, 9);
-                        tmf.jTable1.setValueAt(true, i, 9);
-                    }
+                if (pos < blocks.size()) {
+                    TrackModel.setOccupancy(line, block, true);
                 }
-                for (int i = 0; i < tmf.jTable3.getRowCount(); i++) {
-                    if (tmf.jTable3.getValueAt(i, 2).toString().equalsIgnoreCase(block) && tmf.jTable3.getValueAt(i, 0).toString().equalsIgnoreCase(line)) {
-                        tmf.jTable3.setValueAt(false, i != 0 ? (i - 1) % 12 : 11, 4);
-                        tmf.jTable3.setValueAt(false, i != 0 ? (i - 1) % 12 : 11, 5);
-                        tmf.jTable3.setValueAt(true, i, 4);
-                        tmf.jTable3.setValueAt(true, i, 5);
-                    }
+                if (pos > 0) {
+                    TrackModel.setOccupancy(line, blocks.get(pos - 1), false);
                 }
-                tmf.scanOccupiedBlocks();
-                trainz.set(counter, trainz.get(counter) + 1);
+                if (pos == blocks.size()) {
+                    ((Timer) e.getSource()).stop();
+                }
+                trainz.set(counter, pos + 1);
             }
-
-        }, 0, 4000);
-
+        });
+        timer.setDelay(2000);
+        timer.start();
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -160,18 +160,7 @@ public class MurphFrame extends javax.swing.JFrame {
         String block = jComboBox1.getSelectedItem().toString().split(",")[2];
         block = block.substring(block.lastIndexOf(" "), block.length()).trim();
 
-        for (int i = 0; i < blocks.getRowCount(); i++) {
-            if (blocks.getValueAt(i, 2).toString().equalsIgnoreCase(block) && blocks.getValueAt(i, 0).toString().equalsIgnoreCase(line)) {
-                blocks.setValueAt(true, i, 9);
-            }
-        }
-        for (int i = 0; i < crossings.getRowCount(); i++) {
-            if (crossings.getValueAt(i, 2).toString().equalsIgnoreCase(block) && crossings.getValueAt(i, 0).toString().equalsIgnoreCase(line)) {
-                crossings.setValueAt(true, i, 4);
-                crossings.setValueAt(true, i, 5);
-            }
-        }
-        tmf.scanOccupiedBlocks();
+        TrackModel.setOccupancy(line, Integer.parseInt(block), true);
     }
     
     private void breakSomething2() {
