@@ -38,13 +38,13 @@ public class Main
 
 	public static void main(String[] args)
 	{
-		initialize();
+		initializeModules();
 		launchUI();
-		updateLoop();
+		scheduleUpdates();
 	}
 
 	// Initializes/links modules and fills updateables.
-	private static void initialize()
+	private static void initializeModules()
 	{
 		//
 		// instantiate modules
@@ -129,26 +129,15 @@ public class Main
 
 	// Runs an updater on updateables.
 	//
-	// Never returns.
-	private static void updateLoop()
+	// Returns immediately. Updates occur in a worker thread.
+	//
+	// Currently there's no way to stop this other than
+	// interrupting/killing the program.
+	private static void scheduleUpdates()
 	{
 		Updater updater =
 			new Updater(updateables.toArray(new Updateable[0]));
 
-		for (;;)
-		{
-			for (int i = 0; i < updateables.size(); ++i)
-				updater.iteration();
-
-			// hand-wave the timing
-			try
-			{
-				Thread.sleep(100);
-			}
-			catch (InterruptedException e)
-			{
-				// let it be
-			}
-		}
+		updater.scheduleAtFixedRate(100);
 	}
 }
