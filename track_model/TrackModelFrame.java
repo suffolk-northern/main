@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package trackmodel;
+package track_model;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -13,7 +13,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -261,7 +260,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
                 Connection conn = DriverManager.getConnection("jdbc:sqlite:test.db");
                 Statement stat = conn.createStatement();
                 stat.executeUpdate("DROP TABLE IF EXISTS BLOCKS;");
-                stat.executeUpdate("DROP TABLE IF EXISTS SWITCHES;");
+                stat.executeUpdate("DROP TABLE IF EXISTS CONNECTIONS;");
                 stat.executeUpdate("DROP TABLE IF EXISTS CROSSINGS;");
                 stat.executeUpdate("DROP TABLE IF EXISTS STATIONS;");
                 conn.close();
@@ -303,40 +302,6 @@ public class TrackModelFrame extends javax.swing.JFrame {
         mf.setVisible(true);
     }//GEN-LAST:event_jButton3ActionPerformed
 
-//    /**
-//     * @param args the command line arguments
-//     */
-//    public static void main(String args[]) {
-//        /* Set the Nimbus look and feel */
-//        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-//        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-//         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-//         */
-//        try {
-//            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-//                if ("Nimbus".equals(info.getName())) {
-//                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-//                    break;
-//                }
-//            }
-//        } catch (ClassNotFoundException ex) {
-//            java.util.logging.Logger.getLogger(TrackModelFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-//        } catch (InstantiationException ex) {
-//            java.util.logging.Logger.getLogger(TrackModelFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-//        } catch (IllegalAccessException ex) {
-//            java.util.logging.Logger.getLogger(TrackModelFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-//        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-//            java.util.logging.Logger.getLogger(TrackModelFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-//        }
-//        //</editor-fold>
-//
-//        /* Create and display the dialog */
-//        java.awt.EventQueue.invokeLater(new Runnable() {
-//            public void run() {
-//                new TrackModelFrame().setVisible(true);
-//            }
-//        });
-//    }
     private void initializeDatabase() {
 
         try {
@@ -344,56 +309,57 @@ public class TrackModelFrame extends javax.swing.JFrame {
             Connection conn = DriverManager.getConnection("jdbc:sqlite:test.db");
             Statement stat = conn.createStatement();
             stat.executeUpdate("DROP TABLE IF EXISTS BLOCKS;");
-            stat.executeUpdate("DROP TABLE IF EXISTS SWITCHES;");
+            stat.executeUpdate("DROP TABLE IF EXISTS CONNECTIONS;");
             stat.executeUpdate("DROP TABLE IF EXISTS CROSSINGS;");
             stat.executeUpdate("DROP TABLE IF EXISTS STATIONS;");
 
             stat.executeUpdate("CREATE TABLE BLOCKS (\n"
-                    + "	id integer,\n"
                     + "	line text NOT NULL,\n"
                     + "	section varchar(1) NOT NULL,\n"
+                    + "	block integer,\n"
                     + "	length float,\n"
                     + " curvature float,\n"
                     + "	grade float,\n"
-                    + "	direction integer,\n"
                     + "	speed_limit integer,\n"
                     + "	underground boolean,\n"
-                    + " power text,\n"
+                    + " power boolean,\n"
                     + "	occupied boolean,\n"
                     + "	heater boolean,\n"
                     + " message varchar(128),\n"
-                    + " PRIMARY KEY (line, id)\n"
+                    + " x float,\n"
+                    + " y float,\n"
+                    + " PRIMARY KEY (line, block)\n"
                     + ");");
-            stat.executeUpdate("CREATE TABLE SWITCHES (\n"
-                    + "	id integer,\n"
+            stat.executeUpdate("CREATE TABLE CONNECTIONS (\n"
                     + "	line text NOT NULL,\n"
                     + "	section varchar(1) NOT NULL,\n"
-                    + "	section_out_a varchar(1),\n"
-                    + "	block_out_a integer,\n"
-                    + "	direction_out_a integer,\n"
-                    + "	section_out_b varchar(1),\n"
-                    + "	block_out_b integer,\n"
-                    + "	direction_out_b varchar(1),\n"
-                    + " current_setting text,\n"
-                    + " PRIMARY KEY (line, id)\n"
+                    + "	block integer,\n"
+                    + "	prev_block integer,\n"
+                    + "	prev_valid integer,\n"
+                    + "	next_block integer,\n"
+                    + "	next_valid integer,\n"
+                    + "	switch_block integer,\n"
+                    + "	switch_valid integer,\n"
+                    + " current_setting integer,\n"
+                    + " PRIMARY KEY (line, block)\n"
                     + ");");
             stat.executeUpdate("CREATE TABLE CROSSINGS (\n"
-                    + "	id integer,\n"
                     + "	line text NOT NULL,\n"
                     + "	section varchar(1) NOT NULL,\n"
+                    + "	block integer,\n"
                     + "	length float,\n"
                     + "	occupied boolean,\n"
                     + "	signal boolean,\n"
-                    + " PRIMARY KEY (line, id)\n"
+                    + " PRIMARY KEY (line, block)\n"
                     + ");");
             stat.executeUpdate("CREATE TABLE STATIONS (\n"
-                    + "	id integer,\n"
                     + "	line text NOT NULL,\n"
                     + "	section varchar(1) NOT NULL,\n"
+                    + "	block integer,\n"
                     + "	name text,\n"
                     + "	passengers integer,\n"
                     + " message varchar(128),\n"
-                    + " PRIMARY KEY (line, id)\n"
+                    + " PRIMARY KEY (line, block)\n"
                     + ");");
             conn.close();
         } catch (Exception e) {
@@ -410,47 +376,55 @@ public class TrackModelFrame extends javax.swing.JFrame {
             Class.forName("org.sqlite.JDBC");
             Connection conn = DriverManager.getConnection("jdbc:sqlite:test.db");
             conn.setAutoCommit(false);
-            PreparedStatement blockStmt = conn.prepareStatement("INSERT INTO BLOCKS VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
-            PreparedStatement switchStmt = conn.prepareStatement("INSERT INTO SWITCHES VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+            PreparedStatement blockStmt = conn.prepareStatement("INSERT INTO BLOCKS VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+            PreparedStatement connStmt = conn.prepareStatement("INSERT INTO CONNECTIONS VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
             PreparedStatement crossingStmt = conn.prepareStatement("INSERT INTO CROSSINGS VALUES(?, ?, ?, ?, ?, ?);");
             PreparedStatement stationStmt = conn.prepareStatement("INSERT INTO STATIONS VALUES(?, ?, ?, ?, ?, ?);");
 
             String line;
             while ((line = br.readLine()) != null) {
-                if (line.contains("%")) {
+                if (line.contains("%") || line.contains("Red")) {
                     continue;
                 }
                 List<String> items = Arrays.asList(line.split(","));
-                blockStmt.setInt(1, Integer.parseInt(items.get(2)));
-                blockStmt.setString(2, items.get(0));
-                blockStmt.setString(3, items.get(1));
+                blockStmt.setString(1, items.get(0));
+                blockStmt.setString(2, items.get(1));
+                blockStmt.setInt(3, Integer.parseInt(items.get(2)));
                 blockStmt.setFloat(4, Float.parseFloat(items.get(3)));
                 blockStmt.setFloat(5, Float.parseFloat(items.get(4)));
                 blockStmt.setFloat(6, Float.parseFloat(items.get(5)));
                 blockStmt.setInt(7, Integer.parseInt(items.get(6)));
-                blockStmt.setInt(8, Integer.parseInt(items.get(7)));
-                blockStmt.setBoolean(9, line.contains("UNDERGROUND"));
-                blockStmt.setString(10, "GOOD");
+                blockStmt.setBoolean(8, line.contains("UNDERGROUND"));
+                blockStmt.setBoolean(9, true);
+                blockStmt.setBoolean(10, false);
                 blockStmt.setBoolean(11, false);
-                blockStmt.setBoolean(12, false);
-                blockStmt.setString(13, "");
+                blockStmt.setString(12, "");
+                blockStmt.setFloat(13, Float.parseFloat(items.get(10)));
+                blockStmt.setFloat(14, Float.parseFloat(items.get(11)));
                 blockStmt.addBatch();
+
+                connStmt.setString(1, items.get(0));
+                connStmt.setString(2, items.get(1));
+                connStmt.setInt(3, Integer.parseInt(items.get(2)));
+                connStmt.setInt(4, Integer.parseInt(items.get(12)));
+                connStmt.setInt(5, Integer.parseInt(items.get(13)));
+                connStmt.setInt(6, Integer.parseInt(items.get(14)));
+                connStmt.setInt(7, Integer.parseInt(items.get(15)));
                 if (line.contains("SWITCH")) {
-                    switchStmt.setInt(1, Integer.parseInt(items.get(2)));
-                    switchStmt.setString(2, items.get(0));
-                    switchStmt.setString(3, items.get(1));
-                    switchStmt.setString(4, items.get(11));
-                    switchStmt.setInt(5, Integer.parseInt(items.get(12)));
-                    switchStmt.setInt(6, Integer.parseInt(items.get(13)));
-                    switchStmt.setString(7, items.get(14));
-                    switchStmt.setInt(8, Integer.parseInt(items.get(15)));
-                    switchStmt.setInt(9, Integer.parseInt(items.get(16)));
-                    switchStmt.addBatch();
+                    connStmt.setInt(8, Integer.parseInt(items.get(16)));
+                    connStmt.setInt(9, Integer.parseInt(items.get(17)));
+                    connStmt.setInt(10, Integer.parseInt(items.get(16)));
+                } else {
+                    connStmt.setNull(8, java.sql.Types.INTEGER);
+                    connStmt.setNull(9, java.sql.Types.INTEGER);
+                    connStmt.setNull(10, java.sql.Types.INTEGER);
                 }
+                connStmt.addBatch();
+
                 if (line.contains("CROSSING")) {
-                    crossingStmt.setInt(1, Integer.parseInt(items.get(2)));
-                    crossingStmt.setString(2, items.get(0));
-                    crossingStmt.setString(3, items.get(1));
+                    crossingStmt.setString(1, items.get(0));
+                    crossingStmt.setString(2, items.get(1));
+                    crossingStmt.setInt(3, Integer.parseInt(items.get(2)));
                     crossingStmt.setFloat(4, Float.parseFloat(items.get(3)));
                     crossingStmt.setBoolean(5, false);
                     crossingStmt.setBoolean(6, false);
@@ -458,9 +432,9 @@ public class TrackModelFrame extends javax.swing.JFrame {
                 }
                 if (line.contains("STATION")) {
                     List<String> swag = Arrays.asList(items.get(7).split(";"));
-                    stationStmt.setInt(1, Integer.parseInt(items.get(2)));
-                    stationStmt.setString(2, items.get(0));
-                    stationStmt.setString(3, items.get(1));
+                    stationStmt.setString(1, items.get(0));
+                    stationStmt.setString(2, items.get(1));
+                    stationStmt.setInt(3, Integer.parseInt(items.get(2)));
                     stationStmt.setString(4, swag.size() > 1 ? swag.get(1).trim() : "");
                     stationStmt.setInt(5, rand.nextInt(20) + 1);
                     stationStmt.setString(6, "");
@@ -468,23 +442,21 @@ public class TrackModelFrame extends javax.swing.JFrame {
                 }
             }
             blockStmt.executeBatch();
-            switchStmt.executeBatch();
+            connStmt.executeBatch();
             crossingStmt.executeBatch();
             stationStmt.executeBatch();
             conn.setAutoCommit(true);
             conn.close();
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (SQLException ex) {
-            Logger.getLogger(TrackModelFrame.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
+        } catch (SQLException | ClassNotFoundException ex) {
             Logger.getLogger(TrackModelFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    private void populateTables() {
-        Object[] columnNames = {"Line", "Section", "Block #", "Length (yd)", "Curvature", "Grade", "Direction", "Speed Limit (mph)", "Underground", "Power", "Occupied", "Heater", "Message"};
-        Object[] columnNames2 = {"Line", "Section In", "Block In", "Section Out A", "Block Out A", "Direction Out A", "Section Out B", "Block Out B", "Direction Out B", "Current Setting"};
+    protected void populateTables() {
+        Object[] columnNames = {"Line", "Section", "Block #", "Length (yd)", "Curvature", "Grade", "Speed Limit (mph)", "Underground", "Power", "Occupied", "Heater", "Message"};
+        Object[] columnNames2 = {"Line", "Section In", "Block In", "Prev Block", "Prev Direction", "Next Block", "Next Direction", "Switch Block", "Switch Direction", "Current Setting"};
         Object[] columnNames3 = {"Line", "Section", "Block #", "Length", "Occupied", "Signal"};
         Object[] columnNames4 = {"Line", "Section", "Block #", "Name", "Passengers Embarking", "Beacon Message"};
 
@@ -521,26 +493,62 @@ public class TrackModelFrame extends javax.swing.JFrame {
 
             ResultSet rs = stat.executeQuery("SELECT * FROM BLOCKS;");
             while (rs.next()) {
-                Object rowData[] = {rs.getString(2), rs.getString(3), rs.getInt(1), rs.getFloat(4), rs.getFloat(5), rs.getFloat(6), rs.getInt(7), rs.getInt(8), rs.getBoolean(9), rs.getString(10), rs.getBoolean(11),
-                    (boolean) rs.getBoolean(11) ? "ON" : "OFF", rs.getString(12)};
+                Object rowData[] = {
+                    rs.getString(1),
+                    rs.getString(2),
+                    rs.getInt(3),
+                    rs.getFloat(4),
+                    rs.getFloat(5),
+                    rs.getFloat(6),
+                    rs.getInt(7),
+                    rs.getBoolean(8) ? "UNDERGROUND" : "",
+                    rs.getBoolean(9) ? "POWER" : "OUTAGE",
+                    rs.getBoolean(10) ? "OCCUPIED" : "",
+                    rs.getBoolean(11) ? "ON" : "OFF",
+                    rs.getString(12)
+                };
                 model.addRow(rowData);
             }
 
-            rs = stat.executeQuery("SELECT * FROM SWITCHES;");
+            rs = stat.executeQuery("SELECT * FROM CONNECTIONS WHERE SWITCH_BLOCK;");
             while (rs.next()) {
-                Object rowData2[] = {rs.getString(2), rs.getString(3), rs.getInt(1), rs.getString(4), rs.getInt(5), rs.getInt(6), rs.getString(7), rs.getInt(8), rs.getString(9), rs.getInt(5)};
+                Object rowData2[] = {
+                    rs.getString(1),
+                    rs.getString(2),
+                    rs.getInt(3),
+                    rs.getInt(4),
+                    rs.getInt(5),
+                    rs.getInt(6),
+                    rs.getInt(7),
+                    rs.getInt(8) == -1 ? "YARD" : rs.getInt(8),
+                    rs.getInt(9),
+                    rs.getInt(10) == -1 ? "YARD" : rs.getInt(10)
+                };
                 model2.addRow(rowData2);
             }
 
             rs = stat.executeQuery("SELECT * FROM CROSSINGS;");
             while (rs.next()) {
-                Object rowData[] = {rs.getString(2), rs.getString(3), rs.getInt(1), rs.getFloat(4), rs.getBoolean(5), rs.getBoolean(6)};
+                Object rowData[] = {
+                    rs.getString(1),
+                    rs.getString(2),
+                    rs.getInt(3),
+                    rs.getFloat(4),
+                    rs.getBoolean(5) ? "OCCUPIED" : "",
+                    rs.getBoolean(6) ? "ON" : "OFF"
+                };
                 model3.addRow(rowData);
             }
 
             rs = stat.executeQuery("SELECT * FROM STATIONS;");
             while (rs.next()) {
-                Object rowData[] = {rs.getString(2), rs.getString(3), rs.getInt(1), rs.getString(4), rs.getInt(5)};
+                Object rowData[] = {
+                    rs.getString(1),
+                    rs.getString(2),
+                    rs.getInt(3),
+                    rs.getString(4),
+                    rs.getInt(5)
+                };
                 model4.addRow(rowData);
             }
 
@@ -560,24 +568,24 @@ public class TrackModelFrame extends javax.swing.JFrame {
 
     public void colorRows(JTable table, int colIndex) {
         table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table,
-                    Object value, boolean isSelected, boolean hasFocus, int row, int col) {
-                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
-                boolean status = (boolean) table.getModel().getValueAt(row, colIndex);
-                boolean outage = colIndex == 4 ? false : table.getModel().getValueAt(row, 8).toString().equalsIgnoreCase("OUTAGE");
-                if (status) {
-                    setBackground(Color.RED);
-                    setForeground(Color.WHITE);
-                } else if (outage) {
-                    setBackground(Color.ORANGE);
-                    setForeground(Color.WHITE);
-                } else {
-                    setBackground(table.getBackground());
-                    setForeground(table.getForeground());
-                }
-                return this;
-            }
+//            @Override
+//            public Component getTableCellRendererComponent(JTable table,
+//                    Object value, boolean isSelected, boolean hasFocus, int row, int col) {
+//                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
+//                boolean status = (boolean) table.getModel().getValueAt(row, colIndex);
+//                boolean outage = colIndex == 4 ? false : table.getModel().getValueAt(row, 9).toString().equalsIgnoreCase("OUTAGE");
+//                if (status) {
+//                    setBackground(Color.RED);
+//                    setForeground(Color.WHITE);
+//                } else if (outage) {
+//                    setBackground(Color.ORANGE);
+//                    setForeground(Color.WHITE);
+//                } else {
+//                    setBackground(table.getBackground());
+//                    setForeground(table.getForeground());
+//                }
+//                return this;
+//            }
         });
     }
 
