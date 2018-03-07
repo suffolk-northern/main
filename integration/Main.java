@@ -25,6 +25,7 @@ import track_model.TrackModel;
 import train_model.TrainModel;
 import updater.Updateable;
 import updater.Updater;
+import updater.ClockMultiplier;
 
 public class Main
 {
@@ -75,6 +76,18 @@ public class Main
 		//if (trainControllers.length != trainModels.length)
 		//	throw new RuntimeError("mismatched train modules");
 
+		ArrayList<Updateable> trainObjects =
+			new ArrayList<Updateable>();
+
+		// FIXME: see instantiation above
+		//trainObjects.addAll(Arrays.asList(trainControllers));
+		trainObjects.addAll(Arrays.asList(trainModels));
+
+		ClockMultiplier trainMultiplier = new ClockMultiplier(
+			10,
+			trainObjects.toArray(new Updateable[0])
+		);
+
 		//
 		// link modules
 		//
@@ -112,8 +125,7 @@ public class Main
 		//updateables.add(mbo);
 		updateables.addAll(Arrays.asList(trackControllers));
 		//updateables.add(trackModel);
-		//updateables.addAll(Arrays.asList(trainControllers));
-		updateables.addAll(Arrays.asList(trainModels));
+		updateables.add(trainMultiplier);
 	}
 
 	// Starts the user interface.
