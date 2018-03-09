@@ -16,7 +16,7 @@ import java.util.TimerTask;
 public class Updater
 {
 	// milliseconds
-	private static int period;
+	private final int period;
 
 	private Updateable[] objects;
 
@@ -27,8 +27,15 @@ public class Updater
 	//
 	// Parameter period is the length of one update in simulation time, in
 	// milliseconds.
+	//
+	// Throws IllegalArgumentException if period is not positive.
 	public Updater(int period, Updateable[] objects)
+		throws IllegalArgumentException
 	{
+		if (period < 0)
+			throw new IllegalArgumentException("period sign");
+
+		this.period = period;
 		this.objects = objects;
 	}
 
