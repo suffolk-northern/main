@@ -24,7 +24,7 @@ public class TrackBlock {
     public TrackBlock nextBlock;
     public TrackBlock prevBlock;
 
-    private static final double YARD_MULTIPLIER = 1.09361;
+    public static final double YARD_MULTIPLIER = 1.09361;
 
     public TrackBlock(String line, int block) {
         this.line = line;

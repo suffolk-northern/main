@@ -294,15 +294,14 @@ public class TestFrame extends javax.swing.JFrame {
         ArrayList<Integer> blocks = TrackModel.getDefaultGreenLine();
         trainz.add(0);
         int counter = trainz.size() - 1;
-        Timer timer = new Timer(0, new ActionListener()  {
+        Timer timer = new Timer(0, new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e)  {
-                 String line = "Green";
+            public void actionPerformed(ActionEvent e) {
+                String line = "Green";
                 int pos = trainz.get(counter);
-                int block = blocks.get(pos);
 
                 if (pos < blocks.size()) {
-                    TrackModel.setOccupancy(line, block, true);
+                    TrackModel.setOccupancy(line, blocks.get(pos), true);
                 }
                 if (pos > 0) {
                     TrackModel.setOccupancy(line, blocks.get(pos - 1), false);
@@ -313,7 +312,7 @@ public class TestFrame extends javax.swing.JFrame {
                 trainz.set(counter, pos + 1);
             }
         });
-        timer.setDelay(2000);
+        timer.setDelay(50);
         timer.start();
     }
 

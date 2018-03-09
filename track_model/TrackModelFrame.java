@@ -65,6 +65,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
         jTable3 = new javax.swing.JTable();
         jScrollPane6 = new javax.swing.JScrollPane();
         jTable6 = new javax.swing.JTable();
+        jCheckBox1 = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Track Model");
@@ -219,6 +220,13 @@ public class TrackModelFrame extends javax.swing.JFrame {
 
         jTabbedPane1.addTab("Stations", jScrollPane6);
 
+        jCheckBox1.setText("Show Occupied Blocks Only");
+        jCheckBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCheckBox1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -226,10 +234,12 @@ public class TrackModelFrame extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTabbedPane1)
+                    .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 876, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jButton3)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 628, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jCheckBox1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jButton2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton1)))
@@ -244,7 +254,8 @@ public class TrackModelFrame extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton1)
                     .addComponent(jButton2)
-                    .addComponent(jButton3))
+                    .addComponent(jButton3)
+                    .addComponent(jCheckBox1))
                 .addContainerGap())
         );
 
@@ -301,6 +312,10 @@ public class TrackModelFrame extends javax.swing.JFrame {
         MurphFrame mf = new MurphFrame(this, jTable1, jTable3);
         mf.setVisible(true);
     }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
+        populateTables();
+    }//GEN-LAST:event_jCheckBox1ActionPerformed
 
     private void initializeDatabase() {
 
@@ -495,13 +510,15 @@ public class TrackModelFrame extends javax.swing.JFrame {
             Connection conn = DriverManager.getConnection("jdbc:sqlite:test.db");
             Statement stat = conn.createStatement();
 
-            ResultSet rs = stat.executeQuery("SELECT * FROM BLOCKS;");
+            ResultSet rs = jCheckBox1.isSelected()
+                    ? stat.executeQuery("SELECT * FROM BLOCKS WHERE OCCUPIED")
+                    : stat.executeQuery("SELECT * FROM BLOCKS");
             while (rs.next()) {
                 Object rowData[] = {
                     rs.getString(1),
                     rs.getString(2),
                     rs.getInt(3),
-                    rs.getFloat(4),
+                    rs.getFloat(4) * TrackBlock.YARD_MULTIPLIER,
                     rs.getFloat(5),
                     rs.getFloat(6),
                     rs.getInt(7),
@@ -593,6 +610,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
+    private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;

@@ -16,11 +16,16 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import track_controller.TrackController;
+import train_model.TrainModel;
+
+import updater.Updateable;
+
 /**
  *
  * @author Gowest
  */
-public class TrackModel {
+public class TrackModel implements Updateable {
 
     private static TrackModelFrame tmf;
 
@@ -296,5 +301,18 @@ public class TrackModel {
             Logger.getLogger(TrackModel.class.getName()).log(Level.SEVERE, null, ex);
         }
         return blocks;
+    }
+
+    public void registerTrain(TrainModel tm) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public void configureTrackController(TrackController tc) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void update() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
