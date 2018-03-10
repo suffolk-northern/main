@@ -5,11 +5,8 @@
  */
 package track_model;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -137,19 +134,16 @@ public class MurphFrame extends javax.swing.JFrame {
 
     private void populateDropdown() {
         ArrayList<String> blockList = new ArrayList<>();
+        DbHelper dbHelper = new DbHelper();
         try {
-            Class.forName("org.sqlite.JDBC");
-
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:test.db");
-            Statement stat = conn.createStatement();
-
-            ResultSet rs = stat.executeQuery("SELECT LINE, SECTION, BLOCK FROM BLOCKS;");
+            dbHelper.connect();
+            ResultSet rs = dbHelper.query("SELECT LINE, SECTION, BLOCK FROM BLOCKS;");
             while (rs.next()) {
                 blockList.add("Line: " + rs.getString(1) + ", Section: " + rs.getString(2) + ", Block: " + rs.getInt(3));
             }
             jComboBox1.setModel(new DefaultComboBoxModel(blockList.toArray()));
-            conn.close();
-        } catch (ClassNotFoundException | SQLException ex) {
+            dbHelper.close();
+        } catch (SQLException ex) {
             Logger.getLogger(MurphFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -162,13 +156,13 @@ public class MurphFrame extends javax.swing.JFrame {
 
         TrackModel.setOccupancy(line, Integer.parseInt(block), true);
     }
-    
+
     private void breakSomething2() {
         String line = jComboBox1.getSelectedItem().toString().split(",")[0];
         line = line.substring(line.lastIndexOf(" "), line.length()).trim();
         String block = jComboBox1.getSelectedItem().toString().split(",")[2];
         block = block.substring(block.lastIndexOf(" "), block.length()).trim();
-        
+
         TrackModel.setPower(line, Integer.parseInt(block), false);
     }
 
