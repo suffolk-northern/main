@@ -13,14 +13,17 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.*;
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -362,10 +365,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
                     + ");");
             stat.executeUpdate("CREATE TABLE CROSSINGS (\n"
                     + "	line text NOT NULL,\n"
-                    + "	section varchar(1) NOT NULL,\n"
                     + "	block integer,\n"
-                    + "	length float,\n"
-                    + "	occupied boolean,\n"
                     + "	signal boolean,\n"
                     + " PRIMARY KEY (line, block)\n"
                     + ");");
@@ -395,7 +395,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
             conn.setAutoCommit(false);
             PreparedStatement blockStmt = conn.prepareStatement("INSERT INTO BLOCKS VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
             PreparedStatement connStmt = conn.prepareStatement("INSERT INTO CONNECTIONS VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
-            PreparedStatement crossingStmt = conn.prepareStatement("INSERT INTO CROSSINGS VALUES(?, ?, ?, ?, ?, ?);");
+            PreparedStatement crossingStmt = conn.prepareStatement("INSERT INTO CROSSINGS VALUES(?, ?, ?);");
             PreparedStatement stationStmt = conn.prepareStatement("INSERT INTO STATIONS VALUES(?, ?, ?, ?, ?, ?);");
 
             String line;
@@ -442,11 +442,8 @@ public class TrackModelFrame extends javax.swing.JFrame {
 
                 if (line.contains("CROSSING")) {
                     crossingStmt.setString(1, items.get(0));
-                    crossingStmt.setString(2, items.get(1));
-                    crossingStmt.setInt(3, Integer.parseInt(items.get(2)));
-                    crossingStmt.setFloat(4, Float.parseFloat(items.get(3)));
-                    crossingStmt.setBoolean(5, false);
-                    crossingStmt.setBoolean(6, false);
+                    crossingStmt.setInt(2, Integer.parseInt(items.get(2)));
+                    crossingStmt.setBoolean(3, false);
                     crossingStmt.addBatch();
                 }
                 if (line.contains("STATION")) {
@@ -518,10 +515,10 @@ public class TrackModelFrame extends javax.swing.JFrame {
                     rs.getString(1),
                     rs.getString(2),
                     rs.getInt(3),
-                    rs.getFloat(4) * TrackBlock.YARD_MULTIPLIER,
-                    rs.getFloat(5),
-                    rs.getFloat(6),
-                    rs.getInt(7),
+                    rs.getDouble(4) * TrackBlock.METER_TO_YARD_MULTIPLIER,
+                    rs.getDouble(5),
+                    rs.getDouble(6),
+                    rs.getInt(7) * TrackBlock.KILOMETER_TO_MILE_MULTIPLIER,
                     rs.getBoolean(8) ? "UNDERGROUND" : "",
                     rs.getBoolean(9) ? "POWER" : "OUTAGE",
                     rs.getBoolean(10) ? "OCCUPIED" : "",
@@ -548,15 +545,15 @@ public class TrackModelFrame extends javax.swing.JFrame {
                 model2.addRow(rowData2);
             }
 
-            rs = stat.executeQuery("SELECT * FROM CROSSINGS;");
+            rs = stat.executeQuery("SELECT * FROM CROSSINGS NATURAL JOIN BLOCKS;");
             while (rs.next()) {
                 Object rowData[] = {
                     rs.getString(1),
-                    rs.getString(2),
-                    rs.getInt(3),
-                    rs.getFloat(4),
-                    rs.getBoolean(5) ? "OCCUPIED" : "",
-                    rs.getBoolean(6) ? "ON" : "OFF"
+                    rs.getString(4),
+                    rs.getInt(2),
+                    rs.getDouble(5),
+                    rs.getBoolean(11) ? "OCCUPIED" : "",
+                    rs.getBoolean(3) ? "ON" : "OFF"
                 };
                 model3.addRow(rowData);
             }
@@ -581,20 +578,45 @@ public class TrackModelFrame extends javax.swing.JFrame {
     }
 
     public void scanOccupiedBlocks() {
-        colorRows(jTable1, 9);
-        colorRows(jTable3, 4);
-        jTable1.repaint();
-        jTable3.repaint();
-    }
-
-    public void colorRows(JTable table, int colIndex) {
-        table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+        jTable1.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table,
                     Object value, boolean isSelected, boolean hasFocus, int row, int col) {
                 super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
-                boolean status = ((String) table.getModel().getValueAt(row, colIndex)).length() > 0;
-                if (status) {
+                boolean occupied = ((String) table.getModel().getValueAt(row, 9)).equalsIgnoreCase("OCCUPIED");
+                boolean powerOut = ((String) table.getModel().getValueAt(row, 8)).equalsIgnoreCase("OUTAGE");
+
+                if (occupied) {
+                    setBackground(Color.RED);
+                    setForeground(Color.WHITE);
+                } else if (powerOut) {
+                    setBackground(Color.ORANGE);
+                    setForeground(Color.WHITE);
+                } else {
+                    setBackground(table.getBackground());
+                    setForeground(table.getForeground());
+                }
+                boolean underground = ((String) table.getModel().getValueAt(row, 7)).equalsIgnoreCase("UNDERGROUND");
+                if (underground && col == 7) {
+                    setBackground(Color.BLACK);
+                    setForeground(Color.WHITE);
+                }
+
+                if (col >= 3 && col <= 6) {
+                    DecimalFormat dFormat = new DecimalFormat("#0.00");
+                    String s = dFormat.format((double) value);
+                    super.getTableCellRendererComponent(table, s, isSelected, hasFocus, row, col);
+                }
+                return this;
+            }
+        });
+        jTable3.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table,
+                    Object value, boolean isSelected, boolean hasFocus, int row, int col) {
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
+                boolean occupied = ((String) table.getModel().getValueAt(row, 4)).equalsIgnoreCase("OCCUPIED");
+                if (occupied) {
                     setBackground(Color.RED);
                     setForeground(Color.WHITE);
                 } else {

@@ -24,7 +24,8 @@ public class TrackBlock {
     public TrackBlock nextBlock;
     public TrackBlock prevBlock;
 
-    public static final double YARD_MULTIPLIER = 1.09361;
+    public static final double METER_TO_YARD_MULTIPLIER = 1.09361;
+    public static final double KILOMETER_TO_MILE_MULTIPLIER = 0.621371;
 
     public TrackBlock(String line, int block) {
         this.line = line;
@@ -59,6 +60,10 @@ public class TrackBlock {
         return length;
     }
 
+    public double getLengthInYards() {
+        return length * METER_TO_YARD_MULTIPLIER;
+    }
+
     public void setLength(double length) {
         this.length = length;
     }
@@ -89,6 +94,10 @@ public class TrackBlock {
 
     public int getSpeedLimit() {
         return speedLimit;
+    }
+
+    public double getSpeedLimitInMph() {
+        return speedLimit * KILOMETER_TO_MILE_MULTIPLIER;
     }
 
     public void setSpeedLimit(int speedLimit) {
@@ -176,11 +185,11 @@ public class TrackBlock {
     }
 
     public void setStartCoordinates(double x, double y) {
-        start = GlobalCoordinates.ORIGIN.addYards(y * YARD_MULTIPLIER, x * YARD_MULTIPLIER);
+        start = GlobalCoordinates.ORIGIN.addYards(y * METER_TO_YARD_MULTIPLIER, x * METER_TO_YARD_MULTIPLIER);
     }
 
     public void setEndCoordinates(double x, double y) {
-        end = GlobalCoordinates.ORIGIN.addYards(y * YARD_MULTIPLIER, x * YARD_MULTIPLIER);
+        end = GlobalCoordinates.ORIGIN.addYards(y * METER_TO_YARD_MULTIPLIER, x * METER_TO_YARD_MULTIPLIER);
     }
 
     public GlobalCoordinates getStart() {

@@ -190,10 +190,31 @@ public class TrackModel implements Updateable {
         if (doTablesExist()) {
             try {
                 Connection conn = DriverManager.getConnection("jdbc:sqlite:test.db");
+                Statement stat = conn.createStatement();
 
                 String query = "UPDATE BLOCKS SET OCCUPIED=? WHERE LINE=? AND BLOCK=?";
                 PreparedStatement preparedStmt = conn.prepareStatement(query);
                 preparedStmt.setBoolean(1, occupied);
+                preparedStmt.setString(2, line);
+                preparedStmt.setInt(3, block);
+                preparedStmt.executeUpdate();
+
+                tmf.populateTables();
+                conn.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(TrackModel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
+    public static void setPower(String line, int block, boolean on) {
+        if (doTablesExist()) {
+            try {
+                Connection conn = DriverManager.getConnection("jdbc:sqlite:test.db");
+
+                String query = "UPDATE BLOCKS SET POWER=? WHERE LINE=? AND BLOCK=?";
+                PreparedStatement preparedStmt = conn.prepareStatement(query);
+                preparedStmt.setBoolean(1, on);
                 preparedStmt.setString(2, line);
                 preparedStmt.setInt(3, block);
                 preparedStmt.executeUpdate();

@@ -285,7 +285,6 @@ public class TestFrame extends javax.swing.JFrame {
                 );
             }
         }
-        tmf.scanOccupiedBlocks();
     }
 
     private final ArrayList<Integer> trainz = new ArrayList<>();

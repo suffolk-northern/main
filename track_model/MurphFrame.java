@@ -143,7 +143,7 @@ public class MurphFrame extends javax.swing.JFrame {
             Connection conn = DriverManager.getConnection("jdbc:sqlite:test.db");
             Statement stat = conn.createStatement();
 
-            ResultSet rs = stat.executeQuery("SELECT * FROM BLOCKS;");
+            ResultSet rs = stat.executeQuery("SELECT LINE, SECTION, BLOCK FROM BLOCKS;");
             while (rs.next()) {
                 blockList.add("Line: " + rs.getString(1) + ", Section: " + rs.getString(2) + ", Block: " + rs.getInt(3));
             }
@@ -168,13 +168,8 @@ public class MurphFrame extends javax.swing.JFrame {
         line = line.substring(line.lastIndexOf(" "), line.length()).trim();
         String block = jComboBox1.getSelectedItem().toString().split(",")[2];
         block = block.substring(block.lastIndexOf(" "), block.length()).trim();
-
-        for (int i = 0; i < blocks.getRowCount(); i++) {
-            if (blocks.getValueAt(i, 2).toString().equalsIgnoreCase(block) && blocks.getValueAt(i, 0).toString().equalsIgnoreCase(line)) {
-                blocks.setValueAt("OUTAGE", i, 8);
-            }
-        }
-        tmf.scanOccupiedBlocks();
+        
+        TrackModel.setPower(line, Integer.parseInt(block), false);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
