@@ -40,14 +40,9 @@ public class TrackModel implements Updateable {
             TestFrame tf = new TestFrame(tmf);
             tf.setVisible(true);
         }
-//        getStation("Green", 3);
 //        for (int i = 1; i < 151; i++) {
 //            TrackBlock tb = getBlock("Green", i);
-////            System.out.println(tb.toString());
-//            System.out.println("-------------------");
-//        }
-//        for (int i = 1; i < 77; i++) {
-//            getBlock("Red", i);
+//            System.out.println(tb.toString());
 //            System.out.println("-------------------");
 //        }
     }
@@ -120,14 +115,12 @@ public class TrackModel implements Updateable {
                 rs = stat.executeQuery("SELECT X, Y FROM BLOCKS WHERE LINE='" + line + "' AND BLOCK=" + rs.getInt(1) + ";");
                 tb.setEndCoordinates(rs.getDouble(1), rs.getDouble(2));
 
-                rs = stat.executeQuery("SELECT * FROM CONNECTIONS WHERE LINE='" + line + "' AND BLOCK=" + block + ";");
+                rs = stat.executeQuery("SELECT * FROM CONNECTIONS WHERE LINE='" + line + "' AND BLOCK=" + block + " AND SWITCH_BLOCK;");
                 tb.setIsSwitch(rs.next());
                 rs = stat.executeQuery("SELECT * FROM CROSSINGS WHERE LINE='" + line + "' AND BLOCK=" + block + ";");
                 tb.setIsCrossing(rs.next());
                 rs = stat.executeQuery("SELECT * FROM STATIONS WHERE LINE='" + line + "' AND BLOCK=" + block + ";");
                 tb.setIsStation(rs.next());
-
-                getConnections(line, block);
             } else {
                 System.out.println("Invalid block.");
             }
@@ -287,7 +280,6 @@ public class TrackModel implements Updateable {
     }
 
     public static ArrayList<Integer> getDefaultGreenLine() {
-
         ArrayList<Integer> blocks = new ArrayList<>();
         try {
             Connection conn = DriverManager.getConnection("jdbc:sqlite:test.db");

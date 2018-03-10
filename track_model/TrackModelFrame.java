@@ -5,26 +5,20 @@
  */
 package track_model;
 
-import java.awt.Color;
-import java.awt.Component;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.*;
-import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.JTable;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import track_model.tables.BlockTable;
 import track_model.tables.CrossingTable;
@@ -58,64 +52,64 @@ public class TrackModelFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jTabbedPane1 = new javax.swing.JTabbedPane();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new BlockTable();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        jTable2 = new SwitchTable();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        jTable3 = new CrossingTable();
-        jScrollPane6 = new javax.swing.JScrollPane();
-        jTable6 = new StationTable();
-        jCheckBox1 = new javax.swing.JCheckBox();
+        clearButton = new javax.swing.JButton();
+        importButton = new javax.swing.JButton();
+        murphButton = new javax.swing.JButton();
+        tabbedPane = new javax.swing.JTabbedPane();
+        blockScrollPane = new javax.swing.JScrollPane();
+        blockTable = new BlockTable();
+        switchScrollPane = new javax.swing.JScrollPane();
+        switchTable = new SwitchTable();
+        crossingScrollPane = new javax.swing.JScrollPane();
+        crossingTable = new CrossingTable();
+        stationScrollPane = new javax.swing.JScrollPane();
+        stationTable = new StationTable();
+        occupancyCheckBox = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Track Model");
 
-        jButton1.setText("Clear");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        clearButton.setText("Clear");
+        clearButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                clearButtonActionPerformed(evt);
             }
         });
 
-        jButton2.setText("Import");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        importButton.setText("Import");
+        importButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                importButtonActionPerformed(evt);
             }
         });
 
-        jButton3.setText("Failure Tests");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        murphButton.setText("Failure Tests");
+        murphButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                murphButtonActionPerformed(evt);
             }
         });
 
-        jScrollPane1.setViewportView(jTable1);
+        blockScrollPane.setViewportView(blockTable);
 
-        jTabbedPane1.addTab("Blocks", jScrollPane1);
+        tabbedPane.addTab("Blocks", blockScrollPane);
 
-        jScrollPane2.setViewportView(jTable2);
+        switchScrollPane.setViewportView(switchTable);
 
-        jTabbedPane1.addTab("Switches", jScrollPane2);
+        tabbedPane.addTab("Switches", switchScrollPane);
 
-        jScrollPane3.setViewportView(jTable3);
+        crossingScrollPane.setViewportView(crossingTable);
 
-        jTabbedPane1.addTab("Crossings", jScrollPane3);
+        tabbedPane.addTab("Crossings", crossingScrollPane);
 
-        jScrollPane6.setViewportView(jTable6);
+        stationScrollPane.setViewportView(stationTable);
 
-        jTabbedPane1.addTab("Stations", jScrollPane6);
+        tabbedPane.addTab("Stations", stationScrollPane);
 
-        jCheckBox1.setText("Show Occupied Blocks Only");
-        jCheckBox1.addActionListener(new java.awt.event.ActionListener() {
+        occupancyCheckBox.setText("Show Occupied Blocks Only");
+        occupancyCheckBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jCheckBox1ActionPerformed(evt);
+                occupancyCheckBoxActionPerformed(evt);
             }
         });
 
@@ -126,35 +120,35 @@ public class TrackModelFrame extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 876, Short.MAX_VALUE)
+                    .addComponent(tabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 876, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButton3)
+                        .addComponent(murphButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jCheckBox1)
+                        .addComponent(occupancyCheckBox)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton2)
+                        .addComponent(importButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton1)))
+                        .addComponent(clearButton)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 479, Short.MAX_VALUE)
+                .addComponent(tabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 479, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
-                    .addComponent(jButton2)
-                    .addComponent(jButton3)
-                    .addComponent(jCheckBox1))
+                    .addComponent(clearButton)
+                    .addComponent(importButton)
+                    .addComponent(murphButton)
+                    .addComponent(occupancyCheckBox))
                 .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void clearButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearButtonActionPerformed
         int response = JOptionPane.showConfirmDialog(null, "Clearing will wipe all existing track data. Continue?", "Confirm",
                 JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
         if (response == JOptionPane.YES_OPTION) {
@@ -170,14 +164,14 @@ public class TrackModelFrame extends javax.swing.JFrame {
             } catch (SQLException | ClassNotFoundException ex) {
                 Logger.getLogger(TrackModelFrame.class.getName()).log(Level.SEVERE, null, ex);
             }
-            ((DefaultTableModel) jTable1.getModel()).setRowCount(0);
-            ((DefaultTableModel) jTable2.getModel()).setRowCount(0);
-            ((DefaultTableModel) jTable3.getModel()).setRowCount(0);
-            ((DefaultTableModel) jTable6.getModel()).setRowCount(0);
+            ((DefaultTableModel) blockTable.getModel()).setRowCount(0);
+            ((DefaultTableModel) switchTable.getModel()).setRowCount(0);
+            ((DefaultTableModel) crossingTable.getModel()).setRowCount(0);
+            ((DefaultTableModel) stationTable.getModel()).setRowCount(0);
         }
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_clearButtonActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void importButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importButtonActionPerformed
 
         int response = JOptionPane.showConfirmDialog(null, "Importing new track will wipe all existing track data. Continue?", "Confirm",
                 JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
@@ -192,18 +186,18 @@ public class TrackModelFrame extends javax.swing.JFrame {
                 populateTables();
             }
         }
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_importButtonActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        MurphFrame mf = new MurphFrame(this, jTable1, jTable3);
+    private void murphButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_murphButtonActionPerformed
+        MurphFrame mf = new MurphFrame(this, blockTable, crossingTable);
         mf.setVisible(true);
-    }//GEN-LAST:event_jButton3ActionPerformed
+    }//GEN-LAST:event_murphButtonActionPerformed
 
-    private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
+    private void occupancyCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_occupancyCheckBoxActionPerformed
         if (TrackModel.doTablesExist()) {
             populateTables();
         }
-    }//GEN-LAST:event_jCheckBox1ActionPerformed
+    }//GEN-LAST:event_occupancyCheckBoxActionPerformed
 
     private void initializeDatabase() {
         try {
@@ -270,8 +264,6 @@ public class TrackModelFrame extends javax.swing.JFrame {
 
     public void populateDatabase(File trackDataFile) {
         try {
-            Random rand = new Random();
-
             BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(trackDataFile)));
 
             Class.forName("org.sqlite.JDBC");
@@ -336,7 +328,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
                     stationStmt.setString(2, items.get(1));
                     stationStmt.setInt(3, Integer.parseInt(items.get(2)));
                     stationStmt.setString(4, swag.size() > 1 ? swag.get(1).trim() : "");
-                    stationStmt.setInt(5, rand.nextInt(20) + 1);
+                    stationStmt.setInt(5, 0);
                     stationStmt.setString(6, "");
                     stationStmt.addBatch();
                 }
@@ -362,17 +354,17 @@ public class TrackModelFrame extends javax.swing.JFrame {
         TrackModelTableModel stationTableModel = TrackModelTableModel.getStationTableModel();
 
 //        jTable1 = new TrackModelTable();
-        jTable1.setModel(blockTableModel);
-        jTable2.setModel(switchTableModel);
-        jTable3.setModel(crossingTableModel);
-        jTable6.setModel(stationTableModel);
+        blockTable.setModel(blockTableModel);
+        switchTable.setModel(switchTableModel);
+        crossingTable.setModel(crossingTableModel);
+        stationTable.setModel(stationTableModel);
 
         try {
             Class.forName("org.sqlite.JDBC");
             Connection conn = DriverManager.getConnection("jdbc:sqlite:test.db");
             Statement stat = conn.createStatement();
 
-            ResultSet rs = jCheckBox1.isSelected()
+            ResultSet rs = occupancyCheckBox.isSelected()
                     ? stat.executeQuery("SELECT * FROM BLOCKS WHERE OCCUPIED")
                     : stat.executeQuery("SELECT * FROM BLOCKS");
             while (rs.next()) {
@@ -443,18 +435,18 @@ public class TrackModelFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JCheckBox jCheckBox1;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JScrollPane jScrollPane6;
-    private javax.swing.JTabbedPane jTabbedPane1;
-    public javax.swing.JTable jTable1;
-    public javax.swing.JTable jTable2;
-    public javax.swing.JTable jTable3;
-    public javax.swing.JTable jTable6;
+    private javax.swing.JScrollPane blockScrollPane;
+    public javax.swing.JTable blockTable;
+    private javax.swing.JButton clearButton;
+    private javax.swing.JScrollPane crossingScrollPane;
+    public javax.swing.JTable crossingTable;
+    private javax.swing.JButton importButton;
+    private javax.swing.JButton murphButton;
+    private javax.swing.JCheckBox occupancyCheckBox;
+    private javax.swing.JScrollPane stationScrollPane;
+    public javax.swing.JTable stationTable;
+    private javax.swing.JScrollPane switchScrollPane;
+    public javax.swing.JTable switchTable;
+    private javax.swing.JTabbedPane tabbedPane;
     // End of variables declaration//GEN-END:variables
 }

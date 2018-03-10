@@ -215,9 +215,9 @@ public class TestFrame extends javax.swing.JFrame {
             String block = jComboBox2.getSelectedItem().toString().split(",")[1];
             block = block.substring(block.lastIndexOf(" "), block.length() - 1).trim();
 
-            for (int i = 0; i < tmf.jTable6.getRowCount(); i++) {
-                if (tmf.jTable6.getValueAt(i, 2).toString().equalsIgnoreCase(block) && tmf.jTable1.getValueAt(i, 0).toString().equalsIgnoreCase(line)) {
-                    tmf.jTable6.setValueAt(message, i, 5);
+            for (int i = 0; i < tmf.stationTable.getRowCount(); i++) {
+                if (tmf.stationTable.getValueAt(i, 2).toString().equalsIgnoreCase(block) && tmf.blockTable.getValueAt(i, 0).toString().equalsIgnoreCase(line)) {
+                    tmf.stationTable.setValueAt(message, i, 5);
                 }
             }
         }
@@ -273,15 +273,15 @@ public class TestFrame extends javax.swing.JFrame {
         line = line.substring(line.lastIndexOf(" "), line.length()).trim();
         String block = jComboBox2.getSelectedItem().toString().split(",")[1];
         block = block.substring(block.lastIndexOf(" "), block.length() - 1).trim();
-        for (int i = 0; i < tmf.jTable6.getRowCount(); i++) {
-            if (tmf.jTable6.getValueAt(i, 2).toString().equalsIgnoreCase(block) && tmf.jTable6.getValueAt(i, 0).toString().equalsIgnoreCase(line)) {
+        for (int i = 0; i < tmf.stationTable.getRowCount(); i++) {
+            if (tmf.stationTable.getValueAt(i, 2).toString().equalsIgnoreCase(block) && tmf.stationTable.getValueAt(i, 0).toString().equalsIgnoreCase(line)) {
                 JOptionPane.showMessageDialog(tmf,
-                        "Line: " + tmf.jTable6.getValueAt(i, 0) + "\n"
-                        + "Section: " + tmf.jTable6.getValueAt(i, 1) + "\n"
-                        + "Block: " + tmf.jTable6.getValueAt(i, 2) + "\n"
-                        + "Name: " + tmf.jTable6.getValueAt(i, 3) + "\n"
-                        + "Passengers: " + tmf.jTable6.getValueAt(i, 4) + "\n"
-                        + "Message: " + tmf.jTable6.getValueAt(i, 5)
+                        "Line: " + tmf.stationTable.getValueAt(i, 0) + "\n"
+                        + "Section: " + tmf.stationTable.getValueAt(i, 1) + "\n"
+                        + "Block: " + tmf.stationTable.getValueAt(i, 2) + "\n"
+                        + "Name: " + tmf.stationTable.getValueAt(i, 3) + "\n"
+                        + "Passengers: " + tmf.stationTable.getValueAt(i, 4) + "\n"
+                        + "Message: " + tmf.stationTable.getValueAt(i, 5)
                 );
             }
         }
