@@ -20,14 +20,17 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
-import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import track_model.tables.BlockTable;
+import track_model.tables.CrossingTable;
+import track_model.tables.StationTable;
+import track_model.tables.SwitchTable;
+import track_model.tables.TrackModelTableModel;
 
 /**
  *
@@ -42,7 +45,6 @@ public class TrackModelFrame extends javax.swing.JFrame {
         initComponents();
         if (TrackModel.doTablesExist()) {
             populateTables();
-            scanOccupiedBlocks();
         }
     }
 
@@ -61,13 +63,13 @@ public class TrackModelFrame extends javax.swing.JFrame {
         jButton3 = new javax.swing.JButton();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        jTable1 = new BlockTable();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTable2 = new javax.swing.JTable();
+        jTable2 = new SwitchTable();
         jScrollPane3 = new javax.swing.JScrollPane();
-        jTable3 = new javax.swing.JTable();
+        jTable3 = new CrossingTable();
         jScrollPane6 = new javax.swing.JScrollPane();
-        jTable6 = new javax.swing.JTable();
+        jTable6 = new StationTable();
         jCheckBox1 = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -94,131 +96,18 @@ public class TrackModelFrame extends javax.swing.JFrame {
             }
         });
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null}
-            },
-            new String [] {
-                "Line", "Section", "Block", "Length", "Grade", "Speed Limit", "Occupied", "Heater", ""
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Double.class, java.lang.Integer.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Double.class
-            };
-            boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, false
-            };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
-        jTable1.setFocusable(false);
-        jTable1.setVerifyInputWhenFocusTarget(false);
         jScrollPane1.setViewportView(jTable1);
 
         jTabbedPane1.addTab("Blocks", jScrollPane1);
 
-        jTable2.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null}
-            },
-            new String [] {
-                "Line", "Section", "Block", "Length", "Grade", "Speed Limit", "Occupied", "Heater", ""
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Double.class, java.lang.Integer.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Double.class
-            };
-            boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, false
-            };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
-        jTable2.setFocusable(false);
         jScrollPane2.setViewportView(jTable2);
 
         jTabbedPane1.addTab("Switches", jScrollPane2);
 
-        jTable3.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null}
-            },
-            new String [] {
-                "Line", "Section", "Block", "Length", "Grade", "Speed Limit", "Occupied", "Heater", ""
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Double.class, java.lang.Integer.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Double.class
-            };
-            boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, false
-            };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
-        jTable3.setFocusable(false);
         jScrollPane3.setViewportView(jTable3);
 
         jTabbedPane1.addTab("Crossings", jScrollPane3);
 
-        jTable6.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null}
-            },
-            new String [] {
-                "Line", "Section", "Block", "Length", "Grade", "Speed Limit", "Occupied", "Heater", ""
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Double.class, java.lang.Integer.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Double.class
-            };
-            boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, false
-            };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
-        jTable6.setFocusable(false);
         jScrollPane6.setViewportView(jTable6);
 
         jTabbedPane1.addTab("Stations", jScrollPane6);
@@ -281,14 +170,10 @@ public class TrackModelFrame extends javax.swing.JFrame {
             } catch (SQLException | ClassNotFoundException ex) {
                 Logger.getLogger(TrackModelFrame.class.getName()).log(Level.SEVERE, null, ex);
             }
-            DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-            model.setRowCount(0);
-            model = (DefaultTableModel) jTable2.getModel();
-            model.setRowCount(0);
-            model = (DefaultTableModel) jTable3.getModel();
-            model.setRowCount(0);
-            model = (DefaultTableModel) jTable6.getModel();
-            model.setRowCount(0);
+            ((DefaultTableModel) jTable1.getModel()).setRowCount(0);
+            ((DefaultTableModel) jTable2.getModel()).setRowCount(0);
+            ((DefaultTableModel) jTable3.getModel()).setRowCount(0);
+            ((DefaultTableModel) jTable6.getModel()).setRowCount(0);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -305,8 +190,6 @@ public class TrackModelFrame extends javax.swing.JFrame {
                 initializeDatabase();
                 populateDatabase(jfc.getSelectedFile());
                 populateTables();
-                TestFrame tf = new TestFrame(this);
-                tf.setVisible(true);
             }
         }
     }//GEN-LAST:event_jButton2ActionPerformed
@@ -317,11 +200,12 @@ public class TrackModelFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
-        populateTables();
+        if (TrackModel.doTablesExist()) {
+            populateTables();
+        }
     }//GEN-LAST:event_jCheckBox1ActionPerformed
 
     private void initializeDatabase() {
-
         try {
             Class.forName("org.sqlite.JDBC");
             Connection conn = DriverManager.getConnection("jdbc:sqlite:test.db");
@@ -471,36 +355,17 @@ public class TrackModelFrame extends javax.swing.JFrame {
     }
 
     protected void populateTables() {
-        Object[] columnNames = {"Line", "Section", "Block #", "Length (yd)", "Curvature", "Grade", "Speed Limit (mph)", "Underground", "Power", "Occupied", "Heater", "Message"};
-        Object[] columnNames2 = {"Line", "Section In", "Block In", "Prev Block", "Prev Direction", "Next Block", "Next Direction", "Switch Block", "Switch Direction", "Current Setting"};
-        Object[] columnNames3 = {"Line", "Section", "Block #", "Length", "Occupied", "Signal"};
-        Object[] columnNames4 = {"Line", "Section", "Block #", "Name", "Passengers Embarking", "Beacon Message"};
 
-        DefaultTableModel model = new DefaultTableModel(columnNames, 0) {
-            public boolean isCellEditable(int rowIndex, int mColIndex) {
-                return false;
-            }
-        };
-        DefaultTableModel model2 = new DefaultTableModel(columnNames2, 0) {
-            public boolean isCellEditable(int rowIndex, int mColIndex) {
-                return false;
-            }
-        };
-        DefaultTableModel model3 = new DefaultTableModel(columnNames3, 0) {
-            public boolean isCellEditable(int rowIndex, int mColIndex) {
-                return false;
-            }
-        };
-        DefaultTableModel model4 = new DefaultTableModel(columnNames4, 0) {
-            public boolean isCellEditable(int rowIndex, int mColIndex) {
-                return false;
-            }
-        };
+        TrackModelTableModel blockTableModel = TrackModelTableModel.getBlockTableModel();
+        TrackModelTableModel switchTableModel = TrackModelTableModel.getSwitchTableModel();
+        TrackModelTableModel crossingTableModel = TrackModelTableModel.getCrossingTableModel();
+        TrackModelTableModel stationTableModel = TrackModelTableModel.getStationTableModel();
 
-        jTable1.setModel(model);
-        jTable2.setModel(model2);
-        jTable3.setModel(model3);
-        jTable6.setModel(model4);
+//        jTable1 = new TrackModelTable();
+        jTable1.setModel(blockTableModel);
+        jTable2.setModel(switchTableModel);
+        jTable3.setModel(crossingTableModel);
+        jTable6.setModel(stationTableModel);
 
         try {
             Class.forName("org.sqlite.JDBC");
@@ -525,7 +390,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
                     rs.getBoolean(11) ? "ON" : "OFF",
                     rs.getString(12)
                 };
-                model.addRow(rowData);
+                blockTableModel.addRow(rowData);
             }
 
             rs = stat.executeQuery("SELECT * FROM CONNECTIONS WHERE SWITCH_BLOCK;");
@@ -542,7 +407,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
                     rs.getInt(9),
                     rs.getInt(10) == -1 ? "YARD" : rs.getInt(10)
                 };
-                model2.addRow(rowData2);
+                switchTableModel.addRow(rowData2);
             }
 
             rs = stat.executeQuery("SELECT * FROM CROSSINGS NATURAL JOIN BLOCKS;");
@@ -555,7 +420,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
                     rs.getBoolean(11) ? "OCCUPIED" : "",
                     rs.getBoolean(3) ? "ON" : "OFF"
                 };
-                model3.addRow(rowData);
+                crossingTableModel.addRow(rowData);
             }
 
             rs = stat.executeQuery("SELECT * FROM STATIONS;");
@@ -567,7 +432,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
                     rs.getString(4),
                     rs.getInt(5)
                 };
-                model4.addRow(rowData);
+                stationTableModel.addRow(rowData);
             }
 
             rs.close();
@@ -575,57 +440,6 @@ public class TrackModelFrame extends javax.swing.JFrame {
         } catch (ClassNotFoundException | SQLException ex) {
             Logger.getLogger(TrackModelFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
-
-    public void scanOccupiedBlocks() {
-        jTable1.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table,
-                    Object value, boolean isSelected, boolean hasFocus, int row, int col) {
-                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
-                boolean occupied = ((String) table.getModel().getValueAt(row, 9)).equalsIgnoreCase("OCCUPIED");
-                boolean powerOut = ((String) table.getModel().getValueAt(row, 8)).equalsIgnoreCase("OUTAGE");
-
-                if (occupied) {
-                    setBackground(Color.RED);
-                    setForeground(Color.WHITE);
-                } else if (powerOut) {
-                    setBackground(Color.ORANGE);
-                    setForeground(Color.WHITE);
-                } else {
-                    setBackground(table.getBackground());
-                    setForeground(table.getForeground());
-                }
-                boolean underground = ((String) table.getModel().getValueAt(row, 7)).equalsIgnoreCase("UNDERGROUND");
-                if (underground && col == 7) {
-                    setBackground(Color.BLACK);
-                    setForeground(Color.WHITE);
-                }
-
-                if (col >= 3 && col <= 6) {
-                    DecimalFormat dFormat = new DecimalFormat("#0.00");
-                    String s = dFormat.format((double) value);
-                    super.getTableCellRendererComponent(table, s, isSelected, hasFocus, row, col);
-                }
-                return this;
-            }
-        });
-        jTable3.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table,
-                    Object value, boolean isSelected, boolean hasFocus, int row, int col) {
-                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
-                boolean occupied = ((String) table.getModel().getValueAt(row, 4)).equalsIgnoreCase("OCCUPIED");
-                if (occupied) {
-                    setBackground(Color.RED);
-                    setForeground(Color.WHITE);
-                } else {
-                    setBackground(table.getBackground());
-                    setForeground(table.getForeground());
-                }
-                return this;
-            }
-        });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
