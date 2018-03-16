@@ -24,8 +24,8 @@ public class Ctc implements Updateable{
 	public static final int TRAINCOLS = 8;
 	public static final int TRACKCOLS = 9;
 
-	public static MyCtc ctc;
-	public static MyCtcUI ui;
+	public static Ctc ctc;
+	public static CtcUI ui;
 	
 	public static TrackModel trackmodel;
 
