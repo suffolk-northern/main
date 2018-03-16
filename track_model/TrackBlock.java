@@ -16,13 +16,10 @@ public class TrackBlock {
     private boolean isHeaterOn;
     private String message;
     private GlobalCoordinates start, end;
-
+    
     private boolean isSwitch;
     private boolean isStation;
     private boolean isCrossing;
-
-    public TrackBlock nextBlock;
-    public TrackBlock prevBlock;
 
     public static final double METER_TO_YARD_MULTIPLIER = 1.09361;
     public static final double KILOMETER_TO_MILE_MULTIPLIER = 0.621371;
@@ -150,22 +147,6 @@ public class TrackBlock {
 
     public void setIsCrossing(boolean isCrossing) {
         this.isCrossing = isCrossing;
-    }
-
-    public TrackBlock getNextBlock() {
-        return nextBlock;
-    }
-
-    public void setNextBlock(TrackBlock nextBlock) {
-        this.nextBlock = nextBlock;
-    }
-
-    public TrackBlock getPrevBlock() {
-        return prevBlock;
-    }
-
-    public void setPrevBlock(TrackBlock prevBlock) {
-        this.prevBlock = prevBlock;
     }
 
     public boolean isIsOccupied() {

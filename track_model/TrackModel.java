@@ -301,7 +301,7 @@ public class TrackModel implements Updateable {
     }
 
     @Override
-    public void update() {
+    public void update(int time) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
