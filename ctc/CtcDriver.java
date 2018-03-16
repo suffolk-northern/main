@@ -15,6 +15,7 @@ public class CtcDriver {
 
 	public static void main(String[] args) {
 		MyCtc ctc = new MyCtc();
+		ctc.showUI();
 		Scanner scan = new Scanner(System.in);
 		String str = scan.nextLine();
 		while (true) {

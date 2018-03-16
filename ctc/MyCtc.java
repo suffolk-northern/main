@@ -53,7 +53,7 @@ public class MyCtc implements Updateable{
 	public MyCtc() {
 		ctc = this;
 		ui = new MyCtcUI(ctc);
-		showUI();
+		//showUI();
 
 		blueline.add(new Block("blue", true));
 		blueline.add(new Block("blue", 'A', 1, 100, null, null, false));
