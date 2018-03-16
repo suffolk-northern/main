@@ -11,7 +11,9 @@ package myctc;
  */
 import java.util.ArrayDeque;
 import java.util.StringTokenizer;
+
 import updater.Updateable;
+import track_model.TrackModel;
 
 /**
  *
@@ -24,6 +26,8 @@ public class MyCtc implements Updateable{
 
 	public static MyCtc ctc;
 	public static MyCtcUI ui;
+	
+	public static TrackModel trackmodel;
 
 	public static ArrayDeque<Train> trains = new ArrayDeque<Train>();
 	public static ArrayDeque<Block> blueline = new ArrayDeque<Block>();
@@ -53,6 +57,11 @@ public class MyCtc implements Updateable{
     }
 	 */
 	//public static void main(String[] args)
+	
+	public void setTrackModel(TrackModel tm)
+	{
+		this.trackmodel = tm;
+	}
 	
 	public MyCtc() {
 		ctc = this;
@@ -601,6 +610,10 @@ public class MyCtc implements Updateable{
 		
 
 		System.out.println();
+		
+		String msg = speed + " " + auth;
+		
+		trackmodel.setBlockMessage(loc.line, loc.num, msg);
 	}
 	
 	private static void combineAuth(TrackCon tc, boolean[] s, boolean[] l, boolean[] r)
