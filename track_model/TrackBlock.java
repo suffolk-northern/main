@@ -16,15 +16,13 @@ public class TrackBlock {
     private boolean isHeaterOn;
     private String message;
     private GlobalCoordinates start, end;
-
+    
     private boolean isSwitch;
     private boolean isStation;
     private boolean isCrossing;
 
-    public TrackBlock nextBlock;
-    public TrackBlock prevBlock;
-
-    private static final double YARD_MULTIPLIER = 1.09361;
+    public static final double METER_TO_YARD_MULTIPLIER = 1.09361;
+    public static final double KILOMETER_TO_MILE_MULTIPLIER = 0.621371;
 
     public TrackBlock(String line, int block) {
         this.line = line;
@@ -59,6 +57,10 @@ public class TrackBlock {
         return length;
     }
 
+    public double getLengthInYards() {
+        return length * METER_TO_YARD_MULTIPLIER;
+    }
+
     public void setLength(double length) {
         this.length = length;
     }
@@ -89,6 +91,10 @@ public class TrackBlock {
 
     public int getSpeedLimit() {
         return speedLimit;
+    }
+
+    public double getSpeedLimitInMph() {
+        return speedLimit * KILOMETER_TO_MILE_MULTIPLIER;
     }
 
     public void setSpeedLimit(int speedLimit) {
@@ -143,22 +149,6 @@ public class TrackBlock {
         this.isCrossing = isCrossing;
     }
 
-    public TrackBlock getNextBlock() {
-        return nextBlock;
-    }
-
-    public void setNextBlock(TrackBlock nextBlock) {
-        this.nextBlock = nextBlock;
-    }
-
-    public TrackBlock getPrevBlock() {
-        return prevBlock;
-    }
-
-    public void setPrevBlock(TrackBlock prevBlock) {
-        this.prevBlock = prevBlock;
-    }
-
     public boolean isIsOccupied() {
         return isOccupied;
     }
@@ -176,14 +166,11 @@ public class TrackBlock {
     }
 
     public void setStartCoordinates(double x, double y) {
-        start = GlobalCoordinates.ORIGIN.addYards(y * YARD_MULTIPLIER, x * YARD_MULTIPLIER);
-        System.out.println(start.latitude() + " " + start.longitude());
+        start = GlobalCoordinates.ORIGIN.addYards(y * METER_TO_YARD_MULTIPLIER, x * METER_TO_YARD_MULTIPLIER);
     }
 
     public void setEndCoordinates(double x, double y) {
-        end = GlobalCoordinates.ORIGIN.addYards(y * YARD_MULTIPLIER, x * YARD_MULTIPLIER);
-                System.out.println(end.latitude() + " " + end.longitude());
-
+        end = GlobalCoordinates.ORIGIN.addYards(y * METER_TO_YARD_MULTIPLIER, x * METER_TO_YARD_MULTIPLIER);
     }
 
     public GlobalCoordinates getStart() {

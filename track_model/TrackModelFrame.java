@@ -5,8 +5,6 @@
  */
 package track_model;
 
-import java.awt.Color;
-import java.awt.Component;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,22 +13,26 @@ import java.io.InputStreamReader;
 import java.sql.*;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.JTable;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import track_model.tables.BlockTable;
+import track_model.tables.CrossingTable;
+import track_model.tables.StationTable;
+import track_model.tables.SwitchTable;
+import track_model.tables.TrackModelTableModel;
 
 /**
  *
  * @author Gowest
  */
 public class TrackModelFrame extends javax.swing.JFrame {
+
+    private final DbHelper dbHelper = new DbHelper();
 
     /**
      * Creates new form TrackModelFrame
@@ -39,7 +41,6 @@ public class TrackModelFrame extends javax.swing.JFrame {
         initComponents();
         if (TrackModel.doTablesExist()) {
             populateTables();
-            scanOccupiedBlocks();
         }
     }
 
@@ -53,171 +54,66 @@ public class TrackModelFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jTabbedPane1 = new javax.swing.JTabbedPane();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        jTable2 = new javax.swing.JTable();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        jTable3 = new javax.swing.JTable();
-        jScrollPane6 = new javax.swing.JScrollPane();
-        jTable6 = new javax.swing.JTable();
+        clearButton = new javax.swing.JButton();
+        importButton = new javax.swing.JButton();
+        murphButton = new javax.swing.JButton();
+        tabbedPane = new javax.swing.JTabbedPane();
+        blockScrollPane = new javax.swing.JScrollPane();
+        blockTable = new BlockTable();
+        switchScrollPane = new javax.swing.JScrollPane();
+        switchTable = new SwitchTable();
+        crossingScrollPane = new javax.swing.JScrollPane();
+        crossingTable = new CrossingTable();
+        stationScrollPane = new javax.swing.JScrollPane();
+        stationTable = new StationTable();
+        occupancyCheckBox = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Track Model");
 
-        jButton1.setText("Clear");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        clearButton.setText("Clear");
+        clearButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                clearButtonActionPerformed(evt);
             }
         });
 
-        jButton2.setText("Import");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        importButton.setText("Import");
+        importButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                importButtonActionPerformed(evt);
             }
         });
 
-        jButton3.setText("Failure Tests");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        murphButton.setText("Failure Tests");
+        murphButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                murphButtonActionPerformed(evt);
             }
         });
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null}
-            },
-            new String [] {
-                "Line", "Section", "Block", "Length", "Grade", "Speed Limit", "Occupied", "Heater", ""
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Double.class, java.lang.Integer.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Double.class
-            };
-            boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, false
-            };
+        blockScrollPane.setViewportView(blockTable);
 
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
+        tabbedPane.addTab("Blocks", blockScrollPane);
 
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
+        switchScrollPane.setViewportView(switchTable);
+
+        tabbedPane.addTab("Switches", switchScrollPane);
+
+        crossingScrollPane.setViewportView(crossingTable);
+
+        tabbedPane.addTab("Crossings", crossingScrollPane);
+
+        stationScrollPane.setViewportView(stationTable);
+
+        tabbedPane.addTab("Stations", stationScrollPane);
+
+        occupancyCheckBox.setText("Show Occupied Blocks Only");
+        occupancyCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                occupancyCheckBoxActionPerformed(evt);
             }
         });
-        jTable1.setFocusable(false);
-        jTable1.setVerifyInputWhenFocusTarget(false);
-        jScrollPane1.setViewportView(jTable1);
-
-        jTabbedPane1.addTab("Blocks", jScrollPane1);
-
-        jTable2.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null}
-            },
-            new String [] {
-                "Line", "Section", "Block", "Length", "Grade", "Speed Limit", "Occupied", "Heater", ""
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Double.class, java.lang.Integer.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Double.class
-            };
-            boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, false
-            };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
-        jTable2.setFocusable(false);
-        jScrollPane2.setViewportView(jTable2);
-
-        jTabbedPane1.addTab("Switches", jScrollPane2);
-
-        jTable3.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null}
-            },
-            new String [] {
-                "Line", "Section", "Block", "Length", "Grade", "Speed Limit", "Occupied", "Heater", ""
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Double.class, java.lang.Integer.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Double.class
-            };
-            boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, false
-            };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
-        jTable3.setFocusable(false);
-        jScrollPane3.setViewportView(jTable3);
-
-        jTabbedPane1.addTab("Crossings", jScrollPane3);
-
-        jTable6.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null}
-            },
-            new String [] {
-                "Line", "Section", "Block", "Length", "Grade", "Speed Limit", "Occupied", "Heater", ""
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Double.class, java.lang.Integer.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Double.class
-            };
-            boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, false
-            };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
-        jTable6.setFocusable(false);
-        jScrollPane6.setViewportView(jTable6);
-
-        jTabbedPane1.addTab("Stations", jScrollPane6);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -226,59 +122,53 @@ public class TrackModelFrame extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTabbedPane1)
+                    .addComponent(tabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 876, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButton3)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 628, Short.MAX_VALUE)
-                        .addComponent(jButton2)
+                        .addComponent(murphButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(occupancyCheckBox)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(importButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton1)))
+                        .addComponent(clearButton)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 479, Short.MAX_VALUE)
+                .addComponent(tabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 479, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
-                    .addComponent(jButton2)
-                    .addComponent(jButton3))
+                    .addComponent(clearButton)
+                    .addComponent(importButton)
+                    .addComponent(murphButton)
+                    .addComponent(occupancyCheckBox))
                 .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void clearButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearButtonActionPerformed
         int response = JOptionPane.showConfirmDialog(null, "Clearing will wipe all existing track data. Continue?", "Confirm",
                 JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
         if (response == JOptionPane.YES_OPTION) {
-            try {
-                Class.forName("org.sqlite.JDBC");
-                Connection conn = DriverManager.getConnection("jdbc:sqlite:test.db");
-                Statement stat = conn.createStatement();
-                stat.executeUpdate("DROP TABLE IF EXISTS BLOCKS;");
-                stat.executeUpdate("DROP TABLE IF EXISTS CONNECTIONS;");
-                stat.executeUpdate("DROP TABLE IF EXISTS CROSSINGS;");
-                stat.executeUpdate("DROP TABLE IF EXISTS STATIONS;");
-                conn.close();
-            } catch (SQLException | ClassNotFoundException ex) {
-                Logger.getLogger(TrackModelFrame.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-            model.setRowCount(0);
-            model = (DefaultTableModel) jTable2.getModel();
-            model.setRowCount(0);
-            model = (DefaultTableModel) jTable3.getModel();
-            model.setRowCount(0);
-            model = (DefaultTableModel) jTable6.getModel();
-            model.setRowCount(0);
-        }
-    }//GEN-LAST:event_jButton1ActionPerformed
+            dbHelper.connect();
+            dbHelper.execute("DROP TABLE IF EXISTS BLOCKS");
+            dbHelper.execute("DROP TABLE IF EXISTS CONNECTIONS");
+            dbHelper.execute("DROP TABLE IF EXISTS CROSSINGS");
+            dbHelper.execute("DROP TABLE IF EXISTS STATIONS");
+            dbHelper.close();
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+            ((DefaultTableModel) blockTable.getModel()).setRowCount(0);
+            ((DefaultTableModel) switchTable.getModel()).setRowCount(0);
+            ((DefaultTableModel) crossingTable.getModel()).setRowCount(0);
+            ((DefaultTableModel) stationTable.getModel()).setRowCount(0);
+        }
+    }//GEN-LAST:event_clearButtonActionPerformed
+
+    private void importButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importButtonActionPerformed
 
         int response = JOptionPane.showConfirmDialog(null, "Importing new track will wipe all existing track data. Continue?", "Confirm",
                 JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
@@ -291,94 +181,88 @@ public class TrackModelFrame extends javax.swing.JFrame {
                 initializeDatabase();
                 populateDatabase(jfc.getSelectedFile());
                 populateTables();
-                TestFrame tf = new TestFrame(this);
-                tf.setVisible(true);
             }
         }
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_importButtonActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        MurphFrame mf = new MurphFrame(this, jTable1, jTable3);
+    private void murphButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_murphButtonActionPerformed
+        MurphFrame mf = new MurphFrame(this, blockTable, crossingTable);
         mf.setVisible(true);
-    }//GEN-LAST:event_jButton3ActionPerformed
+    }//GEN-LAST:event_murphButtonActionPerformed
+
+    private void occupancyCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_occupancyCheckBoxActionPerformed
+        if (TrackModel.doTablesExist()) {
+            populateTables();
+        }
+    }//GEN-LAST:event_occupancyCheckBoxActionPerformed
 
     private void initializeDatabase() {
+        dbHelper.connect();
+        dbHelper.execute("DROP TABLE IF EXISTS BLOCKS");
+        dbHelper.execute("DROP TABLE IF EXISTS CONNECTIONS");
+        dbHelper.execute("DROP TABLE IF EXISTS CROSSINGS");
+        dbHelper.execute("DROP TABLE IF EXISTS STATIONS");
 
-        try {
-            Class.forName("org.sqlite.JDBC");
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:test.db");
-            Statement stat = conn.createStatement();
-            stat.executeUpdate("DROP TABLE IF EXISTS BLOCKS;");
-            stat.executeUpdate("DROP TABLE IF EXISTS CONNECTIONS;");
-            stat.executeUpdate("DROP TABLE IF EXISTS CROSSINGS;");
-            stat.executeUpdate("DROP TABLE IF EXISTS STATIONS;");
-
-            stat.executeUpdate("CREATE TABLE BLOCKS (\n"
-                    + "	line text NOT NULL,\n"
-                    + "	section varchar(1) NOT NULL,\n"
-                    + "	block integer,\n"
-                    + "	length float,\n"
-                    + " curvature float,\n"
-                    + "	grade float,\n"
-                    + "	speed_limit integer,\n"
-                    + "	underground boolean,\n"
-                    + " power boolean,\n"
-                    + "	occupied boolean,\n"
-                    + "	heater boolean,\n"
-                    + " message varchar(128),\n"
-                    + " x float,\n"
-                    + " y float,\n"
-                    + " PRIMARY KEY (line, block)\n"
-                    + ");");
-            stat.executeUpdate("CREATE TABLE CONNECTIONS (\n"
-                    + "	line text NOT NULL,\n"
-                    + "	section varchar(1) NOT NULL,\n"
-                    + "	block integer,\n"
-                    + "	prev_block integer,\n"
-                    + "	prev_valid integer,\n"
-                    + "	next_block integer,\n"
-                    + "	next_valid integer,\n"
-                    + "	switch_block integer,\n"
-                    + "	switch_valid integer,\n"
-                    + " current_setting integer,\n"
-                    + " PRIMARY KEY (line, block)\n"
-                    + ");");
-            stat.executeUpdate("CREATE TABLE CROSSINGS (\n"
-                    + "	line text NOT NULL,\n"
-                    + "	section varchar(1) NOT NULL,\n"
-                    + "	block integer,\n"
-                    + "	length float,\n"
-                    + "	occupied boolean,\n"
-                    + "	signal boolean,\n"
-                    + " PRIMARY KEY (line, block)\n"
-                    + ");");
-            stat.executeUpdate("CREATE TABLE STATIONS (\n"
-                    + "	line text NOT NULL,\n"
-                    + "	section varchar(1) NOT NULL,\n"
-                    + "	block integer,\n"
-                    + "	name text,\n"
-                    + "	passengers integer,\n"
-                    + " message varchar(128),\n"
-                    + " PRIMARY KEY (line, block)\n"
-                    + ");");
-            conn.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        dbHelper.execute("CREATE TABLE BLOCKS (\n"
+                + " line text NOT NULL,\n"
+                + " section varchar(1) NOT NULL,\n"
+                + " block integer,\n"
+                + " length float,\n"
+                + " curvature float,\n"
+                + " grade float,\n"
+                + " speed_limit integer,\n"
+                + " underground boolean,\n"
+                + " power boolean,\n"
+                + " occupied boolean,\n"
+                + " heater boolean,\n"
+                + " message varchar(128),\n"
+                + " x float,\n"
+                + " y float,\n"
+                + " track_controller integer,\n"
+                + " tc_orientation,\n"
+                + " PRIMARY KEY (line, block)\n"
+                + ");");
+        dbHelper.execute("CREATE TABLE CONNECTIONS (\n"
+                + " line text NOT NULL,\n"
+                + " section varchar(1) NOT NULL,\n"
+                + " block integer,\n"
+                + " prev_block integer,\n"
+                + " prev_valid integer,\n"
+                + " next_block integer,\n"
+                + " next_valid integer,\n"
+                + " switch_block integer,\n"
+                + " switch_valid integer,\n"
+                + " current_setting integer,\n"
+                + " PRIMARY KEY (line, block)\n"
+                + ");");
+        dbHelper.execute("CREATE TABLE CROSSINGS (\n"
+                + " line text NOT NULL,\n"
+                + " block integer,\n"
+                + " signal boolean,\n"
+                + " PRIMARY KEY (line, block)\n"
+                + ");");
+        dbHelper.execute("CREATE TABLE STATIONS (\n"
+                + " line text NOT NULL,\n"
+                + " section varchar(1) NOT NULL,\n"
+                + " block integer,\n"
+                + " name text,\n"
+                + " passengers integer,\n"
+                + " message varchar(128),\n"
+                + " PRIMARY KEY (line, block)\n"
+                + ");");
+        dbHelper.close();
     }
 
     public void populateDatabase(File trackDataFile) {
         try {
-            Random rand = new Random();
-
             BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(trackDataFile)));
 
             Class.forName("org.sqlite.JDBC");
             Connection conn = DriverManager.getConnection("jdbc:sqlite:test.db");
             conn.setAutoCommit(false);
-            PreparedStatement blockStmt = conn.prepareStatement("INSERT INTO BLOCKS VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+            PreparedStatement blockStmt = conn.prepareStatement("INSERT INTO BLOCKS VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
             PreparedStatement connStmt = conn.prepareStatement("INSERT INTO CONNECTIONS VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
-            PreparedStatement crossingStmt = conn.prepareStatement("INSERT INTO CROSSINGS VALUES(?, ?, ?, ?, ?, ?);");
+            PreparedStatement crossingStmt = conn.prepareStatement("INSERT INTO CROSSINGS VALUES(?, ?, ?);");
             PreparedStatement stationStmt = conn.prepareStatement("INSERT INTO STATIONS VALUES(?, ?, ?, ?, ?, ?);");
 
             String line;
@@ -401,6 +285,8 @@ public class TrackModelFrame extends javax.swing.JFrame {
                 blockStmt.setString(12, "");
                 blockStmt.setFloat(13, Float.parseFloat(items.get(10)));
                 blockStmt.setFloat(14, Float.parseFloat(items.get(11)));
+                blockStmt.setInt(15, Integer.parseInt(items.get(18)));
+                blockStmt.setInt(16, Integer.parseInt(items.get(19)));
                 blockStmt.addBatch();
 
                 connStmt.setString(1, items.get(0));
@@ -423,11 +309,8 @@ public class TrackModelFrame extends javax.swing.JFrame {
 
                 if (line.contains("CROSSING")) {
                     crossingStmt.setString(1, items.get(0));
-                    crossingStmt.setString(2, items.get(1));
-                    crossingStmt.setInt(3, Integer.parseInt(items.get(2)));
-                    crossingStmt.setFloat(4, Float.parseFloat(items.get(3)));
-                    crossingStmt.setBoolean(5, false);
-                    crossingStmt.setBoolean(6, false);
+                    crossingStmt.setInt(2, Integer.parseInt(items.get(2)));
+                    crossingStmt.setBoolean(3, false);
                     crossingStmt.addBatch();
                 }
                 if (line.contains("STATION")) {
@@ -436,7 +319,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
                     stationStmt.setString(2, items.get(1));
                     stationStmt.setInt(3, Integer.parseInt(items.get(2)));
                     stationStmt.setString(4, swag.size() > 1 ? swag.get(1).trim() : "");
-                    stationStmt.setInt(5, rand.nextInt(20) + 1);
+                    stationStmt.setInt(5, 0);
                     stationStmt.setString(6, "");
                     stationStmt.addBatch();
                 }
@@ -455,62 +338,42 @@ public class TrackModelFrame extends javax.swing.JFrame {
     }
 
     protected void populateTables() {
-        Object[] columnNames = {"Line", "Section", "Block #", "Length (yd)", "Curvature", "Grade", "Speed Limit (mph)", "Underground", "Power", "Occupied", "Heater", "Message"};
-        Object[] columnNames2 = {"Line", "Section In", "Block In", "Prev Block", "Prev Direction", "Next Block", "Next Direction", "Switch Block", "Switch Direction", "Current Setting"};
-        Object[] columnNames3 = {"Line", "Section", "Block #", "Length", "Occupied", "Signal"};
-        Object[] columnNames4 = {"Line", "Section", "Block #", "Name", "Passengers Embarking", "Beacon Message"};
 
-        DefaultTableModel model = new DefaultTableModel(columnNames, 0) {
-            public boolean isCellEditable(int rowIndex, int mColIndex) {
-                return false;
-            }
-        };
-        DefaultTableModel model2 = new DefaultTableModel(columnNames2, 0) {
-            public boolean isCellEditable(int rowIndex, int mColIndex) {
-                return false;
-            }
-        };
-        DefaultTableModel model3 = new DefaultTableModel(columnNames3, 0) {
-            public boolean isCellEditable(int rowIndex, int mColIndex) {
-                return false;
-            }
-        };
-        DefaultTableModel model4 = new DefaultTableModel(columnNames4, 0) {
-            public boolean isCellEditable(int rowIndex, int mColIndex) {
-                return false;
-            }
-        };
+        TrackModelTableModel blockTableModel = TrackModelTableModel.getBlockTableModel();
+        TrackModelTableModel switchTableModel = TrackModelTableModel.getSwitchTableModel();
+        TrackModelTableModel crossingTableModel = TrackModelTableModel.getCrossingTableModel();
+        TrackModelTableModel stationTableModel = TrackModelTableModel.getStationTableModel();
 
-        jTable1.setModel(model);
-        jTable2.setModel(model2);
-        jTable3.setModel(model3);
-        jTable6.setModel(model4);
+        blockTable.setModel(blockTableModel);
+        switchTable.setModel(switchTableModel);
+        crossingTable.setModel(crossingTableModel);
+        stationTable.setModel(stationTableModel);
 
         try {
-            Class.forName("org.sqlite.JDBC");
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:test.db");
-            Statement stat = conn.createStatement();
+            dbHelper.connect();
 
-            ResultSet rs = stat.executeQuery("SELECT * FROM BLOCKS;");
+            ResultSet rs = occupancyCheckBox.isSelected()
+                    ? dbHelper.query("SELECT * FROM BLOCKS WHERE OCCUPIED")
+                    : dbHelper.query("SELECT * FROM BLOCKS");
             while (rs.next()) {
                 Object rowData[] = {
                     rs.getString(1),
                     rs.getString(2),
                     rs.getInt(3),
-                    rs.getFloat(4),
-                    rs.getFloat(5),
-                    rs.getFloat(6),
-                    rs.getInt(7),
+                    rs.getDouble(4) * TrackBlock.METER_TO_YARD_MULTIPLIER,
+                    rs.getDouble(5),
+                    rs.getDouble(6),
+                    rs.getInt(7) * TrackBlock.KILOMETER_TO_MILE_MULTIPLIER,
                     rs.getBoolean(8) ? "UNDERGROUND" : "",
                     rs.getBoolean(9) ? "POWER" : "OUTAGE",
                     rs.getBoolean(10) ? "OCCUPIED" : "",
                     rs.getBoolean(11) ? "ON" : "OFF",
                     rs.getString(12)
                 };
-                model.addRow(rowData);
+                blockTableModel.addRow(rowData);
             }
 
-            rs = stat.executeQuery("SELECT * FROM CONNECTIONS WHERE SWITCH_BLOCK;");
+            rs = dbHelper.query("SELECT * FROM CONNECTIONS WHERE SWITCH_BLOCK;");
             while (rs.next()) {
                 Object rowData2[] = {
                     rs.getString(1),
@@ -524,23 +387,23 @@ public class TrackModelFrame extends javax.swing.JFrame {
                     rs.getInt(9),
                     rs.getInt(10) == -1 ? "YARD" : rs.getInt(10)
                 };
-                model2.addRow(rowData2);
+                switchTableModel.addRow(rowData2);
             }
 
-            rs = stat.executeQuery("SELECT * FROM CROSSINGS;");
+            rs = dbHelper.query("SELECT * FROM CROSSINGS NATURAL JOIN BLOCKS;");
             while (rs.next()) {
                 Object rowData[] = {
                     rs.getString(1),
-                    rs.getString(2),
-                    rs.getInt(3),
-                    rs.getFloat(4),
-                    rs.getBoolean(5) ? "OCCUPIED" : "",
-                    rs.getBoolean(6) ? "ON" : "OFF"
+                    rs.getString(4),
+                    rs.getInt(2),
+                    rs.getDouble(5),
+                    rs.getBoolean(11) ? "OCCUPIED" : "",
+                    rs.getBoolean(3) ? "ON" : "OFF"
                 };
-                model3.addRow(rowData);
+                crossingTableModel.addRow(rowData);
             }
 
-            rs = stat.executeQuery("SELECT * FROM STATIONS;");
+            rs = dbHelper.query("SELECT * FROM STATIONS;");
             while (rs.next()) {
                 Object rowData[] = {
                     rs.getString(1),
@@ -549,58 +412,29 @@ public class TrackModelFrame extends javax.swing.JFrame {
                     rs.getString(4),
                     rs.getInt(5)
                 };
-                model4.addRow(rowData);
+                stationTableModel.addRow(rowData);
             }
 
             rs.close();
-            conn.close();
-        } catch (ClassNotFoundException | SQLException ex) {
+            dbHelper.close();
+        } catch (SQLException ex) {
             Logger.getLogger(TrackModelFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    public void scanOccupiedBlocks() {
-        colorRows(jTable1, 10);
-        colorRows(jTable3, 4);
-        jTable1.repaint();
-        jTable3.repaint();
-    }
-
-    public void colorRows(JTable table, int colIndex) {
-        table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
-//            @Override
-//            public Component getTableCellRendererComponent(JTable table,
-//                    Object value, boolean isSelected, boolean hasFocus, int row, int col) {
-//                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
-//                boolean status = (boolean) table.getModel().getValueAt(row, colIndex);
-//                boolean outage = colIndex == 4 ? false : table.getModel().getValueAt(row, 9).toString().equalsIgnoreCase("OUTAGE");
-//                if (status) {
-//                    setBackground(Color.RED);
-//                    setForeground(Color.WHITE);
-//                } else if (outage) {
-//                    setBackground(Color.ORANGE);
-//                    setForeground(Color.WHITE);
-//                } else {
-//                    setBackground(table.getBackground());
-//                    setForeground(table.getForeground());
-//                }
-//                return this;
-//            }
-        });
-    }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JScrollPane jScrollPane6;
-    private javax.swing.JTabbedPane jTabbedPane1;
-    public javax.swing.JTable jTable1;
-    public javax.swing.JTable jTable2;
-    public javax.swing.JTable jTable3;
-    public javax.swing.JTable jTable6;
+    private javax.swing.JScrollPane blockScrollPane;
+    public javax.swing.JTable blockTable;
+    private javax.swing.JButton clearButton;
+    private javax.swing.JScrollPane crossingScrollPane;
+    public javax.swing.JTable crossingTable;
+    private javax.swing.JButton importButton;
+    private javax.swing.JButton murphButton;
+    private javax.swing.JCheckBox occupancyCheckBox;
+    private javax.swing.JScrollPane stationScrollPane;
+    public javax.swing.JTable stationTable;
+    private javax.swing.JScrollPane switchScrollPane;
+    public javax.swing.JTable switchTable;
+    private javax.swing.JTabbedPane tabbedPane;
     // End of variables declaration//GEN-END:variables
 }

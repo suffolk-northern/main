@@ -6,6 +6,7 @@ public class Station {
     private char section;
     private int block;
     private String name;
+    private int passengers;
     private String beacon;
 
     public Station(String line, int block) {
@@ -57,6 +58,7 @@ public class Station {
     public String toString() {
         return "Hi, I'm Station " + name + " of the " + line + " Line, Section " + section + ".\n"
                 + "\tBlock: " + block + "\n"
+                + "\tPassengers: " + passengers + "\n"
                 + "\tBeacon Message: " + beacon;
     }
 }
