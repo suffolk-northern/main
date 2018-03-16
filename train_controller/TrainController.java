@@ -14,8 +14,8 @@ public class TrainController implements Updateable
 
 	boolean manualMode;		// States of commands from controller GUI
 	boolean lightsCMD;
-	boolean leftDoorsCMD;
 	boolean rightDoorsCMD;
+	boolean leftDoorsCMD;
 	boolean heaterOnCMD;
 	int driverSetSpeed;
 
