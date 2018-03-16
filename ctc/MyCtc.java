@@ -36,9 +36,13 @@ public class MyCtc implements Updateable{
 		ui.showUI();
 	}
 
-	public static void update()
+	public void update(int time)
 	{
+		// ask track model for updates
 		
+		updateTrack();
+		updateTrains();
+		return;
 	}
 	
 	/*
@@ -123,11 +127,6 @@ public class MyCtc implements Updateable{
 		updateTrains();
 
 
-	}
-	
-	public void update()
-	{
-		
 	}
 
 	private static Train getTrain(int ID) {
@@ -595,11 +594,11 @@ public class MyCtc implements Updateable{
 		System.out.println("To Track Controller");
 		System.out.println("Train " + train.getID() + " at location " + loc.display());
 		System.out.println("Send speed = " + speed + ", authority = " + auth);
-		/*
+		
 		if (swpos != null) {
 			System.out.println("Next switch position, in block: " + sw.display() + " from: " + from.display() + " to: " + to.display());
 		}
-		*/
+		
 
 		System.out.println();
 	}
