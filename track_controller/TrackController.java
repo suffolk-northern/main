@@ -237,7 +237,7 @@ public class TrackController implements Updateable
 	}
 
 	// Updates this object.
-	public void update()
+	public void update(int time)
 	{
 		// TODO: unimplemented
 		//

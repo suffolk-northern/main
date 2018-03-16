@@ -25,6 +25,7 @@ import track_model.TrackModel;
 import train_model.TrainModel;
 import updater.Updateable;
 import updater.Updater;
+import updater.ClockMultiplier;
 
 public class Main
 {
@@ -38,13 +39,13 @@ public class Main
 
 	public static void main(String[] args)
 	{
-		initialize();
+		initializeModules();
 		launchUI();
-		updateLoop();
+		scheduleUpdates();
 	}
 
 	// Initializes/links modules and fills updateables.
-	private static void initialize()
+	private static void initializeModules()
 	{
 		//
 		// instantiate modules
@@ -74,6 +75,18 @@ public class Main
 
 		//if (trainControllers.length != trainModels.length)
 		//	throw new RuntimeError("mismatched train modules");
+
+		ArrayList<Updateable> trainObjects =
+			new ArrayList<Updateable>();
+
+		// FIXME: see instantiation above
+		//trainObjects.addAll(Arrays.asList(trainControllers));
+		trainObjects.addAll(Arrays.asList(trainModels));
+
+		ClockMultiplier trainMultiplier = new ClockMultiplier(
+			10,
+			trainObjects.toArray(new Updateable[0])
+		);
 
 		//
 		// link modules
@@ -112,8 +125,7 @@ public class Main
 		//updateables.add(mbo);
 		updateables.addAll(Arrays.asList(trackControllers));
 		//updateables.add(trackModel);
-		//updateables.addAll(Arrays.asList(trainControllers));
-		updateables.addAll(Arrays.asList(trainModels));
+		updateables.add(trainMultiplier);
 	}
 
 	// Starts the user interface.
@@ -129,26 +141,21 @@ public class Main
 
 	// Runs an updater on updateables.
 	//
-	// Never returns.
-	private static void updateLoop()
+	// Returns immediately. Updates occur in a worker thread.
+	//
+	// Currently there's no way to stop this other than
+	// interrupting/killing the program.
+	private static void scheduleUpdates()
 	{
-		Updater updater =
-			new Updater(updateables.toArray(new Updateable[0]));
+		// milliseconds
+		final int simulationUpdatePeriod = 100;
+		final int       wallUpdatePeriod = 100;
 
-		for (;;)
-		{
-			for (int i = 0; i < updateables.size(); ++i)
-				updater.iteration();
+		Updater updater = new Updater(
+			simulationUpdatePeriod,
+			updateables.toArray(new Updateable[0])
+		);
 
-			// hand-wave the timing
-			try
-			{
-				Thread.sleep(100);
-			}
-			catch (InterruptedException e)
-			{
-				// let it be
-			}
-		}
+		updater.scheduleAtFixedRate(wallUpdatePeriod);
 	}
 }

@@ -35,21 +35,10 @@ public class TestyTest
 			mbo
 		};
 
-		Updater updater = new Updater(objects);
+		final int updatePeriod = 250;
 
-		for (;;)
-		{
-			updater.iteration();
+		Updater updater = new Updater(updatePeriod, objects);
 
-			// hand-wave the timing
-			try
-			{
-				Thread.sleep(250);
-			}
-			catch (InterruptedException e)
-			{
-				// let it be
-			}
-		}
+		updater.scheduleAtFixedRate(updatePeriod);
 	}
 }

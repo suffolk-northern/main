@@ -46,7 +46,7 @@ public class Controller implements Updateable
 	}
 
 	// Updates this object.
-	public void update()
+	public void update(int time)
 	{
 		// real implementation won't have this information
 		double trainX = origin.xDistanceTo(train.location());

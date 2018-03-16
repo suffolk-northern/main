@@ -20,7 +20,7 @@ public class Patrick implements Updateable
 	private Spongebob spongebob;
 
 	// Updates this object.
-	public void update()
+	public void update(int time)
 	{
 		if (spongebob == null)
 			return;

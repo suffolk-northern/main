@@ -48,24 +48,11 @@ public class Main
 			controller
 		};
 
-		Updater updater = new Updater(objects);
+		final int updatePeriod = 100;
 
-		for (;;)
-		{
-			for (int i = 0; i < objects.length; ++i)
-				updater.iteration();
+		Updater updater = new Updater(updatePeriod, objects);
 
-			printTrainState(train);
-
-			try
-			{
-				Thread.sleep(100);
-			}
-			catch (InterruptedException e)
-			{
-				// let it be
-			}
-		}
+		updater.scheduleAtFixedRate(updatePeriod);
 	}
 
 	private static void printTrainState(TrainModel train)

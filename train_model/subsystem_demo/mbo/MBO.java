@@ -21,7 +21,7 @@ public class MBO implements Updateable
 	private ArrayList<MboRadio> radios = new ArrayList<MboRadio>();
 
 	// Updates this object.
-	public void update()
+	public void update(int time)
 	{
 		for (MboRadio radio : radios) {
 			radio.send(new MboMovementCommand(
