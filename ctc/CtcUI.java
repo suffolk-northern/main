@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package myctc;
+package ctc;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -40,12 +40,12 @@ import javax.swing.border.EtchedBorder;
  *
  * @author missm
  */
-public class MyCtcUI extends javax.swing.JFrame {
+public class CtcUI extends javax.swing.JFrame {
 
-	public MyCtc ctc;
+	public Ctc ctc;
 	private JFrame frame;
 
-	public MyCtcUI(MyCtc ctc) {
+	public CtcUI(Ctc ctc) {
 		this.ctc = ctc;
 		frame = this;
 		initialize();
