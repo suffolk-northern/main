@@ -108,6 +108,33 @@ public class TrackModel implements Updateable {
         return tb;
     }
 
+    public static void flipSwitch(String line, int block) {
+        try {
+            dbHelper.connect();
+            ResultSet rs = dbHelper.query("SELECT * FROM CONNECTIONS WHERE LINE='" + line + "' AND BLOCK=" + block + " AND SWITCH_BLOCK;");
+            if (rs.next()) {
+                int mainBlock = rs.getInt(9) < 0 ? rs.getInt(4) : rs.getInt(6);
+                int switchBlock = rs.getInt(8);
+
+                String query = "UPDATE CONNECTIONS SET CURRENT_SETTING=? WHERE LINE=? AND BLOCK=?";
+                if (rs.getInt(10) == mainBlock) {
+                    Object[] values = {switchBlock, line, block};
+                    dbHelper.execute(query, values);
+                } else {
+                    Object[] values = {mainBlock, line, block};
+                    dbHelper.execute(query, values);
+                }
+
+                tmf.populateTables();
+            } else {
+                System.out.println("Not a switch.");
+            }
+            dbHelper.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(TrackModel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     public static Station getStation(String line, int block) {
         if (!doTablesExist()) {
             return null;
