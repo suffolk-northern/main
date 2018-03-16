@@ -304,6 +304,26 @@ public class TrackModel implements Updateable {
         return blocks;
     }
 
+    public static int getBlockCount(String line) {
+        if (!doTablesExist()) {
+            return 0;
+        }
+        int count = 0;
+        try {
+            dbHelper.connect();
+            ResultSet rs = dbHelper.query("SELECT MAX(BLOCK) FROM BLOCKS WHERE LINE='" + line + "';");
+            if (rs.next()) {
+                count = rs.getInt(1);
+            } else {
+                System.out.println("Invalid line.");
+            }
+            dbHelper.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(TrackModel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return count;
+    }
+
     public void registerTrain(TrainModel tm) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
