@@ -17,7 +17,7 @@ import java.awt.EventQueue;
 //
 // FIXME: naming convention: pick Ctc and Mbo or CTC and MBO
 //
-//import ctc.Ctc;
+import ctc.Ctc;
 //import mbo.Mbo;
 import track_controller.TrackController;
 import track_model.TrackModel;
@@ -33,7 +33,7 @@ public class Main
 		new ArrayList<Updateable>();
 
 	// FIXME: see imports and initialize()
-	//private static Ctc ctc;
+	private static Ctc ctc;
 	//private static Mbo mbo;
 	private static TrackModel trackModel;
 
@@ -52,7 +52,7 @@ public class Main
 		//
 
 		// FIXME: launches UI in constructor
-		//ctc = new Ctc();
+		ctc = new Ctc();
 
 		// FIXME: launches UI in constructor
 		//mbo = new Mbo();
@@ -121,7 +121,7 @@ public class Main
 		//
 
 		// FIXME: see instantiations above
-		//updateables.add(ctc);
+		updateables.add(ctc);
 		//updateables.add(mbo);
 		updateables.addAll(Arrays.asList(trackControllers));
 		//updateables.add(trackModel);
