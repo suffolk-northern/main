@@ -32,10 +32,10 @@ public class TrackModel implements Updateable {
         tmf = new TrackModelFrame();
         tmf.setLocationRelativeTo(null);
         tmf.setVisible(true);
-//        if (doTablesExist()) {
-//            TestFrame tf = new TestFrame(tmf);
-//            tf.setVisible(true);
-//        }
+        if (doTablesExist()) {
+            TestFrame tf = new TestFrame(tmf);
+            tf.setVisible(true);
+        }
 //        for (int i = 1; i < 151; i++) {
 //            TrackBlock tb = getBlock("Green", i);
 //            System.out.println(tb.toString());
@@ -244,11 +244,24 @@ public class TrackModel implements Updateable {
         }
     }
 
-    public static ArrayList<Integer> getDefaultGreenLine() {
+    public static TrackBlock getFirstBlock(String line) {
+        TrackBlock tb = null;
+        try {
+            dbHelper.connect();
+            ResultSet rs = dbHelper.query("SELECT BLOCK FROM CONNECTIONS WHERE LINE='" + line + "' AND SWITCH_BLOCK=-1 AND SWITCH_VALID=-2");
+            tb = getBlock(line, rs.getInt(1));
+            dbHelper.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(TrackModel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return tb;
+    }
+
+    public static ArrayList<Integer> getDefaultLine(String line) {
         ArrayList<Integer> blocks = new ArrayList<>();
         try {
             dbHelper.connect();
-            ResultSet rs = dbHelper.query("SELECT BLOCK FROM CONNECTIONS WHERE LINE='Green' AND SWITCH_BLOCK=-1 AND SWITCH_VALID=-2");
+            ResultSet rs = dbHelper.query("SELECT BLOCK FROM CONNECTIONS WHERE LINE='" + line + "' AND SWITCH_BLOCK=-1 AND SWITCH_VALID=-2");
 
             int swit = 0;
             int valid = 0;
@@ -256,7 +269,7 @@ public class TrackModel implements Updateable {
             int prev = 0;
 
             while (swit != -1 || valid != 1) {
-                rs = dbHelper.query("SELECT * FROM CONNECTIONS WHERE LINE='Green' AND BLOCK=" + cur);
+                rs = dbHelper.query("SELECT * FROM CONNECTIONS WHERE LINE='" + line + "' AND BLOCK=" + cur);
                 blocks.add(cur);
                 if (cur > prev && rs.getInt(7) == 1) {
                     prev = cur;
