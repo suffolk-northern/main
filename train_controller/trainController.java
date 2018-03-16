@@ -1,158 +1,262 @@
-package my.firstProject;
+package train_controller;
 
-import java.io.*;
 import java.util.*;
 import java.lang.Math;
 
-public class trainController {
+import train_model.communication.ControllerLink;
+import updater.Updateable;
 
-	simpleTrainModel Model;
-	boolean manualMode;
-	Double setPointSpeed = 0.0;
-	Double currAuth;
-	Double lastAuth;
-	Double movingAuth;
-	Double driverSetSpeed;
-	Double kW = 0.0;
-	boolean driverHardBrakes;
-	Double Kp = 1.0;
-	Double Ki = 40000.0;
-	Double queue[] = new Double[500];
 
-	Double distanceFromLastStation;
+public class TrainController implements Updateable
+{
+
+	ControllerLink link;
+
+	boolean manualMode;		// States of commands from controller GUI
+	boolean lightsCMD;
+	boolean leftDoorsCMD;
+	boolean rightDoorsCMD;
+	boolean heaterOnCMD;
+	int driverSetSpeed;
+
+	double currentSpeed;		// Model states
+
+	int speedCMD;			// Commands from track
+	int currAuth;
+
+	double MAXSPEED = 19.4;		// Controller's own vars
+	double MAXPOWER = 120000;
+	double MAX_SDECEL = 1.2;
+	double mass = 50*907.185;
+	double powerCMD;
+	double brakeCMD;	
+	double brakePowerConv = 1;
+	int setSpeed;
+	double error;
+	double timeConstant = 5;
+	double Kp = 2.5 / timeConstant;
+	double Ki = 0.5;
+	double [] queue = new double[5000];
+	int queueInsert = 0;
+	int queueFill = 0;
+	double averageError;
 	TreeMap<Integer, Double> stations = new TreeMap<>();
-	int stationCounter;
-	int stationsToDisplay;
+	double distanceFromLastStation = 0.0;
+	int stationCounter = 1;
+	int stationsToDisplay = 1;
+	boolean manualBrake;
+	double movingAuth = 0.0;
+	double lastAuth = 0.0;
+	double lastSpeed = 0.0;
+	double updateTime = 0;
 	boolean returning = false;
-	
-	public trainController() {
-		Model = new simpleTrainModel();
-		manualMode = true;
-		driverSetSpeed = 0.0;
-		currAuth = 0.0;
-		lastAuth = 0.0;
-		movingAuth = 0.0;
-		driverHardBrakes = true;
-		distanceFromLastStation = 0.0;
-		stations.put(1, 24.0);
-		stations.put(2, 59.0);
-		stations.put(3, 140.0);
-		stations.put(4, 44.0);
-		stations.put(5, 62.0);
-		stations.put(6, 62.0);
-		stations.put(7, 30.0);
-		stations.put(8, 90.0);
-		stations.put(9, 90.0);
-		stationCounter = 1;
-		stationsToDisplay = 1;
-
-		for(int i=0; i<queue.length; i++) {
-			queue[i]=0.0;
-		}
 
 
+	public TrainController(ControllerLink link) 
+	{
+		this.link = link;
+
+		// Before train recieves first command, make everything safe
+		manualMode = false;
+		speedCMD = 0;
+		currAuth = 0;
+		driverSetSpeed = 0;
+		link.power(0);
+		link.serviceBrake(1.0);
+		manualBrake = false;
+
+		// Relative station distances
+		stations.put(1, 240.0);
+		stations.put(2, 590.0);
+		stations.put(3, 1400.0);
+		stations.put(4, 440.0);
+		stations.put(5, 620.0);
+		stations.put(6, 620.0);
+		stations.put(7, 300.0);
+		stations.put(8, 900.0);
+		stations.put(9, 900.0);
 	}
 
 
-	public void setDriverSetSpeed(Double command) {
+	// Setters/getters for driver GUI
+
+	public boolean getBrakesEngaged()
+	{
+		if(brakePowerConv > 0)
+			return true;
+		return false;
+	}
+
+	public void setBrakesEngaged(boolean command)
+	{
+		if(manualMode)
+		{
+			link.serviceBrake(1.0);
+			manualBrake = true;
+		}
+	}
+
+	public void setDriverSpeed(int command)
+	{
 		driverSetSpeed = command;
 	}
 
-	public void setManualMode(boolean command) {
+	public void setManualMode(boolean command)
+	{
 		manualMode = command;
 	}
 
-	public boolean getLights() {
-		return Model.getLights();
+	public void setLights(boolean command) 
+	{
+		if(command)
+			link.lightsOn();
+		else
+			link.lightsOff();
 	}
 
-	public boolean getDoors() {
-		return Model.getDoors();
+	public boolean getLights() 
+	{
+		return link.lights();
 	}
 
-	public boolean getBrakesEngaged() {
-		return Model.getBrakes();
+	public void setHeater(boolean command)
+	{
+		if(command)
+			link.heaterOn();
+		else
+			link.heaterOff();
 	}
 
-	public void setBrakesEngaged(boolean command) {
-		Model.setBrakes(command);
-		driverHardBrakes = command;
+	public double getTemp() 
+	{
+		return link.temperature();
 	}
 
-	public Double getSpeed() {
-		return Model.getVelocity();
+	public double getPowerKW() 
+	{
+		return MAXPOWER * powerCMD / 1000;
 	}
 
-	public Double getCTCspeed() {
-		return Model.getCTCspeed();
+	public double getSpeed()
+	{
+		return link.speed();
 	}
 
-	public Double getCTCauth() {
-		return Model.getCTCauth();
+	public int getCTCspeed()
+	{
+		return speedCMD;
 	}
 
-	public Double getMovingAuth() {
+	public double getCTCauth()
+	{
+		return currAuth;
+	}
+
+	public double getMovingAuth()
+	{
 		return movingAuth;
 	}
 
-	public Double getPowerKW() {
-		return kW;
-	}
-
-	public int getStationsToDisplay() {
+	public int getStationsToDisplay()
+	{
 		return stationsToDisplay;
 	}
 
-	private int updateStationDistance() {
-		int correction = 0;
-		if (stationCounter==9) {
-			returning = true;
-		}
-		if (stationCounter<=1) {
-			if (stationCounter<1)
-				stationCounter = 2;
-			returning = false;
-		}
+
+	// Distance from last station
+	private int updateStationDistance() 
+	{
+	int correction = 0;
+	if (stationCounter == 9) 
+	{
+		returning = true;
+	}
+	if (stationCounter <= 1) 
+	{
+		if (stationCounter < 1)
+			stationCounter = 2;
+		returning = false;
+	}
+	if (returning)
+		correction = 1;
+	if ( distanceFromLastStation > stations.get(stationCounter - correction) )
+	{
+		distanceFromLastStation = 0.0;
 		if (returning)
-			correction = 1;
-		if ( distanceFromLastStation > stations.get(stationCounter - correction) ) {
-			distanceFromLastStation = 0.0;
-			if (returning)
-				return stationCounter--;
-			return stationCounter++;
-		}
+			return stationCounter--;
+		return stationCounter++;
+	}
+	else
+		distanceFromLastStation += 1760 * displacement() / 3600;
+	if(returning)
+		return -1 * stationCounter + 1;
+	return -1 * stationCounter;	
+	}
+
+	// Calculates train displacement since last update
+	private double displacement()
+	{
+		double avgSpeed = (link.speed() + lastSpeed) / 2;
+		return updateTime * avgSpeed;
+	}
+
+	// Updates authority states
+	private void authority()
+	{
+		if (link.receiveFromTrack() == null)
+			return;
+		// New authority message
+	}
+
+
+
+	// millis is ignored as this is not a model module
+	public void update(int millis) 
+	{
+		updateTime = millis;
+		lastSpeed = link.speed();
+
+		// Update authority
+		authority();
+
+		// Set desired speed
+		if(manualMode)
+			setSpeed = driverSetSpeed;
 		else
-			distanceFromLastStation += 1760*Model.getVelocity()*Model.getTimeIncrement()/3600;
-		if(returning)
-			return -1*stationCounter+1;
-		return -1*stationCounter;
-		
-	}
-
-	private void printArr (Double [] arr) {
-		for(int i=0; i<arr.length; i++) {
-			if(arr[i]!=null) 
-				System.out.print("" + arr[i] + ", ");
+			setSpeed = speedCMD;
+	
+		setSpeed = 20;
+		// Obtain error and average error
+		currentSpeed = link.speed();
+		if(currentSpeed == 0)
+			currentSpeed = 0.01;
+		error = (double)setSpeed - currentSpeed;
+		queue[queueInsert++] = error;
+		if(queueInsert%queue.length == 0)
+			queueInsert = 0;
+		averageError = 0;
+		for(int i=0; i<queueFill; i++)
+		{
+			averageError += queue[i] / queueFill;
 		}
-		System.out.println();
-	}
+		if(++queueFill > queue.length)
+			queueFill = queue.length;
 
-	public void update() { // Returns station(s) to display on map
-		Model.update();
-
-		// Update queue to include X most recent speeds
-		Double sum = 0.0;
-		//int numSamples = queue.length;
-		for(int i=0; i<queue.length-1; i++) {
-			queue[queue.length-1-i] = queue[queue.length-2-i];
-			sum += queue[queue.length-2-i];
+		// Compute power and brake commands
+		powerCMD = Kp*error*currentSpeed*mass;
+		powerCMD += Ki*averageError*currentSpeed*mass;
+		powerCMD /= MAXPOWER;
+		if(powerCMD > 1)
+			powerCMD = 1;
+		brakePowerConv = Math.min( 1.0, -1 * powerCMD*MAXPOWER / (mass * currentSpeed * MAX_SDECEL) );
+		if(!manualBrake)
+		{
+			link.power( Math.max(0.0, powerCMD) );		
+			link.serviceBrake( Math.max(0.0, brakePowerConv) );
 		}
-		queue[0] = setPointSpeed - Model.getVelocity();
-		printArr(queue);
-		sum += queue[0];
-//		System.out.println("\t" + sum);
-//		System.out.println("\t\t" + numSamples);
-//		System.out.println("\t\t\t" + queue.length);
+	//	System.out.println("\t\tpow: " + powerCMD);
+	//	System.out.println("\t\t\t\tbrake: " + brakePowerConv);
+	//	System.out.println("\t\t\t\t\t\tspeed: " + link.speed());
 
 		// Update stations to display on map
 		int d = updateStationDistance();
@@ -163,49 +267,8 @@ public class trainController {
 				stationsToDisplay = -1*d;
 		else
 			stationsToDisplay = d;
-	//	System.out.println(d);
-	//	System.out.println("\t\t\t" + stationCounter);
-	//	System.out.println("\t" + returning);
 
-
-		// Update authority and distance
-		lastAuth = currAuth;
-		currAuth = Model.getCTCauth();
-		if (lastAuth!=currAuth) 
-			movingAuth = currAuth;
-		else {
-			movingAuth -= 1760*Model.getVelocity()*Model.getTimeIncrement()/3600;
-		}
-
-		// Set max braking if authority is almost expired
-		if(movingAuth<50) 
-			Model.setBrakes(true);
-		else if(!driverHardBrakes)
-			Model.setBrakes(false);
-
-
-		// Update power command
-		if (manualMode)
-			setPointSpeed = driverSetSpeed;
-		else
-			setPointSpeed = getCTCspeed();
-
-		Double timeConstant = 5.0;	
-
-		Double error = setPointSpeed - Model.getVelocity();
-		Double powerCommand = Kp*error*Model.getVelocity()*Model.getMass()/timeConstant; // Proportional term
-		Double averageError = sum/queue.length;
-		System.out.println(averageError);
-		powerCommand += Ki*averageError; // Integral term
-
-		if(driverHardBrakes) {
-			powerCommand = -1*Model.getMaxBraking()*Model.getVelocity()*Model.getMass()/Model.getTimeIncrement(); // Craft power to drive velocity down by maxBraking per timeIncrement
-		}
-
-
-		kW = powerCommand*Math.pow(1609.34,2)/(1000*Math.pow(3600,2)); // 1 mile = 1609.34 meters
-
-		Model.setPowerCommand(powerCommand);
 	}
 
 }
+
