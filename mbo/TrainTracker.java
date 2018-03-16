@@ -73,4 +73,8 @@ public class TrainTracker
 		return trainID;
 	}
 	
+	public MboRadio getRadio()
+	{
+		return radio;
+	}
 }

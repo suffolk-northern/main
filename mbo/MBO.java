@@ -17,6 +17,7 @@ import train_model.TrainModel;
 import track_model.Orientation;
 import controller.ControllerUI;
 import train_model.communication.MboRadio;
+import train_model.communication.MboMovementCommand;
 
 // Main MBO model
 
@@ -25,6 +26,7 @@ public class MBO implements Updateable
 	private ArrayList<TrainTracker> trains = new ArrayList<TrainTracker>();
 	private TrackModel myTrack;
 	private ControllerUI ui;
+	private String line = "Green";
 	
 	public MBO()
 	{
@@ -53,7 +55,7 @@ public class MBO implements Updateable
 		{
 			TrainTracker trainInfo = trains.get(i);
 			
-			TrackBlock newBlock = getBlock(trainInfo.getLocation());
+			TrackBlock newBlock = getBlockFromLoc(trainInfo.getLocation());
 			if (newBlock != null)
 				trainInfo.block = newBlock;
 		}
@@ -65,18 +67,23 @@ public class MBO implements Updateable
 			double authority = findAuthority(trainInfo);
 			trainInfo.setAuthority((int) authority);
 			trainInfo.setSuggestedSpeed(trainInfo.block.getSpeedLimit());
-			GlobalCoordinates loc = trainInfo.train.location();
+			MboMovementCommand com = new MboMovementCommand(trainInfo.getAuthority(), trainInfo.getSuggestedSpeed());
+			trainInfo.getRadio().send(com);
+			GlobalCoordinates loc = trainInfo.getLocation();
 			int trackDist = (int) trainInfo.block.getStart().distanceTo(loc);
 			ui.updateTrain(trainInfo.getID(), trainInfo.block.getSection(), trainInfo.block.getBlock(), trackDist, trainInfo.getAuthority(), trainInfo.getSuggestedSpeed());
 		}
 	}
 	
-	public TrackBlock getBlock(GlobalCoordinates location)
+	// TODO: make this more efficient by starting from last known block
+	public TrackBlock getBlockFromLoc(GlobalCoordinates location)
 	{
-		for (TrackBlock block: myTrack.sections[0].blocks)
+		int maxBlockID = myTrack.getMaxBlock();
+		for (int i = 1; i < maxBlockID; i++)
 		{
-			if (isOnBlock(location, block))
-				return block;
+			TrackBlock curBlock = myTrack.getBlock(line, i);
+			if (isOnBlock(location, curBlock))
+				return curBlock;
 		}
 		return null;
 	}
@@ -208,4 +215,4 @@ public class MBO implements Updateable
 //		}
 //		return error;
 //	}
-//}
+}
