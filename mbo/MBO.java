@@ -1,5 +1,5 @@
 /*
- * Ryan Matthews
+ * Kaylene Stocking
  *
  * Main
  */
@@ -11,26 +11,35 @@ import java.lang.Math.*;
 
 import updater.Updateable;
 import track_model.GlobalCoordinates;
-import track_model.Track;
+import track_model.TrackModel;
 import track_model.TrackBlock;
-import track_model.TrackSection;
 import train_model.TrainModel;
 import track_model.Orientation;
 import controller.ControllerUI;
+import train_model.communication.MboRadio;
 
 // Main MBO model
 
 public class MBO implements Updateable
 {
 	private ArrayList<TrainTracker> trains = new ArrayList<TrainTracker>();
-	private Track myTrack;
+	private TrackModel myTrack;
 	private ControllerUI ui;
 	
 	public MBO()
 	{
-		myTrack = new Track();
+		myTrack = new TrackModel();
 		ui = new ControllerUI();
+	}
+	
+	public void showUI()
+	{
 		ui.setVisible(true);
+	}
+	
+	public void hideUI()
+	{
+		ui.setVisible(false);
 	}
 
 	// Updates this object.
@@ -42,22 +51,23 @@ public class MBO implements Updateable
 
 		for (int i = 0; i < trains.size(); i++) 
 		{
-			TrainTracker train = trains.get(i);
-			TrackBlock newBlock = getBlock(train.train.location());
+			TrainTracker trainInfo = trains.get(i);
+			
+			TrackBlock newBlock = getBlock(trainInfo.getLocation());
 			if (newBlock != null)
-				train.block = newBlock;
+				trainInfo.block = newBlock;
 		}
 		
-		for (TrainTracker train: trains)
+		for (TrainTracker trainInfo:trains)
 		{
-			if (train == null)
+			if (trainInfo == null)
 				break;
-			double authority = findAuthority(train);
-			train.setAuthority((int) authority);
-			train.setSuggestedSpeed(train.block.getSpeedLimit());
-			GlobalCoordinates loc = train.train.location();
-			int trackDist = (int) train.block.startPoint.distanceTo(loc);
-			ui.updateTrain(train.train.trainID, 'A', train.block.ID, trackDist, train.getAuthority(), train.getSuggestedSpeed());
+			double authority = findAuthority(trainInfo);
+			trainInfo.setAuthority((int) authority);
+			trainInfo.setSuggestedSpeed(trainInfo.block.getSpeedLimit());
+			GlobalCoordinates loc = trainInfo.train.location();
+			int trackDist = (int) trainInfo.block.getStart().distanceTo(loc);
+			ui.updateTrain(trainInfo.train.trainID, trainInfo.block.getBlock(), trackDist, trainInfo.getAuthority(), trainInfo.getSuggestedSpeed());
 		}
 	}
 	

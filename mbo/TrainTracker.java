@@ -6,6 +6,9 @@
 package mbo;
 
 import track_model.TrackBlock;
+import train_model.TrainModel;
+import train_model.communication.MboRadio;
+import track_model.GlobalCoordinates;
 // import train_model.Train;
 /**
  *
@@ -13,17 +16,19 @@ import track_model.TrackBlock;
  */
 public class TrainTracker 
 {
-	FakeTrain train;
+	TrainModel train;
 	TrackBlock block;
 	int authority;
 	int suggestedSpeed;
+	MboRadio radio;
 	
-	public TrainTracker(FakeTrain newTrain, TrackBlock newBlock)
+	public TrainTracker(TrainModel newTrain, TrackBlock newBlock, MboRadio newRadio)
 	{
 		train = newTrain;
 		block = newBlock;
 		authority = 0;
 		suggestedSpeed = 0;
+		radio = newRadio;
 	}
 	
 	public void setAuthority(int newAuthority)
@@ -54,6 +59,11 @@ public class TrainTracker
 	public TrackBlock getBlock()
 	{
 		return block;
+	}
+	
+	public GlobalCoordinates getLocation()
+	{
+		return radio.receive();
 	}
 	
 }
