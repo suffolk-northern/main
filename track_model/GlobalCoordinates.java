@@ -12,9 +12,9 @@ public class GlobalCoordinates {
     //   = radius in miles * yard/mi
     //
     //   radius in miles from Wikipedia
-
     private static final double radius = 3958.8 * 1760;
 
+    // Generalized coordinates for a spot in North Shore, used as reference point
     public static final GlobalCoordinates ORIGIN = new GlobalCoordinates(40.4, -80.0);
 
     // stored as degrees

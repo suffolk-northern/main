@@ -5,18 +5,19 @@
  */
 package track_model;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
+import javax.swing.Timer;
 
 /**
  *
@@ -214,9 +215,9 @@ public class TestFrame extends javax.swing.JFrame {
             String block = jComboBox2.getSelectedItem().toString().split(",")[1];
             block = block.substring(block.lastIndexOf(" "), block.length() - 1).trim();
 
-            for (int i = 0; i < tmf.jTable6.getRowCount(); i++) {
-                if (tmf.jTable6.getValueAt(i, 2).toString().equalsIgnoreCase(block) && tmf.jTable1.getValueAt(i, 0).toString().equalsIgnoreCase(line)) {
-                    tmf.jTable6.setValueAt(message, i, 5);
+            for (int i = 0; i < tmf.stationTable.getRowCount(); i++) {
+                if (tmf.stationTable.getValueAt(i, 2).toString().equalsIgnoreCase(block) && tmf.blockTable.getValueAt(i, 0).toString().equalsIgnoreCase(line)) {
+                    tmf.stationTable.setValueAt(message, i, 5);
                 }
             }
         }
@@ -256,7 +257,6 @@ public class TestFrame extends javax.swing.JFrame {
         block = block.substring(block.lastIndexOf(" "), block.length()).trim();
 
         JOptionPane.showMessageDialog(tmf, TrackModel.getBlock(line, Integer.parseInt(block)).toString());
-        tmf.scanOccupiedBlocks();
     }
 
     private void heat() {
@@ -266,7 +266,6 @@ public class TestFrame extends javax.swing.JFrame {
         block = block.substring(block.lastIndexOf(" "), block.length()).trim();
 
         TrackModel.setHeater(line, Integer.parseInt(block), true);
-        tmf.scanOccupiedBlocks();
     }
 
     private void getSomething2() {
@@ -274,55 +273,46 @@ public class TestFrame extends javax.swing.JFrame {
         line = line.substring(line.lastIndexOf(" "), line.length()).trim();
         String block = jComboBox2.getSelectedItem().toString().split(",")[1];
         block = block.substring(block.lastIndexOf(" "), block.length() - 1).trim();
-        for (int i = 0; i < tmf.jTable6.getRowCount(); i++) {
-            if (tmf.jTable6.getValueAt(i, 2).toString().equalsIgnoreCase(block) && tmf.jTable6.getValueAt(i, 0).toString().equalsIgnoreCase(line)) {
+        for (int i = 0; i < tmf.stationTable.getRowCount(); i++) {
+            if (tmf.stationTable.getValueAt(i, 2).toString().equalsIgnoreCase(block) && tmf.stationTable.getValueAt(i, 0).toString().equalsIgnoreCase(line)) {
                 JOptionPane.showMessageDialog(tmf,
-                        "Line: " + tmf.jTable6.getValueAt(i, 0) + "\n"
-                        + "Section: " + tmf.jTable6.getValueAt(i, 1) + "\n"
-                        + "Block: " + tmf.jTable6.getValueAt(i, 2) + "\n"
-                        + "Name: " + tmf.jTable6.getValueAt(i, 3) + "\n"
-                        + "Passengers: " + tmf.jTable6.getValueAt(i, 4) + "\n"
-                        + "Message: " + tmf.jTable6.getValueAt(i, 5)
+                        "Line: " + tmf.stationTable.getValueAt(i, 0) + "\n"
+                        + "Section: " + tmf.stationTable.getValueAt(i, 1) + "\n"
+                        + "Block: " + tmf.stationTable.getValueAt(i, 2) + "\n"
+                        + "Name: " + tmf.stationTable.getValueAt(i, 3) + "\n"
+                        + "Passengers: " + tmf.stationTable.getValueAt(i, 4) + "\n"
+                        + "Message: " + tmf.stationTable.getValueAt(i, 5)
                 );
             }
         }
-        tmf.scanOccupiedBlocks();
     }
 
     private final ArrayList<Integer> trainz = new ArrayList<>();
 
     private void runTrain() {
-        int[] blocks = new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+        ArrayList<Integer> blocks = TrackModel.getDefaultGreenLine();
         trainz.add(0);
         int counter = trainz.size() - 1;
-        Timer timer = new Timer();
-
-        timer.scheduleAtFixedRate(new TimerTask() {
+        Timer timer = new Timer(0, new ActionListener() {
             @Override
-            public void run() {
-                String line = "GREEN";
-                String block = Integer.toString(blocks[trainz.get(counter) % 12]);
+            public void actionPerformed(ActionEvent e) {
+                String line = "Green";
+                int pos = trainz.get(counter);
 
-                for (int i = 0; i < tmf.jTable1.getRowCount(); i++) {
-                    if (tmf.jTable1.getValueAt(i, 2).toString().equalsIgnoreCase(block) && tmf.jTable1.getValueAt(i, 0).toString().equalsIgnoreCase(line)) {
-                        tmf.jTable1.setValueAt(false, i != 0 ? (i - 1) % 12 : 11, 9);
-                        tmf.jTable1.setValueAt(true, i, 9);
-                    }
+                if (pos < blocks.size()) {
+                    TrackModel.setOccupancy(line, blocks.get(pos), true);
                 }
-                for (int i = 0; i < tmf.jTable3.getRowCount(); i++) {
-                    if (tmf.jTable3.getValueAt(i, 2).toString().equalsIgnoreCase(block) && tmf.jTable3.getValueAt(i, 0).toString().equalsIgnoreCase(line)) {
-                        tmf.jTable3.setValueAt(false, i != 0 ? (i - 1) % 12 : 11, 4);
-                        tmf.jTable3.setValueAt(false, i != 0 ? (i - 1) % 12 : 11, 5);
-                        tmf.jTable3.setValueAt(true, i, 4);
-                        tmf.jTable3.setValueAt(true, i, 5);
-                    }
+                if (pos > 0) {
+                    TrackModel.setOccupancy(line, blocks.get(pos - 1), false);
                 }
-                tmf.scanOccupiedBlocks();
-                trainz.set(counter, trainz.get(counter) + 1);
+                if (pos == blocks.size()) {
+                    ((Timer) e.getSource()).stop();
+                }
+                trainz.set(counter, pos + 1);
             }
-
-        }, 0, 4000);
-
+        });
+        timer.setDelay(50);
+        timer.start();
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
