@@ -29,18 +29,22 @@ public class TrackModel implements Updateable {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+//        launchUI();
+//        launchTestUI();
+    }
+
+    public static void launchUI() {
         tmf = new TrackModelFrame();
         tmf.setLocationRelativeTo(null);
         tmf.setVisible(true);
+    }
+
+    public static void launchTestUI() {
         if (doTablesExist()) {
             TestFrame tf = new TestFrame(tmf);
+            tf.setLocationRelativeTo(tmf);
             tf.setVisible(true);
         }
-//        for (int i = 1; i < 151; i++) {
-//            TrackBlock tb = getBlock("Green", i);
-//            System.out.println(tb.toString());
-//            System.out.println("-------------------");
-//        }
     }
 
     /**
@@ -91,13 +95,21 @@ public class TrackModel implements Updateable {
                 rs = dbHelper.query("SELECT X, Y FROM BLOCKS WHERE LINE='" + line + "' AND BLOCK=" + rs.getInt(1) + ";");
                 tb.setEndCoordinates(rs.getDouble(1), rs.getDouble(2));
 
-                rs = dbHelper.query("SELECT * FROM CONNECTIONS WHERE LINE='" + line + "' AND BLOCK=" + block + " AND SWITCH_BLOCK;");
-                tb.setIsSwitch(rs.next());
+                rs = dbHelper.query("SELECT * FROM CONNECTIONS WHERE LINE='" + line + "' AND BLOCK=" + block + ";");
+                if (rs.next()) {
+                    tb.setPrevBlockId(rs.getInt(4));
+                    tb.setNextBlockId(rs.getInt(6));
+                    tb.setIsSwitch(rs.getInt(8) != 0);
+                    if (tb.isIsSwitch()) {
+                        tb.setSwitchBlockId(rs.getInt(8));
+                        tb.setSwitchDirection(rs.getInt(9));
+                    }
+                }
                 rs = dbHelper.query("SELECT * FROM CROSSINGS WHERE LINE='" + line + "' AND BLOCK=" + block + ";");
                 tb.setIsCrossing(rs.next());
                 rs = dbHelper.query("SELECT * FROM STATIONS WHERE LINE='" + line + "' AND BLOCK=" + block + ";");
                 tb.setIsStation(rs.next());
-
+                rs.close();
                 dbHelper.close();
             } else {
                 System.out.println("Invalid block.");

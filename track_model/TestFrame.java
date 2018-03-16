@@ -58,6 +58,9 @@ public class TestFrame extends javax.swing.JFrame {
         jButton4 = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
         jButton6 = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
+        jComboBox3 = new javax.swing.JComboBox<>();
+        jButton7 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Track Model Testing");
@@ -115,6 +118,18 @@ public class TestFrame extends javax.swing.JFrame {
             }
         });
 
+        jLabel3.setText("Select Switch:");
+
+        jComboBox3.setMaximumRowCount(24);
+        jComboBox3.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Block 1", "Block 2", "Block 3", "Block 4", "Block 5" }));
+
+        jButton7.setText("Flip Switch");
+        jButton7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton7ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -147,7 +162,15 @@ public class TestFrame extends javax.swing.JFrame {
                                 .addComponent(jLabel1)
                                 .addGap(18, 18, 18)
                                 .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                        .addContainerGap())))
+                        .addContainerGap())
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jComboBox3, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addContainerGap())
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jButton7)
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -170,6 +193,12 @@ public class TestFrame extends javax.swing.JFrame {
                     .addComponent(jButton3)
                     .addComponent(jButton6))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton7)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton2)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -178,7 +207,12 @@ public class TestFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        getSomething();
+        String line = jComboBox1.getSelectedItem().toString().split(",")[0];
+        line = line.substring(line.lastIndexOf(" "), line.length()).trim();
+        String block = jComboBox1.getSelectedItem().toString().split(",")[2];
+        block = block.substring(block.lastIndexOf(" "), block.length()).trim();
+
+        JOptionPane.showMessageDialog(tmf, TrackModel.getBlock(line, Integer.parseInt(block)).toString());
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -190,7 +224,12 @@ public class TestFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        heat();
+        String line = jComboBox1.getSelectedItem().toString().split(",")[0];
+        line = line.substring(line.lastIndexOf(" "), line.length()).trim();
+        String block = jComboBox1.getSelectedItem().toString().split(",")[2];
+        block = block.substring(block.lastIndexOf(" "), block.length()).trim();
+
+        TrackModel.setHeater(line, Integer.parseInt(block), true);
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
@@ -223,6 +262,15 @@ public class TestFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jButton6ActionPerformed
 
+    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
+        String line = jComboBox3.getSelectedItem().toString().split(",")[0];
+        line = line.substring(line.lastIndexOf(" "), line.length()).trim();
+        String block = jComboBox3.getSelectedItem().toString().split(",")[2];
+        block = block.substring(block.lastIndexOf(" "), block.length()).trim();
+
+        TrackModel.flipSwitch(line, Integer.parseInt(block));
+    }//GEN-LAST:event_jButton7ActionPerformed
+
     private void populateDropdown() {
         ArrayList<String> blockList = new ArrayList<>();
         try {
@@ -236,36 +284,25 @@ public class TestFrame extends javax.swing.JFrame {
                 blockList.add("Line: " + rs.getString(1) + ", Section: " + rs.getString(2) + ", Block: " + rs.getInt(3));
             }
             jComboBox1.setModel(new DefaultComboBoxModel(blockList.toArray()));
+
             rs = stat.executeQuery("SELECT * FROM STATIONS;");
             blockList = new ArrayList<>();
             while (rs.next()) {
                 blockList.add("Station: " + rs.getString(4) + " (Line: " + rs.getString(1) + ", Block: " + rs.getInt(3) + ")");
             }
             jComboBox2.setModel(new DefaultComboBoxModel(blockList.toArray()));
-            rs.close();
+
+            rs = stat.executeQuery("SELECT * FROM CONNECTIONS WHERE SWITCH_BLOCK;");
+            blockList = new ArrayList<>();
+            while (rs.next()) {
+                blockList.add("Line: " + rs.getString(1) + ", Section: " + rs.getString(2) + ", Block: " + rs.getInt(3));
+            }
+            jComboBox3.setModel(new DefaultComboBoxModel(blockList.toArray()));
             rs.close();
             conn.close();
         } catch (ClassNotFoundException | SQLException ex) {
             Logger.getLogger(TestFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
-
-    private void getSomething() {
-        String line = jComboBox1.getSelectedItem().toString().split(",")[0];
-        line = line.substring(line.lastIndexOf(" "), line.length()).trim();
-        String block = jComboBox1.getSelectedItem().toString().split(",")[2];
-        block = block.substring(block.lastIndexOf(" "), block.length()).trim();
-
-        JOptionPane.showMessageDialog(tmf, TrackModel.getBlock(line, Integer.parseInt(block)).toString());
-    }
-
-    private void heat() {
-        String line = jComboBox1.getSelectedItem().toString().split(",")[0];
-        line = line.substring(line.lastIndexOf(" "), line.length()).trim();
-        String block = jComboBox1.getSelectedItem().toString().split(",")[2];
-        block = block.substring(block.lastIndexOf(" "), block.length()).trim();
-
-        TrackModel.setHeater(line, Integer.parseInt(block), true);
     }
 
     private void getSomething2() {
@@ -290,7 +327,7 @@ public class TestFrame extends javax.swing.JFrame {
     private final ArrayList<Integer> trainz = new ArrayList<>();
 
     private void runTrain() {
-        ArrayList<Integer> blocks = TrackModel.getDefaultGreenLine();
+        ArrayList<Integer> blocks = TrackModel.getDefaultLine("Green");
         trainz.add(0);
         int counter = trainz.size() - 1;
         Timer timer = new Timer(0, new ActionListener() {
@@ -322,9 +359,12 @@ public class TestFrame extends javax.swing.JFrame {
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
+    private javax.swing.JButton jButton7;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JComboBox<String> jComboBox2;
+    private javax.swing.JComboBox<String> jComboBox3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     // End of variables declaration//GEN-END:variables
 }

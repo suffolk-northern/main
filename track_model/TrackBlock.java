@@ -17,6 +17,11 @@ public class TrackBlock {
     private String message;
     private GlobalCoordinates start, end;
     
+    private int nextBlockId;
+    private int prevBlockId;
+    private int switchBlockId;
+    private int switchDirection;
+    
     private boolean isSwitch;
     private boolean isStation;
     private boolean isCrossing;
@@ -180,6 +185,40 @@ public class TrackBlock {
     public GlobalCoordinates getEnd() {
         return end;
     }
+
+    public int getNextBlockId() {
+        return nextBlockId;
+    }
+
+    public void setNextBlockId(int nextBlockId) {
+        this.nextBlockId = nextBlockId;
+    }
+
+    public int getPrevBlockId() {
+        return prevBlockId;
+    }
+
+    public void setPrevBlockId(int prevBlockId) {
+        this.prevBlockId = prevBlockId;
+    }
+
+    public int getSwitchBlockId() {
+        return switchBlockId;
+    }
+
+    public void setSwitchBlockId(int switchBlockId) {
+        this.switchBlockId = switchBlockId;
+    }
+
+    public int getSwitchDirection() {
+        return switchDirection;
+    }
+
+    public void setSwitchDirection(int switchDirection) {
+        this.switchDirection = switchDirection;
+    }
+    
+    
 
     @Override
     public String toString() {
