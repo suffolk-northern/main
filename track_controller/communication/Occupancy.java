@@ -74,6 +74,7 @@ public class Occupancy {
 	//                      0 1 0 1 1
     
     public boolean occupancies[];
+    public boolean lights[];
     
     //Constructs an occupancy as a clone of another
     
@@ -86,7 +87,16 @@ public class Occupancy {
         if(occupancies.length < 1 || occupancies.length > TrackController.MAX_BRANCH_SIZE){
             throw new IllegalArgumentException("length bounds");
         }
+        
+        this.occupancies = new boolean[occupancies.length];
+        this.lights = new boolean[occupancies.length];
+        
         this.occupancies = occupancies;
+        
+        for(int i = 0; i < occupancies.length; i++)
+        {
+         this.lights[i] = !this.occupancies[i];   
+        }
     }
     
 
