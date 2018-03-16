@@ -11,12 +11,13 @@ package myctc;
  */
 import java.util.ArrayDeque;
 import java.util.StringTokenizer;
+import updater.Updateable;
 
 /**
  *
  * @author missm
  */
-public class MyCtc {
+public class MyCtc implements Updateable{
 
 	public static final int TRAINCOLS = 8;
 	public static final int TRACKCOLS = 9;
@@ -35,6 +36,11 @@ public class MyCtc {
 		ui.showUI();
 	}
 
+	public static void update()
+	{
+		
+	}
+	
 	/*
     public MyCtc()
     {
@@ -43,6 +49,7 @@ public class MyCtc {
     }
 	 */
 	//public static void main(String[] args)
+	
 	public MyCtc() {
 		ctc = this;
 		ui = new MyCtcUI(ctc);
