@@ -17,14 +17,16 @@ import track_model.GlobalCoordinates;
 public class TrainTracker 
 {
 	TrainModel train;
+	int trainID;
 	TrackBlock block;
 	int authority;
 	int suggestedSpeed;
 	MboRadio radio;
 	
-	public TrainTracker(TrainModel newTrain, TrackBlock newBlock, MboRadio newRadio)
+	public TrainTracker(TrainModel newTrain,  int newID, TrackBlock newBlock, MboRadio newRadio)
 	{
 		train = newTrain;
+		trainID = newID;
 		block = newBlock;
 		authority = 0;
 		suggestedSpeed = 0;
@@ -64,6 +66,11 @@ public class TrainTracker
 	public GlobalCoordinates getLocation()
 	{
 		return radio.receive();
+	}
+	
+	public int getID()
+	{
+		return trainID;
 	}
 	
 }

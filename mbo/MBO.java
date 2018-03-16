@@ -67,7 +67,7 @@ public class MBO implements Updateable
 			trainInfo.setSuggestedSpeed(trainInfo.block.getSpeedLimit());
 			GlobalCoordinates loc = trainInfo.train.location();
 			int trackDist = (int) trainInfo.block.getStart().distanceTo(loc);
-			ui.updateTrain(trainInfo.train.trainID, trainInfo.block.getBlock(), trackDist, trainInfo.getAuthority(), trainInfo.getSuggestedSpeed());
+			ui.updateTrain(trainInfo.getID(), trainInfo.block.getSection(), trainInfo.block.getBlock(), trackDist, trainInfo.getAuthority(), trainInfo.getSuggestedSpeed());
 		}
 	}
 	
@@ -84,10 +84,10 @@ public class MBO implements Updateable
 	public boolean isOnBlock(GlobalCoordinates location, TrackBlock block)
 	{
 		double tolerance = 5;
-		double startDist = location.distanceTo(block.startPoint);
-		double endDist = location.distanceTo(block.endPoint);
+		double startDist = location.distanceTo(block.getStart());
+		double endDist = location.distanceTo(block.getEnd());
 		double distSum = startDist + endDist;
-		double blockLength = block.startPoint.distanceTo(block.endPoint);
+		double blockLength = block.getStart().distanceTo(block.getEnd());
 		if (Math.abs(distSum - blockLength) < tolerance)
 			return true;
 		else
@@ -110,22 +110,23 @@ public class MBO implements Updateable
 	}
 	
 	// Adds a FakeTrain to the set of objects this object communicates with.
-	public void registerTrain(FakeTrain train, TrackBlock block)
+	public void registerTrain(TrainModel train, TrackBlock block, int ID)
 	{
-		TrainTracker trainTracking = new TrainTracker(train, block);
-		trains.add(trainTracking);
-		ui.addTrain(train.getID(), 'A', block.ID, 0, 0, 0);
+		MboRadio radio = train.mboRadio();
+		TrainTracker trainInfo = new TrainTracker(train, ID, block, radio);
+		trains.add(trainInfo);
+		ui.addTrain(ID, block.getSection(), block.getBlock(), 0, 0, 0);
 	}
 
 	// Removes a train from the set of objects this object communicates
 	// with.
-	public void unregisterTrain(FakeTrain train)
+	public void unregisterTrain(TrainModel train)
 	{
-		for (TrainTracker curTrain: trains)
+		for (TrainTracker curTrainInfo: trains)
 		{
-			if (curTrain.train == train)
+			if (curTrainInfo.train == train)
 			{
-				trains.remove(curTrain);
+				trains.remove(curTrainInfo);
 				break;
 			}
 		}
@@ -162,7 +163,7 @@ public class MBO implements Updateable
 		double authority = 0;
 		if (route[0] != null)
 		{
-			authority = route[0].startPoint.distanceTo(train.train.location());
+			authority = route[0].getStart().distanceTo(train.train.location());
 			for (int j = 0; j < blockingBlock; j++)
 			{
 				authority += route[j+1].getLength();
@@ -170,41 +171,41 @@ public class MBO implements Updateable
 			if (blockingTrain == null)
 				authority += route[blockingBlock].getLength();
 			else
-				authority += route[blockingBlock].startPoint.distanceTo(blockingTrain.train.location());
+				authority += route[blockingBlock].getStart().distanceTo(blockingTrain.train.location());
 		}
 		else
-			authority = train.block.endPoint.distanceTo(train.train.location());
+			authority = train.block.getEnd().distanceTo(train.train.location());
 		
 		// System.out.println(String.format("Train %d, blockingBlock %d", train.train.getID(), route[blockingBlock].ID));
 	
 		return authority;
 	}
 	
-	public void flipSwitch(int switchID)
-	{
-		myTrack.sections[0].switches[switchID].flipSwitch();
-	}
+//	public void flipSwitch(int switchID)
+//	{
+//		myTrack.sections[0].switches[switchID].flipSwitch();
+//	}
 	
-	public TrackBlock getDefaultBlock()
-	{
-		return myTrack.sections[0].blocks[0];
-	}
+//	public TrackBlock getDefaultBlock()
+//	{
+//		return myTrack.sections[0].blocks[0];
+//	}
 	
-	public int changeTrainLocation(int trainID, GlobalCoordinates location)
-	{
-		int error = 0;
-		for (TrainTracker train: trains)
-		{
-			if (train.train.trainID == trainID)
-			{
-				train.train.setLocation(location);
-				TrackBlock newBlock = getBlock(location);
-				if (newBlock != null)
-					train.block = newBlock;
-				else
-					error = 1;
-			}
-		}
-		return error;
-	}
-}
+//	public int changeTrainLocation(int trainID, GlobalCoordinates location)
+//	{
+//		int error = 0;
+//		for (TrainTracker trainInfo:trains)
+//		{
+//			if (trainInfo.getID() == trainID)
+//			{
+//				trainInfo.setLocation(location);
+//				TrackBlock newBlock = getBlock(location);
+//				if (newBlock != null)
+//					train.block = newBlock;
+//				else
+//					error = 1;
+//			}
+//		}
+//		return error;
+//	}
+//}

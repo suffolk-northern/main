@@ -14,7 +14,6 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.TableModel;
 
-import mbo.FakeTrain;
 /**
  *
  * @author Fenne
