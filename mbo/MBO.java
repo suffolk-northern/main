@@ -24,13 +24,14 @@ import train_model.communication.MboMovementCommand;
 public class MBO implements Updateable
 {
 	private ArrayList<TrainTracker> trains = new ArrayList<TrainTracker>();
-	private TrackModel myTrack;
+	private ArrayList<TrackBlock> defaultLine; 
+	// private TrackModel myTrack;
 	private ControllerUI ui;
-	private String line = "Green";
+	private String lineName = "Green";
 	
 	public MBO()
 	{
-		myTrack = new TrackModel();
+		// myTrack = new TrackModel();
 		ui = new ControllerUI();
 	}
 	
@@ -42,6 +43,16 @@ public class MBO implements Updateable
 	public void hideUI()
 	{
 		ui.setVisible(false);
+	}
+	
+	public void initLine()
+	{
+		if (defaultLine.isEmpty())
+		{
+			ArrayList<Integer> blockNums = TrackModel.getDefaultLine(lineName);
+			for (int blockID : blockNums)
+				defaultLine.add(TrackModel.getBlock(lineName, blockID));
+		}
 	}
 
 	// Updates this object.
@@ -78,10 +89,10 @@ public class MBO implements Updateable
 	// TODO: make this more efficient by starting from last known block
 	public TrackBlock getBlockFromLoc(GlobalCoordinates location)
 	{
-		int maxBlockID = myTrack.getMaxBlock();
-		for (int i = 1; i < maxBlockID; i++)
+		int maxBlockID = TrackModel.getMaxBlock();
+		for (int i = 1; i <= maxBlockID; i++)
 		{
-			TrackBlock curBlock = myTrack.getBlock(line, i);
+			TrackBlock curBlock = TrackModel.getBlock(lineName, i);
 			if (isOnBlock(location, curBlock))
 				return curBlock;
 		}
@@ -103,15 +114,15 @@ public class MBO implements Updateable
 	
 	public TrackBlock[] getRoute(TrackBlock block)
 	{
-		TrackBlock blocks[] = new TrackBlock[myTrack.sections[0].numBlocks];
-		TrackBlock curBlock = block.getNextBlock();
+		TrackBlock blocks[] = new TrackBlock[defaultLine.size()];
+		int blockInd = defaultLine.indexOf(block);
+		int maxBlockInd = defaultLine.size();
+		TrackBlock curBlock = TrackModel.getBlock(lineName, (blockInd + 1) % maxBlockInd);
 		blocks[0] = curBlock;
-		int ind = 1;
 		while (curBlock != block && curBlock != null)
 		{
-			blocks[ind] = curBlock.getNextBlock();
-			curBlock = blocks[ind];
-			ind += 1;
+			blocks[ind] = TrackModel.getBlock(lineName, (blockInd + 1) % maxBlockInd);
+			blockInd += 1;
 		}
 		return blocks;
 	}
