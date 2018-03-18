@@ -120,7 +120,15 @@ public class TrackModel implements Updateable {
         return tb;
     }
 
-    public static void flipSwitch(String line, int block) {
+    /**
+     * Flips a switch if input line and block is valid switch.
+     *
+     * @param line
+     * @param block
+     * @return Whether or not the switch was successfully flipped.
+     */
+    public static boolean flipSwitch(String line, int block) {
+        boolean success = false;
         try {
             dbHelper.connect();
             ResultSet rs = dbHelper.query("SELECT * FROM CONNECTIONS WHERE LINE='" + line + "' AND BLOCK=" + block + " AND SWITCH_BLOCK;");
@@ -136,7 +144,7 @@ public class TrackModel implements Updateable {
                     Object[] values = {mainBlock, line, block};
                     dbHelper.execute(query, values);
                 }
-
+                success = true;
                 tmf.populateTables();
             } else {
                 System.out.println("Not a switch.");
@@ -145,6 +153,7 @@ public class TrackModel implements Updateable {
         } catch (SQLException ex) {
             Logger.getLogger(TrackModel.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return success;
     }
 
     public static Station getStation(String line, int block) {
