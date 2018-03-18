@@ -89,7 +89,7 @@ public class MBO implements Updateable
 	// TODO: make this more efficient by starting from last known block
 	public TrackBlock getBlockFromLoc(GlobalCoordinates location)
 	{
-		int maxBlockID = TrackModel.getMaxBlock();
+		int maxBlockID = defaultLine.size();
 		for (int i = 1; i <= maxBlockID; i++)
 		{
 			TrackBlock curBlock = TrackModel.getBlock(lineName, i);
@@ -119,15 +119,17 @@ public class MBO implements Updateable
 		int maxBlockInd = defaultLine.size();
 		TrackBlock curBlock = TrackModel.getBlock(lineName, (blockInd + 1) % maxBlockInd);
 		blocks[0] = curBlock;
+		int ind = 1;
 		while (curBlock != block && curBlock != null)
 		{
 			blocks[ind] = TrackModel.getBlock(lineName, (blockInd + 1) % maxBlockInd);
 			blockInd += 1;
+			ind += 1;
 		}
 		return blocks;
 	}
 	
-	// Adds a FakeTrain to the set of objects this object communicates with.
+	// Adds a train to the set of objects this object communicates with.
 	public void registerTrain(TrainModel train, TrackBlock block, int ID)
 	{
 		MboRadio radio = train.mboRadio();
@@ -181,7 +183,7 @@ public class MBO implements Updateable
 		double authority = 0;
 		if (route[0] != null)
 		{
-			authority = route[0].getStart().distanceTo(train.train.location());
+			authority = route[0].getStart().distanceTo(train.getLocation());
 			for (int j = 0; j < blockingBlock; j++)
 			{
 				authority += route[j+1].getLength();
@@ -189,10 +191,12 @@ public class MBO implements Updateable
 			if (blockingTrain == null)
 				authority += route[blockingBlock].getLength();
 			else
-				authority += route[blockingBlock].getStart().distanceTo(blockingTrain.train.location());
+				// TODO: change to length along track (arc length)
+				authority += route[blockingBlock].getStart().distanceTo(blockingTrain.getLocation());
 		}
+		// TODO: change to length along track (arc length)
 		else
-			authority = train.block.getEnd().distanceTo(train.train.location());
+			authority = train.block.getEnd().distanceTo(train.getLocation());
 		
 		// System.out.println(String.format("Train %d, blockingBlock %d", train.train.getID(), route[blockingBlock].ID));
 	
