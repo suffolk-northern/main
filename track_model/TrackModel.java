@@ -320,7 +320,7 @@ public class TrackModel implements Updateable {
         int count = 0;
         try {
             dbHelper.connect();
-            ResultSet rs = dbHelper.query("SELECT MAX(BLOCK) FROM BLOCKS WHERE LINE='" + line + "';");
+            ResultSet rs = dbHelper.query("SELECT COUNT(BLOCK) FROM BLOCKS WHERE LINE='" + line + "';");
             if (rs.next()) {
                 count = rs.getInt(1);
             } else {
