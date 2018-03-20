@@ -253,7 +253,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
         dbHelper.close();
     }
 
-    public void populateDatabase(File trackDataFile) {
+    private void populateDatabase(File trackDataFile) {
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(trackDataFile)));
 

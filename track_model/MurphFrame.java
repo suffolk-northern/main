@@ -121,15 +121,15 @@ public class MurphFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        breakSomething();
+        breakTrack();
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        breakSomething();
+        breakTrack();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        breakSomething2();
+        breakPower();
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void populateDropdown() {
@@ -148,7 +148,7 @@ public class MurphFrame extends javax.swing.JFrame {
         }
     }
 
-    private void breakSomething() {
+    private void breakTrack() {
         String line = jComboBox1.getSelectedItem().toString().split(",")[0];
         line = line.substring(line.lastIndexOf(" "), line.length()).trim();
         String block = jComboBox1.getSelectedItem().toString().split(",")[2];
@@ -157,7 +157,7 @@ public class MurphFrame extends javax.swing.JFrame {
         TrackModel.setOccupancy(line, Integer.parseInt(block), true);
     }
 
-    private void breakSomething2() {
+    private void breakPower() {
         String line = jComboBox1.getSelectedItem().toString().split(",")[0];
         line = line.substring(line.lastIndexOf(" "), line.length()).trim();
         String block = jComboBox1.getSelectedItem().toString().split(",")[2];
