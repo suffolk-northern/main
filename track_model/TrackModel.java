@@ -145,7 +145,9 @@ public class TrackModel implements Updateable {
                     dbHelper.execute(query, values);
                 }
                 success = true;
-                tmf.populateTables();
+                if (tmf != null) {
+                    tmf.populateTables();
+                }
             } else {
                 System.out.println("Not a switch.");
             }
@@ -188,7 +190,9 @@ public class TrackModel implements Updateable {
             dbHelper.execute(query, values);
             dbHelper.close();
 
-            tmf.populateTables();
+            if (tmf != null) {
+                tmf.populateTables();
+            }
         }
     }
 
@@ -200,7 +204,9 @@ public class TrackModel implements Updateable {
             dbHelper.execute(query, values);
             dbHelper.close();
 
-            tmf.populateTables();
+            if (tmf != null) {
+                tmf.populateTables();
+            }
         }
     }
 
@@ -212,7 +218,23 @@ public class TrackModel implements Updateable {
             dbHelper.execute(query, values);
             dbHelper.close();
 
-            tmf.populateTables();
+            if (tmf != null) {
+                tmf.populateTables();
+            }
+        }
+    }
+
+    public static void setCrossingSignal(String line, int block, boolean on) {
+        if (doTablesExist()) {
+            dbHelper.connect();
+            String query = "UPDATE CROSSINGS SET SIGNAL=? WHERE LINE=? AND BLOCK=?";
+            Object[] values = {on, line, block};
+            dbHelper.execute(query, values);
+            dbHelper.close();
+
+            if (tmf != null) {
+                tmf.populateTables();
+            }
         }
     }
 
@@ -224,7 +246,9 @@ public class TrackModel implements Updateable {
             dbHelper.execute(query, values);
             dbHelper.close();
 
-            tmf.populateTables();
+            if (tmf != null) {
+                tmf.populateTables();
+            }
         }
     }
 
@@ -276,6 +300,10 @@ public class TrackModel implements Updateable {
             Logger.getLogger(TrackModel.class.getName()).log(Level.SEVERE, null, ex);
         }
         return tb;
+    }
+
+    public static int generatePassengers() {
+        return (int) (Math.random() * 20);
     }
 
     public static ArrayList<Integer> getDefaultLine(String line) {

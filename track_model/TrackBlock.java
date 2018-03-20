@@ -2,29 +2,29 @@ package track_model;
 
 public class TrackBlock {
 
-    private String line;
-    private char section;
-    private int block;
-    private double length;
-    private double curvature;
-    private double grade;
-    private int direction;
-    private int speedLimit;
-    private boolean isUnderground;
-    private boolean isPowerOn;
-    private boolean isOccupied;
-    private boolean isHeaterOn;
-    private String message;
-    private GlobalCoordinates start, end;
+    protected String line;
+    protected char section;
+    protected int block;
+    protected double length;
+    protected double curvature;
+    protected double grade;
+    protected int direction;
+    protected int speedLimit;
+    protected boolean isUnderground;
+    protected boolean isPowerOn;
+    protected boolean isOccupied;
+    protected boolean isHeaterOn;
+    protected String message;
+    protected GlobalCoordinates start, end;
     
-    private int nextBlockId;
-    private int prevBlockId;
-    private int switchBlockId;
-    private int switchDirection;
+    protected int nextBlockId;
+    protected int prevBlockId;
+    protected int switchBlockId;
+    protected int switchDirection;
     
-    private boolean isSwitch;
-    private boolean isStation;
-    private boolean isCrossing;
+    protected boolean isSwitch;
+    protected boolean isStation;
+    protected boolean isCrossing;
 
     public static final double METER_TO_YARD_MULTIPLIER = 1.09361;
     public static final double KILOMETER_TO_MILE_MULTIPLIER = 0.621371;
