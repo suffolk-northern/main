@@ -54,6 +54,10 @@ public class Station {
         this.beacon = beacon;
     }
 
+    public int generatePassengers() {
+        return (int) (Math.random() * 20);
+    }
+
     @Override
     public String toString() {
         return "Hi, I'm Station " + name + " of the " + line + " Line, Section " + section + ".\n"

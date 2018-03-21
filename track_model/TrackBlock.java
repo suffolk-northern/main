@@ -14,6 +14,7 @@ public class TrackBlock {
     protected boolean isPowerOn;
     protected boolean isOccupied;
     protected boolean isHeaterOn;
+    protected boolean closedForMaintenance;
     protected String message;
     protected GlobalCoordinates start, end;
     
@@ -217,8 +218,24 @@ public class TrackBlock {
     protected void setSwitchDirection(int switchDirection) {
         this.switchDirection = switchDirection;
     }
+
+    public boolean isClosedForMaintenance() {
+        return closedForMaintenance;
+    }
+
+    protected void setClosedForMaintenance(boolean closedForMaintenance) {
+        this.closedForMaintenance = closedForMaintenance;
+    }
     
     
+    
+    public double getDistanceTo(GlobalCoordinates gc)   {
+        return 0;
+    }
+    
+    public GlobalCoordinates getPositionAlongBlock(double meters)    {
+        return null;
+    }
 
     @Override
     public String toString() {

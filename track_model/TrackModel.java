@@ -24,13 +24,14 @@ public class TrackModel implements Updateable {
 
     private static TrackModelFrame tmf;
     private static final DbHelper dbHelper = new DbHelper();
+    private static final ArrayList<TrainModel> trains = new ArrayList<>();
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-//        launchUI();
-//        launchTestUI();
+        launchUI();
+        launchTestUI();
     }
 
     public static void launchUI() {
@@ -90,6 +91,7 @@ public class TrackModel implements Updateable {
                 tb.setIsHeaterOn(rs.getBoolean(11));
                 tb.setMessage(rs.getString(12));
                 tb.setStartCoordinates(rs.getDouble(13), rs.getDouble(14));
+                tb.setClosedForMaintenance(rs.getBoolean(17));
 
                 rs = dbHelper.query("SELECT NEXT_BLOCK FROM CONNECTIONS WHERE LINE='" + line + "' AND BLOCK=" + block + ";");
                 rs = dbHelper.query("SELECT X, Y FROM BLOCKS WHERE LINE='" + line + "' AND BLOCK=" + rs.getInt(1) + ";");
@@ -146,7 +148,7 @@ public class TrackModel implements Updateable {
                 }
                 success = true;
                 if (tmf != null) {
-                    tmf.populateTables();
+                    tmf.refreshTables();
                 }
             } else {
                 System.out.println("Not a switch.");
@@ -191,7 +193,21 @@ public class TrackModel implements Updateable {
             dbHelper.close();
 
             if (tmf != null) {
-                tmf.populateTables();
+                tmf.refreshTables();
+            }
+        }
+    }
+
+    public static void setMaintenance(String line, int block, boolean maintain) {
+        if (doTablesExist()) {
+            dbHelper.connect();
+            String query = "UPDATE BLOCKS SET MAINTENANCE=? WHERE LINE=? AND BLOCK=?";
+            Object[] values = {maintain, line, block};
+            dbHelper.execute(query, values);
+            dbHelper.close();
+
+            if (tmf != null) {
+                tmf.refreshTables();
             }
         }
     }
@@ -205,7 +221,7 @@ public class TrackModel implements Updateable {
             dbHelper.close();
 
             if (tmf != null) {
-                tmf.populateTables();
+                tmf.refreshTables();
             }
         }
     }
@@ -219,7 +235,7 @@ public class TrackModel implements Updateable {
             dbHelper.close();
 
             if (tmf != null) {
-                tmf.populateTables();
+                tmf.refreshTables();
             }
         }
     }
@@ -233,7 +249,7 @@ public class TrackModel implements Updateable {
             dbHelper.close();
 
             if (tmf != null) {
-                tmf.populateTables();
+                tmf.refreshTables();
             }
         }
     }
@@ -247,7 +263,7 @@ public class TrackModel implements Updateable {
             dbHelper.close();
 
             if (tmf != null) {
-                tmf.populateTables();
+                tmf.refreshTables();
             }
         }
     }
@@ -300,10 +316,6 @@ public class TrackModel implements Updateable {
             Logger.getLogger(TrackModel.class.getName()).log(Level.SEVERE, null, ex);
         }
         return tb;
-    }
-
-    public static int generatePassengers() {
-        return (int) (Math.random() * 20);
     }
 
     public static ArrayList<Integer> getDefaultLine(String line) {
@@ -361,8 +373,26 @@ public class TrackModel implements Updateable {
         return count;
     }
 
+    public TrackBlock getYardBlock() {
+        return getBlock("YARD", -1);
+    }
+
+    public void setYardMessage(String message) {
+        if (doTablesExist()) {
+            dbHelper.connect();
+            String query = "UPDATE BLOCKS SET MESSAGE=? WHERE BLOCK=-1";
+            Object[] values = {message};
+            dbHelper.execute(query, values);
+            dbHelper.close();
+
+            if (tmf != null) {
+                tmf.refreshTables();
+            }
+        }
+    }
+
     public void registerTrain(TrainModel tm) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        trains.add(tm);
     }
 
     public void configureTrackController(TrackController tc) {

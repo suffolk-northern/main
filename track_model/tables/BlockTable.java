@@ -20,11 +20,15 @@ public class BlockTable extends TrackModelTable {
                     Object value, boolean isSelected, boolean hasFocus, int row, int col) {
                 super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
                 boolean occupied = ((String) table.getModel().getValueAt(row, 9)).equalsIgnoreCase("OCCUPIED");
+                boolean maintain = ((String) table.getModel().getValueAt(row, 9)).equalsIgnoreCase("CLOSED");
                 boolean powerOut = ((String) table.getModel().getValueAt(row, 8)).equalsIgnoreCase("OUTAGE");
                 boolean underground = ((String) table.getModel().getValueAt(row, 7)).equalsIgnoreCase("UNDERGROUND");
 
                 if (occupied) {
                     setBackground(Color.RED);
+                    setForeground(Color.WHITE);
+                } else if (maintain) {
+                    setBackground(Color.GRAY);
                     setForeground(Color.WHITE);
                 } else if (powerOut) {
                     setBackground(Color.ORANGE);
@@ -33,7 +37,7 @@ public class BlockTable extends TrackModelTable {
                     setBackground(table.getBackground());
                     setForeground(table.getForeground());
                 }
-                
+
                 if (underground && col == 7) {
                     setBackground(Color.BLACK);
                     setForeground(Color.WHITE);
