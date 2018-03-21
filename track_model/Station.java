@@ -54,7 +54,7 @@ public class Station {
         this.beacon = beacon;
     }
 
-    public int generatePassengers() {
+    public static int generatePassengers() {
         return (int) (Math.random() * 20);
     }
 

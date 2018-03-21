@@ -404,7 +404,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
                     rs.getString(4),
                     rs.getInt(2),
                     rs.getDouble(5),
-                    rs.getBoolean(11) ? "OCCUPIED" : (rs.getBoolean(17) ? "CLOSED" : ""),
+                    rs.getBoolean(11) ? "OCCUPIED" : (rs.getBoolean(18) ? "CLOSED" : ""),
                     rs.getBoolean(3) ? "ON" : "OFF"
                 };
                 crossingTableModel.addRow(rowData);

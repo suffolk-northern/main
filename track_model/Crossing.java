@@ -3,7 +3,6 @@ package track_model;
 public class Crossing {
 
     private String line;
-    private char section;
     private int block;
     private boolean signal;
 
@@ -18,14 +17,6 @@ public class Crossing {
 
     protected void setLine(String line) {
         this.line = line;
-    }
-
-    public char getSection() {
-        return section;
-    }
-
-    protected void setSection(char section) {
-        this.section = section;
     }
 
     public int getBlock() {

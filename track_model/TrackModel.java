@@ -184,6 +184,27 @@ public class TrackModel implements Updateable {
         return s;
     }
 
+    public static Crossing getCrossing(String line, int block) {
+        if (!doTablesExist()) {
+            return null;
+        }
+        Crossing c = null;
+        try {
+            dbHelper.connect();
+            ResultSet rs = dbHelper.query("SELECT * FROM CROSSINGS WHERE LINE='" + line + "' AND BLOCK=" + block + ";");
+            if (rs.next()) {
+                c = new Crossing(line, block);
+                c.setSignal(rs.getBoolean(3));
+            } else {
+                System.out.println("Invalid crossing.");
+            }
+            dbHelper.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(TrackModel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return c;
+    }
+
     public static void setBlockMessage(String line, int block, String message) {
         if (doTablesExist()) {
             dbHelper.connect();
@@ -224,6 +245,13 @@ public class TrackModel implements Updateable {
                 tmf.refreshTables();
             }
         }
+    }
+
+    public static int exchangePassengers(int departing) {
+        int boarding = Station.generatePassengers();
+
+//        ctc.updatePassengers(departing, boarding, train, station);
+        return boarding;
     }
 
     public static void setPower(String line, int block, boolean on) {
