@@ -2,24 +2,30 @@ package track_model;
 
 public class TrackBlock {
 
-    private String line;
-    private char section;
-    private int block;
-    private double length;
-    private double curvature;
-    private double grade;
-    private int direction;
-    private int speedLimit;
-    private boolean isUnderground;
-    private boolean isPowerOn;
-    private boolean isOccupied;
-    private boolean isHeaterOn;
-    private String message;
-    private GlobalCoordinates start, end;
+    protected String line;
+    protected char section;
+    protected int block;
+    protected double length;
+    protected double curvature;
+    protected double grade;
+    protected int direction;
+    protected int speedLimit;
+    protected boolean isUnderground;
+    protected boolean isPowerOn;
+    protected boolean isOccupied;
+    protected boolean isHeaterOn;
+    protected boolean closedForMaintenance;
+    protected String message;
+    protected GlobalCoordinates start, end;
     
-    private boolean isSwitch;
-    private boolean isStation;
-    private boolean isCrossing;
+    protected int nextBlockId;
+    protected int prevBlockId;
+    protected int switchBlockId;
+    protected int switchDirection;
+    
+    protected boolean isSwitch;
+    protected boolean isStation;
+    protected boolean isCrossing;
 
     public static final double METER_TO_YARD_MULTIPLIER = 1.09361;
     public static final double KILOMETER_TO_MILE_MULTIPLIER = 0.621371;
@@ -33,7 +39,7 @@ public class TrackBlock {
         return line;
     }
 
-    public void setLine(String line) {
+    protected void setLine(String line) {
         this.line = line;
     }
 
@@ -41,7 +47,7 @@ public class TrackBlock {
         return section;
     }
 
-    public void setSection(char section) {
+    protected void setSection(char section) {
         this.section = section;
     }
 
@@ -49,7 +55,7 @@ public class TrackBlock {
         return block;
     }
 
-    public void setBlock(int block) {
+    protected void setBlock(int block) {
         this.block = block;
     }
 
@@ -61,7 +67,7 @@ public class TrackBlock {
         return length * METER_TO_YARD_MULTIPLIER;
     }
 
-    public void setLength(double length) {
+    protected void setLength(double length) {
         this.length = length;
     }
 
@@ -69,7 +75,7 @@ public class TrackBlock {
         return curvature;
     }
 
-    public void setCurvature(double curvature) {
+    protected void setCurvature(double curvature) {
         this.curvature = curvature;
     }
 
@@ -77,7 +83,7 @@ public class TrackBlock {
         return grade;
     }
 
-    public void setGrade(double grade) {
+    protected void setGrade(double grade) {
         this.grade = grade;
     }
 
@@ -85,7 +91,7 @@ public class TrackBlock {
         return direction;
     }
 
-    public void setDirection(int direction) {
+    protected void setDirection(int direction) {
         this.direction = direction;
     }
 
@@ -97,7 +103,7 @@ public class TrackBlock {
         return speedLimit * KILOMETER_TO_MILE_MULTIPLIER;
     }
 
-    public void setSpeedLimit(int speedLimit) {
+    protected void setSpeedLimit(int speedLimit) {
         this.speedLimit = speedLimit;
     }
 
@@ -105,7 +111,7 @@ public class TrackBlock {
         return isUnderground;
     }
 
-    public void setIsUnderground(boolean isUnderground) {
+    protected void setIsUnderground(boolean isUnderground) {
         this.isUnderground = isUnderground;
     }
 
@@ -113,7 +119,7 @@ public class TrackBlock {
         return isPowerOn;
     }
 
-    public void setIsPowerOn(boolean isPowerOn) {
+    protected void setIsPowerOn(boolean isPowerOn) {
         this.isPowerOn = isPowerOn;
     }
 
@@ -121,7 +127,7 @@ public class TrackBlock {
         return isHeaterOn;
     }
 
-    public void setIsHeaterOn(boolean isHeaterOn) {
+    protected void setIsHeaterOn(boolean isHeaterOn) {
         this.isHeaterOn = isHeaterOn;
     }
 
@@ -129,7 +135,7 @@ public class TrackBlock {
         return isSwitch;
     }
 
-    public void setIsSwitch(boolean isSwitch) {
+    protected void setIsSwitch(boolean isSwitch) {
         this.isSwitch = isSwitch;
     }
 
@@ -137,7 +143,7 @@ public class TrackBlock {
         return isStation;
     }
 
-    public void setIsStation(boolean isStation) {
+    protected void setIsStation(boolean isStation) {
         this.isStation = isStation;
     }
 
@@ -145,7 +151,7 @@ public class TrackBlock {
         return isCrossing;
     }
 
-    public void setIsCrossing(boolean isCrossing) {
+    protected void setIsCrossing(boolean isCrossing) {
         this.isCrossing = isCrossing;
     }
 
@@ -153,7 +159,7 @@ public class TrackBlock {
         return isOccupied;
     }
 
-    public void setIsOccupied(boolean isOccupied) {
+    protected void setIsOccupied(boolean isOccupied) {
         this.isOccupied = isOccupied;
     }
 
@@ -161,15 +167,15 @@ public class TrackBlock {
         return message;
     }
 
-    public void setMessage(String message) {
+    protected void setMessage(String message) {
         this.message = message;
     }
 
-    public void setStartCoordinates(double x, double y) {
+    protected void setStartCoordinates(double x, double y) {
         start = GlobalCoordinates.ORIGIN.addYards(y * METER_TO_YARD_MULTIPLIER, x * METER_TO_YARD_MULTIPLIER);
     }
 
-    public void setEndCoordinates(double x, double y) {
+    protected void setEndCoordinates(double x, double y) {
         end = GlobalCoordinates.ORIGIN.addYards(y * METER_TO_YARD_MULTIPLIER, x * METER_TO_YARD_MULTIPLIER);
     }
 
@@ -179,6 +185,56 @@ public class TrackBlock {
 
     public GlobalCoordinates getEnd() {
         return end;
+    }
+
+    public int getNextBlockId() {
+        return nextBlockId;
+    }
+
+    protected void setNextBlockId(int nextBlockId) {
+        this.nextBlockId = nextBlockId;
+    }
+
+    public int getPrevBlockId() {
+        return prevBlockId;
+    }
+
+    protected void setPrevBlockId(int prevBlockId) {
+        this.prevBlockId = prevBlockId;
+    }
+
+    public int getSwitchBlockId() {
+        return switchBlockId;
+    }
+
+    protected void setSwitchBlockId(int switchBlockId) {
+        this.switchBlockId = switchBlockId;
+    }
+
+    public int getSwitchDirection() {
+        return switchDirection;
+    }
+
+    protected void setSwitchDirection(int switchDirection) {
+        this.switchDirection = switchDirection;
+    }
+
+    public boolean isClosedForMaintenance() {
+        return closedForMaintenance;
+    }
+
+    protected void setClosedForMaintenance(boolean closedForMaintenance) {
+        this.closedForMaintenance = closedForMaintenance;
+    }
+    
+    
+    
+    public double getDistanceTo(GlobalCoordinates gc)   {
+        return 0;
+    }
+    
+    public GlobalCoordinates getPositionAlongBlock(double meters)    {
+        return null;
     }
 
     @Override

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package myctc;
+package ctc;
 
 /**
  *
@@ -19,13 +19,13 @@ import track_model.TrackModel;
  *
  * @author missm
  */
-public class MyCtc implements Updateable{
+public class Ctc implements Updateable{
 
 	public static final int TRAINCOLS = 8;
 	public static final int TRACKCOLS = 9;
 
-	public static MyCtc ctc;
-	public static MyCtcUI ui;
+	public static Ctc ctc;
+	public static CtcUI ui;
 	
 	public static TrackModel trackmodel;
 
@@ -63,9 +63,9 @@ public class MyCtc implements Updateable{
 		this.trackmodel = tm;
 	}
 	
-	public MyCtc() {
+	public Ctc() {
 		ctc = this;
-		ui = new MyCtcUI(ctc);
+		ui = new CtcUI(ctc);
 		//showUI();
 
 		blueline.add(new Block("blue", true));
