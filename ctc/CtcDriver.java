@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package myctc;
+package ctc;
 
 import java.util.Scanner;
 
@@ -14,7 +14,7 @@ import java.util.Scanner;
 public class CtcDriver {
 
 	public static void main(String[] args) {
-		MyCtc ctc = new MyCtc();
+		Ctc ctc = new Ctc();
 		ctc.showUI();
 		Scanner scan = new Scanner(System.in);
 		String str = scan.nextLine();
