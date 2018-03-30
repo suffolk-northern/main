@@ -18,7 +18,7 @@ public class Station {
         return line;
     }
 
-    public void setLine(String line) {
+    protected void setLine(String line) {
         this.line = line;
     }
 
@@ -26,7 +26,7 @@ public class Station {
         return section;
     }
 
-    public void setSection(char section) {
+    protected void setSection(char section) {
         this.section = section;
     }
 
@@ -34,7 +34,7 @@ public class Station {
         return block;
     }
 
-    public void setBlock(int block) {
+    protected void setBlock(int block) {
         this.block = block;
     }
 
@@ -42,7 +42,7 @@ public class Station {
         return name;
     }
 
-    public void setName(String name) {
+    protected void setName(String name) {
         this.name = name;
     }
 
@@ -50,8 +50,12 @@ public class Station {
         return beacon;
     }
 
-    public void setBeacon(String beacon) {
+    protected void setBeacon(String beacon) {
         this.beacon = beacon;
+    }
+
+    public static int generatePassengers() {
+        return (int) (Math.random() * 20);
     }
 
     @Override

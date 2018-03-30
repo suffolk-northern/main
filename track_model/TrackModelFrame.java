@@ -40,7 +40,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
     public TrackModelFrame() {
         initComponents();
         if (TrackModel.doTablesExist()) {
-            populateTables();
+            refreshTables();
         }
     }
 
@@ -180,7 +180,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
             if (returnValue == JFileChooser.APPROVE_OPTION) {
                 initializeDatabase();
                 populateDatabase(jfc.getSelectedFile());
-                populateTables();
+                refreshTables();
             }
         }
     }//GEN-LAST:event_importButtonActionPerformed
@@ -192,7 +192,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
 
     private void occupancyCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_occupancyCheckBoxActionPerformed
         if (TrackModel.doTablesExist()) {
-            populateTables();
+            refreshTables();
         }
     }//GEN-LAST:event_occupancyCheckBoxActionPerformed
 
@@ -205,8 +205,8 @@ public class TrackModelFrame extends javax.swing.JFrame {
 
         dbHelper.execute("CREATE TABLE BLOCKS (\n"
                 + " line text NOT NULL,\n"
-                + " section varchar(1) NOT NULL,\n"
-                + " block integer,\n"
+                + " section varchar(1),\n"
+                + " block integer  NOT NULL,\n"
                 + " length float,\n"
                 + " curvature float,\n"
                 + " grade float,\n"
@@ -219,7 +219,8 @@ public class TrackModelFrame extends javax.swing.JFrame {
                 + " x float,\n"
                 + " y float,\n"
                 + " track_controller integer,\n"
-                + " tc_orientation,\n"
+                + " tc_orientation integer,\n"
+                + " maintenance boolean,\n"
                 + " PRIMARY KEY (line, block)\n"
                 + ");");
         dbHelper.execute("CREATE TABLE CONNECTIONS (\n"
@@ -253,17 +254,22 @@ public class TrackModelFrame extends javax.swing.JFrame {
         dbHelper.close();
     }
 
-    public void populateDatabase(File trackDataFile) {
+    private void populateDatabase(File trackDataFile) {
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(trackDataFile)));
 
             Class.forName("org.sqlite.JDBC");
             Connection conn = DriverManager.getConnection("jdbc:sqlite:test.db");
             conn.setAutoCommit(false);
-            PreparedStatement blockStmt = conn.prepareStatement("INSERT INTO BLOCKS VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+            PreparedStatement blockStmt = conn.prepareStatement("INSERT INTO BLOCKS VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
             PreparedStatement connStmt = conn.prepareStatement("INSERT INTO CONNECTIONS VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
             PreparedStatement crossingStmt = conn.prepareStatement("INSERT INTO CROSSINGS VALUES(?, ?, ?);");
             PreparedStatement stationStmt = conn.prepareStatement("INSERT INTO STATIONS VALUES(?, ?, ?, ?, ?, ?);");
+
+            blockStmt.setString(1, "YARD");
+            blockStmt.setInt(3, -1);
+            blockStmt.setBoolean(9, true);
+            blockStmt.addBatch();
 
             String line;
             while ((line = br.readLine()) != null) {
@@ -287,6 +293,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
                 blockStmt.setFloat(14, Float.parseFloat(items.get(11)));
                 blockStmt.setInt(15, Integer.parseInt(items.get(18)));
                 blockStmt.setInt(16, Integer.parseInt(items.get(19)));
+                blockStmt.setBoolean(17, false);
                 blockStmt.addBatch();
 
                 connStmt.setString(1, items.get(0));
@@ -337,7 +344,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
         }
     }
 
-    protected void populateTables() {
+    protected void refreshTables() {
 
         TrackModelTableModel blockTableModel = TrackModelTableModel.getBlockTableModel();
         TrackModelTableModel switchTableModel = TrackModelTableModel.getSwitchTableModel();
@@ -366,7 +373,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
                     rs.getInt(7) * TrackBlock.KILOMETER_TO_MILE_MULTIPLIER,
                     rs.getBoolean(8) ? "UNDERGROUND" : "",
                     rs.getBoolean(9) ? "POWER" : "OUTAGE",
-                    rs.getBoolean(10) ? "OCCUPIED" : "",
+                    rs.getBoolean(10) ? "OCCUPIED" : (rs.getBoolean(17) ? "CLOSED" : ""),
                     rs.getBoolean(11) ? "ON" : "OFF",
                     rs.getString(12)
                 };
@@ -397,7 +404,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
                     rs.getString(4),
                     rs.getInt(2),
                     rs.getDouble(5),
-                    rs.getBoolean(11) ? "OCCUPIED" : "",
+                    rs.getBoolean(11) ? "OCCUPIED" : (rs.getBoolean(18) ? "CLOSED" : ""),
                     rs.getBoolean(3) ? "ON" : "OFF"
                 };
                 crossingTableModel.addRow(rowData);
