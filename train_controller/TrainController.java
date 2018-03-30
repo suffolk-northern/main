@@ -52,17 +52,13 @@ public class TrainController implements Updateable
 	boolean returning = false;
 
 
-	public TrainController(ControllerLink link) 
+	public TrainController() 
 	{
-		this.link = link;
-
 		// Before train recieves first command, make everything safe
 		manualMode = false;
 		speedCMD = 0;
 		currAuth = 0;
 		driverSetSpeed = 0;
-		link.power(0);
-		link.serviceBrake(1.0);
 		manualBrake = false;
 
 		// Relative station distances
@@ -77,6 +73,12 @@ public class TrainController implements Updateable
 		stations.put(9, 900.0);
 	}
 
+	public void registerTrain(ControllerLink link)
+	{
+		this.link = link;
+		link.power(0);
+		link.serviceBrake(1.0);
+	}
 
 	// Setters/getters for driver GUI
 
