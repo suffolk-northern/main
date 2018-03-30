@@ -21,7 +21,7 @@ import train_model.communication.MboMovementCommand;
 
 // Main MBO model
 
-public class MBO implements Updateable
+public class MboController implements Updateable
 {
 	private ArrayList<TrainTracker> trains = new ArrayList<TrainTracker>();
 	private ArrayList<TrackBlock> defaultLine; 
@@ -29,7 +29,7 @@ public class MBO implements Updateable
 	private ControllerUI ui;
 	private String lineName = "Green";
 	
-	public MBO()
+	public MboController()
 	{
 		// myTrack = new TrackModel();
 		ui = new ControllerUI();

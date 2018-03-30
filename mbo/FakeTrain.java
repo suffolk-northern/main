@@ -6,11 +6,11 @@
 package mbo;
 
 import track_model.GlobalCoordinates;
-import mbo.MBO;
+import mbo.MboController;
 
 /**
  *
- * @author Fenne
+ * @author Kaylene Stocking
  */
 public class FakeTrain {
 	GlobalCoordinates location;

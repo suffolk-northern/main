@@ -12,7 +12,7 @@ import track_model.GlobalCoordinates;
 // import train_model.Train;
 /**
  *
- * @author Fenne
+ * @author Kaylene Stocking
  */
 public class TrainTracker 
 {
