@@ -15,7 +15,6 @@ import track_model.TrackModel;
 import track_model.TrackBlock;
 import train_model.TrainModel;
 import track_model.Orientation;
-import controller.ControllerUI;
 import train_model.communication.MboRadio;
 import train_model.communication.MboMovementCommand;
 
@@ -26,19 +25,41 @@ public class MboController implements Updateable
 	private ArrayList<TrainTracker> trains = new ArrayList<TrainTracker>();
 	private ArrayList<TrackBlock> defaultLine; 
 	// private TrackModel myTrack;
-	private ControllerUI ui;
-	private String lineName = "Green";
-	boolean enabled = false;
+	private MboControllerUI ui;
+	private String lineName;
+	private boolean enabled = false;
+	private boolean launchedUI = false;
+	private CtcRadio ctcRadio;
 	
-	public MboController()
+	public MboController(String ln)
 	{
-		// myTrack = new TrackModel();
-		ui = new ControllerUI();
+		lineName = ln;
+	}
+	
+	public void launchUI()
+	{
+		if (!launchedUI)
+		{
+			ui = new MboControllerUI();
+			launchedUI = true;
+		}
 	}
 	
 	public void showUI()
 	{
-		ui.setVisible(true);
+		if (launchedUI)
+			ui.setVisible(true);
+	}
+	
+	public void hideUI()
+	{
+		if (launchedUI)
+			ui.setVisible(false);
+	}
+	
+	public void registerCtc(CtcRadio cr)
+	{
+		ctcRadio = cr;
 	}
 	
 	public void enableMboController()
@@ -49,11 +70,6 @@ public class MboController implements Updateable
 	public void disableMboController()
 	{
 		enabled = false;
-	}
-	
-	public void hideUI()
-	{
-		ui.setVisible(false);
 	}
 	
 	public void initLine()
