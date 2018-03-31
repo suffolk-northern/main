@@ -23,12 +23,14 @@ public class CtcRadio {
 		ctc = c;
 	}
 	
-	// Returns a 2D array of integer block IDs
-	// First int is block with the switch
-	// Second and third ints are the two blocks currently connected to the first
+	// Returns a 2D array of integer block IDs, each row is a switch
+	// 2 ints in each row, one for each block id
 	public int[][] getSwitchStates()
 	{
-		return ctc.requestSwitches();
+		// TODO: add this method to CTC
+		// return ctc.requestSwitches();
+		
+		return null;
 	}
 	
 	public void enableMovingBlock()

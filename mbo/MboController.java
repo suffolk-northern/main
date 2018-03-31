@@ -23,12 +23,11 @@ import train_model.communication.MboMovementCommand;
 public class MboController implements Updateable
 {
 	private ArrayList<TrainTracker> trains = new ArrayList<TrainTracker>();
-	private ArrayList<TrackBlock> defaultLine; 
+	private BlockTracker[] line; 
 	// private TrackModel myTrack;
 	private MboControllerUI ui;
 	private String lineName;
 	private boolean enabled = false;
-	private boolean launchedUI = false;
 	private CtcRadio ctcRadio;
 	
 	public MboController(String ln)
@@ -38,22 +37,19 @@ public class MboController implements Updateable
 	
 	public void launchUI()
 	{
-		if (!launchedUI)
-		{
+		if (ui == null)
 			ui = new MboControllerUI();
-			launchedUI = true;
-		}
 	}
 	
 	public void showUI()
 	{
-		if (launchedUI)
+		if (ui != null)
 			ui.setVisible(true);
 	}
 	
 	public void hideUI()
 	{
-		if (launchedUI)
+		if (ui != null)
 			ui.setVisible(false);
 	}
 	
@@ -74,11 +70,19 @@ public class MboController implements Updateable
 	
 	public void initLine()
 	{
-		if (defaultLine.isEmpty())
+		if (line == null)
 		{
-			ArrayList<Integer> blockNums = TrackModel.getDefaultLine(lineName);
-			for (int blockID : blockNums)
-				defaultLine.add(TrackModel.getBlock(lineName, blockID));
+			int numBlocks = TrackModel.getBlockCount(lineName);
+			line = new BlockTracker[numBlocks+1];
+			for (int i = 0; i < numBlocks; i++)
+			{
+				TrackBlock curBlock = TrackModel.getBlock(lineName, i+1);
+				double blockLength = curBlock.getLength();
+				int nextBlock = curBlock.getNextBlockId();
+				int prevBlock = curBlock.getPrevBlockId();
+				int speedLimit = curBlock.getSpeedLimit();
+				line[i+1] = new BlockTracker(i+1, nextBlock, prevBlock, blockLength, speedLimit);
+			}
 		}
 	}
 
