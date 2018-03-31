@@ -54,15 +54,15 @@ public class Main
 		// FIXME: launches UI in constructor
 		ctc = new Ctc();
 
-		// FIXME: launches UI in constructor
-		//mbo = new Mbo();
-
 		TrackController[] trackControllers = {
 			new TrackController(),
 			new TrackController(),
 		};
 
 		trackModel = new TrackModel();
+		
+		// mboCont = new MboController("green");
+		// mboSched = new MboScheduler("green");
 
 		// FIXME: see imports above
 		//TrainController[] trainControllers = {
@@ -115,6 +115,11 @@ public class Main
 		// train model <---> MBO
 		//for (TrainModel trainModel : trainModels)
 		//	mbo.registerTrain(trainModel.mboRadio());
+		
+		// CTC <--> MBO
+		// ctcRadio = new CtcRadio(mboCont, mboSched, ctc);
+		// ctc.registerMbo(ctcRadio);
+		// mboCont.registerCtc(ctcRadio);
 
 		//
 		// fill updateables
