@@ -28,6 +28,7 @@ public class MboController implements Updateable
 	// private TrackModel myTrack;
 	private ControllerUI ui;
 	private String lineName = "Green";
+	boolean enabled = false;
 	
 	public MboController()
 	{
@@ -38,6 +39,16 @@ public class MboController implements Updateable
 	public void showUI()
 	{
 		ui.setVisible(true);
+	}
+	
+	public void enableMboController()
+	{
+		enabled = true;
+	}
+	
+	public void disableMboController()
+	{
+		enabled = false;
 	}
 	
 	public void hideUI()
@@ -87,7 +98,7 @@ public class MboController implements Updateable
 	}
 	
 	// TODO: make this more efficient by starting from last known block
-	public TrackBlock getBlockFromLoc(GlobalCoordinates location)
+	private TrackBlock getBlockFromLoc(GlobalCoordinates location)
 	{
 		int maxBlockID = defaultLine.size();
 		for (int i = 1; i <= maxBlockID; i++)
@@ -99,7 +110,7 @@ public class MboController implements Updateable
 		return null;
 	}
 	
-	public boolean isOnBlock(GlobalCoordinates location, TrackBlock block)
+	private boolean isOnBlock(GlobalCoordinates location, TrackBlock block)
 	{
 		double tolerance = 5;
 		double startDist = location.distanceTo(block.getStart());
@@ -112,7 +123,7 @@ public class MboController implements Updateable
 			return false;	
 	}
 	
-	public TrackBlock[] getRoute(TrackBlock block)
+	private TrackBlock[] getRoute(TrackBlock block)
 	{
 		TrackBlock blocks[] = new TrackBlock[defaultLine.size()];
 		int blockInd = defaultLine.indexOf(block);
@@ -152,7 +163,7 @@ public class MboController implements Updateable
 		}
 	}
         
-	public double findAuthority(TrainTracker train)
+	private double findAuthority(TrainTracker train)
 	{
 		TrackBlock[] route = getRoute(train.getBlock());
 		int blockingBlock = route.length-1;
