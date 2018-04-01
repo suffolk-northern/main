@@ -195,6 +195,14 @@ public class TrainModel
 		return pointMass.orientation();
 	}
 
+	// Moves to the given pose instantaneously.
+	//
+	// Sets the speed to zero.
+	public void slew(Pose pose)
+	{
+		pointMass.slew(pose);
+	}
+
 	// Sets the orientation.
 	//
 	// Causes an instantaneous change in the direction of the velocity
