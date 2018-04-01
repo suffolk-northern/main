@@ -81,6 +81,9 @@ public class TrainModel
 	// notify observers once every this many updates
 	private static int NOTIFY_OBSERVERS_MOD = 2;
 
+	// identifier
+	private final int id;
+
 	private final PointMass pointMass =
 		new PointMass(MASS_EMPTY, INITIAL_POSE);
 
@@ -109,6 +112,18 @@ public class TrainModel
 	private final MboRadio mboRadio = new MboRadio(relay);
 
 	private int notifyObserversCount = 0;
+
+	// Constructs a TrainModel with the given identifier.
+	public TrainModel(int id)
+	{
+		this.id = id;
+	}
+
+	// Returns this train's identifier.
+	public int id()
+	{
+		return id;
+	}
 
 	// Returns a train_model.communication.BeaconRadio suitable for
 	// communicating with this train.
