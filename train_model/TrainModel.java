@@ -46,6 +46,7 @@ public class TrainModel
 	private static final double DATASHEET_EDECEL_MPSPS  =  2.73;
 	private static final double DATASHEET_MID_SPEED_KPH = 35.00;
 	private static final double DATASHEET_MID_MASS_TON  = 50.00;
+	private static final double DATASHEET_POWER_WATT = 120e3;
 
 	// kilograms (constant for now)
 	private static final double MASS_EMPTY =
@@ -58,8 +59,7 @@ public class TrainModel
 		MASS_EMPTY * DATASHEET_ACCEL_MPSPS;
 
 	// watts, newtons
-	private static final double MAX_ENGINE_POWER =
-		DERIVED_MID_ENGINE_FORCE * DERIVED_MID_SPEED;
+	private static final double MAX_ENGINE_POWER = DATASHEET_POWER_WATT;
 	private static final double MAX_ENGINE_FORCE =
 		2.0 * DERIVED_MID_ENGINE_FORCE;
 
