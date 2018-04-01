@@ -4,6 +4,8 @@ import java.util.*;
 import java.lang.Math;
 
 import train_model.communication.ControllerLink;
+import train_model.communication.TrackMovementCommand;
+import train_model.communication.MboMovementCommand;
 import updater.Updateable;
 
 
@@ -50,16 +52,18 @@ public class TrainController implements Updateable
 	double lastSpeed = 0.0;
 	double updateTime = 0;
 	boolean returning = false;
+	boolean disable = false;
+	ArrayList<String> ads = new ArrayList<>();
 
 
 	public TrainController() 
 	{
 		// Before train recieves first command, make everything safe
-		manualMode = false;
+		manualMode = true;
 		speedCMD = 0;
 		currAuth = 0;
 		driverSetSpeed = 0;
-		manualBrake = false;
+		manualBrake = true;
 
 		// Relative station distances
 		stations.put(1, 240.0);
@@ -71,6 +75,11 @@ public class TrainController implements Updateable
 		stations.put(7, 300.0);
 		stations.put(8, 900.0);
 		stations.put(9, 900.0);
+
+		ads.add("Broken frisbee? Get a new one today! Visit getnewfrisbee.com");
+		ads.add("Got blisters on your feet from playing frisbee? Visit frisbeecleats.com");
+		ads.add("Do your teamates make fun of you because you can't catch a frisbee? Visit frisbeelessons.com");
+		ads.add("Can't hold a conversation without bringing up frisbee? Visit frisbeefreaksanonymous.com");
 	}
 
 	public void registerTrain(ControllerLink link)
@@ -78,6 +87,12 @@ public class TrainController implements Updateable
 		this.link = link;
 		link.power(0);
 		link.serviceBrake(1.0);
+	}
+
+	public void launchGUI()
+	{
+		TrainControllerUI gui = new TrainControllerUI(this);
+		gui.setVisible(true);
 	}
 
 	// Setters/getters for driver GUI
@@ -93,9 +108,13 @@ public class TrainController implements Updateable
 	{
 		if(manualMode)
 		{
-			link.serviceBrake(1.0);
-			manualBrake = true;
+			if(command)
+			{
+				link.serviceBrake(1.0);
+				link.power(0);
+			}
 		}
+		manualBrake = command;
 	}
 
 	public void setDriverSpeed(int command)
@@ -199,23 +218,37 @@ public class TrainController implements Updateable
 	private double displacement()
 	{
 		double avgSpeed = (link.speed() + lastSpeed) / 2;
+	//	System.out.println(updateTime*avgSpeed);
 		return updateTime * avgSpeed;
 	}
 
 	// Updates authority states
 	private void authority()
 	{
-		if (link.receiveFromTrack() == null)
-			return;
-		// New authority message
+		TrackMovementCommand ctcMsg = link.receiveFromTrack();
+		MboMovementCommand mboMsg = link.receiveFromMbo();
+		if (mboMsg!=null)
+		{
+			speedCMD = mboMsg.speed;
+			currAuth = mboMsg.authority;
+			movingAuth = currAuth;
+		}
+		if (ctcMsg!=null)
+		{
+			speedCMD = ctcMsg.speed;
+			currAuth = ctcMsg.authority;
+			movingAuth = currAuth;
+		}
+		movingAuth -= displacement();
+		if(movingAuth<0)
+			movingAuth = 0;
 	}
-
 
 
 	// millis is ignored as this is not a model module
 	public void update(int millis) 
 	{
-		updateTime = millis;
+		updateTime = millis/1000;
 		lastSpeed = link.speed();
 
 		// Update authority
@@ -223,13 +256,29 @@ public class TrainController implements Updateable
 
 		// Set desired speed
 		if(manualMode)
+		{
 			setSpeed = driverSetSpeed;
+			movingAuth = 100; // authority never expires
+		}
 		else
 			setSpeed = speedCMD;
-	
-		setSpeed = 20;
-		// Obtain error and average error
+
+		// If authority is about to expire
 		currentSpeed = link.speed();
+		disable = false;
+		if(movingAuth<=20)
+		{
+			setSpeed = 0;
+			link.serviceBrake(1 - movingAuth/20);
+			powerCMD = -1*mass*(1-movingAuth/20)*MAX_SDECEL*currentSpeed*0.44704/MAXPOWER;
+			disable = true;
+		}
+	//	System.out.println(setSpeed);
+	//	System.out.println("manual brake = " + manualBrake);
+	//	System.out.println("manual mode = " + manualMode);
+
+		// Obtain error and average error
+	//	System.out.println("current speed = " + currentSpeed);
 		if(currentSpeed == 0)
 			currentSpeed = 0.01;
 		error = (double)setSpeed - currentSpeed;
@@ -244,15 +293,17 @@ public class TrainController implements Updateable
 		if(++queueFill > queue.length)
 			queueFill = queue.length;
 
-		// Compute power and brake commands
-		powerCMD = Kp*error*currentSpeed*mass;
-		powerCMD += Ki*averageError*currentSpeed*mass;
-		powerCMD /= MAXPOWER;
-		if(powerCMD > 1)
-			powerCMD = 1;
-		brakePowerConv = Math.min( 1.0, -1 * powerCMD*MAXPOWER / (mass * currentSpeed * MAX_SDECEL) );
-		if(!manualBrake)
+		// Compute power and brake commands. Default power cmd => max braking
+		powerCMD = -1*mass*currentSpeed*0.44704*MAX_SDECEL/MAXPOWER;
+		if(!manualBrake & !disable)
 		{
+			powerCMD = Kp*error*currentSpeed*mass;
+			powerCMD += Ki*averageError*currentSpeed*mass;
+			powerCMD /= MAXPOWER;
+			if(powerCMD > 1)
+				powerCMD = 1;
+			brakePowerConv = Math.min( 1.0, -1 * powerCMD*MAXPOWER / (mass * currentSpeed * 0.44704 * MAX_SDECEL) );
+	//		System.out.println("powerCMD = " + powerCMD);
 			link.power( Math.max(0.0, powerCMD) );		
 			link.serviceBrake( Math.max(0.0, brakePowerConv) );
 		}
