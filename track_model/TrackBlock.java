@@ -17,12 +17,12 @@ public class TrackBlock {
     protected boolean closedForMaintenance;
     protected String message;
     protected GlobalCoordinates start, end;
-    
+
     protected int nextBlockId;
     protected int prevBlockId;
     protected int switchBlockId;
     protected int switchDirection;
-    
+
     protected boolean isSwitch;
     protected boolean isStation;
     protected boolean isCrossing;
@@ -226,14 +226,24 @@ public class TrackBlock {
     protected void setClosedForMaintenance(boolean closedForMaintenance) {
         this.closedForMaintenance = closedForMaintenance;
     }
-    
-    
-    
-    public double getDistanceTo(GlobalCoordinates gc)   {
+
+    public double getDistanceTo(GlobalCoordinates gc) {
         return 0;
     }
-    
-    public GlobalCoordinates getPositionAlongBlock(double meters)    {
+
+    public GlobalCoordinates getPositionAlongBlock(double meters) {
+//        if (meters > length) {
+//            return null;
+//        }
+//        double latDiff = end.latitude() - start.latitude();
+//        double longDiff = end.longitude() - start.longitude();
+//        double radius = (360 / Math.abs(curvature) * length) / (2 * Math.PI);
+//        System.out.println(radius);
+//        
+//        if (latDiff < 0 && longDiff > 0) {
+//
+//        }
+
         return null;
     }
 

@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 public class DbHelper {
 
     private String driver = "org.sqlite.JDBC";
-    private String url = "jdbc:sqlite:test.db";
+    private String url = "jdbc:sqlite:TrackModel.db";
     private Connection connection = null;
 
     public DbHelper() {
