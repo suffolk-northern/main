@@ -64,22 +64,23 @@ public class Main
 		// mboCont = new MboController("green");
 		// mboSched = new MboScheduler("green");
 
-		// FIXME: see imports above
-		TrainController[] trainControllers = {
-			new TrainController(),
-		};
+		final int numberOfTrains = 1;
 
-		TrainModel[] trainModels = {
-			new TrainModel(),
-		};
+		TrainController[] trainControllers =
+			new TrainController[numberOfTrains];
 
-		if (trainControllers.length != trainModels.length)
-			throw new RuntimeException("mismatched train modules");
+		TrainModel[] trainModels =
+			new TrainModel[numberOfTrains];
+
+		for (int i = 0; i < numberOfTrains; ++i)
+		{
+			trainControllers[i] = new TrainController();
+			trainModels[i] = new TrainModel(i);
+		}
 
 		ArrayList<Updateable> trainObjects =
 			new ArrayList<Updateable>();
 
-		// FIXME: see instantiation above
 		trainObjects.addAll(Arrays.asList(trainControllers));
 		trainObjects.addAll(Arrays.asList(trainModels));
 
