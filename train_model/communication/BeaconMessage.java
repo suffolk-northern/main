@@ -12,8 +12,8 @@ public class BeaconMessage
 {
 	// max legal length of beacon string
 	//
-	// TODO: BSed. What's the real value?
-	public static final int MAX_LENGTH = 80;
+	// 16 ASCII chars is 16 bytes * 8 bits per byte = 128 bits
+	public static final int MAX_LENGTH = 16;
 
 	public String string;
 

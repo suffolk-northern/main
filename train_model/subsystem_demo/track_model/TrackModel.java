@@ -71,23 +71,7 @@ public class TrackModel implements Updateable
 		circuit.send(
 			new TrackMovementCommand(
 				10,
-				new Authority(
-					new boolean[] {  true,  true,  true }
-				),
-				trackCircuitState ?
-					new Authority(
-						new boolean[] {  true,  true }
-					) :
-					new Authority(
-						new boolean[] { false, false }
-					),
-				trackCircuitState ?
-					new Authority(
-						new boolean[] { false, false }
-					) :
-					new Authority(
-						new boolean[] {  true,  true }
-					)
+				trackCircuitState ? 10 : 20
 			)
 		);
 	}

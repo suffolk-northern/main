@@ -46,6 +46,7 @@ public class TrainModel
 	private static final double DATASHEET_EDECEL_MPSPS  =  2.73;
 	private static final double DATASHEET_MID_SPEED_KPH = 35.00;
 	private static final double DATASHEET_MID_MASS_TON  = 50.00;
+	private static final double DATASHEET_POWER_WATT = 120e3;
 
 	// kilograms (constant for now)
 	private static final double MASS_EMPTY =
@@ -58,8 +59,7 @@ public class TrainModel
 		MASS_EMPTY * DATASHEET_ACCEL_MPSPS;
 
 	// watts, newtons
-	private static final double MAX_ENGINE_POWER =
-		DERIVED_MID_ENGINE_FORCE * DERIVED_MID_SPEED;
+	private static final double MAX_ENGINE_POWER = DATASHEET_POWER_WATT;
 	private static final double MAX_ENGINE_FORCE =
 		2.0 * DERIVED_MID_ENGINE_FORCE;
 
@@ -80,6 +80,9 @@ public class TrainModel
 
 	// notify observers once every this many updates
 	private static int NOTIFY_OBSERVERS_MOD = 2;
+
+	// identifier
+	private final int id;
 
 	private final PointMass pointMass =
 		new PointMass(MASS_EMPTY, INITIAL_POSE);
@@ -109,6 +112,18 @@ public class TrainModel
 	private final MboRadio mboRadio = new MboRadio(relay);
 
 	private int notifyObserversCount = 0;
+
+	// Constructs a TrainModel with the given identifier.
+	public TrainModel(int id)
+	{
+		this.id = id;
+	}
+
+	// Returns this train's identifier.
+	public int id()
+	{
+		return id;
+	}
 
 	// Returns a train_model.communication.BeaconRadio suitable for
 	// communicating with this train.
@@ -193,6 +208,14 @@ public class TrainModel
 	public Orientation orientation()
 	{
 		return pointMass.orientation();
+	}
+
+	// Moves to the given pose instantaneously.
+	//
+	// Sets the speed to zero.
+	public void slew(Pose pose)
+	{
+		pointMass.slew(pose);
 	}
 
 	// Sets the orientation.
