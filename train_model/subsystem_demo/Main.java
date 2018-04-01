@@ -24,7 +24,7 @@ public class Main
 	public static void main(String[] args)
 	{
 		TrackModel track = new TrackModel();
-		TrainModel train = new TrainModel();
+		TrainModel train = new TrainModel(1);
 		MBO mbo = new MBO();
 
 		// in real implemenation, won't be passing the train here
