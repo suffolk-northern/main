@@ -115,12 +115,16 @@ public class Main
 
 		// train model <---> MBO
 		//for (TrainModel trainModel : trainModels)
-		//	mbo.registerTrain(trainModel.mboRadio());
+		//	mboCont.registerTrain(trainModel.id(), trainModel.mboRadio());
 		
 		// CTC <--> MBO
 		// ctcRadio = new CtcRadio(mboCont, mboSched, ctc);
 		// ctc.registerMbo(ctcRadio);
 		// mboCont.registerCtc(ctcRadio);
+		
+		// Track Model <---> MBO
+		// mboCont.initLine();
+		// mboSched.initLine();
 
 		//
 		// fill updateables
