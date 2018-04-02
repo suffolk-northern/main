@@ -13,9 +13,10 @@
 package integration;
 
 // FIXME: see Main imports
-//import ctc.Ctc;
-//import mbo.Mbo;
-//import track_model.TrackModel;
+import ctc.Ctc;
+import track_model.TrackModel;
+import train_model.TrainModel;
+import train_controller.TrainController;
 
 /**
  *
@@ -24,21 +25,24 @@ package integration;
 public class UI extends javax.swing.JFrame {
 
     // FIXME: see imports
-    //private Ctc ctc;
+    private Ctc ctc;
     //private Mbo mbo;
-    //private TrackModel trackModel;
+    private TrackModel trackModel;
+    private TrainModel trainModel;
+    private TrainController trainController;
 
     /**
      * Creates new form UI
      */
-    // FIXME: see imports
-    //public UI(Ctc ctc, Mbo mbo, TrackModel trackModel) {
-    //    this.ctc = ctc;
-    //    this.mbo = mbo;
-    //    this.trackModel = trackModel;
+    public UI(Ctc ctc, TrackModel trackModel, TrainModel trainModel,
+              TrainController trainController) {
+        this.ctc = ctc;
+        this.trackModel = trackModel;
+        this.trainModel = trainModel;
+        this.trainController = trainController;
 
-    //    initComponents();
-    //}
+        initComponents();
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -49,16 +53,40 @@ public class UI extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
+        ctcButton = new javax.swing.JButton();
+        trackModelButton = new javax.swing.JButton();
+        trainModelButton = new javax.swing.JButton();
+        trainControllerButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jLabel1.setFont(new java.awt.Font("Dialog", 1, 24)); // NOI18N
-        jLabel1.setText("TODO: buttons to launch");
+        ctcButton.setText("CTC");
+        ctcButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ctcButtonActionPerformed(evt);
+            }
+        });
 
-        jLabel2.setFont(new java.awt.Font("Dialog", 1, 24)); // NOI18N
-        jLabel2.setText("CTC, MBO, and Track UIs");
+        trackModelButton.setText("Track Model");
+        trackModelButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                trackModelButtonActionPerformed(evt);
+            }
+        });
+
+        trainModelButton.setText("Train Model");
+        trainModelButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                trainModelButtonActionPerformed(evt);
+            }
+        });
+
+        trainControllerButton.setText("Train Controller");
+        trainControllerButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                trainControllerButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -67,22 +95,48 @@ public class UI extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1)
-                    .addComponent(jLabel2))
-                .addContainerGap(43, Short.MAX_VALUE))
+                    .addComponent(ctcButton)
+                    .addComponent(trackModelButton)
+                    .addComponent(trainModelButton)
+                    .addComponent(trainControllerButton))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1)
+                .addComponent(ctcButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel2)
-                .addContainerGap(33, Short.MAX_VALUE))
+                .addComponent(trackModelButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(trainModelButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(trainControllerButton)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void ctcButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ctcButtonActionPerformed
+        // TODO add your handling code here:
+        ctc.showUI();
+    }//GEN-LAST:event_ctcButtonActionPerformed
+
+    private void trackModelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_trackModelButtonActionPerformed
+        // TODO add your handling code here:
+        trackModel.launchUI();
+    }//GEN-LAST:event_trackModelButtonActionPerformed
+
+    private void trainModelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_trainModelButtonActionPerformed
+        // TODO add your handling code here:
+        new train_model.subsystem_demo.UI(trainModel).setVisible(true);
+    }//GEN-LAST:event_trainModelButtonActionPerformed
+
+    private void trainControllerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_trainControllerButtonActionPerformed
+        // TODO add your handling code here:
+        trainController.launchGUI();
+    }//GEN-LAST:event_trainControllerButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -121,7 +175,9 @@ public class UI extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
+    private javax.swing.JButton ctcButton;
+    private javax.swing.JButton trackModelButton;
+    private javax.swing.JButton trainControllerButton;
+    private javax.swing.JButton trainModelButton;
     // End of variables declaration//GEN-END:variables
 }
