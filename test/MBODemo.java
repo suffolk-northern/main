@@ -5,7 +5,7 @@
  */
 package test;
 
-import mbo.MBO;
+import mbo.MboController;
 import mbo.FakeTrain;
 import track_model.GlobalCoordinates;
 import track_model.TrackBlock;
@@ -20,7 +20,7 @@ public class MBODemo
 	
 	public static void main(String[] args)
 	{
-		MBO mbo = new MBO();
+		MboController mbo = new MboController();
 		
 		MBODemoUI ui = new MBODemoUI();
 		ui.setVisible(true);
@@ -31,7 +31,7 @@ public class MBODemo
 			numTrains = update(ui, mbo, numTrains, origin);
 	}
 	
-	public static int update(MBODemoUI ui, MBO mbo, int numTrains, GlobalCoordinates origin)
+	public static int update(MBODemoUI ui, MboController mbo, int numTrains, GlobalCoordinates origin)
 	{
 		if (ui.addedTrain)
 		{

@@ -5,6 +5,8 @@
  */
 package mbo;
 
+import mbo.schedules.ScheduleWriter;
+import mbo.schedules.LineSchedule;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -14,7 +16,9 @@ import java.io.File;
  * @author Fenne
  */
 public class MboSchedulerUI extends javax.swing.JFrame {
-
+	
+	private LineSchedule schedule;
+	
     /**
      * Creates new form Scheduler
      */
@@ -514,10 +518,10 @@ public class MboSchedulerUI extends javax.swing.JFrame {
 		if (returnVal == JFileChooser.APPROVE_OPTION)
 		{
 			File file = sFile.getSelectedFile();
-			ScheduleWriter sw = new ScheduleWriter();
+			ScheduleWriter sw = new ScheduleWriter(schedule);
 			try 
 			{
-				sw.writeSchedule(file, jTable2.getModel());
+				sw.writeSchedule(file);
 			}
 			catch (Exception e)
 			{
@@ -552,20 +556,20 @@ public class MboSchedulerUI extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Scheduler.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MboSchedulerUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Scheduler.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MboSchedulerUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Scheduler.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MboSchedulerUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Scheduler.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MboSchedulerUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Scheduler().setVisible(true);
+                new MboSchedulerUI().setVisible(true);
             }
         });
     }

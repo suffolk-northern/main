@@ -6,7 +6,7 @@
 
 package test;
 
-import mbo.MBO;
+import mbo.MboController;
 import patrick.Patrick;
 import spongebob.Spongebob;
 import train_model.TrainModel;
@@ -21,7 +21,7 @@ public class TestyTest
 		Patrick patrick = new Patrick();
 		TrainModel train0 = new TrainModel();
 		TrainModel train1 = new TrainModel();
-		MBO mbo = new MBO();
+		MboController mbo = new MboController();
 
 		patrick.registerSpongebob(spongebob);
 		mbo.registerTrain(train0);
