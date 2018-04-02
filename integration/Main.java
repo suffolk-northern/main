@@ -37,6 +37,10 @@ public class Main
 	//private static Mbo mbo;
 	private static TrackModel trackModel;
 
+	// temporary single references for initial integration
+	private static TrainModel singleTrainModel;
+	private static TrainController singleTrainController;
+
 	public static void main(String[] args)
 	{
 		initializeModules();
@@ -77,6 +81,9 @@ public class Main
 			trainControllers[i] = new TrainController();
 			trainModels[i] = new TrainModel(i);
 		}
+
+		singleTrainController = trainControllers[0];
+		singleTrainModel = trainModels[0];
 
 		ArrayList<Updateable> trainObjects =
 			new ArrayList<Updateable>();
@@ -139,8 +146,10 @@ public class Main
 	{
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				// FIXME: see imports and initialize()
-				//new UI(ctc, mbo, trackModel);
+				new UI(ctc, trackModel,
+				       singleTrainModel,
+				       singleTrainController)
+				          .setVisible(true);
 			}
 		});
 	}
