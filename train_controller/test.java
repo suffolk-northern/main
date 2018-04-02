@@ -21,7 +21,9 @@ public class test
 
 		ControllerLink link = new ControllerLink(relay, model);
 
-		TrainController controller = new TrainController(link);
+		TrainController controller = new TrainController();
+		controller.registerTrain(link);
+		controller.launchGUI();
 
 		// Combine model & controller into a 'burst' module (100 cycles)
 		Updateable [] burst_arr = {
@@ -39,7 +41,6 @@ public class test
 		};
 
 		// Update time for each module is 100 ms
-		System.out.println("got here");
 		Updater modules = new Updater(100, arr);
 
 		// Time between updates is 100 ms. Start executing
