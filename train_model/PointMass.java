@@ -64,6 +64,15 @@ public class PointMass
 		return new Pose(pose);
 	}
 
+	// Sets a new pose instantaneously.
+	//
+	// Sets the speed to zero.
+	public void slew(Pose pose)
+	{
+		this.pose = new Pose(pose);
+		this.speed = 0.0;
+	}
+
 	// Returns the current speed.
 	//
 	// Units: meters per second

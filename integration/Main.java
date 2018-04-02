@@ -21,7 +21,7 @@ import ctc.Ctc;
 //import mbo.Mbo;
 import track_controller.TrackController;
 import track_model.TrackModel;
-//import train_controller.trainController;
+import train_controller.TrainController;
 import train_model.TrainModel;
 import updater.Updateable;
 import updater.Updater;
@@ -64,23 +64,24 @@ public class Main
 		// mboCont = new MboController("green");
 		// mboSched = new MboScheduler("green");
 
-		// FIXME: see imports above
-		//TrainController[] trainControllers = {
-		//	new trainController(),
-		//};
+		final int numberOfTrains = 1;
 
-		TrainModel[] trainModels = {
-			new TrainModel(),
-		};
+		TrainController[] trainControllers =
+			new TrainController[numberOfTrains];
 
-		//if (trainControllers.length != trainModels.length)
-		//	throw new RuntimeError("mismatched train modules");
+		TrainModel[] trainModels =
+			new TrainModel[numberOfTrains];
+
+		for (int i = 0; i < numberOfTrains; ++i)
+		{
+			trainControllers[i] = new TrainController();
+			trainModels[i] = new TrainModel(i);
+		}
 
 		ArrayList<Updateable> trainObjects =
 			new ArrayList<Updateable>();
 
-		// FIXME: see instantiation above
-		//trainObjects.addAll(Arrays.asList(trainControllers));
+		trainObjects.addAll(Arrays.asList(trainControllers));
 		trainObjects.addAll(Arrays.asList(trainModels));
 
 		ClockMultiplier trainMultiplier = new ClockMultiplier(
@@ -107,10 +108,10 @@ public class Main
 		//	trackModel.registerTrain(trainModel);
 
 		// train model <---> train controller
-		//for (int i = 0; i < trainControllers.length; ++i)
-		//	trainControllers[i].registerTrain(
-		//		trainModels[i].controllerLink()
-		//	);
+		for (int i = 0; i < trainControllers.length; ++i)
+			trainControllers[i].registerTrain(
+				trainModels[i].controllerLink()
+			);
 
 		// train model <---> MBO
 		//for (TrainModel trainModel : trainModels)

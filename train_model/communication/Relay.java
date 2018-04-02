@@ -28,12 +28,7 @@ public class Relay
 	private MboMovementCommand mboMessageLast =
 		new MboMovementCommand(0, 0);
 	private TrackMovementCommand trackMessageLast =
-		new TrackMovementCommand(
-			0,
-			new Authority(new boolean[] { false }),
-			new Authority(new boolean[] { false }),
-			new Authority(new boolean[] { false })
-		);
+		new TrackMovementCommand(0, 0);
 
 	// like most recent, but set to null after read
 	private BeaconMessage beaconMessageCached = null;

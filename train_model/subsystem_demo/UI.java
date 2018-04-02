@@ -100,13 +100,7 @@ public class UI
 
         trackRxSpeed.setText(String.format("%d mph", trackMessage.speed));
         trackRxAuthority.setText(
-		String.format(
-			"%2x / %2x / %2x",
-			boolArrayToInt(trackMessage.commonAuthority.blocks),
-			boolArrayToInt(trackMessage.  leftAuthority.blocks),
-			boolArrayToInt(trackMessage. rightAuthority.blocks)
-		)
-	);
+		String.format("%d y", trackMessage.authority));
 
         // TODO: use real interface for this
         mboTxLatitude.setText(String.format(
@@ -835,7 +829,7 @@ public class UI
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new UI(new TrainModel()).setVisible(true);
+                new UI(new TrainModel(0)).setVisible(true);
             }
         });
     }
