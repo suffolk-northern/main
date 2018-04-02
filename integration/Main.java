@@ -111,8 +111,8 @@ public class Main
 		//	trackModel.configureTrackController(trackController);
 
 		// track model <---> train model
-		//for (TrainModel trainModel : trainModels)
-		//	trackModel.registerTrain(trainModel);
+		for (TrainModel trainModel : trainModels)
+			trackModel.registerTrain(trainModel, "Green");
 
 		// train model <---> train controller
 		for (int i = 0; i < trainControllers.length; ++i)
@@ -137,7 +137,7 @@ public class Main
 		updateables.add(ctc);
 		//updateables.add(mbo);
 		updateables.addAll(Arrays.asList(trackControllers));
-		//updateables.add(trackModel);
+		updateables.add(trackModel);
 		updateables.add(trainMultiplier);
 	}
 
