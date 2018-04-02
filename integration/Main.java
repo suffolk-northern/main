@@ -37,6 +37,10 @@ public class Main
 	//private static Mbo mbo;
 	private static TrackModel trackModel;
 
+	// temporary single references for initial integration
+	private static TrainModel singleTrainModel;
+	private static TrainController singleTrainController;
+
 	public static void main(String[] args)
 	{
 		initializeModules();
@@ -78,6 +82,9 @@ public class Main
 			trainModels[i] = new TrainModel(i);
 		}
 
+		singleTrainController = trainControllers[0];
+		singleTrainModel = trainModels[0];
+
 		ArrayList<Updateable> trainObjects =
 			new ArrayList<Updateable>();
 
@@ -104,8 +111,8 @@ public class Main
 		//	trackModel.configureTrackController(trackController);
 
 		// track model <---> train model
-		//for (TrainModel trainModel : trainModels)
-		//	trackModel.registerTrain(trainModel);
+		for (TrainModel trainModel : trainModels)
+			trackModel.registerTrain(trainModel, "Green");
 
 		// train model <---> train controller
 		for (int i = 0; i < trainControllers.length; ++i)
@@ -130,7 +137,7 @@ public class Main
 		updateables.add(ctc);
 		//updateables.add(mbo);
 		updateables.addAll(Arrays.asList(trackControllers));
-		//updateables.add(trackModel);
+		updateables.add(trackModel);
 		updateables.add(trainMultiplier);
 	}
 
@@ -139,8 +146,10 @@ public class Main
 	{
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				// FIXME: see imports and initialize()
-				//new UI(ctc, mbo, trackModel);
+				new UI(ctc, trackModel,
+				       singleTrainModel,
+				       singleTrainController)
+				          .setVisible(true);
 			}
 		});
 	}
