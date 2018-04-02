@@ -12,7 +12,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import track_controller.TrackController;
+import track_controller.communication.Authority;
+import train_model.Pose;
 import train_model.TrainModel;
+import train_model.communication.BeaconMessage;
+import train_model.communication.BeaconRadio;
+import train_model.communication.TrackCircuit;
+import train_model.communication.TrackMovementCommand;
 
 import updater.Updateable;
 
@@ -22,16 +28,21 @@ import updater.Updateable;
  */
 public class TrackModel implements Updateable {
 
+    private static int temperature;
     private static TrackModelFrame tmf;
     private static final DbHelper dbHelper = new DbHelper();
     private static final ArrayList<TrainModel> trains = new ArrayList<>();
+
+    private static final Orientation GREEN_LINE_ORIENTATION = Orientation.radians(0.9 * Math.PI);
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        launchUI();
-        launchTestUI();
+        TrackBlock tb = getBlock("Green", 33);
+        System.out.println(tb.getPositionAlongBlock(20));
+//        launchUI();
+//        launchTestUI();
     }
 
     public static void launchUI() {
@@ -219,6 +230,14 @@ public class TrackModel implements Updateable {
         }
     }
 
+    public static void setBlockMessage(int trainId, int driverId, TrackMovementCommand tmc) {
+        for (TrainModel tm : trains) {
+            if (tm.id() == trainId) {
+                tm.trackCircuit().send(tmc);
+            }
+        }
+    }
+
     public static void setMaintenance(String line, int block, boolean maintain) {
         if (doTablesExist()) {
             dbHelper.connect();
@@ -300,7 +319,6 @@ public class TrackModel implements Updateable {
     * FOR EXPERIMENTAL PURPOSES AT THE MOMENT
      */
     public static void getConnections(String line, int block) {
-        System.out.println(block);
         try {
             dbHelper.connect();
             ResultSet rs = dbHelper.query("SELECT * FROM CONNECTIONS WHERE LINE='" + line + "' AND BLOCK=" + block);
@@ -349,30 +367,32 @@ public class TrackModel implements Updateable {
     public static ArrayList<Integer> getDefaultLine(String line) {
         ArrayList<Integer> blocks = new ArrayList<>();
         try {
-            dbHelper.connect();
-            ResultSet rs = dbHelper.query("SELECT BLOCK FROM CONNECTIONS WHERE LINE='" + line + "' AND SWITCH_BLOCK=-1 AND SWITCH_VALID=-2");
-
             int swit = 0;
             int valid = 0;
-            int cur = rs.getInt(1);
+            int cur = getFirstBlock(line).block;
             int prev = 0;
 
+            dbHelper.connect();
             while (swit != -1 || valid != 1) {
-                rs = dbHelper.query("SELECT * FROM CONNECTIONS WHERE LINE='" + line + "' AND BLOCK=" + cur);
-                blocks.add(cur);
-                if (cur > prev && rs.getInt(7) == 1) {
-                    prev = cur;
-                    cur = rs.getInt(6);
-                } else if (cur < prev && rs.getInt(5) == 1) {
-                    prev = cur;
-                    cur = rs.getInt(4);
-                } else {
-                    prev = cur;
-                    cur = rs.getInt(8);
-                }
+                ResultSet rs = dbHelper.query("SELECT * FROM CONNECTIONS WHERE LINE='" + line + "' AND BLOCK=" + cur);
+                if (rs.next()) {
+                    blocks.add(cur);
+                    if (cur > prev && rs.getInt(7) == 1) {
+                        prev = cur;
+                        cur = rs.getInt(6);
+                    } else if (cur < prev && rs.getInt(5) == 1) {
+                        prev = cur;
+                        cur = rs.getInt(4);
+                    } else {
+                        prev = cur;
+                        cur = rs.getInt(8);
+                    }
 
-                swit = rs.getInt(8);
-                valid = rs.getInt(9);
+                    swit = rs.getInt(8);
+                    valid = rs.getInt(9);
+                } else {
+                    break;
+                }
             }
             dbHelper.close();
         } catch (SQLException ex) {
@@ -405,22 +425,95 @@ public class TrackModel implements Updateable {
         return getBlock("YARD", -1);
     }
 
-    public void setYardMessage(String message) {
-        if (doTablesExist()) {
-            dbHelper.connect();
-            String query = "UPDATE BLOCKS SET MESSAGE=? WHERE BLOCK=-1";
-            Object[] values = {message};
-            dbHelper.execute(query, values);
-            dbHelper.close();
-
-            if (tmf != null) {
-                tmf.refreshTables();
+//    public void setYardMessage(String message) {
+//        if (doTablesExist()) {
+//            dbHelper.connect();
+//            String query = "UPDATE BLOCKS SET MESSAGE=? WHERE BLOCK=-1";
+//            Object[] values = {message};
+//            dbHelper.execute(query, values);
+//            dbHelper.close();
+//
+//            if (tmf != null) {
+//                tmf.refreshTables();
+//            }
+//        }
+//    }
+    public void setYardMessage(int trainId, int driverId, TrackMovementCommand tmc) {
+        for (TrainModel tm : trains) {
+            if (tm.id() == trainId) {
+                tm.trackCircuit().send(tmc);
             }
         }
     }
 
-    public void registerTrain(TrainModel tm) {
+    private void sendBeacon(BeaconRadio radio) {
+//        radio.send();
+
+    }
+
+    private void sendTrackCircuitMessage(TrackCircuit circuit) {
+//        circuit.send();
+    }
+
+    /**
+     * Registers train locally. Sets its initial location.
+     *
+     * @param tm
+     * @param line
+     */
+    public void registerTrain(TrainModel tm, String line) {
         trains.add(tm);
+        tm.slew(new Pose(getFirstBlock(line).start, GREEN_LINE_ORIENTATION));
+    }
+
+    /**
+     * Returns the closest track block to a given GlobalCoordinate.
+     *
+     * Not mathematically sound, but good enough??? for our purposes
+     *
+     * @param gc
+     * @param line
+     * @return
+     */
+    public static TrackBlock getClosestBlock(GlobalCoordinates gc, String line) {
+        int blocks = getBlockCount(line);
+        double distance = 9999;
+        double startDistance, endDistance;
+        TrackBlock closest = null;
+        for (int i = 1; i <= blocks; i++) {
+            TrackBlock temp = getBlock(line, i);
+            if (closest == null) {
+                closest = temp;
+            }
+            startDistance = Math.sqrt(Math.pow(gc.latitude() - temp.start.latitude(), 2) + Math.pow(gc.longitude() - temp.start.longitude(), 2));
+            endDistance = Math.sqrt(Math.pow(gc.latitude() - temp.end.latitude(), 2) + Math.pow(gc.longitude() - temp.end.longitude(), 2));
+            double tempDistance = startDistance + endDistance;
+
+            if (tempDistance < distance) {
+                distance = tempDistance;
+                closest = temp;
+            }
+        }
+        return closest;
+    }
+
+    /**
+     * Returns the side of a track block a train is on based on its current
+     * coordinate location.
+     *
+     * Returns true if it's on the first half of the track block, false if on
+     * back half.
+     *
+     * @param gc
+     * @param line
+     * @param block
+     * @return
+     */
+    public boolean getSide(GlobalCoordinates gc, String line, int block) {
+        TrackBlock tb = getBlock(line, block);
+        double startDistance = Math.sqrt(Math.pow(gc.latitude() - tb.start.latitude(), 2) + Math.pow(gc.longitude() - tb.start.longitude(), 2));
+        double endDistance = Math.sqrt(Math.pow(gc.latitude() - tb.end.latitude(), 2) + Math.pow(gc.longitude() - tb.end.longitude(), 2));
+        return startDistance < endDistance;
     }
 
     public void configureTrackController(TrackController tc) {
@@ -429,6 +522,11 @@ public class TrackModel implements Updateable {
 
     @Override
     public void update(int time) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+//        resetOccupancy();
+
+        for (TrainModel tm : trains) {
+            TrackBlock tb = getClosestBlock(tm.location(), "Green");        // FIX LATER
+            setOccupancy(tb.line, tb.block, true);
+        }
     }
 }

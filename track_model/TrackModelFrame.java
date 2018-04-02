@@ -187,6 +187,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
 
     private void murphButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_murphButtonActionPerformed
         MurphFrame mf = new MurphFrame(this, blockTable, crossingTable);
+        mf.setLocationRelativeTo(this);
         mf.setVisible(true);
     }//GEN-LAST:event_murphButtonActionPerformed
 
@@ -259,7 +260,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
             BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(trackDataFile)));
 
             Class.forName("org.sqlite.JDBC");
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:test.db");
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:TrackModel.db");
             conn.setAutoCommit(false);
             PreparedStatement blockStmt = conn.prepareStatement("INSERT INTO BLOCKS VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
             PreparedStatement connStmt = conn.prepareStatement("INSERT INTO CONNECTIONS VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
