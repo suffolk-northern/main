@@ -232,18 +232,32 @@ public class TrackBlock {
     }
 
     public GlobalCoordinates getPositionAlongBlock(double meters) {
-//        if (meters > length) {
-//            return null;
-//        }
-//        double latDiff = end.latitude() - start.latitude();
-//        double longDiff = end.longitude() - start.longitude();
-//        double radius = (360 / Math.abs(curvature) * length) / (2 * Math.PI);
-//        System.out.println(radius);
-//        
-//        if (latDiff < 0 && longDiff > 0) {
-//
-//        }
+        if (meters > length) {
+            return null;
+        }
+        double latDiff = end.latitude() - start.latitude();
+        double longDiff = end.longitude() - start.longitude();
+        double radius = (360 / Math.abs(curvature) * length) / (2 * Math.PI);
+        System.out.println(start.latitude());
+        System.out.println(start.longitude());
+        System.out.println(end.latitude());
+        System.out.println(end.longitude());
+        
+        getCenterOfArc(start, end, radius);
+        if (latDiff < 0 && longDiff > 0) {
 
+        }
+
+        return null;
+    }
+
+    private GlobalCoordinates getCenterOfArc(GlobalCoordinates gc1, GlobalCoordinates gc2, double radius) {
+        double radsq = Math.pow(radius, 2);
+        double q = Math.sqrt(Math.pow(gc2.latitude() - gc1.latitude(), 2) + Math.pow(gc2.longitude() - gc1.longitude(), 2));
+        double lat =  (gc1.latitude() + gc2.latitude()) / 2 + Math.sqrt(radsq - Math.pow(q / 2, 2)) * ((gc2.longitude() - gc1.longitude()) / q);
+        double lon = (gc1.longitude() + gc2.longitude()) / 2 + Math.sqrt(radsq - Math.pow(q / 2, 2)) * ((gc1.latitude() - gc2.latitude()) / q);
+        
+        System.out.println(lat + " " + lon);
         return null;
     }
 

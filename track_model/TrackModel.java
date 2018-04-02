@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 
 import track_controller.TrackController;
 import track_controller.communication.Authority;
+import train_model.Pose;
 import train_model.TrainModel;
 import train_model.communication.BeaconMessage;
 import train_model.communication.BeaconRadio;
@@ -32,10 +33,14 @@ public class TrackModel implements Updateable {
     private static final DbHelper dbHelper = new DbHelper();
     private static final ArrayList<TrainModel> trains = new ArrayList<>();
 
+    private static final Orientation GREEN_LINE_ORIENTATION = Orientation.radians(0.9 * Math.PI);
+
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        TrackBlock tb = getBlock("Green", 33);
+        System.out.println(tb.getPositionAlongBlock(20));
 //        launchUI();
 //        launchTestUI();
     }
@@ -211,19 +216,20 @@ public class TrackModel implements Updateable {
         return c;
     }
 
-//    public static void setBlockMessage(String line, int block, String message) {
-//        if (doTablesExist()) {
-//            dbHelper.connect();
-//            String query = "UPDATE BLOCKS SET MESSAGE=? WHERE LINE=? AND BLOCK=?";
-//            Object[] values = {message, line, block};
-//            dbHelper.execute(query, values);
-//            dbHelper.close();
-//
-//            if (tmf != null) {
-//                tmf.refreshTables();
-//            }
-//        }
-//    }
+    public static void setBlockMessage(String line, int block, String message) {
+        if (doTablesExist()) {
+            dbHelper.connect();
+            String query = "UPDATE BLOCKS SET MESSAGE=? WHERE LINE=? AND BLOCK=?";
+            Object[] values = {message, line, block};
+            dbHelper.execute(query, values);
+            dbHelper.close();
+
+            if (tmf != null) {
+                tmf.refreshTables();
+            }
+        }
+    }
+
     public static void setBlockMessage(int trainId, int driverId, TrackMovementCommand tmc) {
         for (TrainModel tm : trains) {
             if (tm.id() == trainId) {
@@ -457,7 +463,7 @@ public class TrackModel implements Updateable {
      */
     public void registerTrain(TrainModel tm, String line) {
         trains.add(tm);
-        tm.setLocation(getFirstBlock(line).start);
+        tm.slew(new Pose(getFirstBlock(line).start, GREEN_LINE_ORIENTATION));
     }
 
     /**
