@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 
 import track_controller.TrackController;
 import track_controller.communication.Authority;
@@ -39,19 +40,21 @@ public class TrackModel implements Updateable {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        TrackBlock tb = getBlock("Green", 33);
-        System.out.println(tb.getPositionAlongBlock(20));
 //        launchUI();
 //        launchTestUI();
     }
 
     public static void launchUI() {
         tmf = new TrackModelFrame();
+        tmf.setDefaultCloseOperation(javax.swing.WindowConstants.HIDE_ON_CLOSE);
         tmf.setLocationRelativeTo(null);
         tmf.setVisible(true);
     }
 
     public static void launchTestUI() {
+        tmf = new TrackModelFrame();
+        tmf.setLocationRelativeTo(null);
+        tmf.setVisible(true);
         if (doTablesExist()) {
             TestFrame tf = new TestFrame(tmf);
             tf.setLocationRelativeTo(tmf);
@@ -103,6 +106,7 @@ public class TrackModel implements Updateable {
                 tb.setMessage(rs.getString(12));
                 tb.setStartCoordinates(rs.getDouble(13), rs.getDouble(14));
                 tb.setClosedForMaintenance(rs.getBoolean(17));
+                tb.setCenterCoordinates(rs.getDouble(18), rs.getDouble(19));
 
                 rs = dbHelper.query("SELECT NEXT_BLOCK FROM CONNECTIONS WHERE LINE='" + line + "' AND BLOCK=" + block + ";");
                 rs = dbHelper.query("SELECT X, Y FROM BLOCKS WHERE LINE='" + line + "' AND BLOCK=" + rs.getInt(1) + ";");
@@ -463,7 +467,11 @@ public class TrackModel implements Updateable {
      */
     public void registerTrain(TrainModel tm, String line) {
         trains.add(tm);
-        tm.slew(new Pose(getFirstBlock(line).start, GREEN_LINE_ORIENTATION));
+        if (doTablesExist()) {
+            tm.slew(new Pose(getFirstBlock(line).start, GREEN_LINE_ORIENTATION));
+        } else {
+            JOptionPane.showMessageDialog(null, "Track database not found. Trains were not assigned location.\n\nPlease import track database.", "Warning", JOptionPane.WARNING_MESSAGE);
+        }
     }
 
     /**
@@ -520,13 +528,17 @@ public class TrackModel implements Updateable {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+    int count = 0;
+
     @Override
     public void update(int time) {
 //        resetOccupancy();
 
         for (TrainModel tm : trains) {
             TrackBlock tb = getClosestBlock(tm.location(), "Green");        // FIX LATER
-            setOccupancy(tb.line, tb.block, true);
+//            System.out.println(count + ": " + tb.block);
+//            setOccupancy(tb.line, tb.block, true);
         }
+        count++;
     }
 }
