@@ -17,6 +17,9 @@ public class TrackBlock {
     protected boolean closedForMaintenance;
     protected String message;
     protected GlobalCoordinates start, end;
+    
+    private double xCoordStart, xCoordEnd, yCoordStart, yCoordEnd;
+    private double xCenter, yCenter;
 
     protected int nextBlockId;
     protected int prevBlockId;
@@ -172,11 +175,20 @@ public class TrackBlock {
     }
 
     protected void setStartCoordinates(double x, double y) {
+        xCoordStart = x;
+        yCoordStart = y;
         start = GlobalCoordinates.ORIGIN.addYards(y * METER_TO_YARD_MULTIPLIER, x * METER_TO_YARD_MULTIPLIER);
     }
 
     protected void setEndCoordinates(double x, double y) {
+        xCoordEnd = x;
+        yCoordEnd = y;
         end = GlobalCoordinates.ORIGIN.addYards(y * METER_TO_YARD_MULTIPLIER, x * METER_TO_YARD_MULTIPLIER);
+    }
+    
+    protected void setCenterCoordinates(double x, double y) {
+        xCenter = x;
+        yCenter = y;
     }
 
     public GlobalCoordinates getStart() {

@@ -106,6 +106,7 @@ public class TrackModel implements Updateable {
                 tb.setMessage(rs.getString(12));
                 tb.setStartCoordinates(rs.getDouble(13), rs.getDouble(14));
                 tb.setClosedForMaintenance(rs.getBoolean(17));
+                tb.setCenterCoordinates(rs.getDouble(18), rs.getDouble(19));
 
                 rs = dbHelper.query("SELECT NEXT_BLOCK FROM CONNECTIONS WHERE LINE='" + line + "' AND BLOCK=" + block + ";");
                 rs = dbHelper.query("SELECT X, Y FROM BLOCKS WHERE LINE='" + line + "' AND BLOCK=" + rs.getInt(1) + ";");
@@ -527,14 +528,17 @@ public class TrackModel implements Updateable {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+    int count = 0;
+
     @Override
     public void update(int time) {
 //        resetOccupancy();
 
         for (TrainModel tm : trains) {
             TrackBlock tb = getClosestBlock(tm.location(), "Green");        // FIX LATER
-//            System.out.println(tb);
+            System.out.println(count + ": " + tb.block);
 //            setOccupancy(tb.line, tb.block, true);
         }
+        count++;
     }
 }
