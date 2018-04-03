@@ -616,7 +616,7 @@ public class Ctc implements Updateable{
 		
 		TrackMovementCommand tmc = new TrackMovementCommand((int)speed,(int)auth);
 		
-		if(loc.num == 0)
+		if(train.location.num == 0)
 			trackmodel.setYardMessage(train.ID, 0, tmc);
 		else
 			trackmodel.setBlockMessage(loc.line, loc.num, msg);
