@@ -50,19 +50,43 @@ public class Ctc implements Updateable{
 	public void update(int time)
 	{
 		// ask track model for updates
+		TrackBlock tb;
+		
 		for(Block block : greenline)
 		{
+			tb = trackmodel.getBlock(block.line, block.num);
+			// update block properties
+			updateBlock(block, tb);
 			
 		}
 		
 		for(Block block : redline)
 		{
+			tb = trackmodel.getBlock(block.line, block.num);
+			// update block properties
+			updateBlock(block, tb);
 			
 		}
 		
 		updateTrack();
 		updateTrains();
 		return;
+	}
+	
+	private static void updateBlock(Block block, TrackBlock tb)
+	{
+		Train train;
+		boolean oldOcc = block.occupied;
+		block.occupied = tb.isIsOccupied();
+		if(block.occupied != oldOcc)
+		{
+			// do some train logic
+			if(block.occupied)
+			{
+				train = getTrain(block.prev);
+				train.location = block;
+			}
+		}
 	}
 	
 	/*
