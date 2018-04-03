@@ -577,6 +577,38 @@ public class Ctc implements Updateable{
 			System.out.println("Current position: from " + sw.getSwitchCurrFrom().display() + ", to " + sw.getSwitchCurrTo().display());
 		}
 	}
+	
+	protected int[][] requestSwitches(String line)
+	{
+		ArrayDeque<Block> temp = switches.clone();
+		Block sw;
+		int numswitches = 0;
+		
+		while (!temp.isEmpty()) {
+			sw = temp.poll();
+			if(sw.line.equals(line))
+			{
+				numswitches++;
+			}
+		}
+		
+		temp = switches.clone();
+		int[][] MBOswitches = new int[numswitches][2];
+		int count = 0;
+		
+		while (!temp.isEmpty()) {
+			sw = temp.poll();
+			if(sw.line.equals(line))
+			{
+				MBOswitches[count][0] = sw.sw_curr_from.num;
+				MBOswitches[count][1] = sw.sw_curr_to.num;
+				
+				count++;
+			}
+		}
+		
+		return MBOswitches;
+	}
 
 	private static void loadSched() {
 
