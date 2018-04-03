@@ -997,7 +997,7 @@ public class CtcUI extends javax.swing.JFrame {
 
 		//ctc.routeTrain(train, line.toLowerCase(), block, speed);
 		
-		ctc.sendSpeedAuthShort(train, speed, 0);
+		ctc.sendSpeedAuthShort(train, speed, 100);
     }//GEN-LAST:event_dispatchButtonActionPerformed
 
 	protected static void updateTrainTable(Object[][] rows, int count) {
