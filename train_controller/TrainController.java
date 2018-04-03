@@ -37,7 +37,7 @@ public class TrainController implements Updateable
 	double error;
 	double timeConstant = 5;
 	double Kp = 2.5 / timeConstant;
-	double Ki = 0.5;
+	double Ki = 0.25;
 	double [] queue = new double[5000];
 	int queueInsert = 0;
 	int queueFill = 0;
@@ -50,7 +50,6 @@ public class TrainController implements Updateable
 	double movingAuth = 0.0;
 	double lastAuth = 0.0;
 	double lastSpeed = 0.0;
-	double updateTime = 0;
 	boolean returning = false;
 	boolean disable = false;
 	ArrayList<String> ads = new ArrayList<>();
@@ -160,7 +159,7 @@ public class TrainController implements Updateable
 
 	public double getSpeed()
 	{
-		return link.speed();
+		return link.speed() * 2.23694;
 	}
 
 	public int getCTCspeed()
@@ -185,7 +184,7 @@ public class TrainController implements Updateable
 
 
 	// Distance from last station
-	private int updateStationDistance() 
+	private int updateStationDistance(int millis) 
 	{
 	int correction = 0;
 	if (stationCounter == 9) 
@@ -208,22 +207,21 @@ public class TrainController implements Updateable
 		return stationCounter++;
 	}
 	else
-		distanceFromLastStation += 1760 * displacement() / 3600;
+		distanceFromLastStation += 1760 * displacement(millis) / 3600;
 	if(returning)
 		return -1 * stationCounter + 1;
 	return -1 * stationCounter;	
 	}
 
 	// Calculates train displacement since last update
-	private double displacement()
+	private double displacement(int millis)
 	{
-		double avgSpeed = (link.speed() + lastSpeed) / 2;
-	//	System.out.println(updateTime*avgSpeed);
-		return updateTime * avgSpeed;
+		double avgSpeed = (link.speed() + lastSpeed)*2.23694 / 2;
+		return (double)millis/1000 * avgSpeed;
 	}
 
 	// Updates authority states
-	private void authority()
+	private void authority(int millis)
 	{
 		TrackMovementCommand ctcMsg = link.receiveFromTrack();
 		MboMovementCommand mboMsg = link.receiveFromMbo();
@@ -239,7 +237,7 @@ public class TrainController implements Updateable
 			currAuth = ctcMsg.authority;
 			movingAuth = currAuth;
 		}
-		movingAuth -= displacement();
+		movingAuth -= displacement(millis);
 		if(movingAuth<0)
 			movingAuth = 0;
 	}
@@ -248,37 +246,32 @@ public class TrainController implements Updateable
 	// millis is ignored as this is not a model module
 	public void update(int millis) 
 	{
-		updateTime = millis/1000;
 		lastSpeed = link.speed();
 
 		// Update authority
-		authority();
+		authority(millis);
 
 		// Set desired speed
 		if(manualMode)
 		{
 			setSpeed = driverSetSpeed;
-			movingAuth = 100; // authority never expires
+			movingAuth = currAuth; // authority never expires
 		}
 		else
 			setSpeed = speedCMD;
 
 		// If authority is about to expire
-		currentSpeed = link.speed();
+		currentSpeed = link.speed() * 2.23694; // convert to mph
 		disable = false;
-		if(movingAuth<=20)
+		if(movingAuth<=30)
 		{
 			setSpeed = 0;
-			link.serviceBrake(1 - movingAuth/20);
+			link.serviceBrake(Math.max(1, 1 - movingAuth/20));
 			powerCMD = -1*mass*(1-movingAuth/20)*MAX_SDECEL*currentSpeed*0.44704/MAXPOWER;
 			disable = true;
 		}
-	//	System.out.println(setSpeed);
-	//	System.out.println("manual brake = " + manualBrake);
-	//	System.out.println("manual mode = " + manualMode);
 
 		// Obtain error and average error
-	//	System.out.println("current speed = " + currentSpeed);
 		if(currentSpeed == 0)
 			currentSpeed = 0.01;
 		error = (double)setSpeed - currentSpeed;
@@ -303,16 +296,12 @@ public class TrainController implements Updateable
 			if(powerCMD > 1)
 				powerCMD = 1;
 			brakePowerConv = Math.min( 1.0, -1 * powerCMD*MAXPOWER / (mass * currentSpeed * 0.44704 * MAX_SDECEL) );
-	//		System.out.println("powerCMD = " + powerCMD);
 			link.power( Math.max(0.0, powerCMD) );		
 			link.serviceBrake( Math.max(0.0, brakePowerConv) );
 		}
-	//	System.out.println("\t\tpow: " + powerCMD);
-	//	System.out.println("\t\t\t\tbrake: " + brakePowerConv);
-	//	System.out.println("\t\t\t\t\t\tspeed: " + link.speed());
 
 		// Update stations to display on map
-		int d = updateStationDistance();
+		int d = updateStationDistance(millis);
 		if(distanceFromLastStation<20)
 			if(returning)
 				stationsToDisplay = -1*d+1;

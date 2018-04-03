@@ -15,7 +15,7 @@ public class test
 	public static void main(String [] args)
 	{
 		// Start train model, communication, and controller
-		TrainModel model = new TrainModel();
+		TrainModel model = new TrainModel(0);
 
 		Relay relay = new Relay(model);
 
@@ -33,7 +33,7 @@ public class test
 		ClockMultiplier burst = new ClockMultiplier(100, burst_arr);
 
 		// dummy module for testing
-		TrainModel dummy = new TrainModel();
+		TrainModel dummy = new TrainModel(1);
 
 		Updateable [] arr = {
 			dummy,
