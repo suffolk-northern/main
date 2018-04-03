@@ -14,7 +14,9 @@ import java.util.StringTokenizer;
 
 import updater.Updateable;
 import track_model.TrackModel;
+import track_model.TrackBlock;
 import train_model.communication.TrackMovementCommand;
+import mbo.CtcRadio;
 
 /**
  *
@@ -29,9 +31,13 @@ public class Ctc implements Updateable{
 	public static CtcUI ui;
 	
 	public static TrackModel trackmodel;
+	public static CtcRadio greenradio;
+	public static CtcRadio redradio;
 
 	public static ArrayDeque<Train> trains = new ArrayDeque<Train>();
 	public static ArrayDeque<Block> blueline = new ArrayDeque<Block>();
+	public static ArrayDeque<Block> greenline = new ArrayDeque<Block>();
+	public static ArrayDeque<Block> redline = new ArrayDeque<Block>();
 	public static ArrayDeque<Block> switches = new ArrayDeque<Block>();
 	public static ArrayDeque<TrackCon> trackcons = new ArrayDeque<TrackCon>();
 
@@ -44,6 +50,15 @@ public class Ctc implements Updateable{
 	public void update(int time)
 	{
 		// ask track model for updates
+		for(Block block : greenline)
+		{
+			
+		}
+		
+		for(Block block : redline)
+		{
+			
+		}
 		
 		updateTrack();
 		updateTrains();
@@ -62,6 +77,12 @@ public class Ctc implements Updateable{
 	public void setTrackModel(TrackModel tm)
 	{
 		this.trackmodel = tm;
+	}
+	
+	public void setCtcRadios(CtcRadio green, CtcRadio red)
+	{
+		this.greenradio = green;
+		this.redradio = red;
 	}
 	
 	public Ctc() {
@@ -654,8 +675,10 @@ public class Ctc implements Updateable{
 			trackmodel.setBlockMessage(loc.line, loc.num, msg);
 	}
 	
-	private static void sendSpeedAuthShort(Train train, double speed, double auth)
+	protected static void sendSpeedAuthShort(String trainID, double speed, double auth)
 	{
+		Train train = getTrain(Integer.parseInt(trainID));
+		
 		String msg = speed + " " + auth;
 		
 		TrackMovementCommand tmc = new TrackMovementCommand((int)speed,(int)auth);
