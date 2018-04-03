@@ -14,6 +14,9 @@ import java.util.StringTokenizer;
 
 import updater.Updateable;
 import track_model.TrackModel;
+import track_model.TrackBlock;
+import train_model.communication.TrackMovementCommand;
+import mbo.CtcRadio;
 
 /**
  *
@@ -28,9 +31,13 @@ public class Ctc implements Updateable{
 	public static CtcUI ui;
 	
 	public static TrackModel trackmodel;
+	public static CtcRadio greenradio;
+	public static CtcRadio redradio;
 
 	public static ArrayDeque<Train> trains = new ArrayDeque<Train>();
 	public static ArrayDeque<Block> blueline = new ArrayDeque<Block>();
+	public static ArrayDeque<Block> greenline = new ArrayDeque<Block>();
+	public static ArrayDeque<Block> redline = new ArrayDeque<Block>();
 	public static ArrayDeque<Block> switches = new ArrayDeque<Block>();
 	public static ArrayDeque<TrackCon> trackcons = new ArrayDeque<TrackCon>();
 
@@ -43,6 +50,15 @@ public class Ctc implements Updateable{
 	public void update(int time)
 	{
 		// ask track model for updates
+		for(Block block : greenline)
+		{
+			
+		}
+		
+		for(Block block : redline)
+		{
+			
+		}
 		
 		updateTrack();
 		updateTrains();
@@ -61,6 +77,12 @@ public class Ctc implements Updateable{
 	public void setTrackModel(TrackModel tm)
 	{
 		this.trackmodel = tm;
+	}
+	
+	public void setCtcRadios(CtcRadio green, CtcRadio red)
+	{
+		this.greenradio = green;
+		this.redradio = red;
 	}
 	
 	public Ctc() {
@@ -576,6 +598,38 @@ public class Ctc implements Updateable{
 			System.out.println("Current position: from " + sw.getSwitchCurrFrom().display() + ", to " + sw.getSwitchCurrTo().display());
 		}
 	}
+	
+	protected int[][] requestSwitches(String line)
+	{
+		ArrayDeque<Block> temp = switches.clone();
+		Block sw;
+		int numswitches = 0;
+		
+		while (!temp.isEmpty()) {
+			sw = temp.poll();
+			if(sw.line.equals(line))
+			{
+				numswitches++;
+			}
+		}
+		
+		temp = switches.clone();
+		int[][] MBOswitches = new int[numswitches][2];
+		int count = 0;
+		
+		while (!temp.isEmpty()) {
+			sw = temp.poll();
+			if(sw.line.equals(line))
+			{
+				MBOswitches[count][0] = sw.sw_curr_from.num;
+				MBOswitches[count][1] = sw.sw_curr_to.num;
+				
+				count++;
+			}
+		}
+		
+		return MBOswitches;
+	}
 
 	private static void loadSched() {
 
@@ -613,7 +667,30 @@ public class Ctc implements Updateable{
 		
 		String msg = speed + " " + auth;
 		
-		trackmodel.setBlockMessage(loc.line, loc.num, msg);
+		TrackMovementCommand tmc = new TrackMovementCommand((int)speed,(int)auth);
+		
+		if(train.location.num == 0)
+			trackmodel.setYardMessage(train.ID, 0, tmc);
+		else
+			trackmodel.setBlockMessage(loc.line, loc.num, msg);
+	}
+	
+	protected static void sendSpeedAuthShort(String trainID, double speed, double auth)
+	{
+		Train train = getTrain(Integer.parseInt(trainID));
+		
+		String msg = speed + " " + auth;
+		
+		TrackMovementCommand tmc = new TrackMovementCommand((int)speed,(int)auth);
+		
+		if(train.location.num == 0)
+		{
+			System.out.println("yard msg");
+			System.out.println(tmc.speed + " " + tmc.authority);
+			trackmodel.setYardMessage(0, 0, tmc);
+		}
+		else
+			trackmodel.setBlockMessage(train.location.line, train.location.num, msg);
 	}
 	
 	private static void combineAuth(TrackCon tc, boolean[] s, boolean[] l, boolean[] r)
