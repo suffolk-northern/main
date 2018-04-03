@@ -84,7 +84,8 @@ public class Ctc implements Updateable{
 			if(block.occupied)
 			{
 				train = getTrain(block.prev);
-				train.location = block;
+				if(train != null)
+					train.location = block;
 			}
 		}
 	}
