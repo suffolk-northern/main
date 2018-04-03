@@ -21,7 +21,6 @@ import ctc.Ctc;
 import mbo.MboController;
 import mbo.MboScheduler;
 import mbo.CtcRadio;
-import track_controller.TrackController;
 import track_model.TrackModel;
 import train_controller.TrainController;
 import train_model.TrainModel;
@@ -58,11 +57,6 @@ public class Main
 
 		// FIXME: launches UI in constructor
 		ctc = new Ctc();
-
-		TrackController[] trackControllers = {
-			new TrackController(),
-			new TrackController(),
-		};
 
 		trackModel = new TrackModel();
 		
@@ -106,10 +100,6 @@ public class Main
 		// CTC <---> track controller
 		ctc.setTrackModel(trackModel);
 
-		// track controller <---> track model
-		//for (TrackController trackController : trackControllers)
-		//	trackModel.configureTrackController(trackController);
-
 		// track model <---> train model
 		for (TrainModel trainModel : trainModels)
 			trackModel.registerTrain(trainModel, "Green");
@@ -141,7 +131,6 @@ public class Main
 		updateables.add(ctc);
 		//updateables.add(mboCont);
 		//updateables.add(mboSched);
-		updateables.addAll(Arrays.asList(trackControllers));
 		updateables.add(trackModel);
 		updateables.add(trainMultiplier);
 	}
