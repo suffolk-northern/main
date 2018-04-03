@@ -7,12 +7,20 @@ import java.util.ArrayList;
  */
 public class LineSchedule {
 	private ArrayList<DriverSchedule> driverSchedules;
+	private ArrayList<Integer> driverIDs;
 	private ArrayList<TrainSchedule> trainSchedules;
+	private ArrayList<Integer> trainIDs;
 	
 	public LineSchedule(ArrayList<DriverSchedule> ds, ArrayList<TrainSchedule> ts)
 	{
 		driverSchedules = ds;
 		trainSchedules = ts;
+		driverIDs = new ArrayList<Integer>();
+		for (DriverSchedule dSched : ds)
+			driverIDs.add(dSched.getID());
+		trainIDs = new ArrayList<Integer>();
+		for (TrainSchedule tSched : ts)
+			trainIDs.add(tSched.getID());
 	}
 	
 	public DriverSchedule getDriverSchedule(int driverID)
@@ -35,4 +43,13 @@ public class LineSchedule {
 		return null;
 	}
 	
+	public ArrayList<Integer> getTrainIDs()
+	{
+		return trainIDs;
+	}
+	
+	public ArrayList<Integer> getDriverIDs()
+	{
+		return driverIDs;
+	}
 }

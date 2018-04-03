@@ -9,11 +9,13 @@ import java.sql.Time;
 public class DriverEvent {
 	private Time eventTime;
 	private EventType event;
+	private int trainID;
 	
-	public DriverEvent(Time t, EventType e)
+	public DriverEvent(Time t, EventType e, int tID)
 	{
 		eventTime = t;
 		event = e;
+		trainID = tID;
 	}
 	
 	public enum EventType
@@ -29,5 +31,10 @@ public class DriverEvent {
 	public EventType getEvent()
 	{
 		return event;
+	}
+	
+	public int getTrainID()
+	{
+		return trainID;
 	}
 }
