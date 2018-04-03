@@ -187,6 +187,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
 
     private void murphButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_murphButtonActionPerformed
         MurphFrame mf = new MurphFrame(this, blockTable, crossingTable);
+        mf.setLocationRelativeTo(this);
         mf.setVisible(true);
     }//GEN-LAST:event_murphButtonActionPerformed
 
@@ -221,6 +222,8 @@ public class TrackModelFrame extends javax.swing.JFrame {
                 + " track_controller integer,\n"
                 + " tc_orientation integer,\n"
                 + " maintenance boolean,\n"
+                + " xcenter float,\n"
+                + " ycenter float,\n"
                 + " PRIMARY KEY (line, block)\n"
                 + ");");
         dbHelper.execute("CREATE TABLE CONNECTIONS (\n"
@@ -259,9 +262,9 @@ public class TrackModelFrame extends javax.swing.JFrame {
             BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(trackDataFile)));
 
             Class.forName("org.sqlite.JDBC");
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:test.db");
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:TrackModel.db");
             conn.setAutoCommit(false);
-            PreparedStatement blockStmt = conn.prepareStatement("INSERT INTO BLOCKS VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+            PreparedStatement blockStmt = conn.prepareStatement("INSERT INTO BLOCKS VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
             PreparedStatement connStmt = conn.prepareStatement("INSERT INTO CONNECTIONS VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
             PreparedStatement crossingStmt = conn.prepareStatement("INSERT INTO CROSSINGS VALUES(?, ?, ?);");
             PreparedStatement stationStmt = conn.prepareStatement("INSERT INTO STATIONS VALUES(?, ?, ?, ?, ?, ?);");
@@ -294,6 +297,8 @@ public class TrackModelFrame extends javax.swing.JFrame {
                 blockStmt.setInt(15, Integer.parseInt(items.get(18)));
                 blockStmt.setInt(16, Integer.parseInt(items.get(19)));
                 blockStmt.setBoolean(17, false);
+                blockStmt.setFloat(18, Float.parseFloat(items.get(20)));
+                blockStmt.setFloat(19, Float.parseFloat(items.get(21)));
                 blockStmt.addBatch();
 
                 connStmt.setString(1, items.get(0));

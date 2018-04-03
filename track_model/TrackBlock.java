@@ -17,12 +17,15 @@ public class TrackBlock {
     protected boolean closedForMaintenance;
     protected String message;
     protected GlobalCoordinates start, end;
-    
+
+    private double xStart, xEnd, yStart, yEnd;
+    private double xCenter, yCenter;
+
     protected int nextBlockId;
     protected int prevBlockId;
     protected int switchBlockId;
     protected int switchDirection;
-    
+
     protected boolean isSwitch;
     protected boolean isStation;
     protected boolean isCrossing;
@@ -172,11 +175,20 @@ public class TrackBlock {
     }
 
     protected void setStartCoordinates(double x, double y) {
+        xStart = x;
+        yStart = y;
         start = GlobalCoordinates.ORIGIN.addYards(y * METER_TO_YARD_MULTIPLIER, x * METER_TO_YARD_MULTIPLIER);
     }
 
     protected void setEndCoordinates(double x, double y) {
+        xEnd = x;
+        yEnd = y;
         end = GlobalCoordinates.ORIGIN.addYards(y * METER_TO_YARD_MULTIPLIER, x * METER_TO_YARD_MULTIPLIER);
+    }
+
+    protected void setCenterCoordinates(double x, double y) {
+        xCenter = x;
+        yCenter = y;
     }
 
     public GlobalCoordinates getStart() {
@@ -226,15 +238,42 @@ public class TrackBlock {
     protected void setClosedForMaintenance(boolean closedForMaintenance) {
         this.closedForMaintenance = closedForMaintenance;
     }
-    
-    
-    
-    public double getDistanceTo(GlobalCoordinates gc)   {
+
+    public double getDistanceTo(GlobalCoordinates gc) {
         return 0;
     }
-    
-    public GlobalCoordinates getPositionAlongBlock(double meters)    {
-        return null;
+
+    public GlobalCoordinates getPositionAlongBlock(double meters) {
+        if (meters > length) {
+            return null;
+        }
+//        double xDiff = xCoordEnd - xCoordStart;
+//        double yDiff = yCoordEnd - yCoordStart;
+//        double radius = (360 / Math.abs(curvature) * length) / (2 * Math.PI);
+//        System.out.println(block + " " + radius);
+//        if (radius == Double.POSITIVE_INFINITY) System.out.println("gooch");
+//        
+        double newX, newY;
+
+        if (curvature == 0) {
+            double xDiff = xEnd - xStart;
+            double yDiff = yEnd - yStart;
+
+            double xDist = xDiff * meters / length;
+            double yDist = yDiff * meters / length;
+
+            newX = xStart + xDist;
+            newY = yStart + yDist;
+        } else {
+            boolean clockwise = curvature > 0;
+            double radius = Math.sqrt(Math.pow(xStart - xCenter, 2) + Math.pow(yStart - yCenter, 2));
+            double angle = Math.atan2(yStart - yCenter, xStart - xCenter);
+            angle = clockwise ? angle - meters / radius : angle + meters / radius;
+
+            newX = xCenter + radius * Math.cos(angle);
+            newY = yCenter + radius * Math.sin(angle);
+        }
+        return GlobalCoordinates.ORIGIN.addYards(newY * METER_TO_YARD_MULTIPLIER, newX * METER_TO_YARD_MULTIPLIER);
     }
 
     @Override
