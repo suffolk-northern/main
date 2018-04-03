@@ -536,7 +536,7 @@ public class TrackModel implements Updateable {
 
         for (TrainModel tm : trains) {
             TrackBlock tb = getClosestBlock(tm.location(), "Green");        // FIX LATER
-            System.out.println(count + ": " + tb.block);
+//            System.out.println(count + ": " + tb.block);
 //            setOccupancy(tb.line, tb.block, true);
         }
         count++;

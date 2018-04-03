@@ -17,8 +17,8 @@ public class TrackBlock {
     protected boolean closedForMaintenance;
     protected String message;
     protected GlobalCoordinates start, end;
-    
-    private double xCoordStart, xCoordEnd, yCoordStart, yCoordEnd;
+
+    private double xStart, xEnd, yStart, yEnd;
     private double xCenter, yCenter;
 
     protected int nextBlockId;
@@ -175,17 +175,17 @@ public class TrackBlock {
     }
 
     protected void setStartCoordinates(double x, double y) {
-        xCoordStart = x;
-        yCoordStart = y;
+        xStart = x;
+        yStart = y;
         start = GlobalCoordinates.ORIGIN.addYards(y * METER_TO_YARD_MULTIPLIER, x * METER_TO_YARD_MULTIPLIER);
     }
 
     protected void setEndCoordinates(double x, double y) {
-        xCoordEnd = x;
-        yCoordEnd = y;
+        xEnd = x;
+        yEnd = y;
         end = GlobalCoordinates.ORIGIN.addYards(y * METER_TO_YARD_MULTIPLIER, x * METER_TO_YARD_MULTIPLIER);
     }
-    
+
     protected void setCenterCoordinates(double x, double y) {
         xCenter = x;
         yCenter = y;
@@ -247,30 +247,33 @@ public class TrackBlock {
         if (meters > length) {
             return null;
         }
-        double latDiff = end.latitude() - start.latitude();
-        double longDiff = end.longitude() - start.longitude();
-        double radius = (360 / Math.abs(curvature) * length) / (2 * Math.PI);
-        System.out.println(start.latitude());
-        System.out.println(start.longitude());
-        System.out.println(end.latitude());
-        System.out.println(end.longitude());
-        
-        getCenterOfArc(start, end, radius);
-        if (latDiff < 0 && longDiff > 0) {
+//        double xDiff = xCoordEnd - xCoordStart;
+//        double yDiff = yCoordEnd - yCoordStart;
+//        double radius = (360 / Math.abs(curvature) * length) / (2 * Math.PI);
+//        System.out.println(block + " " + radius);
+//        if (radius == Double.POSITIVE_INFINITY) System.out.println("gooch");
+//        
+        double newX, newY;
 
+        if (curvature == 0) {
+            double xDiff = xEnd - xStart;
+            double yDiff = yEnd - yStart;
+
+            double xDist = xDiff * meters / length;
+            double yDist = yDiff * meters / length;
+
+            newX = xStart + xDist;
+            newY = yStart + yDist;
+        } else {
+            boolean clockwise = curvature > 0;
+            double radius = Math.sqrt(Math.pow(xStart - xCenter, 2) + Math.pow(yStart - yCenter, 2));
+            double angle = Math.atan2(yStart - yCenter, xStart - xCenter);
+            angle = clockwise ? angle - meters / radius : angle + meters / radius;
+
+            newX = xCenter + radius * Math.cos(angle);
+            newY = yCenter + radius * Math.sin(angle);
         }
-
-        return null;
-    }
-
-    private GlobalCoordinates getCenterOfArc(GlobalCoordinates gc1, GlobalCoordinates gc2, double radius) {
-        double radsq = Math.pow(radius, 2);
-        double q = Math.sqrt(Math.pow(gc2.latitude() - gc1.latitude(), 2) + Math.pow(gc2.longitude() - gc1.longitude(), 2));
-        double lat =  (gc1.latitude() + gc2.latitude()) / 2 + Math.sqrt(radsq - Math.pow(q / 2, 2)) * ((gc2.longitude() - gc1.longitude()) / q);
-        double lon = (gc1.longitude() + gc2.longitude()) / 2 + Math.sqrt(radsq - Math.pow(q / 2, 2)) * ((gc1.latitude() - gc2.latitude()) / q);
-        
-        System.out.println(lat + " " + lon);
-        return null;
+        return GlobalCoordinates.ORIGIN.addYards(newY * METER_TO_YARD_MULTIPLIER, newX * METER_TO_YARD_MULTIPLIER);
     }
 
     @Override
