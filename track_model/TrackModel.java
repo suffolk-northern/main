@@ -492,7 +492,7 @@ public class TrackModel implements Updateable {
                 closest = temp;
             }
             double tempDist = temp.getDistanceTo(gc);
-            if (tempDist < minDist)   {
+            if (tempDist < minDist) {
                 minDist = tempDist;
                 closest = temp;
             }
@@ -530,7 +530,7 @@ public class TrackModel implements Updateable {
 //        resetOccupancy();
 
         for (TrainModel tm : trains) {
-            TrackBlock tb = getClosestBlock(tm.location(), "Green");        // FIX LATER
+//            TrackBlock tb = getClosestBlock(tm.location(), "Green");        // FIX LATER
 //            System.out.println(count + ": " + tb.block);
 //            setOccupancy(tb.line, tb.block, true);
         }
@@ -540,7 +540,7 @@ public class TrackModel implements Updateable {
     private static void testing() {
         for (int j = 1; j <= 150; j++) {
             TrackBlock tb = getBlock("Green", j);
-            for (int i = 1; i < tb.length; i++) {
+            for (int i = 1; i < tb.length; i += 30) {
                 GlobalCoordinates gc = tb.getPositionAlongBlock(i);
                 if (gc != null) {
                     System.out.println(j + " " + gc.latitude() + "," + gc.longitude() + " Closest: " + getClosestBlock(gc, "Green").block);

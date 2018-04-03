@@ -257,18 +257,11 @@ public class TrackBlock {
         if (meters > length) {
             return null;
         }
-//        double xDiff = xCoordEnd - xCoordStart;
-//        double yDiff = yCoordEnd - yCoordStart;
-//        double radius = (360 / Math.abs(curvature) * length) / (2 * Math.PI);
-//        System.out.println(block + " " + radius);
-//        if (radius == Double.POSITIVE_INFINITY) System.out.println("gooch");
-//        
         double newX, newY;
 
         if (curvature == 0) {
             double xDiff = xEnd - xStart;
             double yDiff = yEnd - yStart;
-
             double xDist = xDiff * meters / length;
             double yDist = yDiff * meters / length;
 
@@ -283,6 +276,7 @@ public class TrackBlock {
             newX = xCenter + radius * Math.cos(angle);
             newY = yCenter + radius * Math.sin(angle);
         }
+        
         return GlobalCoordinates.ORIGIN.addYards(newY * METER_TO_YARD_MULTIPLIER, newX * METER_TO_YARD_MULTIPLIER);
     }
 
