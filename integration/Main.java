@@ -18,7 +18,9 @@ import java.awt.EventQueue;
 // FIXME: naming convention: pick Ctc and Mbo or CTC and MBO
 //
 import ctc.Ctc;
-//import mbo.Mbo;
+import mbo.MboController;
+import mbo.MboScheduler;
+import mbo.CtcRadio;
 import track_controller.TrackController;
 import track_model.TrackModel;
 import train_controller.TrainController;
@@ -34,7 +36,6 @@ public class Main
 
 	// FIXME: see imports and initialize()
 	private static Ctc ctc;
-	//private static Mbo mbo;
 	private static TrackModel trackModel;
 
 	// temporary single references for initial integration
@@ -65,8 +66,8 @@ public class Main
 
 		trackModel = new TrackModel();
 		
-		// mboCont = new MboController("green");
-		// mboSched = new MboScheduler("green");
+		MboController mboCont = new MboController("green");
+		MboScheduler mboSched = new MboScheduler("green");
 
 		final int numberOfTrains = 1;
 
@@ -124,9 +125,9 @@ public class Main
 		//	mboCont.registerTrain(trainModel.id(), trainModel.mboRadio());
 		
 		// CTC <--> MBO
-		// ctcRadio = new CtcRadio(mboCont, mboSched, ctc);
-		// ctc.registerMbo(ctcRadio);
-		// mboCont.registerCtc(ctcRadio);
+		CtcRadio ctcRadio = new CtcRadio(mboCont, mboSched, ctc);
+		//ctc.registerMbo(ctcRadio);
+		mboCont.registerCtc(ctcRadio);
 		
 		// Track Model <---> MBO
 		// mboCont.initLine();
@@ -138,7 +139,8 @@ public class Main
 
 		// FIXME: see instantiations above
 		updateables.add(ctc);
-		//updateables.add(mbo);
+		//updateables.add(mboCont);
+		//updateables.add(mboSched);
 		updateables.addAll(Arrays.asList(trackControllers));
 		updateables.add(trackModel);
 		updateables.add(trainMultiplier);
