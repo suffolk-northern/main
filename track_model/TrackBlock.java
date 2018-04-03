@@ -240,7 +240,17 @@ public class TrackBlock {
     }
 
     public double getDistanceTo(GlobalCoordinates gc) {
-        return 0;
+        double minDist = 9999;
+        double latDiff, lonDiff;
+        for (int i = 0; i < length; i += 5) {
+            latDiff = gc.latitude() - getPositionAlongBlock(i).latitude();
+            lonDiff = gc.longitude() - getPositionAlongBlock(i).longitude();
+            double tempDist = Math.sqrt(Math.pow(latDiff, 2) + Math.pow(lonDiff, 2));
+            if (tempDist < minDist) {
+                minDist = tempDist;
+            }
+        }
+        return minDist;
     }
 
     public GlobalCoordinates getPositionAlongBlock(double meters) {

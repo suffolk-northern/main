@@ -40,7 +40,6 @@ public class TrackModel implements Updateable {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-//        launchUI();
 //        launchTestUI();
     }
 
@@ -485,20 +484,16 @@ public class TrackModel implements Updateable {
      */
     public static TrackBlock getClosestBlock(GlobalCoordinates gc, String line) {
         int blocks = getBlockCount(line);
-        double distance = 9999;
-        double startDistance, endDistance;
+        double minDist = 9999;
         TrackBlock closest = null;
         for (int i = 1; i <= blocks; i++) {
             TrackBlock temp = getBlock(line, i);
             if (closest == null) {
                 closest = temp;
             }
-            startDistance = Math.sqrt(Math.pow(gc.latitude() - temp.start.latitude(), 2) + Math.pow(gc.longitude() - temp.start.longitude(), 2));
-            endDistance = Math.sqrt(Math.pow(gc.latitude() - temp.end.latitude(), 2) + Math.pow(gc.longitude() - temp.end.longitude(), 2));
-            double tempDistance = startDistance + endDistance;
-
-            if (tempDistance < distance) {
-                distance = tempDistance;
+            double tempDist = temp.getDistanceTo(gc);
+            if (tempDist < minDist)   {
+                minDist = tempDist;
                 closest = temp;
             }
         }
@@ -540,5 +535,17 @@ public class TrackModel implements Updateable {
 //            setOccupancy(tb.line, tb.block, true);
         }
         count++;
+    }
+
+    private static void testing() {
+        for (int j = 1; j <= 150; j++) {
+            TrackBlock tb = getBlock("Green", j);
+            for (int i = 1; i < tb.length; i++) {
+                GlobalCoordinates gc = tb.getPositionAlongBlock(i);
+                if (gc != null) {
+                    System.out.println(j + " " + gc.latitude() + "," + gc.longitude() + " Closest: " + getClosestBlock(gc, "Green").block);
+                }
+            }
+        }
     }
 }
