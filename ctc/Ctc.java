@@ -622,6 +622,18 @@ public class Ctc implements Updateable{
 			trackmodel.setBlockMessage(loc.line, loc.num, msg);
 	}
 	
+	private static void sendSpeedAuthShort(Train train, double speed, double auth)
+	{
+		String msg = speed + " " + auth;
+		
+		TrackMovementCommand tmc = new TrackMovementCommand((int)speed,(int)auth);
+		
+		if(train.location.num == 0)
+			trackmodel.setYardMessage(train.ID, 0, tmc);
+		else
+			trackmodel.setBlockMessage(train.location.line, train.location.num, msg);
+	}
+	
 	private static void combineAuth(TrackCon tc, boolean[] s, boolean[] l, boolean[] r)
 	{
 		// either combine route with current track con authority or just send route as pieces
