@@ -14,6 +14,7 @@ import java.util.StringTokenizer;
 
 import updater.Updateable;
 import track_model.TrackModel;
+import train_model.communication.TrackMovementCommand;
 
 /**
  *
@@ -613,7 +614,12 @@ public class Ctc implements Updateable{
 		
 		String msg = speed + " " + auth;
 		
-		trackmodel.setBlockMessage(loc.line, loc.num, msg);
+		TrackMovementCommand tmc = new TrackMovementCommand((int)speed,(int)auth);
+		
+		if(loc.num == 0)
+			trackmodel.setYardMessage(train.ID, 0, tmc);
+		else
+			trackmodel.setBlockMessage(loc.line, loc.num, msg);
 	}
 	
 	private static void combineAuth(TrackCon tc, boolean[] s, boolean[] l, boolean[] r)
