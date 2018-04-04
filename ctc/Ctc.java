@@ -83,7 +83,17 @@ public class Ctc implements Updateable{
 			// do some train logic
 			if(block.occupied)
 			{
-				train = getTrain(block.prev);
+				if(isForwardSwitch(block))
+				{
+					train = getTrain(block.prev);
+				}
+				else if(isBackwardSwitch(block))
+				{
+					train = getTrain(block.sw_curr_from);
+				}
+				else
+					train = getTrain(block.prev);
+				
 				if(train != null)
 					train.location = block;
 			}
@@ -710,8 +720,6 @@ public class Ctc implements Updateable{
 		
 		if(train.location.num == 0)
 		{
-			System.out.println("yard msg");
-			System.out.println(tmc.speed + " " + tmc.authority);
 			trackmodel.setYardMessage(0, 0, tmc);
 		}
 		else
