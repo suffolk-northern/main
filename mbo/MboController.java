@@ -82,7 +82,7 @@ public class MboController implements Updateable
 				int prevBlock = curBlock.getPrevBlockId();
 				int speedLimit = curBlock.getSpeedLimit();
 				char section = curBlock.getSection();
-				line[i+1] = new BlockTracker(i+1, nextBlock, prevBlock, blockLength, speedLimit, section);
+				line[i+1] = new BlockTracker(i+1, nextBlock, prevBlock, blockLength, speedLimit, section, null);
 			}
 		}
 	}
