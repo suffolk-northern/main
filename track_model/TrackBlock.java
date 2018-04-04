@@ -23,8 +23,10 @@ public class TrackBlock {
 
     protected int nextBlockId;
     protected int prevBlockId;
+
     protected int switchBlockId;
     protected int switchDirection;
+    protected int switchPosition;
 
     protected boolean isSwitch;
     protected boolean isStation;
@@ -231,6 +233,14 @@ public class TrackBlock {
         this.switchDirection = switchDirection;
     }
 
+    public int getSwitchPosition() {
+        return switchPosition;
+    }
+
+    protected void setSwitchPosition(int switchPosition) {
+        this.switchPosition = switchPosition;
+    }
+
     public boolean isClosedForMaintenance() {
         return closedForMaintenance;
     }
@@ -276,7 +286,7 @@ public class TrackBlock {
             newX = xCenter + radius * Math.cos(angle);
             newY = yCenter + radius * Math.sin(angle);
         }
-        
+
         return GlobalCoordinates.ORIGIN.addYards(newY * METER_TO_YARD_MULTIPLIER, newX * METER_TO_YARD_MULTIPLIER);
     }
 

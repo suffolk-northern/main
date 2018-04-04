@@ -5,6 +5,7 @@
  */
 package track_model;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -21,15 +22,17 @@ public class MurphFrame extends javax.swing.JFrame {
 
     private TrackModelFrame tmf;
     private JTable blocks, crossings;
+    private final DbHelper dbHelper;
 
     /**
      * Creates new form MurphFrame
      */
-    public MurphFrame(TrackModelFrame tmf, JTable blocks, JTable crossings) {
+    public MurphFrame(TrackModelFrame tmf, JTable blocks, JTable crossings, DbHelper dbHelper) {
         initComponents();
         this.tmf = tmf;
         this.blocks = blocks;
         this.crossings = crossings;
+        this.dbHelper = dbHelper;
         if (TrackModel.doTablesExist()) {
             populateDropdown();
         }
@@ -134,17 +137,16 @@ public class MurphFrame extends javax.swing.JFrame {
 
     private void populateDropdown() {
         ArrayList<String> blockList = new ArrayList<>();
-        DbHelper dbHelper = new DbHelper();
         try {
-            dbHelper.connect();
-            ResultSet rs = dbHelper.query("SELECT LINE, SECTION, BLOCK FROM BLOCKS;");
+            Connection conn = dbHelper.getConnection();
+            ResultSet rs = dbHelper.query(conn, "SELECT LINE, SECTION, BLOCK FROM BLOCKS;");
             while (rs.next()) {
                 if (!rs.getString(1).equalsIgnoreCase("YARD")) {
                     blockList.add("Line: " + rs.getString(1) + ", Section: " + rs.getString(2) + ", Block: " + rs.getInt(3));
                 }
             }
             jComboBox1.setModel(new DefaultComboBoxModel(blockList.toArray()));
-            dbHelper.close();
+            conn.close();
         } catch (SQLException ex) {
             Logger.getLogger(MurphFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
