@@ -1148,7 +1148,7 @@ public class Ctc implements Updateable{
 		while (!neighbors.isEmpty()) {
 			block = neighbors.poll();
 			//if(!explored.contains(block))
-			findRouteRec(block, dest, route.clone());
+			findRouteRec(block, dest, route.clone(),max);
 
 		}
 
