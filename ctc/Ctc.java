@@ -129,6 +129,7 @@ public class Ctc implements Updateable{
 	
 	private static void initGreen()
 	{
+		greenline = new ArrayDeque<Block>();
 		String line = "green";
 		TrackBlock bl;
 		Block block;
@@ -221,6 +222,7 @@ public class Ctc implements Updateable{
 	
 	private static void initRed()
 	{
+		redline = new ArrayDeque<Block>();
 		String line = "red";
 		TrackBlock bl;
 		Block block;
@@ -889,7 +891,7 @@ public class Ctc implements Updateable{
 		}
 	}
 	
-	protected int[][] requestSwitches(String line)
+	public int[][] requestSwitches(String line)
 	{
 		ArrayDeque<Block> temp = switches.clone();
 		Block sw;
