@@ -394,13 +394,15 @@ public class TrackModel implements Updateable {
 
     public static TrackBlock getFirstBlock(String line) {
         TrackBlock tb = null;
-        try {
-            Connection conn = dbHelper.getConnection();
-            ResultSet rs = dbHelper.query(conn, "SELECT BLOCK FROM CONNECTIONS WHERE LINE='" + line + "' AND SWITCH_BLOCK=-1 AND SWITCH_VALID=-2");
-            tb = getBlock(line, rs.getInt(1));
-            conn.close();
-        } catch (SQLException ex) {
-            Logger.getLogger(TrackModel.class.getName()).log(Level.SEVERE, null, ex);
+        if (doTablesExist()) {
+            try {
+                Connection conn = dbHelper.getConnection();
+                ResultSet rs = dbHelper.query(conn, "SELECT BLOCK FROM CONNECTIONS WHERE LINE='" + line + "' AND SWITCH_BLOCK=-1 AND SWITCH_VALID=-2");
+                tb = getBlock(line, rs.getInt(1));
+                conn.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(TrackModel.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         return tb;
     }
@@ -503,11 +505,11 @@ public class TrackModel implements Updateable {
      * @param line
      */
     public void registerTrain(TrainModel tm, String line) {
-        trains.add(new TrainData(tm, getFirstBlock(line)));
         if (doTablesExist()) {
+            trains.add(new TrainData(tm, getFirstBlock(line)));
             tm.slew(new Pose(getFirstBlock(line).start, GREEN_LINE_ORIENTATION));
         } else {
-            JOptionPane.showMessageDialog(null, "Track database not found. Trains were not assigned location.\n\nPlease import track database.", "Warning", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Track database not found. Trains were not registered.\n\nPlease import track database.", "Warning", JOptionPane.WARNING_MESSAGE);
         }
     }
 
