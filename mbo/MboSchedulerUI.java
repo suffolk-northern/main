@@ -1,29 +1,31 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mbo;
 
-import mbo.schedules.ScheduleWriter;
-import mbo.schedules.LineSchedule;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.io.File;
+import java.sql.Time;
+
+import mbo.schedules.ScheduleWriter;
+import mbo.schedules.LineSchedule;
 /**
  *
- * @author Fenne
+ * @author Kaylene Stocking
  */
 public class MboSchedulerUI extends javax.swing.JFrame {
 	
 	private LineSchedule schedule;
+	private boolean scheduleRequest;
+	private int[] throughput;
+	private Time start;
+	private Time end;
 	
     /**
      * Creates new form Scheduler
      */
     public MboSchedulerUI() {
         initComponents();
+		scheduleRequest = false;
     }
 
     /**
@@ -466,30 +468,33 @@ public class MboSchedulerUI extends javax.swing.JFrame {
         // Start time drop down in panel1
         JComboBox cb = (JComboBox)evt.getSource();
         String startTime = (String)cb.getSelectedItem();
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {"9:00", "500"},
-                {"10:00", "200"},
-                {"11:00", "300"},
-                {"12:00", "300"},
-                {"13:00", "300"},
-                {"14:00", "300"},
-                {"15:00", "400"},
-                {"16:00", "400"},
-                {"17:00", "100"}
-            },
-            new String [] {
-                "Hour", "Throughput"
-            }
-        ) {
-            boolean[] canEdit = new boolean [] {
-                false, true
-            };
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
+		int startHour = Integer.parseInt(startTime.substring(0, 2));
+		start = new Time(startHour, 0, 0);
+		
+//        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+//            new Object [][] {
+//                {"9:00", "500"},
+//                {"10:00", "200"},
+//                {"11:00", "300"},
+//                {"12:00", "300"},
+//                {"13:00", "300"},
+//                {"14:00", "300"},
+//                {"15:00", "400"},
+//                {"16:00", "400"},
+//                {"17:00", "100"}
+//            },
+//            new String [] {
+//                "Hour", "Throughput"
+//            }
+//        ) {
+//            boolean[] canEdit = new boolean [] {
+//                false, true
+//            };
+//
+//            public boolean isCellEditable(int rowIndex, int columnIndex) {
+//                return canEdit [columnIndex];
+//            }
+//        });
     }                                          
 
     private void jButton11ActionPerformed(java.awt.event.ActionEvent evt) {                                          
@@ -528,7 +533,27 @@ public class MboSchedulerUI extends javax.swing.JFrame {
 				System.out.println("Error writing file");
 			}
 		}
-    }                                        
+    }   
+	
+	public boolean scheduleRequested()
+	{
+		return scheduleRequest;
+	}
+	
+	public int[] getThroughput()
+	{
+		return throughput;
+	}
+	
+	public Time getStartTime()
+	{
+		return start;
+	}
+	
+	public Time getEndTime()
+	{
+		return end;
+	}
 
 //    private class ThroughputPanel {
 //        public static javax.swing.JScrollPane newPanel()

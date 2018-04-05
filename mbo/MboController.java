@@ -237,7 +237,7 @@ public class MboController implements Updateable
 	{
 		if (ctcRadio == null)
 			return;
-		int[][] switches = ctcRadio.getSwitchStates();
+		int[][] switches = ctcRadio.getSwitchStates(lineName);
 		// TODO: change next and prev blocks based on switch changes
 	}
 	

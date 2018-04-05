@@ -25,11 +25,10 @@ public class CtcRadio {
 	
 	// Returns a 2D array of integer block IDs, each row is a switch
 	// 2 ints in each row, one for each block id
-	public int[][] getSwitchStates()
+	public int[][] getSwitchStates(String lineName)
 	{
-		// TODO: add this method to CTC
-		// return ctc.requestSwitches();
-		
+		// TODO: make this method public in CTC
+		// return ctc.requestSwitches(lineName);
 		return null;
 	}
 	
