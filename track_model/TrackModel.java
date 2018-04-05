@@ -13,8 +13,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
-import track_controller.TrackController;
-import track_controller.communication.Authority;
 import train_model.Pose;
 import train_model.TrainModel;
 import train_model.communication.BeaconMessage;
@@ -43,6 +41,14 @@ public class TrackModel implements Updateable {
      */
     public static void main(String[] args) {
         launchTestUI();
+    }
+
+    public TrackModel() {
+        for (int i = 1; i <= getBlockCount("Green"); i++) {
+            if (getBlock("Green", i).isOccupied) {
+                setOccupancy("Green", i, false);
+            }
+        }
     }
 
     public static void launchUI() {
@@ -340,7 +346,7 @@ public class TrackModel implements Updateable {
                 Object[] values = {on, line, block};
                 dbHelper.execute(conn, query, values);
                 conn.close();
-                
+
                 if (tmf != null) {
                     tmf.refreshTables();
                 }
@@ -497,7 +503,7 @@ public class TrackModel implements Updateable {
      * @param line
      */
     public void registerTrain(TrainModel tm, String line) {
-        trains.add(new TrainData(tm));
+        trains.add(new TrainData(tm, getFirstBlock(line)));
         if (doTablesExist()) {
             tm.slew(new Pose(getFirstBlock(line).start, GREEN_LINE_ORIENTATION));
         } else {
@@ -555,16 +561,21 @@ public class TrackModel implements Updateable {
 
     @Override
     public void update(int time) {
-        if (count == 10) {
-//            TrackBlock tb;
-//            for (TrainData td : trains) {
-//                tb = getClosestBlock(td.trainModel.location(), "Green");
-//                td.trackBlock = tb;
-//                System.out.println(count + ": " + td.trackBlock.block);
-//                if (tmf != null && tmf.isVisible()) {
-//                    setOccupancy(td.trackBlock.line, td.trackBlock.block, true);
-//                }
-//            }
+        if (count == 20) {
+            TrackBlock curBlock;
+            for (TrainData td : trains) {
+                curBlock = getClosestBlock(td.trainModel.location(), "Green");
+//                System.out.println(td.trainModel.id() + ": " + curBlock.block);
+                if (!curBlock.isOccupied) {
+                    setOccupancy(curBlock.line, curBlock.block, true);
+                }
+                if (td.trackBlock.block != curBlock.block) {
+                    if (td.trackBlock != null) {
+                        setOccupancy(td.trackBlock.line, td.trackBlock.block, false);
+                    }
+                    td.trackBlock = curBlock;
+                }
+            }
             count = 0;
         }
         count++;
@@ -587,8 +598,9 @@ public class TrackModel implements Updateable {
         public TrainModel trainModel;
         public TrackBlock trackBlock;
 
-        public TrainData(TrainModel tm) {
+        public TrainData(TrainModel tm, TrackBlock tb) {
             this.trainModel = tm;
+            this.trackBlock = tb;
         }
     }
 }
