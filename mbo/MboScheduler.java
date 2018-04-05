@@ -20,6 +20,7 @@ public class MboScheduler implements Updateable
 	private MboSchedulerUI ui;
 	private String lineName;
 	private BlockTracker[] line;
+	private LineSchedule lineSched;
 	
 	// Adjustable parameters
 	private int dwellTime = 20; // Seconds
@@ -80,7 +81,15 @@ public class MboScheduler implements Updateable
 	
 	public void update(int time)
 	{
-		
+		// TODO: use time
+		if (ui != null && ui.scheduleRequested())
+		{
+			Time start = ui.getStartTime();
+			Time end = ui.getEndTime();
+			int[] throughput = ui.getThroughput();
+			if (start != null && end != null && throughput != null)
+				lineSched = makeSchedule(start, end, throughput);
+		}
 	}
 	
 	private TrainSchedule makeTrainSchedule(Time startTime, int trainID)
