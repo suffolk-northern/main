@@ -91,7 +91,7 @@ public class CtcUI extends javax.swing.JFrame {
 		scheduleButton = new javax.swing.JButton();
 		closeTrack = new javax.swing.JRadioButton();
 
-		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(javax.swing.WindowConstants.HIDE_ON_CLOSE);
 
 		jLabel7.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
 		jLabel7.setText("Train Select");
