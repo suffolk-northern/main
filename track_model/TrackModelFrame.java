@@ -32,12 +32,13 @@ import track_model.tables.TrackModelTableModel;
  */
 public class TrackModelFrame extends javax.swing.JFrame {
 
-    private final DbHelper dbHelper = new DbHelper();
+    private final DbHelper dbHelper;
 
     /**
      * Creates new form TrackModelFrame
      */
-    public TrackModelFrame() {
+    public TrackModelFrame(DbHelper dbHelper) {
+        this.dbHelper = dbHelper;
         initComponents();
         if (TrackModel.doTablesExist()) {
             refreshTables();
@@ -154,17 +155,21 @@ public class TrackModelFrame extends javax.swing.JFrame {
         int response = JOptionPane.showConfirmDialog(null, "Clearing will wipe all existing track data. Continue?", "Confirm",
                 JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
         if (response == JOptionPane.YES_OPTION) {
-            dbHelper.connect();
-            dbHelper.execute("DROP TABLE IF EXISTS BLOCKS");
-            dbHelper.execute("DROP TABLE IF EXISTS CONNECTIONS");
-            dbHelper.execute("DROP TABLE IF EXISTS CROSSINGS");
-            dbHelper.execute("DROP TABLE IF EXISTS STATIONS");
-            dbHelper.close();
+            try {
+                Connection conn = dbHelper.getConnection();
+                dbHelper.execute(conn, "DROP TABLE IF EXISTS BLOCKS");
+                dbHelper.execute(conn, "DROP TABLE IF EXISTS CONNECTIONS");
+                dbHelper.execute(conn, "DROP TABLE IF EXISTS CROSSINGS");
+                dbHelper.execute(conn, "DROP TABLE IF EXISTS STATIONS");
+                conn.close();
 
-            ((DefaultTableModel) blockTable.getModel()).setRowCount(0);
-            ((DefaultTableModel) switchTable.getModel()).setRowCount(0);
-            ((DefaultTableModel) crossingTable.getModel()).setRowCount(0);
-            ((DefaultTableModel) stationTable.getModel()).setRowCount(0);
+                ((DefaultTableModel) blockTable.getModel()).setRowCount(0);
+                ((DefaultTableModel) switchTable.getModel()).setRowCount(0);
+                ((DefaultTableModel) crossingTable.getModel()).setRowCount(0);
+                ((DefaultTableModel) stationTable.getModel()).setRowCount(0);
+            } catch (SQLException ex) {
+                Logger.getLogger(TrackModelFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }//GEN-LAST:event_clearButtonActionPerformed
 
@@ -186,7 +191,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_importButtonActionPerformed
 
     private void murphButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_murphButtonActionPerformed
-        MurphFrame mf = new MurphFrame(this, blockTable, crossingTable);
+        MurphFrame mf = new MurphFrame(this, blockTable, crossingTable, dbHelper);
         mf.setLocationRelativeTo(this);
         mf.setVisible(true);
     }//GEN-LAST:event_murphButtonActionPerformed
@@ -198,71 +203,74 @@ public class TrackModelFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_occupancyCheckBoxActionPerformed
 
     private void initializeDatabase() {
-        dbHelper.connect();
-        dbHelper.execute("DROP TABLE IF EXISTS BLOCKS");
-        dbHelper.execute("DROP TABLE IF EXISTS CONNECTIONS");
-        dbHelper.execute("DROP TABLE IF EXISTS CROSSINGS");
-        dbHelper.execute("DROP TABLE IF EXISTS STATIONS");
+        try {
+            Connection conn = dbHelper.getConnection();
+            dbHelper.execute(conn, "DROP TABLE IF EXISTS BLOCKS");
+            dbHelper.execute(conn, "DROP TABLE IF EXISTS CONNECTIONS");
+            dbHelper.execute(conn, "DROP TABLE IF EXISTS CROSSINGS");
+            dbHelper.execute(conn, "DROP TABLE IF EXISTS STATIONS");
 
-        dbHelper.execute("CREATE TABLE BLOCKS (\n"
-                + " line text NOT NULL,\n"
-                + " section varchar(1),\n"
-                + " block integer  NOT NULL,\n"
-                + " length float,\n"
-                + " curvature float,\n"
-                + " grade float,\n"
-                + " speed_limit integer,\n"
-                + " underground boolean,\n"
-                + " power boolean,\n"
-                + " occupied boolean,\n"
-                + " heater boolean,\n"
-                + " message varchar(128),\n"
-                + " x float,\n"
-                + " y float,\n"
-                + " track_controller integer,\n"
-                + " tc_orientation integer,\n"
-                + " maintenance boolean,\n"
-                + " xcenter float,\n"
-                + " ycenter float,\n"
-                + " PRIMARY KEY (line, block)\n"
-                + ");");
-        dbHelper.execute("CREATE TABLE CONNECTIONS (\n"
-                + " line text NOT NULL,\n"
-                + " section varchar(1) NOT NULL,\n"
-                + " block integer,\n"
-                + " prev_block integer,\n"
-                + " prev_valid integer,\n"
-                + " next_block integer,\n"
-                + " next_valid integer,\n"
-                + " switch_block integer,\n"
-                + " switch_valid integer,\n"
-                + " current_setting integer,\n"
-                + " PRIMARY KEY (line, block)\n"
-                + ");");
-        dbHelper.execute("CREATE TABLE CROSSINGS (\n"
-                + " line text NOT NULL,\n"
-                + " block integer,\n"
-                + " signal boolean,\n"
-                + " PRIMARY KEY (line, block)\n"
-                + ");");
-        dbHelper.execute("CREATE TABLE STATIONS (\n"
-                + " line text NOT NULL,\n"
-                + " section varchar(1) NOT NULL,\n"
-                + " block integer,\n"
-                + " name text,\n"
-                + " passengers integer,\n"
-                + " message varchar(128),\n"
-                + " PRIMARY KEY (line, block)\n"
-                + ");");
-        dbHelper.close();
+            dbHelper.execute(conn, "CREATE TABLE BLOCKS (\n"
+                    + " line text NOT NULL,\n"
+                    + " section varchar(1),\n"
+                    + " block integer  NOT NULL,\n"
+                    + " length float,\n"
+                    + " curvature float,\n"
+                    + " grade float,\n"
+                    + " speed_limit integer,\n"
+                    + " underground boolean,\n"
+                    + " power boolean,\n"
+                    + " occupied boolean,\n"
+                    + " heater boolean,\n"
+                    + " message varchar(128),\n"
+                    + " x float,\n"
+                    + " y float,\n"
+                    + " track_controller integer,\n"
+                    + " tc_orientation integer,\n"
+                    + " maintenance boolean,\n"
+                    + " xcenter float,\n"
+                    + " ycenter float,\n"
+                    + " PRIMARY KEY (line, block)\n"
+                    + ");");
+            dbHelper.execute(conn, "CREATE TABLE CONNECTIONS (\n"
+                    + " line text NOT NULL,\n"
+                    + " section varchar(1) NOT NULL,\n"
+                    + " block integer,\n"
+                    + " prev_block integer,\n"
+                    + " prev_valid integer,\n"
+                    + " next_block integer,\n"
+                    + " next_valid integer,\n"
+                    + " switch_block integer,\n"
+                    + " switch_valid integer,\n"
+                    + " current_setting integer,\n"
+                    + " PRIMARY KEY (line, block)\n"
+                    + ");");
+            dbHelper.execute(conn, "CREATE TABLE CROSSINGS (\n"
+                    + " line text NOT NULL,\n"
+                    + " block integer,\n"
+                    + " signal boolean,\n"
+                    + " PRIMARY KEY (line, block)\n"
+                    + ");");
+            dbHelper.execute(conn, "CREATE TABLE STATIONS (\n"
+                    + " line text NOT NULL,\n"
+                    + " section varchar(1) NOT NULL,\n"
+                    + " block integer,\n"
+                    + " name text,\n"
+                    + " passengers integer,\n"
+                    + " message varchar(128),\n"
+                    + " PRIMARY KEY (line, block)\n"
+                    + ");");
+            conn.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(TrackModelFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     private void populateDatabase(File trackDataFile) {
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(trackDataFile)));
 
-            Class.forName("org.sqlite.JDBC");
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:TrackModel.db");
+            Connection conn = dbHelper.getConnection();
             conn.setAutoCommit(false);
             PreparedStatement blockStmt = conn.prepareStatement("INSERT INTO BLOCKS VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
             PreparedStatement connStmt = conn.prepareStatement("INSERT INTO CONNECTIONS VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
@@ -344,7 +352,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
             conn.close();
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (SQLException | ClassNotFoundException ex) {
+        } catch (SQLException ex) {
             Logger.getLogger(TrackModelFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -362,11 +370,11 @@ public class TrackModelFrame extends javax.swing.JFrame {
         stationTable.setModel(stationTableModel);
 
         try {
-            dbHelper.connect();
+            Connection conn = dbHelper.getConnection();
 
             ResultSet rs = occupancyCheckBox.isSelected()
-                    ? dbHelper.query("SELECT * FROM BLOCKS WHERE OCCUPIED")
-                    : dbHelper.query("SELECT * FROM BLOCKS");
+                    ? dbHelper.query(conn, "SELECT * FROM BLOCKS WHERE OCCUPIED")
+                    : dbHelper.query(conn, "SELECT * FROM BLOCKS");
             while (rs.next()) {
                 Object rowData[] = {
                     rs.getString(1),
@@ -385,7 +393,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
                 blockTableModel.addRow(rowData);
             }
 
-            rs = dbHelper.query("SELECT * FROM CONNECTIONS WHERE SWITCH_BLOCK;");
+            rs = dbHelper.query(conn, "SELECT * FROM CONNECTIONS WHERE SWITCH_BLOCK;");
             while (rs.next()) {
                 Object rowData2[] = {
                     rs.getString(1),
@@ -402,7 +410,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
                 switchTableModel.addRow(rowData2);
             }
 
-            rs = dbHelper.query("SELECT * FROM CROSSINGS NATURAL JOIN BLOCKS;");
+            rs = dbHelper.query(conn, "SELECT * FROM CROSSINGS NATURAL JOIN BLOCKS;");
             while (rs.next()) {
                 Object rowData[] = {
                     rs.getString(1),
@@ -415,7 +423,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
                 crossingTableModel.addRow(rowData);
             }
 
-            rs = dbHelper.query("SELECT * FROM STATIONS;");
+            rs = dbHelper.query(conn, "SELECT * FROM STATIONS;");
             while (rs.next()) {
                 Object rowData[] = {
                     rs.getString(1),
@@ -428,7 +436,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
             }
 
             rs.close();
-            dbHelper.close();
+            conn.close();
         } catch (SQLException ex) {
             Logger.getLogger(TrackModelFrame.class.getName()).log(Level.SEVERE, null, ex);
         }

@@ -8,7 +8,6 @@ package track_model;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -26,13 +25,15 @@ import javax.swing.Timer;
 public class TestFrame extends javax.swing.JFrame {
 
     private TrackModelFrame tmf;
+    private final DbHelper dbHelper;
 
     /**
      * Creates new form MurphFrame
      */
-    public TestFrame(TrackModelFrame tmf) {
+    public TestFrame(TrackModelFrame tmf, DbHelper dbHelper) {
         initComponents();
         this.tmf = tmf;
+        this.dbHelper = dbHelper;
         if (TrackModel.doTablesExist()) {
             populateDropdown();
         }
@@ -292,9 +293,7 @@ public class TestFrame extends javax.swing.JFrame {
     private void populateDropdown() {
         ArrayList<String> blockList = new ArrayList<>();
         try {
-            Class.forName("org.sqlite.JDBC");
-
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:TrackModel.db");
+            Connection conn = dbHelper.getConnection();
             Statement stat = conn.createStatement();
 
             ResultSet rs = stat.executeQuery("SELECT * FROM BLOCKS;");
@@ -318,7 +317,7 @@ public class TestFrame extends javax.swing.JFrame {
             jComboBox3.setModel(new DefaultComboBoxModel(blockList.toArray()));
             rs.close();
             conn.close();
-        } catch (ClassNotFoundException | SQLException ex) {
+        } catch (SQLException ex) {
             Logger.getLogger(TestFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

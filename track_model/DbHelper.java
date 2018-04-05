@@ -2,47 +2,35 @@ package track_model;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.sqlite.SQLiteDataSource;
 
 public class DbHelper {
 
-    private String driver = "org.sqlite.JDBC";
+    private SQLiteDataSource ds = new SQLiteDataSource();
     private String url = "jdbc:sqlite:TrackModel.db";
-    private Connection connection = null;
 
     public DbHelper() {
-        try {
-            Class.forName(driver);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(DbHelper.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        ds.setUrl(url);
     }
 
-    public void connect() {
+    public Connection getConnection() {
         try {
-            connection = DriverManager.getConnection(url);
+            return ds.getConnection();
         } catch (SQLException ex) {
             Logger.getLogger(DbHelper.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return null;
     }
-
-    public void close() {
+    
+    public boolean tableExists(Connection conn, String tableName) {
         try {
-            connection.close();
-        } catch (SQLException ex) {
-            Logger.getLogger(DbHelper.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-    public boolean tableExists(String tableName) {
-        try {
-            DatabaseMetaData dbm = connection.getMetaData();
+            DatabaseMetaData dbm = conn.getMetaData();
             ResultSet rs = dbm.getTables(null, null, tableName, null);
 
             return rs.next();
@@ -52,10 +40,10 @@ public class DbHelper {
         return false;
     }
 
-    public ResultSet query(String query) {
+    public ResultSet query(Connection conn, String query) {
         ResultSet rs = null;
         try {
-            Statement stat = connection.createStatement();
+            Statement stat = conn.createStatement();
             rs = stat.executeQuery(query);
         } catch (SQLException ex) {
             Logger.getLogger(DbHelper.class.getName()).log(Level.SEVERE, null, ex);
@@ -63,31 +51,23 @@ public class DbHelper {
         return rs;
     }
     
-    public void execute(String query)   {
-        try {
-            Statement stat = connection.createStatement();
-            stat.execute(query);
-        } catch (SQLException ex) {
-            Logger.getLogger(DbHelper.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
+//    public void execute(Connection conn, String query)   {
+//        try {
+//            Statement stat = conn.createStatement();
+//            stat.execute(query);
+//        } catch (SQLException ex) {
+//            Logger.getLogger(DbHelper2.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//    }
 
-    public void execute(String query, Object... values) {
+    public void execute(Connection conn, String query, Object... values) {
         try {
-            PreparedStatement ps = connection.prepareStatement(query);
+            PreparedStatement ps = conn.prepareStatement(query);
             for (int i = 0; i < values.length; i++)    {
                 ps.setObject(i + 1, values[i]);
             }
             ps.executeUpdate();
 
-        } catch (SQLException ex) {
-            Logger.getLogger(DbHelper.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-    
-    public void setAutoCommit(boolean autoCommit)   {
-        try {
-            connection.setAutoCommit(autoCommit);
         } catch (SQLException ex) {
             Logger.getLogger(DbHelper.class.getName()).log(Level.SEVERE, null, ex);
         }

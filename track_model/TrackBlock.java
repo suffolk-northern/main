@@ -23,8 +23,10 @@ public class TrackBlock {
 
     protected int nextBlockId;
     protected int prevBlockId;
+
     protected int switchBlockId;
     protected int switchDirection;
+    protected int switchPosition;
 
     protected boolean isSwitch;
     protected boolean isStation;
@@ -231,6 +233,14 @@ public class TrackBlock {
         this.switchDirection = switchDirection;
     }
 
+    public int getSwitchPosition() {
+        return switchPosition;
+    }
+
+    protected void setSwitchPosition(int switchPosition) {
+        this.switchPosition = switchPosition;
+    }
+
     public boolean isClosedForMaintenance() {
         return closedForMaintenance;
     }
@@ -240,25 +250,28 @@ public class TrackBlock {
     }
 
     public double getDistanceTo(GlobalCoordinates gc) {
-        return 0;
+        double minDist = 9999;
+        double latDiff, lonDiff;
+        for (int i = 0; i < length; i += 5) {
+            latDiff = gc.latitude() - getPositionAlongBlock(i).latitude();
+            lonDiff = gc.longitude() - getPositionAlongBlock(i).longitude();
+            double tempDist = Math.sqrt(Math.pow(latDiff, 2) + Math.pow(lonDiff, 2));
+            if (tempDist < minDist) {
+                minDist = tempDist;
+            }
+        }
+        return minDist;
     }
 
     public GlobalCoordinates getPositionAlongBlock(double meters) {
         if (meters > length) {
             return null;
         }
-//        double xDiff = xCoordEnd - xCoordStart;
-//        double yDiff = yCoordEnd - yCoordStart;
-//        double radius = (360 / Math.abs(curvature) * length) / (2 * Math.PI);
-//        System.out.println(block + " " + radius);
-//        if (radius == Double.POSITIVE_INFINITY) System.out.println("gooch");
-//        
         double newX, newY;
 
         if (curvature == 0) {
             double xDiff = xEnd - xStart;
             double yDiff = yEnd - yStart;
-
             double xDist = xDiff * meters / length;
             double yDist = yDiff * meters / length;
 
@@ -273,6 +286,7 @@ public class TrackBlock {
             newX = xCenter + radius * Math.cos(angle);
             newY = yCenter + radius * Math.sin(angle);
         }
+
         return GlobalCoordinates.ORIGIN.addYards(newY * METER_TO_YARD_MULTIPLIER, newX * METER_TO_YARD_MULTIPLIER);
     }
 
