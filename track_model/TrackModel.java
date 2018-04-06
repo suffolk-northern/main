@@ -444,10 +444,6 @@ public class TrackModel implements Updateable {
         return count;
     }
 
-    public TrackBlock getYardBlock() {
-        return getBlock("YARD", 0);
-    }
-
     public void setYardMessage(int trainId, int driverId, TrackMovementCommand tmc) {
         for (TrainData td : trains) {
             if (td.trainModel.id() == trainId) {
