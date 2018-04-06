@@ -117,6 +117,10 @@ public class Ctc implements Updateable{
 		initGreen();
 		//initRed();
 		
+		// add trains to yards
+		Train train = new Train(1,getBlock("green",0),0);
+		trains.add(train);
+		
 		updateTrack();
 		updateTrains();
 	}
@@ -384,9 +388,7 @@ public class Ctc implements Updateable{
 		*/
 
 		
-		// add trains to yards
-		Train train = new Train();
-		trains.add(train);
+		
 
 
 	}
@@ -609,7 +611,8 @@ public class Ctc implements Updateable{
 		Block block;
 		while (!temp.isEmpty()) {
 			block = temp.poll();
-			if (block.getLine().equals(line) && block.getNum() == num) {
+			if (block.line.equalsIgnoreCase(line) && block.getNum() == num) 
+			{
 				return block;
 			}
 		}
