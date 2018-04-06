@@ -103,8 +103,7 @@ public class Main
 		// FIXME: none of this linking works
 
 		// CTC <---> track controller
-		//for (TrackController trackController : trackControllers)
-		//	ctc.registerTrackController(trackController.ctcLink());
+		ctc.setTrackModel(trackModel);
 
 		// track controller <---> track model
 		//for (TrackController trackController : trackControllers)
