@@ -130,7 +130,7 @@ public class Ctc implements Updateable{
 	private static void initGreen()
 	{
 		greenline = new ArrayDeque<Block>();
-		String line = "green";
+		String line = "Green";
 		TrackBlock bl;
 		Block block;
 		int numbl = trackmodel.getBlockCount(line);
@@ -223,7 +223,7 @@ public class Ctc implements Updateable{
 	private static void initRed()
 	{
 		redline = new ArrayDeque<Block>();
-		String line = "red";
+		String line = "Red";
 		TrackBlock bl;
 		Block block;
 		int numbl = trackmodel.getBlockCount(line);
@@ -964,7 +964,7 @@ public class Ctc implements Updateable{
 		if(train.location.num == 0)
 			trackmodel.setYardMessage(train.ID, 0, tmc);
 		else
-			trackmodel.setBlockMessage(loc.line, loc.num, msg);
+			trackmodel.setBlockMessage(loc.line, loc.num, tmc);
 	}
 	
 	protected static void sendSpeedAuthShort(String trainID, double speed, double auth)
@@ -980,7 +980,7 @@ public class Ctc implements Updateable{
 			trackmodel.setYardMessage(0, 0, tmc);
 		}
 		else
-			trackmodel.setBlockMessage(train.location.line, train.location.num, msg);
+			trackmodel.setBlockMessage(train.location.line, train.location.num, tmc);
 	}
 	
 	private static void combineAuth(TrackCon tc, boolean[] s, boolean[] l, boolean[] r)
@@ -1293,6 +1293,7 @@ public class Ctc implements Updateable{
 		protected Block dest;
 		protected double deadline;
 		protected int passengers;
+		protected int driverID;
 
 		public Train() {
 			ID = 0;
@@ -1303,9 +1304,10 @@ public class Ctc implements Updateable{
 			dest = null;
 			deadline = 0;
 			passengers = 0;
+			driverID = 0;
 		}
 
-		public Train(int id, Block loc) {
+		public Train(int id, Block loc, int dID) {
 			ID = id;
 			location = loc;
 			authority = 0;
@@ -1314,6 +1316,7 @@ public class Ctc implements Updateable{
 			dest = null;
 			deadline = 0;
 			passengers = 0;
+			driverID = dID;
 
 		}
 
@@ -1326,7 +1329,7 @@ public class Ctc implements Updateable{
 			dest = route.getLast();
 			deadline = 0;
 			passengers = 0;
-
+			driverID = 0;
 		}
 
 		private ArrayDeque<Block> getRoute() {
@@ -1355,6 +1358,16 @@ public class Ctc implements Updateable{
 
 		public int getID() {
 			return ID;
+		}
+		
+		public void setDriver(int id)
+		{
+			driverID = id;
+		}
+		
+		public int getDriver()
+		{
+			return driverID;
 		}
 	}
 
