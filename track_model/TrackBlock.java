@@ -22,7 +22,9 @@ public class TrackBlock {
     private double xCenter, yCenter;
 
     protected int nextBlockId;
+    protected int nextBlockDir;
     protected int prevBlockId;
+    protected int prevBlockDir;
 
     protected int switchBlockId;
     protected int switchDirection;
@@ -215,6 +217,22 @@ public class TrackBlock {
 
     protected void setPrevBlockId(int prevBlockId) {
         this.prevBlockId = prevBlockId;
+    }
+
+    public int getNextBlockDir() {
+        return nextBlockDir;
+    }
+
+    protected void setNextBlockDir(int nextBlockDir) {
+        this.nextBlockDir = nextBlockDir;
+    }
+
+    public int getPrevBlockDir() {
+        return prevBlockDir;
+    }
+
+    protected void setPrevBlockDir(int prevBlockDir) {
+        this.prevBlockDir = prevBlockDir;
     }
 
     public int getSwitchBlockId() {

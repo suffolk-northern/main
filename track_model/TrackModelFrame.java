@@ -33,14 +33,16 @@ import track_model.tables.TrackModelTableModel;
 public class TrackModelFrame extends javax.swing.JFrame {
 
     private final DbHelper dbHelper;
+    private final TrackModel tm;
 
     /**
      * Creates new form TrackModelFrame
      */
-    public TrackModelFrame(DbHelper dbHelper) {
-        this.dbHelper = dbHelper;
+    public TrackModelFrame(TrackModel tm) {
+        this.tm = tm;
+        this.dbHelper = tm.dbHelper;
         initComponents();
-        if (TrackModel.doTablesExist()) {
+        if (tm.doTablesExist()) {
             refreshTables();
         }
     }
@@ -185,13 +187,14 @@ public class TrackModelFrame extends javax.swing.JFrame {
             if (returnValue == JFileChooser.APPROVE_OPTION) {
                 initializeDatabase();
                 populateDatabase(jfc.getSelectedFile());
+                tm.initializeLocalArrays();
                 refreshTables();
             }
         }
     }//GEN-LAST:event_importButtonActionPerformed
 
     private void murphButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_murphButtonActionPerformed
-        MurphFrame mf = new MurphFrame(this, blockTable, crossingTable, dbHelper);
+        MurphFrame mf = new MurphFrame(blockTable, crossingTable, dbHelper);
         mf.setLocationRelativeTo(this);
         mf.setVisible(true);
     }//GEN-LAST:event_murphButtonActionPerformed
@@ -219,15 +222,10 @@ public class TrackModelFrame extends javax.swing.JFrame {
                     + " grade float,\n"
                     + " speed_limit integer,\n"
                     + " underground boolean,\n"
-                    + " power boolean,\n"
-                    + " occupied boolean,\n"
-                    + " heater boolean,\n"
-                    + " message varchar(128),\n"
                     + " x float,\n"
                     + " y float,\n"
                     + " track_controller integer,\n"
                     + " tc_orientation integer,\n"
-                    + " maintenance boolean,\n"
                     + " xcenter float,\n"
                     + " ycenter float,\n"
                     + " PRIMARY KEY (line, block)\n"
@@ -272,22 +270,22 @@ public class TrackModelFrame extends javax.swing.JFrame {
 
             Connection conn = dbHelper.getConnection();
             conn.setAutoCommit(false);
-            PreparedStatement blockStmt = conn.prepareStatement("INSERT INTO BLOCKS VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+            PreparedStatement blockStmt = conn.prepareStatement("INSERT INTO BLOCKS VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
             PreparedStatement connStmt = conn.prepareStatement("INSERT INTO CONNECTIONS VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
             PreparedStatement crossingStmt = conn.prepareStatement("INSERT INTO CROSSINGS VALUES(?, ?, ?);");
             PreparedStatement stationStmt = conn.prepareStatement("INSERT INTO STATIONS VALUES(?, ?, ?, ?, ?, ?);");
 
             blockStmt.setString(1, "YARD");
-            blockStmt.setInt(3, -1);
-            blockStmt.setBoolean(9, true);
+            blockStmt.setInt(3, 0);
             blockStmt.addBatch();
 
             String line;
             while ((line = br.readLine()) != null) {
-                if (line.contains("%") || line.contains("Red")) {
+                if (line.contains("%") || line.contains("red")) {
                     continue;
                 }
                 List<String> items = Arrays.asList(line.split(","));
+
                 blockStmt.setString(1, items.get(0));
                 blockStmt.setString(2, items.get(1));
                 blockStmt.setInt(3, Integer.parseInt(items.get(2)));
@@ -296,17 +294,12 @@ public class TrackModelFrame extends javax.swing.JFrame {
                 blockStmt.setFloat(6, Float.parseFloat(items.get(5)));
                 blockStmt.setInt(7, Integer.parseInt(items.get(6)));
                 blockStmt.setBoolean(8, line.contains("UNDERGROUND"));
-                blockStmt.setBoolean(9, true);
-                blockStmt.setBoolean(10, false);
-                blockStmt.setBoolean(11, false);
-                blockStmt.setString(12, "");
-                blockStmt.setFloat(13, Float.parseFloat(items.get(10)));
-                blockStmt.setFloat(14, Float.parseFloat(items.get(11)));
-                blockStmt.setInt(15, Integer.parseInt(items.get(18)));
-                blockStmt.setInt(16, Integer.parseInt(items.get(19)));
-                blockStmt.setBoolean(17, false);
-                blockStmt.setFloat(18, Float.parseFloat(items.get(20)));
-                blockStmt.setFloat(19, Float.parseFloat(items.get(21)));
+                blockStmt.setFloat(9, Float.parseFloat(items.get(10)));
+                blockStmt.setFloat(10, Float.parseFloat(items.get(11)));
+                blockStmt.setInt(11, Integer.parseInt(items.get(18)));
+                blockStmt.setInt(12, Integer.parseInt(items.get(19)));
+                blockStmt.setFloat(13, Float.parseFloat(items.get(20)));
+                blockStmt.setFloat(14, Float.parseFloat(items.get(21)));
                 blockStmt.addBatch();
 
                 connStmt.setString(1, items.get(0));
@@ -369,76 +362,64 @@ public class TrackModelFrame extends javax.swing.JFrame {
         crossingTable.setModel(crossingTableModel);
         stationTable.setModel(stationTableModel);
 
-        try {
-            Connection conn = dbHelper.getConnection();
-
-            ResultSet rs = occupancyCheckBox.isSelected()
-                    ? dbHelper.query(conn, "SELECT * FROM BLOCKS WHERE OCCUPIED")
-                    : dbHelper.query(conn, "SELECT * FROM BLOCKS");
-            while (rs.next()) {
-                Object rowData[] = {
-                    rs.getString(1),
-                    rs.getString(2),
-                    rs.getInt(3),
-                    rs.getDouble(4) * TrackBlock.METER_TO_YARD_MULTIPLIER,
-                    rs.getDouble(5),
-                    rs.getDouble(6),
-                    rs.getInt(7) * TrackBlock.KILOMETER_TO_MILE_MULTIPLIER,
-                    rs.getBoolean(8) ? "UNDERGROUND" : "",
-                    rs.getBoolean(9) ? "POWER" : "OUTAGE",
-                    rs.getBoolean(10) ? "OCCUPIED" : (rs.getBoolean(17) ? "CLOSED" : ""),
-                    rs.getBoolean(11) ? "ON" : "OFF",
-                    rs.getString(12)
-                };
-                blockTableModel.addRow(rowData);
-            }
-
-            rs = dbHelper.query(conn, "SELECT * FROM CONNECTIONS WHERE SWITCH_BLOCK;");
-            while (rs.next()) {
+        for (TrackBlock tb : tm.blocks) {
+            Object rowData[] = {
+                tb.line,
+                tb.section,
+                tb.block,
+                tb.length * TrackBlock.METER_TO_YARD_MULTIPLIER,
+                tb.curvature,
+                tb.grade,
+                tb.speedLimit * TrackBlock.KILOMETER_TO_MILE_MULTIPLIER,
+                tb.isUnderground ? "UNDERGROUND" : "",
+                tb.isPowerOn ? "POWER" : "OUTAGE",
+                tb.isOccupied ? "OCCUPIED" : (tb.closedForMaintenance ? "CLOSED" : ""),
+                tb.isHeaterOn ? "ON" : "OFF",
+                tb.message
+            };
+            blockTableModel.addRow(rowData);
+            
+            if (tb.isSwitch) {
                 Object rowData2[] = {
-                    rs.getString(1),
-                    rs.getString(2),
-                    rs.getInt(3),
-                    rs.getInt(4),
-                    rs.getInt(5),
-                    rs.getInt(6),
-                    rs.getInt(7),
-                    rs.getInt(8) == -1 ? "YARD" : rs.getInt(8),
-                    rs.getInt(9),
-                    rs.getInt(10) == -1 ? "YARD" : rs.getInt(10)
+                    tb.line,
+                    tb.section,
+                    tb.block,
+                    tb.prevBlockId,
+                    tb.prevBlockDir,
+                    tb.nextBlockId,
+                    tb.nextBlockDir,
+                    tb.switchBlockId == 0 ? "YARD" : tb.switchBlockId,
+                    tb.switchDirection,
+                    tb.switchPosition == 0 ? "YARD" : tb.switchPosition
                 };
                 switchTableModel.addRow(rowData2);
             }
-
-            rs = dbHelper.query(conn, "SELECT * FROM CROSSINGS NATURAL JOIN BLOCKS;");
-            while (rs.next()) {
-                Object rowData[] = {
-                    rs.getString(1),
-                    rs.getString(4),
-                    rs.getInt(2),
-                    rs.getDouble(5),
-                    rs.getBoolean(11) ? "OCCUPIED" : (rs.getBoolean(18) ? "CLOSED" : ""),
-                    rs.getBoolean(3) ? "ON" : "OFF"
+            
+            if (tb.isCrossing) {
+                Crossing c = tm.getCrossing(tb.line, tb.block);
+                Object rowData3[] = {
+                    tb.line,
+                    tb.section,
+                    tb.block,
+                    tb.length,
+                    tb.isOccupied ? "OCCUPIED" : (tb.closedForMaintenance ? "CLOSED" : ""),
+                    c.signal ? "ON" : "OFF"
                 };
-                crossingTableModel.addRow(rowData);
+                crossingTableModel.addRow(rowData3);
             }
-
-            rs = dbHelper.query(conn, "SELECT * FROM STATIONS;");
-            while (rs.next()) {
-                Object rowData[] = {
-                    rs.getString(1),
-                    rs.getString(2),
-                    rs.getInt(3),
-                    rs.getString(4),
-                    rs.getInt(5)
+            
+            if (tb.isStation) {
+                Station s = tm.getStation(tb.line, tb.block);
+                
+                Object rowData4[] = {
+                    s.line,
+                    s.section,
+                    s.block,
+                    s.name,
+                    s.passengers
                 };
-                stationTableModel.addRow(rowData);
+                stationTableModel.addRow(rowData4);
             }
-
-            rs.close();
-            conn.close();
-        } catch (SQLException ex) {
-            Logger.getLogger(TrackModelFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

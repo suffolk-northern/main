@@ -30,9 +30,12 @@ public class TrackModel implements Updateable {
 
     private static int temperature;
     private static TrackModelFrame tmf;
-    private static final DbHelper dbHelper = new DbHelper();
+    protected static final DbHelper dbHelper = new DbHelper();
 
-    private static final ArrayList<TrainData> trains = new ArrayList<>();
+    protected static final ArrayList<TrainData> trains = new ArrayList<>();
+    protected static ArrayList<TrackBlock> blocks = new ArrayList<>();
+    protected static ArrayList<Crossing> crossings = new ArrayList<>();
+    protected static ArrayList<Station> stations = new ArrayList<>();
 
     private static final Orientation GREEN_LINE_ORIENTATION = Orientation.radians(0.9 * Math.PI);
 
@@ -40,26 +43,52 @@ public class TrackModel implements Updateable {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        launchTestUI();
+        TrackModel tm = new TrackModel();
+        tm.launchTestUI();
     }
 
     public TrackModel() {
-        for (int i = 1; i <= getBlockCount("Green"); i++) {
-            if (getBlock("Green", i).isOccupied) {
-                setOccupancy("Green", i, false);
+        initializeLocalArrays();
+    }
+
+    protected void initializeLocalArrays() {
+        blocks = new ArrayList<>();
+        crossings = new ArrayList<>();
+        stations = new ArrayList<>();
+        if (doTablesExist()) {
+            try {
+                try (Connection conn = dbHelper.getConnection()) {
+                    ResultSet rs = dbHelper.query(conn, "SELECT LINE, BLOCK FROM BLOCKS WHERE BLOCK > 0;");
+                    while (rs.next()) {
+                        blocks.add(getBlockFromDatabase(rs.getString("Line"), rs.getInt("Block")));
+                    }
+                    rs = dbHelper.query(conn, "SELECT LINE, BLOCK FROM CROSSINGS;");
+                    while (rs.next()) {
+                        crossings.add(getCrossingFromDatabase(rs.getString("Line"), rs.getInt("Block")));
+                    }
+                    rs = dbHelper.query(conn, "SELECT LINE, BLOCK FROM STATIONS;");
+                    while (rs.next()) {
+                        stations.add(getStationFromDatabase(rs.getString("Line"), rs.getInt("Block")));
+                    }
+                    rs.close();
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(TrackModel.class.getName()).log(Level.SEVERE, null, ex);
             }
+        } else {
+            JOptionPane.showMessageDialog(null, "Track database not found. Trains were not registered.\n\nPlease import track database.", "Warning", JOptionPane.WARNING_MESSAGE);
         }
     }
 
-    public static void launchUI() {
-        tmf = new TrackModelFrame(dbHelper);
+    public void launchUI() {
+        tmf = new TrackModelFrame(this);
         tmf.setDefaultCloseOperation(javax.swing.WindowConstants.HIDE_ON_CLOSE);
         tmf.setLocationRelativeTo(null);
         tmf.setVisible(true);
     }
 
-    public static void launchTestUI() {
-        tmf = new TrackModelFrame(dbHelper);
+    private void launchTestUI() {
+        tmf = new TrackModelFrame(this);
         tmf.setLocationRelativeTo(null);
         tmf.setVisible(true);
         if (doTablesExist()) {
@@ -89,6 +118,16 @@ public class TrackModel implements Updateable {
         return exist;
     }
 
+    public static TrackBlock getBlock(String line, int block) {
+        for (TrackBlock tb : blocks) {
+            if (tb.line.equalsIgnoreCase(line) && tb.block == block) {
+                return tb;
+            }
+        }
+        System.out.println("Track block not found.");
+        return null;
+    }
+
     /**
      * Retrieves specific information related to a block on a line.
      *
@@ -96,11 +135,12 @@ public class TrackModel implements Updateable {
      * @param block
      * @return Track block object
      */
-    public static TrackBlock getBlock(String line, int block) {
+    private static TrackBlock getBlockFromDatabase(String line, int block) {
         if (!doTablesExist()) {
             return null;
         }
         TrackBlock tb = null;
+        line = line.toLowerCase();
         try {
             Connection conn = dbHelper.getConnection();
             ResultSet rs = dbHelper.query(conn, "SELECT * FROM BLOCKS WHERE LINE='" + line + "' AND BLOCK=" + block + ";");
@@ -112,13 +152,13 @@ public class TrackModel implements Updateable {
                 tb.setGrade(rs.getFloat(6));
                 tb.setSpeedLimit(rs.getInt(7));
                 tb.setIsUnderground(rs.getBoolean(8));
-                tb.setIsPowerOn(rs.getBoolean(9));
-                tb.setIsOccupied(rs.getBoolean(10));
-                tb.setIsHeaterOn(rs.getBoolean(11));
-                tb.setMessage(rs.getString(12));
-                tb.setStartCoordinates(rs.getDouble(13), rs.getDouble(14));
-                tb.setClosedForMaintenance(rs.getBoolean(17));
-                tb.setCenterCoordinates(rs.getDouble(18), rs.getDouble(19));
+                tb.setIsPowerOn(true);
+                tb.setIsOccupied(false);
+                tb.setIsHeaterOn(false);
+                tb.setMessage("");
+                tb.setStartCoordinates(rs.getDouble(9), rs.getDouble(10));
+                tb.setClosedForMaintenance(false);
+                tb.setCenterCoordinates(rs.getDouble(13), rs.getDouble(14));
 
                 rs = dbHelper.query(conn, "SELECT NEXT_BLOCK FROM CONNECTIONS WHERE LINE='" + line + "' AND BLOCK=" + block + ";");
                 rs = dbHelper.query(conn, "SELECT X, Y FROM BLOCKS WHERE LINE='" + line + "' AND BLOCK=" + rs.getInt(1) + ";");
@@ -127,8 +167,10 @@ public class TrackModel implements Updateable {
                 rs = dbHelper.query(conn, "SELECT * FROM CONNECTIONS WHERE LINE='" + line + "' AND BLOCK=" + block + ";");
                 if (rs.next()) {
                     tb.setPrevBlockId(rs.getInt(4));
+                    tb.setPrevBlockDir(rs.getInt(5));
                     tb.setNextBlockId(rs.getInt(6));
-                    tb.setIsSwitch(rs.getInt(8) != 0);
+                    tb.setNextBlockDir(rs.getInt(7));
+                    tb.setIsSwitch(rs.getInt(9) != 0);
                     if (tb.isIsSwitch()) {
                         tb.setSwitchBlockId(rs.getInt(8));
                         tb.setSwitchDirection(rs.getInt(9));
@@ -142,7 +184,7 @@ public class TrackModel implements Updateable {
                 rs.close();
                 conn.close();
             } else {
-                System.out.println("Invalid block.");
+                System.out.println("Invalid block. " + line + " " + block);
             }
         } catch (SQLException ex) {
             Logger.getLogger(TrackModel.class.getName()).log(Level.SEVERE, null, ex);
@@ -159,40 +201,42 @@ public class TrackModel implements Updateable {
      */
     public static boolean flipSwitch(String line, int block) {
         boolean success = false;
-        try {
-            Connection conn = dbHelper.getConnection();
-            ResultSet rs = dbHelper.query(conn, "SELECT * FROM CONNECTIONS WHERE LINE='" + line + "' AND BLOCK=" + block + " AND SWITCH_BLOCK;");
-            if (rs.next()) {
-                int mainBlock = rs.getInt(9) < 0 ? rs.getInt(4) : rs.getInt(6);
-                int switchBlock = rs.getInt(8);
+        TrackBlock tb = getBlock(line, block);
+        if (tb != null && tb.isSwitch) {
+            int mainBlock = tb.switchDirection < 0 ? tb.prevBlockId : tb.nextBlockId;
+            int switchBlock = tb.switchBlockId;
 
-                String query = "UPDATE CONNECTIONS SET CURRENT_SETTING=? WHERE LINE=? AND BLOCK=?";
-                if (rs.getInt(10) == mainBlock) {
-                    Object[] values = {switchBlock, line, block};
-                    dbHelper.execute(conn, query, values);
-                } else {
-                    Object[] values = {mainBlock, line, block};
-                    dbHelper.execute(conn, query, values);
-                }
-                success = true;
-                if (tmf != null) {
-                    tmf.refreshTables();
-                }
+            if (tb.switchPosition == mainBlock) {
+                tb.switchPosition = switchBlock;
             } else {
-                System.out.println("Not a switch.");
+                tb.switchPosition = mainBlock;
             }
-            conn.close();
-        } catch (SQLException ex) {
-            Logger.getLogger(TrackModel.class.getName()).log(Level.SEVERE, null, ex);
+            success = true;
+            if (tmf != null) {
+                tmf.refreshTables();
+            }
+        } else {
+            System.out.println("Not a switch.");
         }
         return success;
     }
 
     public static Station getStation(String line, int block) {
+        for (Station s : stations) {
+            if (s.line.equalsIgnoreCase(line) && s.block == block) {
+                return s;
+            }
+        }
+        System.out.println("Station not found.");
+        return null;
+    }
+
+    private static Station getStationFromDatabase(String line, int block) {
         if (!doTablesExist()) {
             return null;
         }
         Station s = null;
+        line = line.toLowerCase();
         try {
             Connection conn = dbHelper.getConnection();
             ResultSet rs = dbHelper.query(conn, "SELECT * FROM STATIONS WHERE LINE='" + line + "' AND BLOCK=" + block + ";");
@@ -213,6 +257,16 @@ public class TrackModel implements Updateable {
     }
 
     public static Crossing getCrossing(String line, int block) {
+        for (Crossing c : crossings) {
+            if (c.line.equalsIgnoreCase(line) && c.block == block) {
+                return c;
+            }
+        }
+        System.out.println("Crossing not found.");
+        return null;
+    }
+
+    private static Crossing getCrossingFromDatabase(String line, int block) {
         if (!doTablesExist()) {
             return null;
         }
@@ -234,21 +288,22 @@ public class TrackModel implements Updateable {
     }
 
     public static void setBlockMessage(String line, int block, String message) {
-        if (doTablesExist()) {
-            try {
-                Connection conn = dbHelper.getConnection();
-                String query = "UPDATE BLOCKS SET MESSAGE=? WHERE LINE=? AND BLOCK=?";
-                Object[] values = {message, line, block};
-                dbHelper.execute(conn, query, values);
-                conn.close();
-
-                if (tmf != null) {
-                    tmf.refreshTables();
-                }
-            } catch (SQLException ex) {
-                Logger.getLogger(TrackModel.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
+        System.out.println("Method no longer supported.");
+//        if (doTablesExist()) {
+//            try {
+//                Connection conn = dbHelper.getConnection();
+//                String query = "UPDATE BLOCKS SET MESSAGE=? WHERE LINE=? AND BLOCK=?";
+//                Object[] values = {message, line, block};
+//                dbHelper.execute(conn, query, values);
+//                conn.close();
+//
+//                if (tmf != null) {
+//                    tmf.refreshTables();
+//                }
+//            } catch (SQLException ex) {
+//                Logger.getLogger(TrackModel.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+//        }
     }
 
     public static void setBlockMessage(int trainId, int driverId, TrackMovementCommand tmc) {
@@ -260,37 +315,21 @@ public class TrackModel implements Updateable {
     }
 
     public static void setMaintenance(String line, int block, boolean maintain) {
-        if (doTablesExist()) {
-            try {
-                Connection conn = dbHelper.getConnection();
-                String query = "UPDATE BLOCKS SET MAINTENANCE=? WHERE LINE=? AND BLOCK=?";
-                Object[] values = {maintain, line, block};
-                dbHelper.execute(conn, query, values);
-                conn.close();
-
-                if (tmf != null) {
-                    tmf.refreshTables();
-                }
-            } catch (SQLException ex) {
-                Logger.getLogger(TrackModel.class.getName()).log(Level.SEVERE, null, ex);
+        TrackBlock tb = getBlock(line, block);
+        if (tb != null) {
+            tb.closedForMaintenance = maintain;
+            if (tmf != null) {
+                tmf.refreshTables();
             }
         }
     }
 
     public static void setOccupancy(String line, int block, boolean occupied) {
-        if (doTablesExist()) {
-            try {
-                Connection conn = dbHelper.getConnection();
-                String query = "UPDATE BLOCKS SET OCCUPIED=? WHERE LINE=? AND BLOCK=?";
-                Object[] values = {occupied, line, block};
-                dbHelper.execute(conn, query, values);
-                conn.close();
-
-                if (tmf != null) {
-                    tmf.refreshTables();
-                }
-            } catch (SQLException ex) {
-                Logger.getLogger(TrackModel.class.getName()).log(Level.SEVERE, null, ex);
+        TrackBlock tb = getBlock(line, block);
+        if (tb != null) {
+            tb.isOccupied = occupied;
+            if (tmf != null) {
+                tmf.refreshTables();
             }
         }
     }
@@ -303,108 +342,43 @@ public class TrackModel implements Updateable {
     }
 
     public static void setPower(String line, int block, boolean on) {
-        if (doTablesExist()) {
-            try {
-                Connection conn = dbHelper.getConnection();
-                String query = "UPDATE BLOCKS SET POWER=? WHERE LINE=? AND BLOCK=?";
-                Object[] values = {on, line, block};
-                dbHelper.execute(conn, query, values);
-                conn.close();
-
-                if (tmf != null) {
-                    tmf.refreshTables();
-                }
-            } catch (SQLException ex) {
-                Logger.getLogger(TrackModel.class.getName()).log(Level.SEVERE, null, ex);
+        TrackBlock tb = getBlock(line, block);
+        if (tb != null) {
+            tb.isPowerOn = on;
+            if (tmf != null) {
+                tmf.refreshTables();
             }
         }
     }
 
-    public static void setCrossingSignal(String line, int block, boolean on) {
-        if (doTablesExist()) {
-            try {
-                Connection conn = dbHelper.getConnection();
-                String query = "UPDATE CROSSINGS SET SIGNAL=? WHERE LINE=? AND BLOCK=?";
-                Object[] values = {on, line, block};
-                dbHelper.execute(conn, query, values);
-                conn.close();
-
-                if (tmf != null) {
-                    tmf.refreshTables();
-                }
-            } catch (SQLException ex) {
-                Logger.getLogger(TrackModel.class.getName()).log(Level.SEVERE, null, ex);
+    public static void setCrossingSignal(String line, int block, boolean signal) {
+        Crossing c = getCrossing(line, block);
+        if (c != null) {
+            c.signal = signal;
+            if (tmf != null) {
+                tmf.refreshTables();
             }
         }
     }
 
-    public static void setHeater(String line, int block, boolean on) {
-        if (doTablesExist()) {
-            try {
-                Connection conn = dbHelper.getConnection();
-                String query = "UPDATE BLOCKS SET HEATER=? WHERE LINE=? AND BLOCK=?";
-                Object[] values = {on, line, block};
-                dbHelper.execute(conn, query, values);
-                conn.close();
-
-                if (tmf != null) {
-                    tmf.refreshTables();
-                }
-            } catch (SQLException ex) {
-                Logger.getLogger(TrackModel.class.getName()).log(Level.SEVERE, null, ex);
+    public static void setHeater(String line, int block, boolean heater) {
+        TrackBlock tb = getBlock(line, block);
+        if (tb != null) {
+            tb.isHeaterOn = heater;
+            if (tmf != null) {
+                tmf.refreshTables();
             }
-        }
-    }
-
-    /*
-    * FOR EXPERIMENTAL PURPOSES AT THE MOMENT
-     */
-    private static void getConnections(String line, int block) {
-        try {
-            Connection conn = dbHelper.getConnection();
-            ResultSet rs = dbHelper.query(conn, "SELECT * FROM CONNECTIONS WHERE LINE='" + line + "' AND BLOCK=" + block);
-            if (rs.next()) {
-                if (rs.getInt(5) == 1) {
-                    System.out.println("PREV: " + rs.getInt(4));
-                }
-                if (rs.getInt(7) == 1) {
-                    System.out.println("NEXT: " + rs.getInt(6));
-                }
-                if (rs.getObject(9) != null) {
-                    switch (rs.getInt(9)) {
-                        case -1:
-                            System.out.println("Going backwards: " + rs.getInt(8));
-                            break;
-                        case 1:
-                            System.out.println("Going forwards: " + rs.getInt(8));
-                            break;
-                        default:
-                            System.out.println("Only re-entries switch");
-                            break;
-                    }
-                }
-            } else {
-                System.out.println("Invalid line or block.");
-            }
-            conn.close();
-        } catch (SQLException ex) {
-            Logger.getLogger(TrackModel.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     public static TrackBlock getFirstBlock(String line) {
-        TrackBlock tb = null;
-        if (doTablesExist()) {
-            try {
-                Connection conn = dbHelper.getConnection();
-                ResultSet rs = dbHelper.query(conn, "SELECT BLOCK FROM CONNECTIONS WHERE LINE='" + line + "' AND SWITCH_BLOCK=-1 AND SWITCH_VALID=-2");
-                tb = getBlock(line, rs.getInt(1));
-                conn.close();
-            } catch (SQLException ex) {
-                Logger.getLogger(TrackModel.class.getName()).log(Level.SEVERE, null, ex);
+        for (TrackBlock tb : blocks) {
+            if (tb.line.equalsIgnoreCase(line) && tb.switchBlockId == 0 && tb.switchDirection == -2) {
+                return tb;
             }
         }
-        return tb;
+        System.out.println("Track block not found.");
+        return null;
     }
 
     public static ArrayList<Integer> getDefaultLine(String line) {
@@ -416,7 +390,7 @@ public class TrackModel implements Updateable {
             int prev = 0;
 
             Connection conn = dbHelper.getConnection();
-            while (swit != -1 || valid != 1) {
+            while (swit != 0 || valid != 1) {
                 ResultSet rs = dbHelper.query(conn, "SELECT * FROM CONNECTIONS WHERE LINE='" + line + "' AND BLOCK=" + cur);
                 if (rs.next()) {
                     blocks.add(cur);
@@ -444,11 +418,32 @@ public class TrackModel implements Updateable {
         return blocks;
     }
 
+    public static int getBlockCount() {
+        if (!doTablesExist()) {
+            return 0;
+        }
+        int count = 0;
+        try {
+            Connection conn = dbHelper.getConnection();
+            ResultSet rs = dbHelper.query(conn, "SELECT COUNT(BLOCK) FROM BLOCKS;");
+            if (rs.next()) {
+                count = rs.getInt(1);
+            } else {
+                System.out.println("Invalid.");
+            }
+            conn.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(TrackModel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return count;
+    }
+
     public static int getBlockCount(String line) {
         if (!doTablesExist()) {
             return 0;
         }
         int count = 0;
+        line = line.toLowerCase();
         try {
             Connection conn = dbHelper.getConnection();
             ResultSet rs = dbHelper.query(conn, "SELECT COUNT(BLOCK) FROM BLOCKS WHERE LINE='" + line + "';");
@@ -465,22 +460,9 @@ public class TrackModel implements Updateable {
     }
 
     public TrackBlock getYardBlock() {
-        return getBlock("YARD", -1);
+        return getBlock("YARD", 0);
     }
 
-//    public void setYardMessage(String message) {
-//        if (doTablesExist()) {
-//            dbHelper.connect();
-//            String query = "UPDATE BLOCKS SET MESSAGE=? WHERE BLOCK=-1";
-//            Object[] values = {message};
-//            dbHelper.execute(query, values);
-//            dbHelper.close();
-//
-//            if (tmf != null) {
-//                tmf.refreshTables();
-//            }
-//        }
-//    }
     public void setYardMessage(int trainId, int driverId, TrackMovementCommand tmc) {
         for (TrainData td : trains) {
             if (td.trainModel.id() == trainId) {
@@ -508,8 +490,6 @@ public class TrackModel implements Updateable {
         if (doTablesExist()) {
             trains.add(new TrainData(tm, getFirstBlock(line)));
             tm.slew(new Pose(getFirstBlock(line).start, GREEN_LINE_ORIENTATION));
-        } else {
-            JOptionPane.showMessageDialog(null, "Track database not found. Trains were not registered.\n\nPlease import track database.", "Warning", JOptionPane.WARNING_MESSAGE);
         }
     }
 
@@ -523,6 +503,7 @@ public class TrackModel implements Updateable {
      * @return
      */
     public static TrackBlock getClosestBlock(GlobalCoordinates gc, String line) {
+        line = line.toLowerCase();
         int blocks = getBlockCount(line);
         double minDist = 9999;
         TrackBlock closest = null;
@@ -553,6 +534,7 @@ public class TrackModel implements Updateable {
      * @return
      */
     public boolean getSide(GlobalCoordinates gc, String line, int block) {
+        line = line.toLowerCase();
         TrackBlock tb = getBlock(line, block);
         double startDistance = Math.sqrt(Math.pow(gc.latitude() - tb.start.latitude(), 2) + Math.pow(gc.longitude() - tb.start.longitude(), 2));
         double endDistance = Math.sqrt(Math.pow(gc.latitude() - tb.end.latitude(), 2) + Math.pow(gc.longitude() - tb.end.longitude(), 2));
@@ -563,7 +545,7 @@ public class TrackModel implements Updateable {
 
     @Override
     public void update(int time) {
-        if (count == 20) {
+        if (count == 2000 / time) {
             TrackBlock curBlock;
             for (TrainData td : trains) {
                 curBlock = getClosestBlock(td.trainModel.location(), "Green");

@@ -2,9 +2,9 @@ package track_model;
 
 public class Crossing {
 
-    private String line;
-    private int block;
-    private boolean signal;
+    protected String line;
+    protected int block;
+    protected boolean signal;
 
     public Crossing(String line, int block) {
         this.line = line;
