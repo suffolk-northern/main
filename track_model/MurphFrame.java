@@ -20,16 +20,14 @@ import javax.swing.JTable;
  */
 public class MurphFrame extends javax.swing.JFrame {
 
-    private TrackModelFrame tmf;
     private JTable blocks, crossings;
     private final DbHelper dbHelper;
 
     /**
      * Creates new form MurphFrame
      */
-    public MurphFrame(TrackModelFrame tmf, JTable blocks, JTable crossings, DbHelper dbHelper) {
+    public MurphFrame(JTable blocks, JTable crossings, DbHelper dbHelper) {
         initComponents();
-        this.tmf = tmf;
         this.blocks = blocks;
         this.crossings = crossings;
         this.dbHelper = dbHelper;

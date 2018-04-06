@@ -101,6 +101,7 @@ public class TrackModel implements Updateable {
             return null;
         }
         TrackBlock tb = null;
+        line = line.toLowerCase();
         try {
             Connection conn = dbHelper.getConnection();
             ResultSet rs = dbHelper.query(conn, "SELECT * FROM BLOCKS WHERE LINE='" + line + "' AND BLOCK=" + block + ";");
@@ -159,6 +160,7 @@ public class TrackModel implements Updateable {
      */
     public static boolean flipSwitch(String line, int block) {
         boolean success = false;
+        line = line.toLowerCase();
         try {
             Connection conn = dbHelper.getConnection();
             ResultSet rs = dbHelper.query(conn, "SELECT * FROM CONNECTIONS WHERE LINE='" + line + "' AND BLOCK=" + block + " AND SWITCH_BLOCK;");
@@ -193,6 +195,7 @@ public class TrackModel implements Updateable {
             return null;
         }
         Station s = null;
+        line = line.toLowerCase();
         try {
             Connection conn = dbHelper.getConnection();
             ResultSet rs = dbHelper.query(conn, "SELECT * FROM STATIONS WHERE LINE='" + line + "' AND BLOCK=" + block + ";");
@@ -260,6 +263,7 @@ public class TrackModel implements Updateable {
     }
 
     public static void setMaintenance(String line, int block, boolean maintain) {
+        line = line.toLowerCase();
         if (doTablesExist()) {
             try {
                 Connection conn = dbHelper.getConnection();
@@ -278,6 +282,7 @@ public class TrackModel implements Updateable {
     }
 
     public static void setOccupancy(String line, int block, boolean occupied) {
+        line = line.toLowerCase();
         if (doTablesExist()) {
             try {
                 Connection conn = dbHelper.getConnection();
@@ -303,6 +308,7 @@ public class TrackModel implements Updateable {
     }
 
     public static void setPower(String line, int block, boolean on) {
+        line = line.toLowerCase();
         if (doTablesExist()) {
             try {
                 Connection conn = dbHelper.getConnection();
@@ -321,6 +327,7 @@ public class TrackModel implements Updateable {
     }
 
     public static void setCrossingSignal(String line, int block, boolean on) {
+        line = line.toLowerCase();
         if (doTablesExist()) {
             try {
                 Connection conn = dbHelper.getConnection();
@@ -339,6 +346,7 @@ public class TrackModel implements Updateable {
     }
 
     public static void setHeater(String line, int block, boolean on) {
+        line = line.toLowerCase();
         if (doTablesExist()) {
             try {
                 Connection conn = dbHelper.getConnection();
@@ -356,44 +364,44 @@ public class TrackModel implements Updateable {
         }
     }
 
-    /*
-    * FOR EXPERIMENTAL PURPOSES AT THE MOMENT
-     */
-    private static void getConnections(String line, int block) {
-        try {
-            Connection conn = dbHelper.getConnection();
-            ResultSet rs = dbHelper.query(conn, "SELECT * FROM CONNECTIONS WHERE LINE='" + line + "' AND BLOCK=" + block);
-            if (rs.next()) {
-                if (rs.getInt(5) == 1) {
-                    System.out.println("PREV: " + rs.getInt(4));
-                }
-                if (rs.getInt(7) == 1) {
-                    System.out.println("NEXT: " + rs.getInt(6));
-                }
-                if (rs.getObject(9) != null) {
-                    switch (rs.getInt(9)) {
-                        case -1:
-                            System.out.println("Going backwards: " + rs.getInt(8));
-                            break;
-                        case 1:
-                            System.out.println("Going forwards: " + rs.getInt(8));
-                            break;
-                        default:
-                            System.out.println("Only re-entries switch");
-                            break;
-                    }
-                }
-            } else {
-                System.out.println("Invalid line or block.");
-            }
-            conn.close();
-        } catch (SQLException ex) {
-            Logger.getLogger(TrackModel.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
+//    /*
+//    * FOR EXPERIMENTAL PURPOSES AT THE MOMENT
+//     */
+//    private static void getConnections(String line, int block) {
+//        try {
+//            Connection conn = dbHelper.getConnection();
+//            ResultSet rs = dbHelper.query(conn, "SELECT * FROM CONNECTIONS WHERE LINE='" + line + "' AND BLOCK=" + block);
+//            if (rs.next()) {
+//                if (rs.getInt(5) == 1) {
+//                    System.out.println("PREV: " + rs.getInt(4));
+//                }
+//                if (rs.getInt(7) == 1) {
+//                    System.out.println("NEXT: " + rs.getInt(6));
+//                }
+//                if (rs.getObject(9) != null) {
+//                    switch (rs.getInt(9)) {
+//                        case -1:
+//                            System.out.println("Going backwards: " + rs.getInt(8));
+//                            break;
+//                        case 1:
+//                            System.out.println("Going forwards: " + rs.getInt(8));
+//                            break;
+//                        default:
+//                            System.out.println("Only re-entries switch");
+//                            break;
+//                    }
+//                }
+//            } else {
+//                System.out.println("Invalid line or block.");
+//            }
+//            conn.close();
+//        } catch (SQLException ex) {
+//            Logger.getLogger(TrackModel.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//    }
     public static TrackBlock getFirstBlock(String line) {
         TrackBlock tb = null;
+        line = line.toLowerCase();
         if (doTablesExist()) {
             try {
                 Connection conn = dbHelper.getConnection();
@@ -449,6 +457,7 @@ public class TrackModel implements Updateable {
             return 0;
         }
         int count = 0;
+        line = line.toLowerCase();
         try {
             Connection conn = dbHelper.getConnection();
             ResultSet rs = dbHelper.query(conn, "SELECT COUNT(BLOCK) FROM BLOCKS WHERE LINE='" + line + "';");
@@ -465,7 +474,7 @@ public class TrackModel implements Updateable {
     }
 
     public TrackBlock getYardBlock() {
-        return getBlock("YARD", -1);
+        return getBlock("YARD", 0);
     }
 
 //    public void setYardMessage(String message) {
@@ -523,6 +532,7 @@ public class TrackModel implements Updateable {
      * @return
      */
     public static TrackBlock getClosestBlock(GlobalCoordinates gc, String line) {
+        line = line.toLowerCase();
         int blocks = getBlockCount(line);
         double minDist = 9999;
         TrackBlock closest = null;
@@ -553,6 +563,7 @@ public class TrackModel implements Updateable {
      * @return
      */
     public boolean getSide(GlobalCoordinates gc, String line, int block) {
+        line = line.toLowerCase();
         TrackBlock tb = getBlock(line, block);
         double startDistance = Math.sqrt(Math.pow(gc.latitude() - tb.start.latitude(), 2) + Math.pow(gc.longitude() - tb.start.longitude(), 2));
         double endDistance = Math.sqrt(Math.pow(gc.latitude() - tb.end.latitude(), 2) + Math.pow(gc.longitude() - tb.end.longitude(), 2));
@@ -563,7 +574,7 @@ public class TrackModel implements Updateable {
 
     @Override
     public void update(int time) {
-        if (count == 20) {
+        if (count == 2000 / time) {
             TrackBlock curBlock;
             for (TrainData td : trains) {
                 curBlock = getClosestBlock(td.trainModel.location(), "Green");

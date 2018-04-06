@@ -191,7 +191,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_importButtonActionPerformed
 
     private void murphButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_murphButtonActionPerformed
-        MurphFrame mf = new MurphFrame(this, blockTable, crossingTable, dbHelper);
+        MurphFrame mf = new MurphFrame(blockTable, crossingTable, dbHelper);
         mf.setLocationRelativeTo(this);
         mf.setVisible(true);
     }//GEN-LAST:event_murphButtonActionPerformed
@@ -278,7 +278,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
             PreparedStatement stationStmt = conn.prepareStatement("INSERT INTO STATIONS VALUES(?, ?, ?, ?, ?, ?);");
 
             blockStmt.setString(1, "YARD");
-            blockStmt.setInt(3, -1);
+            blockStmt.setInt(3, 0);
             blockStmt.setBoolean(9, true);
             blockStmt.addBatch();
 
@@ -403,9 +403,9 @@ public class TrackModelFrame extends javax.swing.JFrame {
                     rs.getInt(5),
                     rs.getInt(6),
                     rs.getInt(7),
-                    rs.getInt(8) == -1 ? "YARD" : rs.getInt(8),
+                    rs.getInt(8) == 0 ? "YARD" : rs.getInt(8),
                     rs.getInt(9),
-                    rs.getInt(10) == -1 ? "YARD" : rs.getInt(10)
+                    rs.getInt(10) == 0 ? "YARD" : rs.getInt(10)
                 };
                 switchTableModel.addRow(rowData2);
             }
