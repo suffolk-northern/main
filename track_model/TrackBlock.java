@@ -18,8 +18,8 @@ public class TrackBlock {
     protected String message;
     protected GlobalCoordinates start, end;
 
-    private double xStart, xEnd, yStart, yEnd;
-    private double xCenter, yCenter;
+    protected double xStart, xEnd, yStart, yEnd;
+    protected double xCenter, yCenter;
 
     protected int nextBlockId;
     protected int nextBlockDir;

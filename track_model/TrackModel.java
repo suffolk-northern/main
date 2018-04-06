@@ -546,6 +546,49 @@ public class TrackModel implements Updateable {
         count++;
     }
 
+    public double getDistanceTo(String line, int block, GlobalCoordinates gc) {
+        TrackBlock tb = getBlock(line, block);
+        double minDist = 9999;
+        double latDiff, lonDiff;
+        for (int i = 0; i < tb.length; i += 5) {
+            latDiff = gc.latitude() - tb.getPositionAlongBlock(i).latitude();
+            lonDiff = gc.longitude() - tb.getPositionAlongBlock(i).longitude();
+            double tempDist = Math.sqrt(Math.pow(latDiff, 2) + Math.pow(lonDiff, 2));
+            if (tempDist < minDist) {
+                minDist = tempDist;
+            }
+        }
+        return minDist;
+    }
+
+    public GlobalCoordinates getPositionAlongBlock(String line, int block, double meters) {
+        TrackBlock tb = getBlock(line, block);
+        if (meters > tb.length) {
+            return null;
+        }
+        double newX, newY;
+
+        if (tb.curvature == 0) {
+            double xDiff = tb.xEnd - tb.xStart;
+            double yDiff = tb.yEnd - tb.yStart;
+            double xDist = xDiff * meters / tb.length;
+            double yDist = yDiff * meters / tb.length;
+
+            newX = tb.xStart + xDist;
+            newY = tb.yStart + yDist;
+        } else {
+            boolean clockwise = tb.curvature > 0;
+            double radius = Math.sqrt(Math.pow(tb.xStart - tb.xCenter, 2) + Math.pow(tb.yStart - tb.yCenter, 2));
+            double angle = Math.atan2(tb.yStart - tb.yCenter, tb.xStart - tb.xCenter);
+            angle = clockwise ? angle - meters / radius : angle + meters / radius;
+
+            newX = tb.xCenter + radius * Math.cos(angle);
+            newY = tb.yCenter + radius * Math.sin(angle);
+        }
+
+        return GlobalCoordinates.ORIGIN.addYards(newY * tb.METER_TO_YARD_MULTIPLIER, newX * tb.METER_TO_YARD_MULTIPLIER);
+    }
+
     private static void testing() {
         for (int j = 1; j <= 150; j++) {
             TrackBlock tb = getBlock("Green", j);
