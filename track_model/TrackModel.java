@@ -287,6 +287,25 @@ public class TrackModel implements Updateable {
         return c;
     }
 
+    public static void setBlockMessage(String line, int block, String message) {
+        System.out.println("Method no longer supported.");
+//        if (doTablesExist()) {
+//            try {
+//                Connection conn = dbHelper.getConnection();
+//                String query = "UPDATE BLOCKS SET MESSAGE=? WHERE LINE=? AND BLOCK=?";
+//                Object[] values = {message, line, block};
+//                dbHelper.execute(conn, query, values);
+//                conn.close();
+//
+//                if (tmf != null) {
+//                    tmf.refreshTables();
+//                }
+//            } catch (SQLException ex) {
+//                Logger.getLogger(TrackModel.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+//        }
+    }
+
     public static void setBlockMessage(int trainId, int driverId, TrackMovementCommand tmc) {
         for (TrainData td : trains) {
             if (td.trainModel.id() == trainId) {
