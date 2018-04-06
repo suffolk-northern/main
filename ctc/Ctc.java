@@ -392,6 +392,32 @@ public class Ctc implements Updateable{
 
 
 	}
+	
+	public static void enableMBO(String line)
+	{
+		if(line.equalsIgnoreCase("green"))
+			greenradio.enableMovingBlock();
+		else if(line.equalsIgnoreCase("red"))
+			redradio.enableMovingBlock();
+	}
+	
+	public static void disableMBO(String line)
+	{
+		if(line.equalsIgnoreCase("green"))
+			greenradio.disableMovingBlock();
+		else if(line.equalsIgnoreCase("red"))
+			redradio.disableMovingBlock();
+	}
+	
+	public static void autoMode()
+	{
+		
+	}
+	
+	public static void manMode()
+	{
+		
+	}
 
 	private static Train getTrain(int ID) {
 		ArrayDeque<Train> temp = trains.clone();

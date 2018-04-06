@@ -984,6 +984,8 @@ public class CtcUI extends javax.swing.JFrame {
     private void fixedBlockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fixedBlockActionPerformed
 		// TODO add your handling code here:
 		System.out.println("Transfer control to fixed block");
+		ctc.disableMBO("green");
+		ctc.disableMBO("red");
     }//GEN-LAST:event_fixedBlockActionPerformed
 
 
@@ -1104,6 +1106,9 @@ public class CtcUI extends javax.swing.JFrame {
     private void MovingBlockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MovingBlockActionPerformed
 		// TODO add your handling code here:
 		System.out.println("Transfer control to MBO");
+		ctc.enableMBO("Green");
+		ctc.enableMBO("Red");
+		
     }//GEN-LAST:event_MovingBlockActionPerformed
 
     private void manualModeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manualModeActionPerformed
