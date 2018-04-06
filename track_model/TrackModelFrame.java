@@ -275,10 +275,14 @@ public class TrackModelFrame extends javax.swing.JFrame {
             PreparedStatement crossingStmt = conn.prepareStatement("INSERT INTO CROSSINGS VALUES(?, ?, ?);");
             PreparedStatement stationStmt = conn.prepareStatement("INSERT INTO STATIONS VALUES(?, ?, ?, ?, ?, ?);");
 
-            blockStmt.setString(1, "YARD");
+            blockStmt.setString(1, "green");
             blockStmt.setInt(3, 0);
             blockStmt.addBatch();
-
+            
+            blockStmt.setString(1, "red");
+            blockStmt.setInt(3, 0);
+            blockStmt.addBatch();
+            
             String line;
             while ((line = br.readLine()) != null) {
                 if (line.contains("%") || line.contains("red")) {
