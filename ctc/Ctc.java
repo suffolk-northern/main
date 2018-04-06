@@ -115,7 +115,7 @@ public class Ctc implements Updateable{
 		this.trackmodel = tm;
 		
 		initGreen();
-		initRed();
+		//initRed();
 		
 		updateTrack();
 		updateTrains();
@@ -623,7 +623,7 @@ public class Ctc implements Updateable{
 
 	private static void updateTrack() {
 		// for all track block in blue line
-		Object[][] rows = new Object[greenline.size() + redline.size()][TRACKCOLS];
+		Object[][] rows = new Object[greenline.size() /*+ redline.size()*/][TRACKCOLS];
 
 		ArrayDeque<Block> temp = greenline.clone();
 		Block block;
@@ -664,6 +664,7 @@ public class Ctc implements Updateable{
 			count++;
 		}
 		
+		/*
 		temp = redline.clone();
 		count = 0;
 
@@ -701,8 +702,8 @@ public class Ctc implements Updateable{
 
 			count++;
 		}
-
-		ui.updateTrackTable(rows, greenline.size() + redline.size());
+		*/
+		ui.updateTrackTable(rows, greenline.size() /*+ redline.size()*/);
 	}
 
 
