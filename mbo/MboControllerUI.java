@@ -116,6 +116,11 @@ public class MboControllerUI extends JFrame
 		model.setValueAt(authority, trainRow, 4);
 		model.setValueAt(speed, trainRow, 5);
 	}
+	
+	public void removeTrain(int trainID)
+	{
+		// TODO: implement this
+	}
 		
 	public static void main(String args[]) {
 		/* Set the Nimbus look and feel */

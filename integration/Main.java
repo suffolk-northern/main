@@ -40,6 +40,7 @@ public class Main
 	// temporary single references for initial integration
 	private static TrainModel singleTrainModel;
 	private static TrainController singleTrainController;
+	private static MboController mboController;
 
 	public static void main(String[] args)
 	{
@@ -60,8 +61,8 @@ public class Main
 
 		trackModel = new TrackModel();
 		
-		MboController mboCont = new MboController("green");
-		MboScheduler mboSched = new MboScheduler("green");
+		MboController mboCont = new MboController("Green");
+		MboScheduler mboSched = new MboScheduler("Green");
 
 		final int numberOfTrains = 1;
 
@@ -109,19 +110,21 @@ public class Main
 			trainControllers[i].registerTrain(
 				trainModels[i].controllerLink()
 			);
+		
+		
+		// Track Model <---> MBO
+		mboCont.initLine();
+		// mboSched.initLine();
 
 		// train model <---> MBO
-		//for (TrainModel trainModel : trainModels)
-		//	mboCont.registerTrain(trainModel.id(), trainModel.mboRadio());
+		for (TrainModel trainModel : trainModels)
+			mboCont.registerTrain(trainModel.id(), trainModel.mboRadio());
 		
 		// CTC <--> MBO
 		CtcRadio ctcRadio = new CtcRadio(mboCont, mboSched, ctc);
 		//ctc.registerMbo(ctcRadio);
 		mboCont.registerCtc(ctcRadio);
-		
-		// Track Model <---> MBO
-		// mboCont.initLine();
-		// mboSched.initLine();
+
 
 		//
 		// fill updateables
@@ -129,7 +132,7 @@ public class Main
 
 		// FIXME: see instantiations above
 		updateables.add(ctc);
-		//updateables.add(mboCont);
+		updateables.add(mboCont);
 		//updateables.add(mboSched);
 		updateables.add(trackModel);
 		updateables.add(trainMultiplier);

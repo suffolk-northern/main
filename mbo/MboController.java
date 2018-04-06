@@ -38,7 +38,21 @@ public class MboController implements Updateable
 	public void launchUI()
 	{
 		if (ui == null)
+		{
 			ui = new MboControllerUI();
+			for (TrainTracker trainInfo : trains)
+			{
+				int ID = trainInfo.getID();
+				char section = trainInfo.getBlock().getSection();
+				int blockID = trainInfo.getBlock().getID();
+				GlobalCoordinates pos = trainInfo.getLocation();
+				// TODO: replace with real distance along block
+				int distance = 0;
+				int authority = trainInfo.getAuthority();
+				int speed = trainInfo.getSuggestedSpeed();
+				ui.addTrain(ID, section, blockID, distance, authority, speed);
+			}
+		}
 	}
 	
 	public void showUI()
@@ -72,7 +86,9 @@ public class MboController implements Updateable
 	{
 		if (line == null)
 		{
+			System.out.println("Initializing line");
 			int numBlocks = TrackModel.getBlockCount(lineName);
+			System.out.printf("Num blocks initalized: %d", numBlocks);
 			line = new BlockTracker[numBlocks+1];
 			for (int i = 0; i < numBlocks; i++)
 			{
@@ -112,13 +128,27 @@ public class MboController implements Updateable
 			double authority = findAuthority(trainInfo);
 			trainInfo.setAuthority((int) authority);
 			trainInfo.setSuggestedSpeed(trainInfo.block.getSpeedLimit());
-			MboMovementCommand com = new MboMovementCommand(trainInfo.getAuthority(), trainInfo.getSuggestedSpeed());
+			MboMovementCommand com;
+			try
+			{
+				com = new MboMovementCommand(trainInfo.getSuggestedSpeed(), trainInfo.getAuthority());
+			}
+			catch (IllegalArgumentException e)
+			{
+				System.out.println("MBO tried to send an invalid speed / authority.");
+				System.out.println("Sending 0 speed / authority instead.");
+				com = new MboMovementCommand(0, 0);
+			}
+			System.out.println(trainInfo.getAuthority());
+			System.out.println(trainInfo.getSuggestedSpeed());
 			trainInfo.getRadio().send(com);
+			System.out.println("Sent");
 			GlobalCoordinates loc = trainInfo.getLocation();
 			// TODO: change to distance along block
 			// int trackDist = (int) trainInfo.block.getStart().distanceTo(loc);
 			int trackDist = 0;
-			ui.updateTrain(trainInfo.getID(), trainInfo.block.getSection(), trainInfo.block.getID(), trackDist, trainInfo.getAuthority(), trainInfo.getSuggestedSpeed());
+			if (ui != null)
+				ui.updateTrain(trainInfo.getID(), trainInfo.block.getSection(), trainInfo.block.getID(), trackDist, trainInfo.getAuthority(), trainInfo.getSuggestedSpeed());
 		}
 	}
 	
@@ -132,7 +162,8 @@ public class MboController implements Updateable
 //			if (isOnBlock(location, curBlock))
 //				return curBlock;
 		}
-		return -1;
+		// return -1;
+		return 1;
 	}
 	
 	private boolean isOnBlock(GlobalCoordinates location, TrackBlock block)
@@ -177,7 +208,8 @@ public class MboController implements Updateable
 		
 		TrainTracker trainInfo = new TrainTracker(ID, block, radio);
 		trains.add(trainInfo);
-		ui.addTrain(ID, block.getSection(), block.getID(), 0, 0, 0);
+		if (ui != null)
+			ui.addTrain(ID, block.getSection(), block.getID(), 0, 0, 0);
 	}
 
 	// Removes a train from the set of objects this object communicates
@@ -196,41 +228,42 @@ public class MboController implements Updateable
         
 	private double findAuthority(TrainTracker train)
 	{
-		BlockTracker curBlock = train.getBlock();
-		BlockTracker blockingBlock = curBlock;
-		
-		// TODO: move this logic to update loop for more efficient
-		ArrayList<BlockTracker> trainBlocks = new ArrayList<BlockTracker>();
-		for (int i = 0; i < trains.size(); i++)
-		{
-			trainBlocks.add(trains.get(i).getBlock());
-		}
-		
-		double authority = 0;
-		boolean trainBlocking = false;
-		for (int i = 0; i < line.length; i++)
-		{
-			for (BlockTracker trainBlock : trainBlocks)
-			{
-				if (curBlock == trainBlock)
-				{
-					// TODO: Change this to the real distance once that's in the track model
-					double distanceAlongBlock = 0;
-					authority += distanceAlongBlock;
-				}
-				trainBlocking = true;
-			}
-			
-			if (trainBlocking)
-				break;
-			
-			if (curBlock.getNext() < 0)
-			{
-				authority += curBlock.getLength();
-			}
-		}
-		
-		return authority;
+		return 50;
+//		BlockTracker curBlock = train.getBlock();
+//		BlockTracker blockingBlock = curBlock;
+//		
+//		// TODO: move this logic to update loop for more efficient
+//		ArrayList<BlockTracker> trainBlocks = new ArrayList<BlockTracker>();
+//		for (int i = 0; i < trains.size(); i++)
+//		{
+//			trainBlocks.add(trains.get(i).getBlock());
+//		}
+//		
+//		double authority = 0;
+//		boolean trainBlocking = false;
+//		for (int i = 0; i < line.length; i++)
+//		{
+//			for (BlockTracker trainBlock : trainBlocks)
+//			{
+//				if (curBlock == trainBlock)
+//				{
+//					// TODO: Change this to the real distance once that's in the track model
+//					double distanceAlongBlock = 0;
+//					authority += distanceAlongBlock;
+//				}
+//				trainBlocking = true;
+//			}
+//			
+//			if (trainBlocking)
+//				break;
+//			
+//			if (curBlock.getNext() < 0)
+//			{
+//				authority += curBlock.getLength();
+//			}
+//		}
+//		
+//		return authority;
 	}
 	
 	private void updateSwitches()
