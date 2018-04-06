@@ -1033,15 +1033,15 @@ public class CtcUI extends javax.swing.JFrame {
 		trackTable.setModel(trackModel);
 		
 		//if (!trackTable.getValueAt(0, 0).equals("")) {
-			for (int k = 0; k < count; k++) {
+			//for (int k = 0; k < count; k++) {
 				for (int i = 0; i < trackTable.getRowCount(); i++) {
-					if (trackTable.getValueAt(i, 1) != null && (trackTable.getValueAt(i, 1)).equals(rows[k][1]) && (trackTable.getValueAt(i, 2)).equals((rows[k][2]))) {
+					//if (trackTable.getValueAt(i, 1) != null && (trackTable.getValueAt(i, 1)).equals(rows[k][1]) && (trackTable.getValueAt(i, 2)).equals((rows[k][2]))) {
 						for (int j = 1; j < trackTable.getColumnCount(); j++) {
-							trackTable.setValueAt(rows[k][j], i, j);
+							trackTable.setValueAt(rows[i][j], i, j);
 						}
 					}
-				}
-			}
+				//}
+			//}
 		//} else {
 		/*
 			for (int i = 0; i < count; i++) {
