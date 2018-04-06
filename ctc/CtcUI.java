@@ -45,6 +45,7 @@ public class CtcUI extends javax.swing.JFrame {
 	public static final int TRACKCOLS = 9;
 	public Ctc ctc;
 	private JFrame frame;
+	private static javax.swing.table.DefaultTableModel trackModel;
 
 	public CtcUI(Ctc ctc) {
 		this.ctc = ctc;
@@ -113,7 +114,8 @@ public class CtcUI extends javax.swing.JFrame {
 		jLabel16.setVisible(false);
 
 		trackTable.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
-		trackTable.setModel(new javax.swing.table.DefaultTableModel(
+		
+		trackModel = new javax.swing.table.DefaultTableModel(
 				new Object[][]{
 					{"", "", "", "", null, "", "", null, null},
 					{"", "", "", "", null, "", "", null, null},
@@ -149,7 +151,8 @@ public class CtcUI extends javax.swing.JFrame {
 				new String[]{
 					"Line", "Section", "Number", "Occupancy", "Switch", "Signals", "Status", "RR Xing", "Station"
 				}
-		));
+		);
+		trackTable.setModel(trackModel);
 		jScrollPane1.setViewportView(trackTable);
 
 		trackTable.getModel().addTableModelListener(trainTable);
@@ -1025,8 +1028,9 @@ public class CtcUI extends javax.swing.JFrame {
 
 	protected static void updateTrackTable(Object[][] rows, int count) {
 
-		DefaultTableModel newTrackTable = new DefaultTableModel(count, TRACKCOLS);
-		trackTable.setModel(newTrackTable);
+		trackModel.setRowCount(count);
+		
+		trackTable.setModel(trackModel);
 		
 		//if (!trackTable.getValueAt(0, 0).equals("")) {
 			for (int k = 0; k < count; k++) {
