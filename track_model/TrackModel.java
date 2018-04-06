@@ -55,6 +55,10 @@ public class TrackModel implements Updateable {
         blocks = new ArrayList<>();
         crossings = new ArrayList<>();
         stations = new ArrayList<>();
+
+        blocks.add(new TrackBlock("green", 0));
+        blocks.add(new TrackBlock("red", 0));
+
         if (doTablesExist()) {
             try {
                 try (Connection conn = dbHelper.getConnection()) {
