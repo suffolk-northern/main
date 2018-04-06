@@ -275,17 +275,9 @@ public class TrackModelFrame extends javax.swing.JFrame {
             PreparedStatement crossingStmt = conn.prepareStatement("INSERT INTO CROSSINGS VALUES(?, ?, ?);");
             PreparedStatement stationStmt = conn.prepareStatement("INSERT INTO STATIONS VALUES(?, ?, ?, ?, ?, ?);");
 
-            blockStmt.setString(1, "green");
-            blockStmt.setInt(3, 0);
-            blockStmt.addBatch();
-            
-            blockStmt.setString(1, "red");
-            blockStmt.setInt(3, 0);
-            blockStmt.addBatch();
-            
             String line;
             while ((line = br.readLine()) != null) {
-                if (line.contains("%") || line.contains("red")) {
+                if (line.contains("%")) {
                     continue;
                 }
                 List<String> items = Arrays.asList(line.split(","));
@@ -367,9 +359,9 @@ public class TrackModelFrame extends javax.swing.JFrame {
         stationTable.setModel(stationTableModel);
 
         for (TrackBlock tb : tm.blocks) {
-            if (!occupancyCheckBox.isSelected() || tb.isOccupied) {
+            if (tb.block != 0 && (!occupancyCheckBox.isSelected() || tb.isOccupied)) {
                 Object rowData[] = {
-                    tb.line,
+                    tb.line.toUpperCase(),
                     tb.section,
                     tb.block,
                     tb.length * TrackBlock.METER_TO_YARD_MULTIPLIER,
@@ -387,7 +379,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
 
             if (tb.isSwitch) {
                 Object rowData2[] = {
-                    tb.line,
+                    tb.line.toUpperCase(),
                     tb.section,
                     tb.block,
                     tb.prevBlockId,
@@ -404,7 +396,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
             if (tb.isCrossing) {
                 Crossing c = tm.getCrossing(tb.line, tb.block);
                 Object rowData3[] = {
-                    tb.line,
+                    tb.line.toUpperCase(),
                     tb.section,
                     tb.block,
                     tb.length,
@@ -418,7 +410,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
                 Station s = tm.getStation(tb.line, tb.block);
 
                 Object rowData4[] = {
-                    s.line,
+                    s.line.toUpperCase(),
                     s.section,
                     s.block,
                     s.name,

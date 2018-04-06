@@ -51,13 +51,23 @@ public class TrackModel implements Updateable {
         initializeLocalArrays();
     }
 
+    private TrackBlock generateYardBlock(String line) {
+        TrackBlock tb = new TrackBlock(line, 0);
+        tb.isPowerOn = true;
+        tb.isCrossing = false;
+        tb.isStation = false;
+        tb.isSwitch = false;
+        tb.setStartCoordinates(265, -1500);
+        return tb;
+    }
+
     protected void initializeLocalArrays() {
         blocks = new ArrayList<>();
         crossings = new ArrayList<>();
         stations = new ArrayList<>();
 
-        blocks.add(new TrackBlock("green", 0));
-        blocks.add(new TrackBlock("red", 0));
+        blocks.add(generateYardBlock("green"));
+        blocks.add(generateYardBlock("red"));
 
         if (doTablesExist()) {
             try {
@@ -469,9 +479,18 @@ public class TrackModel implements Updateable {
      */
     public void registerTrain(TrainModel tm, String line) {
         if (doTablesExist()) {
-            trains.add(new TrainData(tm, getFirstBlock(line)));
+            trains.add(new TrainData(tm, getYardBlock(line)));
             tm.slew(new Pose(getFirstBlock(line).start, GREEN_LINE_ORIENTATION));
         }
+    }
+
+    public TrackBlock getYardBlock(String line) {
+        for (TrackBlock tb : blocks) {
+            if (tb.line.equalsIgnoreCase(line) && tb.block == 0) {
+                return tb;
+            }
+        }
+        return null;
     }
 
     /**
