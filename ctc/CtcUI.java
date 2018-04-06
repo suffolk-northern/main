@@ -42,6 +42,7 @@ import javax.swing.border.EtchedBorder;
  */
 public class CtcUI extends javax.swing.JFrame {
 
+	public static final int TRACKCOLS = 9;
 	public Ctc ctc;
 	private JFrame frame;
 
@@ -1024,7 +1025,10 @@ public class CtcUI extends javax.swing.JFrame {
 
 	protected static void updateTrackTable(Object[][] rows, int count) {
 
-		if (!trackTable.getValueAt(0, 0).equals("")) {
+		DefaultTableModel newTrackTable = new DefaultTableModel(count, TRACKCOLS);
+		trackTable.setModel(newTrackTable);
+		
+		//if (!trackTable.getValueAt(0, 0).equals("")) {
 			for (int k = 0; k < count; k++) {
 				for (int i = 0; i < trackTable.getRowCount(); i++) {
 					if (trackTable.getValueAt(i, 1) != null && (trackTable.getValueAt(i, 1)).equals(rows[k][1]) && (trackTable.getValueAt(i, 2)).equals((rows[k][2]))) {
@@ -1034,13 +1038,15 @@ public class CtcUI extends javax.swing.JFrame {
 					}
 				}
 			}
-		} else {
+		//} else {
+		/*
 			for (int i = 0; i < count; i++) {
 				for (int j = 0; j < trackTable.getColumnCount(); j++) {
 					trackTable.setValueAt(rows[i][j], i, j);
 				}
 			}
 		}
+		*/
 
 	}
 
