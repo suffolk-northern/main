@@ -363,22 +363,24 @@ public class TrackModelFrame extends javax.swing.JFrame {
         stationTable.setModel(stationTableModel);
 
         for (TrackBlock tb : tm.blocks) {
-            Object rowData[] = {
-                tb.line,
-                tb.section,
-                tb.block,
-                tb.length * TrackBlock.METER_TO_YARD_MULTIPLIER,
-                tb.curvature,
-                tb.grade,
-                tb.speedLimit * TrackBlock.KILOMETER_TO_MILE_MULTIPLIER,
-                tb.isUnderground ? "UNDERGROUND" : "",
-                tb.isPowerOn ? "POWER" : "OUTAGE",
-                tb.isOccupied ? "OCCUPIED" : (tb.closedForMaintenance ? "CLOSED" : ""),
-                tb.isHeaterOn ? "ON" : "OFF",
-                tb.message
-            };
-            blockTableModel.addRow(rowData);
-            
+            if (!occupancyCheckBox.isSelected() || tb.isOccupied) {
+                Object rowData[] = {
+                    tb.line,
+                    tb.section,
+                    tb.block,
+                    tb.length * TrackBlock.METER_TO_YARD_MULTIPLIER,
+                    tb.curvature,
+                    tb.grade,
+                    tb.speedLimit * TrackBlock.KILOMETER_TO_MILE_MULTIPLIER,
+                    tb.isUnderground ? "UNDERGROUND" : "",
+                    tb.isPowerOn ? "POWER" : "OUTAGE",
+                    tb.isOccupied ? "OCCUPIED" : (tb.closedForMaintenance ? "CLOSED" : ""),
+                    tb.isHeaterOn ? "ON" : "OFF",
+                    tb.message
+                };
+                blockTableModel.addRow(rowData);
+            }
+
             if (tb.isSwitch) {
                 Object rowData2[] = {
                     tb.line,
@@ -394,7 +396,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
                 };
                 switchTableModel.addRow(rowData2);
             }
-            
+
             if (tb.isCrossing) {
                 Crossing c = tm.getCrossing(tb.line, tb.block);
                 Object rowData3[] = {
@@ -407,10 +409,10 @@ public class TrackModelFrame extends javax.swing.JFrame {
                 };
                 crossingTableModel.addRow(rowData3);
             }
-            
+
             if (tb.isStation) {
                 Station s = tm.getStation(tb.line, tb.block);
-                
+
                 Object rowData4[] = {
                     s.line,
                     s.section,
