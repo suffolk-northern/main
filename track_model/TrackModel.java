@@ -152,13 +152,13 @@ public class TrackModel implements Updateable {
                 tb.setGrade(rs.getFloat(6));
                 tb.setSpeedLimit(rs.getInt(7));
                 tb.setIsUnderground(rs.getBoolean(8));
-                tb.setIsPowerOn(rs.getBoolean(9));
-                tb.setIsOccupied(rs.getBoolean(10));
-                tb.setIsHeaterOn(rs.getBoolean(11));
-                tb.setMessage(rs.getString(12));
-                tb.setStartCoordinates(rs.getDouble(13), rs.getDouble(14));
-                tb.setClosedForMaintenance(rs.getBoolean(17));
-                tb.setCenterCoordinates(rs.getDouble(18), rs.getDouble(19));
+                tb.setIsPowerOn(true);
+                tb.setIsOccupied(false);
+                tb.setIsHeaterOn(false);
+                tb.setMessage("");
+                tb.setStartCoordinates(rs.getDouble(9), rs.getDouble(10));
+                tb.setClosedForMaintenance(false);
+                tb.setCenterCoordinates(rs.getDouble(13), rs.getDouble(14));
 
                 rs = dbHelper.query(conn, "SELECT NEXT_BLOCK FROM CONNECTIONS WHERE LINE='" + line + "' AND BLOCK=" + block + ";");
                 rs = dbHelper.query(conn, "SELECT X, Y FROM BLOCKS WHERE LINE='" + line + "' AND BLOCK=" + rs.getInt(1) + ";");

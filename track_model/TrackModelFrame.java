@@ -222,15 +222,10 @@ public class TrackModelFrame extends javax.swing.JFrame {
                     + " grade float,\n"
                     + " speed_limit integer,\n"
                     + " underground boolean,\n"
-                    + " power boolean,\n"
-                    + " occupied boolean,\n"
-                    + " heater boolean,\n"
-                    + " message varchar(128),\n"
                     + " x float,\n"
                     + " y float,\n"
                     + " track_controller integer,\n"
                     + " tc_orientation integer,\n"
-                    + " maintenance boolean,\n"
                     + " xcenter float,\n"
                     + " ycenter float,\n"
                     + " PRIMARY KEY (line, block)\n"
@@ -275,14 +270,13 @@ public class TrackModelFrame extends javax.swing.JFrame {
 
             Connection conn = dbHelper.getConnection();
             conn.setAutoCommit(false);
-            PreparedStatement blockStmt = conn.prepareStatement("INSERT INTO BLOCKS VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+            PreparedStatement blockStmt = conn.prepareStatement("INSERT INTO BLOCKS VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
             PreparedStatement connStmt = conn.prepareStatement("INSERT INTO CONNECTIONS VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
             PreparedStatement crossingStmt = conn.prepareStatement("INSERT INTO CROSSINGS VALUES(?, ?, ?);");
             PreparedStatement stationStmt = conn.prepareStatement("INSERT INTO STATIONS VALUES(?, ?, ?, ?, ?, ?);");
 
             blockStmt.setString(1, "YARD");
             blockStmt.setInt(3, 0);
-            blockStmt.setBoolean(9, true);
             blockStmt.addBatch();
 
             String line;
@@ -300,17 +294,12 @@ public class TrackModelFrame extends javax.swing.JFrame {
                 blockStmt.setFloat(6, Float.parseFloat(items.get(5)));
                 blockStmt.setInt(7, Integer.parseInt(items.get(6)));
                 blockStmt.setBoolean(8, line.contains("UNDERGROUND"));
-                blockStmt.setBoolean(9, true);
-                blockStmt.setBoolean(10, false);
-                blockStmt.setBoolean(11, false);
-                blockStmt.setString(12, "");
-                blockStmt.setFloat(13, Float.parseFloat(items.get(10)));
-                blockStmt.setFloat(14, Float.parseFloat(items.get(11)));
-                blockStmt.setInt(15, Integer.parseInt(items.get(18)));
-                blockStmt.setInt(16, Integer.parseInt(items.get(19)));
-                blockStmt.setBoolean(17, false);
-                blockStmt.setFloat(18, Float.parseFloat(items.get(20)));
-                blockStmt.setFloat(19, Float.parseFloat(items.get(21)));
+                blockStmt.setFloat(9, Float.parseFloat(items.get(10)));
+                blockStmt.setFloat(10, Float.parseFloat(items.get(11)));
+                blockStmt.setInt(11, Integer.parseInt(items.get(18)));
+                blockStmt.setInt(12, Integer.parseInt(items.get(19)));
+                blockStmt.setFloat(13, Float.parseFloat(items.get(20)));
+                blockStmt.setFloat(14, Float.parseFloat(items.get(21)));
                 blockStmt.addBatch();
 
                 connStmt.setString(1, items.get(0));
