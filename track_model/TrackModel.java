@@ -53,10 +53,6 @@ public class TrackModel implements Updateable {
 
     private TrackBlock generateYardBlock(String line) {
         TrackBlock tb = new TrackBlock(line, 0);
-        tb.isPowerOn = true;
-        tb.isCrossing = false;
-        tb.isStation = false;
-        tb.isSwitch = false;
         tb.setStartCoordinates(265, -1500);
         return tb;
     }
@@ -166,12 +162,7 @@ public class TrackModel implements Updateable {
                 tb.setGrade(rs.getFloat(6));
                 tb.setSpeedLimit(rs.getInt(7));
                 tb.setIsUnderground(rs.getBoolean(8));
-                tb.setIsPowerOn(true);
-                tb.setIsOccupied(false);
-                tb.setIsHeaterOn(false);
-                tb.setMessage("");
                 tb.setStartCoordinates(rs.getDouble(9), rs.getDouble(10));
-                tb.setClosedForMaintenance(false);
                 tb.setCenterCoordinates(rs.getDouble(13), rs.getDouble(14));
 
                 rs = dbHelper.query(conn, "SELECT NEXT_BLOCK FROM CONNECTIONS WHERE LINE='" + line + "' AND BLOCK=" + block + ";");
@@ -476,7 +467,7 @@ public class TrackModel implements Updateable {
     public void registerTrain(TrainModel tm, String line) {
         if (doTablesExist()) {
             trains.add(new TrainData(tm, getYardBlock(line)));
-            tm.slew(new Pose(getFirstBlock(line).start, GREEN_LINE_ORIENTATION));
+//            tm.slew(new Pose(getFirstBlock(line).start, GREEN_LINE_ORIENTATION));
         }
     }
 

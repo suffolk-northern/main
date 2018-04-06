@@ -10,12 +10,12 @@ public class TrackBlock {
     protected double grade;
     protected int direction;
     protected int speedLimit;
-    protected boolean isUnderground;
-    protected boolean isPowerOn;
-    protected boolean isOccupied;
-    protected boolean isHeaterOn;
-    protected boolean closedForMaintenance;
-    protected String message;
+    protected boolean isUnderground = false;
+    protected boolean isPowerOn = true;
+    protected boolean isOccupied = false;
+    protected boolean isHeaterOn = false;
+    protected boolean closedForMaintenance = false;
+    protected String message= "";
     protected GlobalCoordinates start, end;
 
     protected double xStart, xEnd, yStart, yEnd;
@@ -30,9 +30,9 @@ public class TrackBlock {
     protected int switchDirection;
     protected int switchPosition;
 
-    protected boolean isSwitch;
-    protected boolean isStation;
-    protected boolean isCrossing;
+    protected boolean isSwitch = false;
+    protected boolean isStation = false;
+    protected boolean isCrossing = false;
 
     public static final double METER_TO_YARD_MULTIPLIER = 1.09361;
     public static final double KILOMETER_TO_MILE_MULTIPLIER = 0.621371;
