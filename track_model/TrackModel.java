@@ -377,7 +377,7 @@ public class TrackModel implements Updateable {
     }
 
     public static ArrayList<Integer> getDefaultLine(String line) {
-        ArrayList<Integer> blocks = new ArrayList<>();
+        ArrayList<Integer> defaultLine = new ArrayList<>();
         try {
             int swit = 0;
             int valid = 0;
@@ -388,7 +388,7 @@ public class TrackModel implements Updateable {
             while (swit != 0 || valid != 1) {
                 ResultSet rs = dbHelper.query(conn, "SELECT * FROM CONNECTIONS WHERE LINE='" + line + "' AND BLOCK=" + cur);
                 if (rs.next()) {
-                    blocks.add(cur);
+                    defaultLine.add(cur);
                     if (cur > prev && rs.getInt(7) == 1) {
                         prev = cur;
                         cur = rs.getInt(6);
@@ -410,7 +410,7 @@ public class TrackModel implements Updateable {
         } catch (SQLException ex) {
             Logger.getLogger(TrackModel.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return blocks;
+        return defaultLine;
     }
 
     public static int getBlockCount() {
@@ -465,10 +465,6 @@ public class TrackModel implements Updateable {
     private void sendBeacon(BeaconRadio radio) {
 //        radio.send();
 
-    }
-
-    private void sendTrackCircuitMessage(TrackCircuit circuit) {
-//        circuit.send();
     }
 
     /**
@@ -541,30 +537,6 @@ public class TrackModel implements Updateable {
         return startDistance < endDistance;
     }
 
-    int count = 0;
-
-    @Override
-    public void update(int time) {
-        if (count == 2000 / time) {
-            TrackBlock curBlock;
-            for (TrainData td : trains) {
-                curBlock = getClosestBlock(td.trainModel.location(), "Green");
-//                System.out.println(td.trainModel.id() + ": " + curBlock.block);
-                if (!curBlock.isOccupied) {
-                    setOccupancy(curBlock.line, curBlock.block, true);
-                }
-                if (td.trackBlock.block != curBlock.block) {
-                    if (td.trackBlock != null) {
-                        setOccupancy(td.trackBlock.line, td.trackBlock.block, false);
-                    }
-                    td.trackBlock = curBlock;
-                }
-            }
-            count = 0;
-        }
-        count++;
-    }
-
     public double getDistanceTo(String line, int block, GlobalCoordinates gc) {
         TrackBlock tb = getBlock(line, block);
         double minDist = 9999;
@@ -604,8 +576,31 @@ public class TrackModel implements Updateable {
             newX = tb.xCenter + radius * Math.cos(angle);
             newY = tb.yCenter + radius * Math.sin(angle);
         }
-
         return GlobalCoordinates.ORIGIN.addYards(newY * tb.METER_TO_YARD_MULTIPLIER, newX * tb.METER_TO_YARD_MULTIPLIER);
+    }
+    
+    int count = 0;
+
+    @Override
+    public void update(int time) {
+        if (count == 2000 / time) {
+            TrackBlock curBlock;
+            for (TrainData td : trains) {
+                curBlock = getClosestBlock(td.trainModel.location(), "Green");
+//                System.out.println(td.trainModel.id() + ": " + curBlock.block);
+                if (!curBlock.isOccupied) {
+                    setOccupancy(curBlock.line, curBlock.block, true);
+                }
+                if (td.trackBlock.block != curBlock.block) {
+                    if (td.trackBlock != null) {
+                        setOccupancy(td.trackBlock.line, td.trackBlock.block, false);
+                    }
+                    td.trackBlock = curBlock;
+                }
+            }
+            count = 0;
+        }
+        count++;
     }
 
     private static void testing() {

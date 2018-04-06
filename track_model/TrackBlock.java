@@ -267,6 +267,10 @@ public class TrackBlock {
         this.closedForMaintenance = closedForMaintenance;
     }
 
+    protected double getRadius() {
+        return length * 360 / (Math.abs(curvature) * 2 * Math.PI);
+    }
+
     public double getDistanceTo(GlobalCoordinates gc) {
         double minDist = 9999;
         double latDiff, lonDiff;
