@@ -56,6 +56,29 @@ public class TrackModel implements Updateable {
         TrackBlock tb = new TrackBlock(line, 0);
         tb.setStartCoordinates(600, -2100);
         tb.setEndCoordinates(600, -2100);
+
+        if (doTablesExist()) {
+            try {
+                try (Connection conn = dbHelper.getConnection()) {
+                    // Retrive yard next block
+                    ResultSet rs = dbHelper.query(conn, "SELECT * FROM CONNECTIONS WHERE LINE='" + line + "' AND SWITCH_BLOCK=0 "
+                            + "AND (ABS(SWITCH_VALID)=2 OR (SWITCH_VALID=1 AND PREV_VALID=1) OR (SWITCH_VALID=-1 AND NEXT_VALID=1));");
+                    while (rs.next()) {
+                        tb.nextBlockId = rs.getInt(3);
+                        tb.nextBlockDir = rs.getInt(9) < 0 ? 1 : 0;
+                    }
+                    // Retrive yard previous block
+                    rs = dbHelper.query(conn, "SELECT * FROM CONNECTIONS WHERE LINE='" + line + "' AND SWITCH_BLOCK=0 "
+                            + "AND ((SWITCH_VALID=-1 AND PREV_VALID=1) OR (SWITCH_VALID=1 AND NEXT_VALID=1));");
+                    while (rs.next()) {
+                        tb.prevBlockId = rs.getInt(3);
+                        tb.prevBlockDir = rs.getInt(9) == rs.getInt(5) ? 1 : 0;
+                    }
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(TrackModel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
         return tb;
     }
 
