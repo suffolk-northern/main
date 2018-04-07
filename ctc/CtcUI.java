@@ -168,7 +168,7 @@ public class CtcUI extends javax.swing.JFrame {
 		trackTable.getColumnModel().getColumn(8).setMinWidth(80);
 
 		blockSelect.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
-		blockSelect.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "YARD"}));
+		blockSelect.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{}));
 
 		blueThrough.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
 		blueThrough.setText("               ");
@@ -212,7 +212,7 @@ public class CtcUI extends javax.swing.JFrame {
 		});
 
 		trainSelect.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
-		trainSelect.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"1", "2"}));
+		trainSelect.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"0"}));
 
 		jLabel12.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
 		jLabel12.setText("Line");
@@ -1010,9 +1010,9 @@ public class CtcUI extends javax.swing.JFrame {
 			speed = Double.parseDouble(speedSelect.getText());
 		}
 
-		//ctc.routeTrain(train, line.toLowerCase(), block, speed);
+		ctc.routeTrain(train, line, block, speed);
 		
-		ctc.sendSpeedAuthShort(train, speed, 100);
+		//ctc.sendSpeedAuthShort(train, speed, 100);
     }//GEN-LAST:event_dispatchButtonActionPerformed
 
 	protected static void updateTrainTable(Object[][] rows, int count) {
