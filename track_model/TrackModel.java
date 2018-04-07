@@ -511,7 +511,7 @@ public class TrackModel implements Updateable {
         int totalBlocks = getBlockCount(line);
         double minDist = 9999;
         TrackBlock closest = null;
-        for (int i = 1; i <= totalBlocks; i++) {
+        for (int i = 0; i <= totalBlocks; i++) {
             TrackBlock temp = getBlock(line, i);
             if (closest == null) {
                 closest = temp;
@@ -549,7 +549,7 @@ public class TrackModel implements Updateable {
         TrackBlock tb = getBlock(line, block);
         double minDist = 99999;
         double tempDist;
-        for (int i = 0; i < tb.length; i += 5) {
+        for (int i = 0; i <= tb.length; i += 5) {
             tempDist = gc.distanceTo(tb.getPositionAlongBlock(i));
             if (tempDist < minDist) {
                 minDist = tempDist;
