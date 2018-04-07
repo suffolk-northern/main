@@ -222,7 +222,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
 
     private void murphButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_murphButton1ActionPerformed
         tmmf = new TrackModelMapFrame();
-        tmmf.add(new TrackModelMapPanel());
+        tmmf.add(new TrackModelMapPanel(tm));
         tmmf.setLocationByPlatform(true);
         tmmf.pack();
         tmmf.setVisible(true);

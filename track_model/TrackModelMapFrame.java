@@ -19,6 +19,6 @@ public class TrackModelMapFrame extends javax.swing.JFrame {
     public TrackModelMapFrame() {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Track Model Map");
-        this.setPreferredSize(new Dimension(650, 650));
+        this.setPreferredSize(new Dimension(700, 700));
     }
 }
