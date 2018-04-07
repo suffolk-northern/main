@@ -359,7 +359,10 @@ public class TrackModel implements Updateable {
 
     public static TrackBlock getFirstBlock(String line) {
         for (TrackBlock tb : blocks) {
-            if (tb.line.equalsIgnoreCase(line) && tb.switchBlockId == 0 && tb.switchDirection == -2) {
+            if (tb.line.equalsIgnoreCase(line) && tb.switchBlockId == 0
+                    && (Math.abs(tb.switchDirection) == 2
+                    || (tb.switchDirection == 1 && tb.prevBlockDir == 1)
+                    || (tb.switchDirection == -1 && tb.nextBlockDir == 1))) {
                 return tb;
             }
         }
@@ -370,13 +373,14 @@ public class TrackModel implements Updateable {
     public static ArrayList<Integer> getDefaultLine(String line) {
         ArrayList<Integer> defaultLine = new ArrayList<>();
         try {
+            TrackBlock first = getFirstBlock(line);
             int swit = 0;
             int valid = 0;
-            int cur = getFirstBlock(line).block;
-            int prev = 0;
+            int cur = first.block;
+            int prev = first.switchDirection > 0 ? 999 : -1;
 
             try (Connection conn = dbHelper.getConnection()) {
-                while (swit != 0 || valid != 1) {
+                while (swit != 0 || Math.abs(valid) != 1) {
                     ResultSet rs = dbHelper.query(conn, "SELECT * FROM CONNECTIONS WHERE LINE='" + line + "' AND BLOCK=" + cur);
                     if (rs.next()) {
                         defaultLine.add(cur);
@@ -391,6 +395,11 @@ public class TrackModel implements Updateable {
                             cur = rs.getInt(8);
                         }
 
+                        if (first != null && first.block == prev){
+                            first = null;
+                            continue;
+                        }
+                        
                         swit = rs.getInt(8);
                         valid = rs.getInt(9);
                     } else {
@@ -530,12 +539,10 @@ public class TrackModel implements Updateable {
 
     public double getDistanceTo(String line, int block, GlobalCoordinates gc) {
         TrackBlock tb = getBlock(line, block);
-        double minDist = 9999;
-        double latDiff, lonDiff;
+        double minDist = 99999;
+        double tempDist;
         for (int i = 0; i < tb.length; i += 5) {
-            latDiff = gc.latitude() - tb.getPositionAlongBlock(i).latitude();
-            lonDiff = gc.longitude() - tb.getPositionAlongBlock(i).longitude();
-            double tempDist = Math.sqrt(Math.pow(latDiff, 2) + Math.pow(lonDiff, 2));
+            tempDist = gc.distanceTo(tb.getPositionAlongBlock(i));
             if (tempDist < minDist) {
                 minDist = tempDist;
             }

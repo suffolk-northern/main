@@ -272,12 +272,10 @@ public class TrackBlock {
     }
 
     public double getDistanceTo(GlobalCoordinates gc) {
-        double minDist = 9999;
-        double latDiff, lonDiff;
+        double minDist = 99999;
+        double tempDist;
         for (int i = 0; i < length; i += 5) {
-            latDiff = gc.latitude() - getPositionAlongBlock(i).latitude();
-            lonDiff = gc.longitude() - getPositionAlongBlock(i).longitude();
-            double tempDist = Math.sqrt(Math.pow(latDiff, 2) + Math.pow(lonDiff, 2));
+            tempDist = gc.distanceTo(getPositionAlongBlock(i));
             if (tempDist < minDist) {
                 minDist = tempDist;
             }
