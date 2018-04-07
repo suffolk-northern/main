@@ -1048,51 +1048,37 @@ public class CtcUI extends javax.swing.JFrame {
 		
 		trackTable.setModel(trackModel);
 		
-		//if (!trackTable.getValueAt(0, 0).equals("")) {
-			//for (int k = 0; k < count; k++) {
-				for (int i = 0; i < trackTable.getRowCount(); i++) 
-				{
-					
-					line = (String)rows[i][0];
-					
-					if(line.equalsIgnoreCase("Green"))
-					{
-						greens.add(rows[i][1] + "" + rows[i][2]);
-					}
-					else if(line.equalsIgnoreCase("Red"))
-					{
-						reds.add(rows[i][1] + "" + rows[i][2]);
-					}
-					
-					
-					//if (trackTable.getValueAt(i, 1) != null && (trackTable.getValueAt(i, 1)).equals(rows[k][1]) && (trackTable.getValueAt(i, 2)).equals((rows[k][2]))) {
-						for (int j = 0; j < trackTable.getColumnCount(); j++) 
-						{
-							trackTable.setValueAt(rows[i][j], i, j);
-						}
-					}
-				//}
-			//}
-		//} else {
-		/*
-			for (int i = 0; i < count; i++) {
-				for (int j = 0; j < trackTable.getColumnCount(); j++) {
-					trackTable.setValueAt(rows[i][j], i, j);
-				}
+		for (int i = 0; i < trackTable.getRowCount(); i++) 
+		{
+			line = (String)rows[i][0];
+
+			if(line.equalsIgnoreCase("Green"))
+			{
+				greens.add(rows[i][1] + "" + rows[i][2]);
+			}
+			else if(line.equalsIgnoreCase("Red"))
+			{
+				reds.add(rows[i][1] + "" + rows[i][2]);
+			}
+
+			for (int j = 0; j < trackTable.getColumnCount(); j++) 
+			{
+				trackTable.setValueAt(rows[i][j], i, j);
 			}
 		}
-		*/
 		
+		int sizegreen = greens.size();
+		int sizered = reds.size();
 		
-		greenBlocks = new String[greens.size()];
-		redBlocks = new String[reds.size()];
+		greenBlocks = new String[sizegreen];
+		redBlocks = new String[sizered];
 		
-		for(int i = 0; i < greens.size(); i++)
+		for(int i = 0; i < sizegreen; i++)
 		{
 			greenBlocks[i] = greens.poll();
 		}
 		
-		for(int i = 0; i < reds.size(); i++)
+		for(int i = 0; i < sizered; i++)
 		{
 			redBlocks[i] = reds.poll();
 		}
