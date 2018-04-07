@@ -140,7 +140,7 @@ public class MurphFrame extends javax.swing.JFrame {
             ResultSet rs = dbHelper.query(conn, "SELECT LINE, SECTION, BLOCK FROM BLOCKS;");
             while (rs.next()) {
                 if (!rs.getString(1).equalsIgnoreCase("YARD")) {
-                    blockList.add("Line: " + rs.getString(1) + ", Section: " + rs.getString(2) + ", Block: " + rs.getInt(3));
+                    blockList.add("Line: " + rs.getString(1).toUpperCase() + ", Section: " + rs.getString(2) + ", Block: " + rs.getInt(3));
                 }
             }
             jComboBox1.setModel(new DefaultComboBoxModel(blockList.toArray()));

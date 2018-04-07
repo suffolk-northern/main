@@ -38,6 +38,7 @@ public class TrackModel implements Updateable {
     protected static ArrayList<Station> stations = new ArrayList<>();
 
     private static final Orientation GREEN_LINE_ORIENTATION = Orientation.radians(0.9 * Math.PI);
+    private static final Orientation RED_LINE_ORIENTATION = Orientation.radians(0.3737 * Math.PI);
 
     /**
      * @param args the command line arguments
@@ -53,7 +54,8 @@ public class TrackModel implements Updateable {
 
     private TrackBlock generateYardBlock(String line) {
         TrackBlock tb = new TrackBlock(line, 0);
-        tb.setStartCoordinates(265, -1500);
+        tb.setStartCoordinates(600, -2100);
+        tb.setEndCoordinates(600, -2100);
         return tb;
     }
 
@@ -375,33 +377,35 @@ public class TrackModel implements Updateable {
         try {
             TrackBlock first = getFirstBlock(line);
             int swit = 0;
-            int valid = 0;
+            boolean valid = false;
             int cur = first.block;
             int prev = first.switchDirection > 0 ? 999 : -1;
 
             try (Connection conn = dbHelper.getConnection()) {
-                while (swit != 0 || Math.abs(valid) != 1) {
+                while (swit != 0 || !valid) {
                     ResultSet rs = dbHelper.query(conn, "SELECT * FROM CONNECTIONS WHERE LINE='" + line + "' AND BLOCK=" + cur);
                     if (rs.next()) {
                         defaultLine.add(cur);
                         if (cur > prev && rs.getInt(7) == 1) {
                             prev = cur;
                             cur = rs.getInt(6);
+                            valid = rs.getInt(9) == 1;
                         } else if (cur < prev && rs.getInt(5) == 1) {
                             prev = cur;
                             cur = rs.getInt(4);
+                            valid = rs.getInt(9) == -1;
                         } else {
                             prev = cur;
                             cur = rs.getInt(8);
+                            valid = false;
                         }
 
-                        if (first != null && first.block == prev){
+                        if (first != null && first.block == prev) {
                             first = null;
                             continue;
                         }
-                        
+
                         swit = rs.getInt(8);
-                        valid = rs.getInt(9);
                     } else {
                         break;
                     }
@@ -601,13 +605,13 @@ public class TrackModel implements Updateable {
         count++;
     }
 
-    private static void testing() {
-        for (int j = 1; j <= 150; j++) {
-            TrackBlock tb = getBlock("Green", j);
-            for (int i = 1; i < tb.length; i += 30) {
+    private static void testing(String line) {
+        for (int j = 1; j <= getBlockCount(line); j++) {
+            TrackBlock tb = getBlock(line, j);
+            for (int i = 1; i < tb.length; i += 5) {
                 GlobalCoordinates gc = tb.getPositionAlongBlock(i);
                 if (gc != null) {
-                    System.out.println(j + " " + gc.latitude() + "," + gc.longitude() + " Closest: " + getClosestBlock(gc, "Green").block);
+                    System.out.println(j + " " + gc.latitude() + "," + gc.longitude() + " Closest: " + getClosestBlock(gc, line).block);
                 }
             }
         }
