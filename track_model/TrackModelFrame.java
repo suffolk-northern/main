@@ -72,7 +72,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
         stationScrollPane = new javax.swing.JScrollPane();
         stationTable = new StationTable();
         occupancyCheckBox = new javax.swing.JCheckBox();
-        murphButton1 = new javax.swing.JButton();
+        mapButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Track Model");
@@ -121,10 +121,10 @@ public class TrackModelFrame extends javax.swing.JFrame {
             }
         });
 
-        murphButton1.setText("Launch Visual Track Model");
-        murphButton1.addActionListener(new java.awt.event.ActionListener() {
+        mapButton.setText("Launch Visual Track Model");
+        mapButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                murphButton1ActionPerformed(evt);
+                mapButtonActionPerformed(evt);
             }
         });
 
@@ -137,7 +137,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(tabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 876, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(murphButton1)
+                        .addComponent(mapButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(murphButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -160,7 +160,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
                         .addComponent(importButton))
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(murphButton)
-                        .addComponent(murphButton1)
+                        .addComponent(mapButton)
                         .addComponent(occupancyCheckBox)))
                 .addContainerGap())
         );
@@ -220,13 +220,13 @@ public class TrackModelFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_occupancyCheckBoxActionPerformed
 
-    private void murphButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_murphButton1ActionPerformed
+    private void mapButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mapButtonActionPerformed
         tmmf = new TrackModelMapFrame();
         tmmf.add(new TrackModelMapPanel(tm));
         tmmf.setLocationByPlatform(true);
         tmmf.pack();
         tmmf.setVisible(true);
-    }//GEN-LAST:event_murphButton1ActionPerformed
+    }//GEN-LAST:event_mapButtonActionPerformed
 
     private void initializeDatabase() {
         try {
@@ -454,8 +454,8 @@ public class TrackModelFrame extends javax.swing.JFrame {
     private javax.swing.JScrollPane crossingScrollPane;
     public javax.swing.JTable crossingTable;
     private javax.swing.JButton importButton;
+    private javax.swing.JButton mapButton;
     private javax.swing.JButton murphButton;
-    private javax.swing.JButton murphButton1;
     private javax.swing.JCheckBox occupancyCheckBox;
     private javax.swing.JScrollPane stationScrollPane;
     public javax.swing.JTable stationTable;
