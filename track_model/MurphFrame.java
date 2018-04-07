@@ -20,16 +20,14 @@ import javax.swing.JTable;
  */
 public class MurphFrame extends javax.swing.JFrame {
 
-    private TrackModelFrame tmf;
     private JTable blocks, crossings;
     private final DbHelper dbHelper;
 
     /**
      * Creates new form MurphFrame
      */
-    public MurphFrame(TrackModelFrame tmf, JTable blocks, JTable crossings, DbHelper dbHelper) {
+    public MurphFrame(JTable blocks, JTable crossings, DbHelper dbHelper) {
         initComponents();
-        this.tmf = tmf;
         this.blocks = blocks;
         this.crossings = crossings;
         this.dbHelper = dbHelper;
@@ -142,7 +140,7 @@ public class MurphFrame extends javax.swing.JFrame {
             ResultSet rs = dbHelper.query(conn, "SELECT LINE, SECTION, BLOCK FROM BLOCKS;");
             while (rs.next()) {
                 if (!rs.getString(1).equalsIgnoreCase("YARD")) {
-                    blockList.add("Line: " + rs.getString(1) + ", Section: " + rs.getString(2) + ", Block: " + rs.getInt(3));
+                    blockList.add("Line: " + rs.getString(1).toUpperCase() + ", Section: " + rs.getString(2) + ", Block: " + rs.getInt(3));
                 }
             }
             jComboBox1.setModel(new DefaultComboBoxModel(blockList.toArray()));

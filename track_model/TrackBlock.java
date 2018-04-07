@@ -10,27 +10,29 @@ public class TrackBlock {
     protected double grade;
     protected int direction;
     protected int speedLimit;
-    protected boolean isUnderground;
-    protected boolean isPowerOn;
-    protected boolean isOccupied;
-    protected boolean isHeaterOn;
-    protected boolean closedForMaintenance;
-    protected String message;
+    protected boolean isUnderground = false;
+    protected boolean isPowerOn = true;
+    protected boolean isOccupied = false;
+    protected boolean isHeaterOn = false;
+    protected boolean closedForMaintenance = false;
+    protected String message= "";
     protected GlobalCoordinates start, end;
 
-    private double xStart, xEnd, yStart, yEnd;
-    private double xCenter, yCenter;
+    protected double xStart, xEnd, yStart, yEnd;
+    protected double xCenter, yCenter;
 
     protected int nextBlockId;
+    protected int nextBlockDir;
     protected int prevBlockId;
+    protected int prevBlockDir;
 
     protected int switchBlockId;
     protected int switchDirection;
     protected int switchPosition;
 
-    protected boolean isSwitch;
-    protected boolean isStation;
-    protected boolean isCrossing;
+    protected boolean isSwitch = false;
+    protected boolean isStation = false;
+    protected boolean isCrossing = false;
 
     public static final double METER_TO_YARD_MULTIPLIER = 1.09361;
     public static final double KILOMETER_TO_MILE_MULTIPLIER = 0.621371;
@@ -217,6 +219,22 @@ public class TrackBlock {
         this.prevBlockId = prevBlockId;
     }
 
+    public int getNextBlockDir() {
+        return nextBlockDir;
+    }
+
+    protected void setNextBlockDir(int nextBlockDir) {
+        this.nextBlockDir = nextBlockDir;
+    }
+
+    public int getPrevBlockDir() {
+        return prevBlockDir;
+    }
+
+    protected void setPrevBlockDir(int prevBlockDir) {
+        this.prevBlockDir = prevBlockDir;
+    }
+
     public int getSwitchBlockId() {
         return switchBlockId;
     }
@@ -249,13 +267,15 @@ public class TrackBlock {
         this.closedForMaintenance = closedForMaintenance;
     }
 
+    protected double getRadius() {
+        return length * 360 / (Math.abs(curvature) * 2 * Math.PI);
+    }
+
     public double getDistanceTo(GlobalCoordinates gc) {
-        double minDist = 9999;
-        double latDiff, lonDiff;
+        double minDist = 99999;
+        double tempDist;
         for (int i = 0; i < length; i += 5) {
-            latDiff = gc.latitude() - getPositionAlongBlock(i).latitude();
-            lonDiff = gc.longitude() - getPositionAlongBlock(i).longitude();
-            double tempDist = Math.sqrt(Math.pow(latDiff, 2) + Math.pow(lonDiff, 2));
+            tempDist = gc.distanceTo(getPositionAlongBlock(i));
             if (tempDist < minDist) {
                 minDist = tempDist;
             }

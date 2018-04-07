@@ -42,8 +42,10 @@ import javax.swing.border.EtchedBorder;
  */
 public class CtcUI extends javax.swing.JFrame {
 
+	public static final int TRACKCOLS = 9;
 	public Ctc ctc;
 	private JFrame frame;
+	private static javax.swing.table.DefaultTableModel trackModel;
 
 	public CtcUI(Ctc ctc) {
 		this.ctc = ctc;
@@ -91,7 +93,7 @@ public class CtcUI extends javax.swing.JFrame {
 		scheduleButton = new javax.swing.JButton();
 		closeTrack = new javax.swing.JRadioButton();
 
-		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(javax.swing.WindowConstants.HIDE_ON_CLOSE);
 
 		jLabel7.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
 		jLabel7.setText("Train Select");
@@ -112,7 +114,8 @@ public class CtcUI extends javax.swing.JFrame {
 		jLabel16.setVisible(false);
 
 		trackTable.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
-		trackTable.setModel(new javax.swing.table.DefaultTableModel(
+		
+		trackModel = new javax.swing.table.DefaultTableModel(
 				new Object[][]{
 					{"", "", "", "", null, "", "", null, null},
 					{"", "", "", "", null, "", "", null, null},
@@ -148,7 +151,8 @@ public class CtcUI extends javax.swing.JFrame {
 				new String[]{
 					"Line", "Section", "Number", "Occupancy", "Switch", "Signals", "Status", "RR Xing", "Station"
 				}
-		));
+		);
+		trackTable.setModel(trackModel);
 		jScrollPane1.setViewportView(trackTable);
 
 		trackTable.getModel().addTableModelListener(trainTable);
@@ -980,6 +984,8 @@ public class CtcUI extends javax.swing.JFrame {
     private void fixedBlockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fixedBlockActionPerformed
 		// TODO add your handling code here:
 		System.out.println("Transfer control to fixed block");
+		ctc.disableMBO("green");
+		ctc.disableMBO("red");
     }//GEN-LAST:event_fixedBlockActionPerformed
 
 
@@ -995,7 +1001,9 @@ public class CtcUI extends javax.swing.JFrame {
 			speed = Double.parseDouble(speedSelect.getText());
 		}
 
-		ctc.routeTrain(train, line.toLowerCase(), block, speed);
+		//ctc.routeTrain(train, line.toLowerCase(), block, speed);
+		
+		ctc.sendSpeedAuthShort(train, speed, 100);
     }//GEN-LAST:event_dispatchButtonActionPerformed
 
 	protected static void updateTrainTable(Object[][] rows, int count) {
@@ -1022,23 +1030,29 @@ public class CtcUI extends javax.swing.JFrame {
 
 	protected static void updateTrackTable(Object[][] rows, int count) {
 
-		if (!trackTable.getValueAt(0, 0).equals("")) {
-			for (int k = 0; k < count; k++) {
+		trackModel.setRowCount(count);
+		
+		trackTable.setModel(trackModel);
+		
+		//if (!trackTable.getValueAt(0, 0).equals("")) {
+			//for (int k = 0; k < count; k++) {
 				for (int i = 0; i < trackTable.getRowCount(); i++) {
-					if (trackTable.getValueAt(i, 1) != null && (trackTable.getValueAt(i, 1)).equals(rows[k][1]) && (trackTable.getValueAt(i, 2)).equals((rows[k][2]))) {
+					//if (trackTable.getValueAt(i, 1) != null && (trackTable.getValueAt(i, 1)).equals(rows[k][1]) && (trackTable.getValueAt(i, 2)).equals((rows[k][2]))) {
 						for (int j = 1; j < trackTable.getColumnCount(); j++) {
-							trackTable.setValueAt(rows[k][j], i, j);
+							trackTable.setValueAt(rows[i][j], i, j);
 						}
 					}
-				}
-			}
-		} else {
+				//}
+			//}
+		//} else {
+		/*
 			for (int i = 0; i < count; i++) {
 				for (int j = 0; j < trackTable.getColumnCount(); j++) {
 					trackTable.setValueAt(rows[i][j], i, j);
 				}
 			}
 		}
+		*/
 
 	}
 
@@ -1092,6 +1106,9 @@ public class CtcUI extends javax.swing.JFrame {
     private void MovingBlockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MovingBlockActionPerformed
 		// TODO add your handling code here:
 		System.out.println("Transfer control to MBO");
+		ctc.enableMBO("Green");
+		ctc.enableMBO("Red");
+		
     }//GEN-LAST:event_MovingBlockActionPerformed
 
     private void manualModeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manualModeActionPerformed

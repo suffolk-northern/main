@@ -2,12 +2,12 @@ package track_model;
 
 public class Station {
 
-    private String line;
-    private char section;
-    private int block;
-    private String name;
-    private int passengers;
-    private String beacon;
+    protected String line;
+    protected char section;
+    protected int block;
+    protected String name;
+    protected int passengers;
+    protected String beacon;
 
     public Station(String line, int block) {
         this.line = line;
