@@ -78,7 +78,7 @@ public class TrackModelMapPanel extends JPanel {
                 g2.setColor(Color.red);
             }
 
-            if (tb.isOccupied) {
+            if (tb.isOccupied && tb.block != 0) {
                 g2.setStroke(new BasicStroke(2));
                 g2.setColor(Color.black);
                 g2.setFont(new Font("default", Font.BOLD, 16));
@@ -94,7 +94,7 @@ public class TrackModelMapPanel extends JPanel {
             double x = X_BOUND + (td.trainModel.location().longitude() - minLon) * lonMultiplier;
             double y = Y_BOUND - (td.trainModel.location().latitude() - minLat) * latMultiplier;
             g2.setColor(Color.magenta);
-            g2.fillOval((int) x, (int) y, 10, 10);
+            g2.fillOval((int) x - 5, (int) y - 5, 10, 10);
             g2.drawString(Integer.toString(td.trainModel.id()), (int) x + 15, (int) y + 15);
         }
     }

@@ -271,45 +271,6 @@ public class TrackBlock {
         return length * 360 / (Math.abs(curvature) * 2 * Math.PI);
     }
 
-    public double getDistanceTo(GlobalCoordinates gc) {
-        double minDist = 99999;
-        double tempDist;
-        for (int i = 0; i < length; i += 5) {
-            tempDist = gc.distanceTo(getPositionAlongBlock(i));
-            if (tempDist < minDist) {
-                minDist = tempDist;
-            }
-        }
-        return minDist;
-    }
-
-    public GlobalCoordinates getPositionAlongBlock(double meters) {
-        if (meters > length) {
-            return null;
-        }
-        double newX, newY;
-
-        if (curvature == 0) {
-            double xDiff = xEnd - xStart;
-            double yDiff = yEnd - yStart;
-            double xDist = xDiff * meters / length;
-            double yDist = yDiff * meters / length;
-
-            newX = xStart + xDist;
-            newY = yStart + yDist;
-        } else {
-            boolean clockwise = curvature > 0;
-            double radius = Math.sqrt(Math.pow(xStart - xCenter, 2) + Math.pow(yStart - yCenter, 2));
-            double angle = Math.atan2(yStart - yCenter, xStart - xCenter);
-            angle = clockwise ? angle - meters / radius : angle + meters / radius;
-
-            newX = xCenter + radius * Math.cos(angle);
-            newY = yCenter + radius * Math.sin(angle);
-        }
-
-        return GlobalCoordinates.ORIGIN.addYards(newY * METER_TO_YARD_MULTIPLIER, newX * METER_TO_YARD_MULTIPLIER);
-    }
-
     @Override
     public String toString() {
         return "Hi, I'm Block " + block + " of the " + line + " Line, Section " + section + ".\n"
