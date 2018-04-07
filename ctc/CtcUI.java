@@ -30,6 +30,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.util.ArrayDeque;
 import javax.swing.border.LineBorder;
 import javax.swing.border.SoftBevelBorder;
 import javax.swing.border.BevelBorder;
@@ -46,6 +47,8 @@ public class CtcUI extends javax.swing.JFrame {
 	public Ctc ctc;
 	private JFrame frame;
 	private static javax.swing.table.DefaultTableModel trackModel;
+	private static String[] greenBlocks;
+	private static String[] redBlocks;
 
 	public CtcUI(Ctc ctc) {
 		this.ctc = ctc;
@@ -218,8 +221,14 @@ public class CtcUI extends javax.swing.JFrame {
 		jLabel1.setText("Trains");
 
 		lineSelect.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
-		lineSelect.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"Blue"}));
-
+		lineSelect.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"Green","Red"}));
+		lineSelect.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				lineSelectActionPerformed(evt);
+			}
+		});
+		
+		
 		jLabel2.setFont(new java.awt.Font("Tahoma", 0, 35)); // NOI18N
 		jLabel2.setText("Track");
 
@@ -1029,16 +1038,36 @@ public class CtcUI extends javax.swing.JFrame {
 	}
 
 	protected static void updateTrackTable(Object[][] rows, int count) {
-
+ 
+		ArrayDeque<String> greens = new ArrayDeque<String>();
+		ArrayDeque<String> reds = new ArrayDeque<String>();
+		
+		String line;
+		
 		trackModel.setRowCount(count);
 		
 		trackTable.setModel(trackModel);
 		
 		//if (!trackTable.getValueAt(0, 0).equals("")) {
 			//for (int k = 0; k < count; k++) {
-				for (int i = 0; i < trackTable.getRowCount(); i++) {
+				for (int i = 0; i < trackTable.getRowCount(); i++) 
+				{
+					
+					line = (String)rows[i][0];
+					
+					if(line.equalsIgnoreCase("Green"))
+					{
+						greens.add(rows[i][1] + "" + rows[i][2]);
+					}
+					else if(line.equalsIgnoreCase("Red"))
+					{
+						reds.add(rows[i][1] + "" + rows[i][2]);
+					}
+					
+					
 					//if (trackTable.getValueAt(i, 1) != null && (trackTable.getValueAt(i, 1)).equals(rows[k][1]) && (trackTable.getValueAt(i, 2)).equals((rows[k][2]))) {
-						for (int j = 0; j < trackTable.getColumnCount(); j++) {
+						for (int j = 0; j < trackTable.getColumnCount(); j++) 
+						{
 							trackTable.setValueAt(rows[i][j], i, j);
 						}
 					}
@@ -1053,7 +1082,21 @@ public class CtcUI extends javax.swing.JFrame {
 			}
 		}
 		*/
-
+		
+		
+		greenBlocks = new String[greens.size()];
+		redBlocks = new String[reds.size()];
+		
+		for(int i = 0; i < greens.size(); i++)
+		{
+			greenBlocks[i] = greens.poll();
+		}
+		
+		for(int i = 0; i < reds.size(); i++)
+		{
+			redBlocks[i] = reds.poll();
+		}
+		
 	}
 
 	protected void updateThroughput(double through) {
@@ -1095,6 +1138,19 @@ public class CtcUI extends javax.swing.JFrame {
 
     }//GEN-LAST:event_closeTrackActionPerformed
 
+	private void lineSelectActionPerformed(java.awt.event.ActionEvent evt)
+	{
+		if(lineSelect.getSelectedIndex() == 0)
+		{
+			blockSelect.setModel(new javax.swing.DefaultComboBoxModel<>(greenBlocks));
+		}
+		else
+		{
+			blockSelect.setModel(new javax.swing.DefaultComboBoxModel<>(redBlocks));
+		}
+				
+	}
+	
     private void scheduleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_scheduleButtonActionPerformed
 		// TODO add your handling code here:
     }//GEN-LAST:event_scheduleButtonActionPerformed
