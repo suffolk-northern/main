@@ -41,6 +41,8 @@ public class Ctc implements Updateable{
 	public static ArrayDeque<Block> redline = new ArrayDeque<Block>();
 	public static ArrayDeque<Block> switches = new ArrayDeque<Block>();
 	public static ArrayDeque<TrackCon> trackcons = new ArrayDeque<TrackCon>();
+	
+	public static ArrayDeque<Train> dispatched = new ArrayDeque<Train>();
 
 	public static double through = 0;
 
@@ -92,8 +94,15 @@ public class Ctc implements Updateable{
 				{
 					train = getTrain(block.sw_curr_from);
 				}
+				else if(block.prev.num == 0)
+				{
+					train = dispatched.poll();
+				}
 				else
+				{
+					//System.out.println("Train moved from " + block.prev.line + " " + block.prev.num);
 					train = getTrain(block.prev);
+				}
 				
 				if(train != null)
 					train.location = block;
@@ -652,7 +661,7 @@ public class Ctc implements Updateable{
 
 	private static void updateTrack() {
 		// for all track block in blue line
-		Object[][] rows = new Object[greenline.size() /*+ redline.size()*/][TRACKCOLS];
+		Object[][] rows = new Object[greenline.size() - 1 /*+ redline.size() - 1*/][TRACKCOLS];
 
 		ArrayDeque<Block> temp = greenline.clone();
 		Block block;
@@ -732,7 +741,7 @@ public class Ctc implements Updateable{
 			count++;
 		}
 		*/
-		ui.updateTrackTable(rows, greenline.size() /*+ redline.size()*/);
+		ui.updateTrackTable(rows, greenline.size() - 1 /*+ redline.size() - 1*/);
 	}
 
 
@@ -853,7 +862,7 @@ public class Ctc implements Updateable{
 		while (!temp.isEmpty()) {
 			train = temp.poll();
 
-			if (train.getLoc().equals(location)) {
+			if (train.location.equals(location)) {
 				return train;
 			}
 		}
@@ -992,7 +1001,10 @@ public class Ctc implements Updateable{
 		TrackMovementCommand tmc = new TrackMovementCommand((int)speed,(int)auth);
 		
 		if(train.location.num == 0)
+		{
 			trackmodel.setYardMessage(train.ID, 0, tmc);
+			dispatched.add(train);
+		}
 		else
 			trackmodel.setBlockMessage(loc.line, loc.num, tmc);
 	}
