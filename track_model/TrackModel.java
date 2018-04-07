@@ -461,7 +461,6 @@ public class TrackModel implements Updateable {
     public void setYardMessage(int trainId, int driverId, TrackMovementCommand tmc) {
         for (TrainData td : trains) {
             if (td.trainModel.id() == trainId) {
-                System.out.println("gooch dollar");
                 String line = td.trackBlock.line;
                 td.trainModel.slew(new Pose(getFirstBlock(line).start,
                         line.equalsIgnoreCase("green") ? GREEN_LINE_ORIENTATION : RED_LINE_ORIENTATION));
@@ -521,7 +520,6 @@ public class TrackModel implements Updateable {
                 minDist = tempDist;
                 closest = temp;
             }
-            System.out.println(i + " " + tempDist);
         }
         return closest;
     }
