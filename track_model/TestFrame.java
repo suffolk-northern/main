@@ -344,7 +344,7 @@ public class TestFrame extends javax.swing.JFrame {
     private final ArrayList<Integer> trainz = new ArrayList<>();
 
     private void runTrain() {
-        ArrayList<Integer> blocks = TrackModel.getDefaultLine("Green");
+        ArrayList<Integer> blocks = TrackModel.getDefaultLine("green");
         trainz.add(0);
         int counter = trainz.size() - 1;
         Timer timer = new Timer(0, new ActionListener() {
@@ -365,7 +365,7 @@ public class TestFrame extends javax.swing.JFrame {
                 trainz.set(counter, pos + 1);
             }
         });
-        timer.setDelay(50);
+        timer.setDelay(250);
         timer.start();
     }
 

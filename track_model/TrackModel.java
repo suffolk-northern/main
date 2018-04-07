@@ -461,6 +461,10 @@ public class TrackModel implements Updateable {
     public void setYardMessage(int trainId, int driverId, TrackMovementCommand tmc) {
         for (TrainData td : trains) {
             if (td.trainModel.id() == trainId) {
+                System.out.println("gooch dollar");
+                String line = td.trackBlock.line;
+                td.trainModel.slew(new Pose(getFirstBlock(line).start,
+                        line.equalsIgnoreCase("green") ? GREEN_LINE_ORIENTATION : RED_LINE_ORIENTATION));
                 td.trainModel.trackCircuit().send(tmc);
             }
         }
@@ -480,7 +484,7 @@ public class TrackModel implements Updateable {
     public void registerTrain(TrainModel tm, String line) {
         if (doTablesExist()) {
             trains.add(new TrainData(tm, getYardBlock(line)));
-//            tm.slew(new Pose(getFirstBlock(line).start, GREEN_LINE_ORIENTATION));
+            tm.slew(new Pose(getYardBlock(line).start, GREEN_LINE_ORIENTATION));
         }
     }
 
@@ -588,8 +592,7 @@ public class TrackModel implements Updateable {
         if (count == 2000 / time) {
             TrackBlock curBlock;
             for (TrainData td : trains) {
-                curBlock = getClosestBlock(td.trainModel.location(), "Green");
-//                System.out.println(td.trainModel.id() + ": " + curBlock.block);
+                curBlock = getClosestBlock(td.trainModel.location(), td.trackBlock.line);
                 if (!curBlock.isOccupied) {
                     setOccupancy(curBlock.line, curBlock.block, true);
                 }
@@ -599,6 +602,9 @@ public class TrackModel implements Updateable {
                     }
                     td.trackBlock = curBlock;
                 }
+            }
+            if (tmf != null) {
+                tmf.refreshTables();
             }
             count = 0;
         }
@@ -617,7 +623,7 @@ public class TrackModel implements Updateable {
         }
     }
 
-    private class TrainData {
+    protected class TrainData {
 
         public TrainModel trainModel;
         public TrackBlock trackBlock;
