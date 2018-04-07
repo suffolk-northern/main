@@ -32,7 +32,7 @@ public class TrackModel implements Updateable {
     private static TrackModelFrame tmf;
     protected static final DbHelper dbHelper = new DbHelper();
 
-    protected static final ArrayList<TrainData> trains = new ArrayList<>();
+    protected static ArrayList<TrainData> trains = new ArrayList<>();
     protected static ArrayList<TrackBlock> blocks = new ArrayList<>();
     protected static ArrayList<Crossing> crossings = new ArrayList<>();
     protected static ArrayList<Station> stations = new ArrayList<>();
