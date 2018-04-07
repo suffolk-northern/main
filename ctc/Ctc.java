@@ -127,11 +127,38 @@ public class Ctc implements Updateable{
 		//initRed();
 		
 		// add trains to yards
-		Train train = new Train(1,getBlock("green",0),0);
+		Train train = new Train(0,getBlock("green",0),0);
 		trains.add(train);
 		
 		updateTrack();
 		updateTrains();
+		
+		/*
+		for(Block blk : greenline)
+		{
+			System.out.println(blk.display());
+			
+			if(!isBackwardSwitch(blk))
+				System.out.println("Prev " + blk.prev.display());
+			else
+			{
+				System.out.println("Prev " + blk.sw_from.peekFirst().display());
+				System.out.println("Prev " + blk.sw_from.peekLast().display());
+			}
+			
+			if(!isForwardSwitch(blk))
+				System.out.println("Next " + blk.next.display());
+			else
+			{
+				System.out.println("Next " + blk.sw_to.peekFirst().display());
+				System.out.println("Next " + blk.sw_to.peekLast().display());
+			}
+			
+			System.out.println(blk.nextBlockDir + " " + blk.prevBlockDir);
+		}
+		*/
+		
+		
 	}
 	
 	public void setCtcRadios(CtcRadio green, CtcRadio red)
@@ -148,30 +175,30 @@ public class Ctc implements Updateable{
 		Block block;
 		int numbl = trackmodel.getBlockCount(line);
 		
-		greenline.add(new Block(line,true));
+		//greenline.add(new Block(line,true));
 		
 		// read in all blocks
-		for(int i = 1; i <= numbl; i++)
+		for(int i = 0; i <= numbl; i++)
 		{
 			bl = trackmodel.getBlock(line, i);
 			
 			if(bl.isIsCrossing())
 			{
-				greenline.add(new Block(line,bl.getSection(),bl.getBlock(),bl.getLength(),null,null,true));
+				greenline.add(new Block(line,bl.getSection(),bl.getBlock(),bl.getLength(),bl.getNextBlockDir(),bl.getPrevBlockDir(),null,null,true));
 			}
 			else if(bl.isIsStation())
 			{
-				greenline.add(new Block(line,bl.getSection(),bl.getBlock(),bl.getLength(),null,null,false,true,trackmodel.getStation(line,bl.getBlock()).getName()));
+				greenline.add(new Block(line,bl.getSection(),bl.getBlock(),bl.getLength(),bl.getNextBlockDir(),bl.getPrevBlockDir(),null,null,false,true,trackmodel.getStation(line,bl.getBlock()).getName()));
 			}
 			else if(bl.isIsSwitch())
 			{
-				block = new Block(line,bl.getSection(),bl.getBlock(),bl.getLength(),null,null,false,0,null,null,null,null);
+				block = new Block(line,bl.getSection(),bl.getBlock(),bl.getLength(),bl.getNextBlockDir(),bl.getPrevBlockDir(),null,null,false,0,bl.getSwitchDirection(),null,null,null,null);
 				switches.add(block);
 				greenline.add(block);
 			}
 			else
 			{
-				 greenline.add(new Block(line,bl.getSection(),bl.getBlock(),bl.getLength(),null,null,false));
+				 greenline.add(new Block(line,bl.getSection(),bl.getBlock(),bl.getLength(),bl.getNextBlockDir(),bl.getPrevBlockDir(),null,null,false));
 			}
 		}
 		
@@ -196,7 +223,7 @@ public class Ctc implements Updateable{
 					from = getBlock(line,bl.getPrevBlockId());
 					to = getBlock(line,bl.getNextBlockId());
 					extra = getBlock(line,bl.getSwitchBlockId());
-					blockf.add(from); 
+					blockf.add(blk); 
 					blockt.add(to);
 					blockt.add(extra);
 					
@@ -215,7 +242,7 @@ public class Ctc implements Updateable{
 					extra = getBlock(line,bl.getSwitchBlockId());
 					blockf.add(from); 
 					blockf.add(extra);
-					blockt.add(to);
+					blockt.add(blk);
 					
 					blk.setSwitch(bl.getSwitchDirection(), blockf.clone(), blockt.clone());
 					blk.next = getBlock(line,bl.getNextBlockId());
@@ -241,30 +268,30 @@ public class Ctc implements Updateable{
 		Block block;
 		int numbl = trackmodel.getBlockCount(line);
 		
-		redline.add(new Block(line,true));
+		//redline.add(new Block(line,true));
 		
 		// read in all blocks
-		for(int i = 1; i <= numbl; i++)
+		for(int i = 0; i <= numbl; i++)
 		{
 			bl = trackmodel.getBlock(line, i);
 			
 			if(bl.isIsCrossing())
 			{
-				redline.add(new Block(line,bl.getSection(),bl.getBlock(),bl.getLength(),null,null,true));
+				redline.add(new Block(line,bl.getSection(),bl.getBlock(),bl.getLength(),bl.getNextBlockDir(),bl.getPrevBlockDir(),null,null,true));
 			}
 			else if(bl.isIsStation())
 			{
-				redline.add(new Block(line,bl.getSection(),bl.getBlock(),bl.getLength(),null,null,false,true,trackmodel.getStation(line,bl.getBlock()).getName()));
+				redline.add(new Block(line,bl.getSection(),bl.getBlock(),bl.getLength(),bl.getNextBlockDir(),bl.getPrevBlockDir(),null,null,false,true,trackmodel.getStation(line,bl.getBlock()).getName()));
 			}
 			else if(bl.isIsSwitch())
 			{
-				block = new Block(line,bl.getSection(),bl.getBlock(),bl.getLength(),null,null,false,0,null,null,null,null);
+				block = new Block(line,bl.getSection(),bl.getBlock(),bl.getLength(),bl.getNextBlockDir(),bl.getPrevBlockDir(),null,null,false,0,bl.getSwitchDirection(),null,null,null,null);
 				switches.add(block);
 				redline.add(block);
 			}
 			else
 			{
-				 redline.add(new Block(line,bl.getSection(),bl.getBlock(),bl.getLength(),null,null,false));
+				 redline.add(new Block(line,bl.getSection(),bl.getBlock(),bl.getLength(),bl.getNextBlockDir(),bl.getPrevBlockDir(),null,null,false));
 			}
 		}
 		
@@ -1168,6 +1195,15 @@ public class Ctc implements Updateable{
 	private static ArrayDeque<ArrayDeque<Block>> routes;
 
 	private static void findRouteRec(Block start, Block dest, ArrayDeque<Block> route, int max) {
+		
+		// for debugging
+		ArrayDeque<Block> temp = route.clone();
+		for(Block blk : temp)
+		{
+			System.out.print(blk.display() + " ");
+		}
+		System.out.println();
+		
 		route.add(start);
 		//explored.add(start);
 
@@ -1183,10 +1219,33 @@ public class Ctc implements Updateable{
 		Block block = start;
 		ArrayDeque<Block> neighbors = new ArrayDeque<Block>();
 
-		if (block.hasSwitch() && isForwardSwitch(block)) {
-			neighbors = block.getSwitchTo().clone();
-		} else {
-			neighbors.add(block.getNext());
+		if (block.hasSwitch()) 
+		{
+			if(isForwardSwitch(block))
+			{
+				if(block.nextBlockDir == 1)
+					neighbors.add(block.getSwitchTo().clone().peekFirst());
+				if(block.switchDir < 2 && block.switchDir > -2)
+					neighbors.add(block.getSwitchTo().clone().peekLast());
+				if(block.prevBlockDir == 1)
+					neighbors.add(block.prev);
+			}
+			else
+			{
+				if(block.nextBlockDir == 1)
+					neighbors.add(block.next);
+				if(block.switchDir < 2 && block.switchDir > -2)
+					neighbors.add(block.getSwitchFrom().clone().peekLast());
+				if(block.prevBlockDir == 1)
+					neighbors.add(block.getSwitchFrom().clone().peekFirst());
+			}
+		} 
+		else 
+		{
+			if(block.nextBlockDir == 1)
+				neighbors.add(block.next);
+			if(block.prevBlockDir == 1)
+				neighbors.add(block.prev);
 		}
 
 		while (!neighbors.isEmpty()) {
@@ -1435,6 +1494,9 @@ public class Ctc implements Updateable{
 		private Block sw_curr_to;
 		private boolean hasStation;
 		private String station;
+		private int nextBlockDir;
+		private int prevBlockDir;
+		private int switchDir;
 
 		public Block() {
 			yard = false;
@@ -1482,8 +1544,12 @@ public class Ctc implements Updateable{
 			station = "";
 		}
 
-		public Block(String l, char sec, int n, double len, Block nextb, Block prevb, boolean rr) {
-			yard = false;
+		public Block(String l, char sec, int n, double len, int nextdir, int prevdir, Block nextb, Block prevb, boolean rr) {
+			
+			if(n!=0)
+				yard = false;
+			else yard = true;
+			
 			line = l;
 			section = sec;
 			num = n;
@@ -1503,10 +1569,16 @@ public class Ctc implements Updateable{
 			sw_curr_to = null;
 			hasStation = false;
 			station = "";
+			nextBlockDir = nextdir;
+			prevBlockDir = prevdir;
 		}
 
-		public Block(String l, char sec, int n, double len, Block nextb, Block prevb, boolean rr, int swID, ArrayDeque<Block> swf, ArrayDeque<Block> swt, Block currf, Block currt) {
-			yard = false;
+		public Block(String l, char sec, int n, double len, int nextdir, int prevdir, Block nextb, Block prevb, boolean rr, int swID, int swdir, ArrayDeque<Block> swf, ArrayDeque<Block> swt, Block currf, Block currt) {
+			
+			if(n!=0)
+				yard = false;
+			else yard = true;
+			
 			line = l;
 			section = sec;
 			num = n;
@@ -1526,10 +1598,17 @@ public class Ctc implements Updateable{
 			sw_curr_to = currt;
 			hasStation = false;
 			station = "";
+			nextBlockDir = nextdir;
+			prevBlockDir = prevdir;
+			switchDir = swdir;
 		}
 
-		public Block(String l, char sec, int n, double len, Block nextb, Block prevb, boolean rr, boolean stat, String statID) {
-			yard = false;
+		public Block(String l, char sec, int n, double len, int nextdir, int prevdir, Block nextb, Block prevb, boolean rr, boolean stat, String statID) {
+			
+			if(n!=0)
+				yard = false;
+			else yard = true;
+			
 			line = l;
 			section = sec;
 			num = n;
@@ -1549,6 +1628,8 @@ public class Ctc implements Updateable{
 			sw_curr_to = null;
 			hasStation = stat;
 			station = statID;
+			nextBlockDir = nextdir;
+			prevBlockDir = prevdir;
 		}
 
 		private boolean isOccupied() {
