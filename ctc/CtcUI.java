@@ -992,7 +992,7 @@ public class CtcUI extends javax.swing.JFrame {
     */
     private void fixedBlockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fixedBlockActionPerformed
 		// TODO add your handling code here:
-		System.out.println("Transfer control to fixed block");
+		//System.out.println("Transfer control to fixed block");
 		ctc.disableMBO("green");
 		//ctc.disableMBO("red");
     }//GEN-LAST:event_fixedBlockActionPerformed
@@ -1147,7 +1147,7 @@ public class CtcUI extends javax.swing.JFrame {
 
     private void MovingBlockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MovingBlockActionPerformed
 		// TODO add your handling code here:
-		System.out.println("Transfer control to MBO");
+		//System.out.println("Transfer control to MBO");
 		ctc.enableMBO("Green");
 		//ctc.enableMBO("Red");
 		
@@ -1155,13 +1155,13 @@ public class CtcUI extends javax.swing.JFrame {
 
     private void manualModeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manualModeActionPerformed
 		// TODO add your handling code here:
-		System.out.println("Manual mode");
+		//System.out.println("Manual mode");
 		ctc.manMode();
     }//GEN-LAST:event_manualModeActionPerformed
 
     private void autoModeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoModeActionPerformed
 		// TODO add your handling code here:
-		System.out.println("Automatic mode");
+		//System.out.println("Automatic mode");
 		ctc.autoMode();
     }//GEN-LAST:event_autoModeActionPerformed
 
