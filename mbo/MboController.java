@@ -153,12 +153,12 @@ public class MboController implements Updateable
 	// TODO: make this more efficient by starting from last known block
 	private int getBlockFromLoc(GlobalCoordinates location)
 	{
-		for (int i = 1; i < line.length; i++)
-		{
-			double dist = TrackModel.getDistanceTo(lineName, i, location);
-			if (dist < 1)
-				return i;
-		}
+//		for (int i = 1; i < line.length; i++)
+//		{
+//			double dist = TrackModel.getDistanceTo(lineName, i, location);
+//			if (dist < 1)
+//				return i;
+//		}
 		// return -1;
 		return 1;
 	}

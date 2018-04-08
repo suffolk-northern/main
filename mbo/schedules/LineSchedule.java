@@ -30,7 +30,6 @@ public class LineSchedule {
 	
 	public void generateStationSchedules()
 	{
-		
 		stationSchedules = new ArrayList<>();
 		stationNames = new ArrayList<>();
 		for (TrainSchedule ts : trainSchedules)
@@ -60,6 +59,7 @@ public class LineSchedule {
 					ArrayList<StationEvent> newEvents = new ArrayList<>();
 					newEvents.add(se);
 					StationSchedule ss = new StationSchedule(newEvents, stationName);
+					stationSchedules.add(ss);
 					stationNames.add(stationName);
 				}
 			}
@@ -101,6 +101,7 @@ public class LineSchedule {
 	{
 		for (StationSchedule ss : stationSchedules)
 		{
+			System.out.printf("line schedule: %s", ss.getName());
 			if (ss.getName().equals(stationName))
 				return ss;
 		}
