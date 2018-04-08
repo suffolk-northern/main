@@ -60,14 +60,14 @@ public class TrackModel implements Updateable {
         if (doTablesExist()) {
             try {
                 try (Connection conn = dbHelper.getConnection()) {
-                    // Retrive yard next block
+                    // Retrieve yard next block
                     ResultSet rs = dbHelper.query(conn, "SELECT * FROM CONNECTIONS WHERE LINE='" + line + "' AND SWITCH_BLOCK=0 "
                             + "AND (ABS(SWITCH_VALID)=2 OR (SWITCH_VALID=1 AND PREV_VALID=1) OR (SWITCH_VALID=-1 AND NEXT_VALID=1));");
                     while (rs.next()) {
                         tb.nextBlockId = rs.getInt(3);
                         tb.nextBlockDir = rs.getInt(9) < 0 ? 1 : 0;
                     }
-                    // Retrive yard previous block
+                    // Retrieve yard previous block
                     rs = dbHelper.query(conn, "SELECT * FROM CONNECTIONS WHERE LINE='" + line + "' AND SWITCH_BLOCK=0 "
                             + "AND ((SWITCH_VALID=-1 AND PREV_VALID=1) OR (SWITCH_VALID=1 AND NEXT_VALID=1));");
                     while (rs.next()) {
@@ -638,6 +638,31 @@ public class TrackModel implements Updateable {
         return GlobalCoordinates.ORIGIN.addYards(newY * TrackBlock.METER_TO_YARD_MULTIPLIER, newX * TrackBlock.METER_TO_YARD_MULTIPLIER);
     }
 
+    public double getDistanceAlongBlock(String line, int block, GlobalCoordinates gc) {
+        TrackBlock tb = getBlock(line, block);
+        // Special case if block is yard
+        if (tb.length == 0) {
+            return tb.start.distanceTo(gc);
+        }
+        double distance = 0;
+        GlobalCoordinates lowerBound = tb.start;
+        GlobalCoordinates upperBound = tb.end;
+
+        for (int i = 1; i <= 20; i++) {
+            double temp = tb.length / (Math.pow(2, i));
+
+            if (lowerBound.distanceTo(gc) < upperBound.distanceTo(gc)) {
+                upperBound = getPositionAlongBlock(tb, distance + temp);
+            } else if (lowerBound.distanceTo(gc) > upperBound.distanceTo(gc)) {
+                lowerBound = getPositionAlongBlock(tb, distance + temp);
+                distance += temp;
+            } else {
+                distance += temp;
+                break;
+            }
+        }
+        return distance;
+    }
     int count = 0;
 
     @Override
@@ -665,14 +690,20 @@ public class TrackModel implements Updateable {
     }
 
     private void testing(String line) {
-        for (int j = 1; j <= getBlockCount(line); j++) {
-            TrackBlock tb = getBlock(line, j);
+        for (TrackBlock tb : blocks) {
             for (int i = 1; i < tb.length; i += 5) {
                 GlobalCoordinates gc = getPositionAlongBlock(tb, i);
                 if (gc != null) {
-                    System.out.println(j + " " + gc.latitude() + "," + gc.longitude() + " Closest: " + getClosestBlock(gc, line).block);
+                    System.out.println(gc.latitude() + "," + gc.longitude() + " Closest: " + getClosestBlock(gc, line).block);
 
                 }
+            }
+        }
+
+        for (TrackBlock tb : blocks) {
+            for (int i = 0; i <= tb.length; i++) {
+                double d = getDistanceAlongBlock(tb.line, tb.block, getPositionAlongBlock(tb, i));
+                System.out.println(i - d);
             }
         }
     }
