@@ -127,7 +127,8 @@ public class MboController implements Updateable
 				break;
 			double authority = findAuthority(trainInfo);
 			trainInfo.setAuthority((int) authority);
-			trainInfo.setSuggestedSpeed(trainInfo.block.getSpeedLimit());
+			// trainInfo.setSuggestedSpeed(trainInfo.block.getSpeedLimit());
+			trainInfo.setSuggestedSpeed(20);
 			MboMovementCommand com;
 			try
 			{
