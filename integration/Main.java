@@ -22,6 +22,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 //import mbo.Mbo;
 import track_controller.TrackController;
+import mbo.MboController;
+import mbo.MboScheduler;
+import mbo.CtcRadio;
 import track_model.TrackModel;
 import train_controller.TrainController;
 import train_model.TrainModel;
@@ -36,7 +39,6 @@ public class Main
 
 	// FIXME: see imports and initialize()
 	private static Ctc ctc;
-	//private static Mbo mbo;
 	private static TrackModel trackModel;
 
 	// temporary single references for initial integration
@@ -60,11 +62,6 @@ public class Main
 		// FIXME: launches UI in constructor
 		ctc = new Ctc();
 
-		TrackController[] trackControllers = {
-			new TrackController(),
-			new TrackController(),
-		};
-
 		trackModel = new TrackModel();
                 
                 //
@@ -84,8 +81,8 @@ public class Main
                     }
                 }
 		
-		// mboCont = new MboController("green");
-		// mboSched = new MboScheduler("green");
+		MboController mboCont = new MboController("green");
+		MboScheduler mboSched = new MboScheduler("green");
 
 		final int numberOfTrains = 1;
 
@@ -124,10 +121,6 @@ public class Main
 		// CTC <---> track controller
 		ctc.setTrackModel(trackModel);
 
-		// track controller <---> track model
-		//for (TrackController trackController : trackControllers)
-		//	trackModel.configureTrackController(trackController);
-
 		// track model <---> train model
 		for (TrainModel trainModel : trainModels)
 			trackModel.registerTrain(trainModel, "Green");
@@ -143,9 +136,9 @@ public class Main
 		//	mboCont.registerTrain(trainModel.id(), trainModel.mboRadio());
 		
 		// CTC <--> MBO
-		// ctcRadio = new CtcRadio(mboCont, mboSched, ctc);
-		// ctc.registerMbo(ctcRadio);
-		// mboCont.registerCtc(ctcRadio);
+		CtcRadio ctcRadio = new CtcRadio(mboCont, mboSched, ctc);
+		//ctc.registerMbo(ctcRadio);
+		mboCont.registerCtc(ctcRadio);
 		
 		// Track Model <---> MBO
 		// mboCont.initLine();
@@ -157,8 +150,8 @@ public class Main
 
 		// FIXME: see instantiations above
 		updateables.add(ctc);
-		//updateables.add(mbo);
-		updateables.addAll(Arrays.asList(trackControllers));
+		//updateables.add(mboCont);
+		//updateables.add(mboSched);
 		updateables.add(trackModel);
 		updateables.add(trainMultiplier);
 	}

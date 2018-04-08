@@ -505,6 +505,8 @@ public class Ctc implements Updateable{
 
 		train.setRoute(route);
 
+		/*
+		
 		ArrayDeque<SwitchAndPos> swpos = getSwitches(route);
 
 		printSwitchesOnRoute(swpos);
@@ -521,12 +523,12 @@ public class Ctc implements Updateable{
 			t = curr.getTo();
 			swID = curr.getBlock().getSwID();
 			block = curr.getBlock();
-			if (!block.getSwitchCurrFrom().equals(f) || !block.getSwitchCurrTo().equals(t)) {
-				setSwitch(block, f, t);
-			}
+			//if (!block.getSwitchCurrFrom().equals(f) || !block.getSwitchCurrTo().equals(t)) {
+				//setSwitch(block, f, t);
+			//}
 
 		}
-
+		*/
 		double auth = calcAuth(route, route.getFirst(), route.getLast());
 		double speed = sp; // from ui
 
@@ -955,8 +957,12 @@ public class Ctc implements Updateable{
 		while (!temp.isEmpty()) {
 			train = temp.poll();
 
-			if (train.location.equals(location)) {
-				return train;
+			if (train.location.equals(location)) 
+			{
+				if(location.num != 0)
+					return train;
+				else
+					return dispatched.poll();
 			}
 		}
 
@@ -1078,13 +1084,13 @@ public class Ctc implements Updateable{
 			to = swpos.getTo();
 		}
 
-		System.out.println("To Track Controller");
+		//System.out.println("To Track Controller");
 		System.out.println("Train " + train.getID() + " at location " + loc.display());
 		System.out.println("Send speed = " + speed + ", authority = " + auth);
 		
-		if (swpos != null) {
-			System.out.println("Next switch position, in block: " + sw.display() + " from: " + from.display() + " to: " + to.display());
-		}
+		//if (swpos != null) {
+		//	System.out.println("Next switch position, in block: " + sw.display() + " from: " + from.display() + " to: " + to.display());
+		//}
 		
 
 		System.out.println();
@@ -1197,11 +1203,11 @@ public class Ctc implements Updateable{
 
 	}
 
-	private static void setSwitch(Block swBlock, Block from, Block to) {
-		System.out.println("To Track Controller");
-		System.out.println("Set switch at block " + swBlock.display());
-		System.out.println("To configuration from = " + from.display() + ", to = " + to.display());
-	}
+	//private static void setSwitch(Block swBlock, Block from, Block to) {
+	//	System.out.println("To Track Controller");
+	//	System.out.println("Set switch at block " + swBlock.display());
+	//	System.out.println("To configuration from = " + from.display() + ", to = " + to.display());
+	//}
 
 	private static void getTrackConUpdate() {
 

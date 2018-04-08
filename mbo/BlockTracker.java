@@ -16,8 +16,9 @@ public class BlockTracker {
 	private double length;
 	private int speedLimit;
 	private char section;
+	private String station;
 	
-	public BlockTracker(int id, int nextId, int prevId, double len, int limit, char sec)
+	public BlockTracker(int id, int nextId, int prevId, double len, int limit, char sec, String sta)
 	{
 		ID = id;
 		nextBlockID = nextId;
@@ -25,6 +26,7 @@ public class BlockTracker {
 		length = len;
 		speedLimit = limit;
 		section = sec;
+		station = sta;
 	}
 	
 	public int getID()
@@ -57,6 +59,11 @@ public class BlockTracker {
 		return section;
 	}
 	
+	public String getStation()
+	{
+		return station;
+	}
+	
 	public void setNext(int nextId)
 	{
 		nextBlockID = nextId;
@@ -66,4 +73,5 @@ public class BlockTracker {
 	{
 		prevBlockID = prevId;
 	}
+	
 }
