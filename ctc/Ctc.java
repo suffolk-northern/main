@@ -758,10 +758,24 @@ public class Ctc implements Updateable{
 			rows[count][2] = block.num;
 			rows[count][3] = toCap(String.valueOf(block.occupied));
 
+			String str = "";
+			
 			if (!block.hasSwitch()) {
 				rows[count][4] = "";
 			} else {
-				rows[count][4] = "" + block.sw_curr_from.section + block.sw_curr_from.num + ", " + block.sw_curr_to.section + block.sw_curr_to.num;
+				if(block.sw_curr_from.num == 0)
+					str += "YARD";
+				else
+					str += "" + block.sw_curr_from.section + block.sw_curr_from.num;
+				
+				str += ", ";
+				
+				if(block.sw_curr_to.num == 0)
+					str += "YARD";
+				else
+					str += "" + block.sw_curr_to.section + block.sw_curr_to.num;
+					
+				rows[count][4] = str;
 			}
 
 			rows[count][5] = "";
