@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Roger Xue
+ *
+ * Visual map panel.
  */
 package track_model;
 
@@ -10,33 +10,37 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.util.ArrayList;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import track_model.TrackModel.TrainData;
 
-/**
- *
- * @author Gowest
- */
 public class TrackModelMapPanel extends JPanel {
 
+    // Access to TrackModel objects.
     private TrackModel tm;
+    // Variables used for maintaining map boundaries.
     private double minLon = 999;
     private double minLat = 999;
     private double maxLon = -999;
     private double maxLat = -999;
     private double lonMultiplier = 0;
     private double latMultiplier = 0;
-
+    // Display margins.
     private final int X_BOUND = 20;
     private final int Y_BOUND = 640;
 
+    /**
+     * Initializes map panel.
+     *
+     * @param tm
+     */
     public TrackModelMapPanel(TrackModel tm) {
         this.tm = tm;
         setBounds();
     }
 
+    /**
+     * Establishes window bounds.
+     */
     private void setBounds() {
         for (TrackBlock tb : tm.blocks) {
             if (tb.start.latitude() > maxLat) {
@@ -63,6 +67,11 @@ public class TrackModelMapPanel extends JPanel {
         plopTrains(g);
     }
 
+    /**
+     * Places track blocks on map.
+     *
+     * @param g
+     */
     private void plopTrack(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
         for (TrackBlock tb : tm.blocks) {
@@ -70,14 +79,18 @@ public class TrackModelMapPanel extends JPanel {
             double yStart = Y_BOUND - (tb.start.latitude() - minLat) * latMultiplier;
             double xEnd = X_BOUND + (tb.end.longitude() - minLon) * lonMultiplier;
             double yEnd = Y_BOUND - (tb.end.latitude() - minLat) * latMultiplier;
-
+            //
+            // Sets color of track block.
+            // 
             g2.setStroke(new BasicStroke(0));
             if (tb.line.equalsIgnoreCase("green")) {
                 g2.setColor(Color.green);
             } else {
                 g2.setColor(Color.red);
             }
-
+            //
+            // Boldens occupied track blocks.
+            //
             if (tb.isOccupied && tb.block != 0) {
                 g2.setStroke(new BasicStroke(2));
                 g2.setColor(Color.black);
@@ -88,6 +101,11 @@ public class TrackModelMapPanel extends JPanel {
         }
     }
 
+    /**
+     * Places trains on map.
+     *
+     * @param g
+     */
     private void plopTrains(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
         for (TrainData td : tm.trains) {

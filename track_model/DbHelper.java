@@ -1,3 +1,8 @@
+/*
+ * Roger Xue
+ *
+ * Database access helper.
+ */
 package track_model;
 
 import java.sql.Connection;
@@ -12,13 +17,23 @@ import org.sqlite.SQLiteDataSource;
 
 public class DbHelper {
 
+    // Manages connection pool
     private SQLiteDataSource ds = new SQLiteDataSource();
+    // Permanent address of track model database
     private String url = "jdbc:sqlite:TrackModel.db";
 
+    /**
+     * Initializes DbHelper.
+     */
     public DbHelper() {
         ds.setUrl(url);
     }
 
+    /**
+     * Gets connection to database.
+     *
+     * @return Connection
+     */
     public Connection getConnection() {
         try {
             return ds.getConnection();
@@ -27,12 +42,18 @@ public class DbHelper {
         }
         return null;
     }
-    
+
+    /**
+     * Checks if a table exists in the database.
+     *
+     * @param conn
+     * @param tableName
+     * @return tableExists
+     */
     public boolean tableExists(Connection conn, String tableName) {
         try {
             DatabaseMetaData dbm = conn.getMetaData();
             ResultSet rs = dbm.getTables(null, null, tableName, null);
-
             return rs.next();
         } catch (SQLException ex) {
             Logger.getLogger(DbHelper.class.getName()).log(Level.SEVERE, null, ex);
@@ -40,6 +61,13 @@ public class DbHelper {
         return false;
     }
 
+    /**
+     * Executes a query.
+     *
+     * @param conn
+     * @param query
+     * @return ResultSet
+     */
     public ResultSet query(Connection conn, String query) {
         ResultSet rs = null;
         try {
@@ -50,20 +78,18 @@ public class DbHelper {
         }
         return rs;
     }
-    
-//    public void execute(Connection conn, String query)   {
-//        try {
-//            Statement stat = conn.createStatement();
-//            stat.execute(query);
-//        } catch (SQLException ex) {
-//            Logger.getLogger(DbHelper2.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//    }
 
+    /**
+     * Execute a query with parameters.
+     *
+     * @param conn
+     * @param query
+     * @param values
+     */
     public void execute(Connection conn, String query, Object... values) {
         try {
             PreparedStatement ps = conn.prepareStatement(query);
-            for (int i = 0; i < values.length; i++)    {
+            for (int i = 0; i < values.length; i++) {
                 ps.setObject(i + 1, values[i]);
             }
             ps.executeUpdate();

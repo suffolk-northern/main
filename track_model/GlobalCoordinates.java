@@ -1,5 +1,5 @@
 /*
- * Ryan Matthews
+ * Ryan Matthews and Roger Xue
  *
  * Geometry
  */
@@ -7,6 +7,7 @@ package track_model;
 
 // Location of an object on the globe of the Earth
 public class GlobalCoordinates {
+
     // radius of the Earth in yards
     //
     //   = radius in miles * yard/mi

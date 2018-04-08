@@ -1,3 +1,9 @@
+/*
+ * Roger Xue
+ *
+ * Track Block object.
+ */
+
 package track_model;
 
 public class TrackBlock {
@@ -15,7 +21,7 @@ public class TrackBlock {
     protected boolean isOccupied = false;
     protected boolean isHeaterOn = false;
     protected boolean closedForMaintenance = false;
-    protected String message= "";
+    protected String message = "";
     protected GlobalCoordinates start, end;
 
     protected double xStart, xEnd, yStart, yEnd;
@@ -37,6 +43,12 @@ public class TrackBlock {
     public static final double METER_TO_YARD_MULTIPLIER = 1.09361;
     public static final double KILOMETER_TO_MILE_MULTIPLIER = 0.621371;
 
+    /**
+     * Initializes a Track Block object.
+     *
+     * @param line
+     * @param block
+     */
     public TrackBlock(String line, int block) {
         this.line = line;
         this.block = block;

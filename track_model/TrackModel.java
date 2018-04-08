@@ -1,8 +1,9 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Roger Xue
+ *
+ * Main Track Model.
  */
+
 package track_model;
 
 import java.sql.Connection;
@@ -15,48 +16,64 @@ import javax.swing.JOptionPane;
 
 import train_model.Pose;
 import train_model.TrainModel;
-import train_model.communication.BeaconMessage;
-import train_model.communication.BeaconRadio;
-import train_model.communication.TrackCircuit;
 import train_model.communication.TrackMovementCommand;
 
 import updater.Updateable;
 
-/**
- *
- * @author Gowest
- */
 public class TrackModel implements Updateable {
 
     private static int temperature;
+    // Main Track Model Frame.
     private static TrackModelFrame tmf;
+    // Database helper.
     protected static final DbHelper dbHelper = new DbHelper();
 
+    // ArrayList of registered trains.
     protected static ArrayList<TrainData> trains = new ArrayList<>();
+    // ArrayLists of track model objects.
     protected static ArrayList<TrackBlock> blocks = new ArrayList<>();
     protected static ArrayList<Crossing> crossings = new ArrayList<>();
     protected static ArrayList<Station> stations = new ArrayList<>();
 
+    // Hard-coded initial orientations.
     private static final Orientation GREEN_LINE_ORIENTATION = Orientation.radians(0.9 * Math.PI);
     private static final Orientation RED_LINE_ORIENTATION = Orientation.radians(0.3737 * Math.PI);
+    // Hard-coded initial yard coordinates.
+    private static final double YARD_X_LOCATION = 600;
+    private static final double YARD_Y_LOCATION = -2100;
 
     /**
-     * @param args the command line arguments
+     * For testing purposes.
      */
     public static void main(String[] args) {
         TrackModel tm = new TrackModel();
         tm.launchTestUI();
     }
 
+    /**
+     * Initializes Track Model object.
+     */
     public TrackModel() {
         initializeLocalArrays();
+
     }
 
+    /**
+     * Generates a yard block.
+     *
+     * @param line
+     * @return TrackBlock yard
+     */
     private TrackBlock generateYardBlock(String line) {
         TrackBlock tb = new TrackBlock(line, 0);
-        tb.setStartCoordinates(600, -2100);
-        tb.setEndCoordinates(600, -2100);
-
+        //
+        // Hard-coded coordinates.
+        //
+        tb.setStartCoordinates(YARD_X_LOCATION, YARD_Y_LOCATION);
+        tb.setEndCoordinates(YARD_X_LOCATION, YARD_Y_LOCATION);
+        //
+        // Retrives blocks directly connected to yard.
+        //
         if (doTablesExist()) {
             try {
                 try (Connection conn = dbHelper.getConnection()) {
@@ -82,14 +99,21 @@ public class TrackModel implements Updateable {
         return tb;
     }
 
+    /**
+     * Initializes the local arrays holding the track model objects.
+     */
     protected void initializeLocalArrays() {
         blocks = new ArrayList<>();
         crossings = new ArrayList<>();
         stations = new ArrayList<>();
-
+        //
+        // Generates yard blocks.
+        //
         blocks.add(generateYardBlock("green"));
         blocks.add(generateYardBlock("red"));
-
+        //
+        // Gathers data from database.
+        //
         if (doTablesExist()) {
             try {
                 try (Connection conn = dbHelper.getConnection()) {
@@ -115,6 +139,9 @@ public class TrackModel implements Updateable {
         }
     }
 
+    /**
+     * Launches main UI for integration.
+     */
     public void launchUI() {
         tmf = new TrackModelFrame(this);
         tmf.setDefaultCloseOperation(javax.swing.WindowConstants.HIDE_ON_CLOSE);
@@ -122,6 +149,9 @@ public class TrackModel implements Updateable {
         tmf.setVisible(true);
     }
 
+    /**
+     * Launches test UI for testing.
+     */
     private void launchTestUI() {
         tmf = new TrackModelFrame(this);
         tmf.setLocationRelativeTo(null);
@@ -136,7 +166,7 @@ public class TrackModel implements Updateable {
     /**
      * Checks if database tables exist.
      *
-     * @return
+     * @return doTablesExist
      */
     protected static boolean doTablesExist() {
         boolean exist = false;
@@ -153,22 +183,29 @@ public class TrackModel implements Updateable {
         return exist;
     }
 
+    /**
+     * Gets a block based on specific line name and block number.
+     *
+     * @param line
+     * @param block
+     * @return TrackBlock
+     */
     public static TrackBlock getBlock(String line, int block) {
         for (TrackBlock tb : blocks) {
             if (tb.line.equalsIgnoreCase(line) && tb.block == block) {
                 return tb;
             }
         }
-        System.out.println("Track block not found.");
+        System.out.println("Track block not found. (" + line + " " + block + ")");
         return null;
     }
 
     /**
-     * Retrieves specific information related to a block on a line.
+     * Retrieves block data from the database.
      *
      * @param line
      * @param block
-     * @return Track block object
+     * @return TrackBlock
      */
     private static TrackBlock getBlockFromDatabase(String line, int block) {
         if (!doTablesExist()) {
@@ -180,6 +217,9 @@ public class TrackModel implements Updateable {
             Connection conn = dbHelper.getConnection();
             ResultSet rs = dbHelper.query(conn, "SELECT * FROM BLOCKS WHERE LINE='" + line + "' AND BLOCK=" + block + ";");
             if (rs.next()) {
+                //
+                // Retrieves track block data.
+                //
                 tb = new TrackBlock(line, block);
                 tb.setSection(rs.getString(2).charAt(0));
                 tb.setLength(rs.getFloat(4));
@@ -189,11 +229,15 @@ public class TrackModel implements Updateable {
                 tb.setIsUnderground(rs.getBoolean(8));
                 tb.setStartCoordinates(rs.getDouble(9), rs.getDouble(10));
                 tb.setCenterCoordinates(rs.getDouble(13), rs.getDouble(14));
-
+                //
+                // Sets track block end coordinates from the next block it's connected to.
+                //
                 rs = dbHelper.query(conn, "SELECT NEXT_BLOCK FROM CONNECTIONS WHERE LINE='" + line + "' AND BLOCK=" + block + ";");
                 rs = dbHelper.query(conn, "SELECT X, Y FROM BLOCKS WHERE LINE='" + line + "' AND BLOCK=" + rs.getInt(1) + ";");
                 tb.setEndCoordinates(rs.getDouble(1), rs.getDouble(2));
-
+                //
+                // Determines the neighboring blocks and if it is a switch.
+                //
                 rs = dbHelper.query(conn, "SELECT * FROM CONNECTIONS WHERE LINE='" + line + "' AND BLOCK=" + block + ";");
                 if (rs.next()) {
                     tb.setPrevBlockId(rs.getInt(4));
@@ -207,8 +251,14 @@ public class TrackModel implements Updateable {
                         tb.setSwitchPosition(rs.getInt(10));
                     }
                 }
+                //
+                // Determines if the block has a crossing.
+                //
                 rs = dbHelper.query(conn, "SELECT * FROM CROSSINGS WHERE LINE='" + line + "' AND BLOCK=" + block + ";");
                 tb.setIsCrossing(rs.next());
+                //
+                // Determines if the block has a station.
+                //
                 rs = dbHelper.query(conn, "SELECT * FROM STATIONS WHERE LINE='" + line + "' AND BLOCK=" + block + ";");
                 tb.setIsStation(rs.next());
                 rs.close();
@@ -235,7 +285,6 @@ public class TrackModel implements Updateable {
         if (tb != null && tb.isSwitch) {
             int mainBlock = tb.switchDirection < 0 ? tb.prevBlockId : tb.nextBlockId;
             int switchBlock = tb.switchBlockId;
-
             if (tb.switchPosition == mainBlock) {
                 tb.switchPosition = switchBlock;
             } else {
@@ -251,6 +300,13 @@ public class TrackModel implements Updateable {
         return success;
     }
 
+    /**
+     * Retrieves a Station.
+     *
+     * @param line
+     * @param block
+     * @return Station
+     */
     public static Station getStation(String line, int block) {
         for (Station s : stations) {
             if (s.line.equalsIgnoreCase(line) && s.block == block) {
@@ -261,6 +317,13 @@ public class TrackModel implements Updateable {
         return null;
     }
 
+    /**
+     * Gets station data from the database.
+     *
+     * @param line
+     * @param block
+     * @return Station
+     */
     private static Station getStationFromDatabase(String line, int block) {
         if (!doTablesExist()) {
             return null;
@@ -282,10 +345,16 @@ public class TrackModel implements Updateable {
         } catch (SQLException ex) {
             Logger.getLogger(TrackModel.class.getName()).log(Level.SEVERE, null, ex);
         }
-
         return s;
     }
 
+    /**
+     * Retrieves a Crossing.
+     *
+     * @param line
+     * @param block
+     * @return Crossing
+     */
     public static Crossing getCrossing(String line, int block) {
         for (Crossing c : crossings) {
             if (c.line.equalsIgnoreCase(line) && c.block == block) {
@@ -296,6 +365,13 @@ public class TrackModel implements Updateable {
         return null;
     }
 
+    /**
+     * Gets a crossing from the database.
+     *
+     * @param line
+     * @param block
+     * @return Crossing
+     */
     private static Crossing getCrossingFromDatabase(String line, int block) {
         if (!doTablesExist()) {
             return null;
@@ -317,14 +393,29 @@ public class TrackModel implements Updateable {
         return c;
     }
 
+    /**
+     * Sets a block message to a specific block.
+     *
+     * @param line
+     * @param block
+     * @param tmc
+     */
     public static void setBlockMessage(String line, int block, TrackMovementCommand tmc) {
         for (TrainData td : trains) {
             if (td.trackBlock.line.equalsIgnoreCase(line) && td.trackBlock.block == block) {
                 td.trainModel.trackCircuit().send(tmc);
+                td.trackBlock.message = "Speed: " + tmc.speed + ", Auth: " + tmc.authority;
             }
         }
     }
 
+    /**
+     * Opens and closes a track block for maintenance.
+     *
+     * @param line
+     * @param block
+     * @param maintain
+     */
     public static void setMaintenance(String line, int block, boolean maintain) {
         TrackBlock tb = getBlock(line, block);
         if (tb != null) {
@@ -335,7 +426,14 @@ public class TrackModel implements Updateable {
         }
     }
 
-    public static void setOccupancy(String line, int block, boolean occupied) {
+    /**
+     * Sets the occupancy of a track block.
+     *
+     * @param line
+     * @param block
+     * @param occupied
+     */
+    protected static void setOccupancy(String line, int block, boolean occupied) {
         TrackBlock tb = getBlock(line, block);
         if (tb != null && block != 0) {
             tb.isOccupied = occupied;
@@ -352,7 +450,14 @@ public class TrackModel implements Updateable {
         return boarding;
     }
 
-    public static void setPower(String line, int block, boolean on) {
+    /**
+     * Sets the power status of a track block.
+     *
+     * @param line
+     * @param block
+     * @param power
+     */
+    protected static void setPower(String line, int block, boolean on) {
         TrackBlock tb = getBlock(line, block);
         if (tb != null) {
             tb.isPowerOn = on;
@@ -362,6 +467,13 @@ public class TrackModel implements Updateable {
         }
     }
 
+    /**
+     * Sets the crossing signal for a crossing.
+     *
+     * @param line
+     * @param block
+     * @param signal
+     */
     public static void setCrossingSignal(String line, int block, boolean signal) {
         Crossing c = getCrossing(line, block);
         if (c != null) {
@@ -372,6 +484,13 @@ public class TrackModel implements Updateable {
         }
     }
 
+    /**
+     * Turns the track heater on and off.
+     *
+     * @param line
+     * @param block
+     * @param heater
+     */
     public static void setHeater(String line, int block, boolean heater) {
         TrackBlock tb = getBlock(line, block);
         if (tb != null) {
@@ -382,19 +501,28 @@ public class TrackModel implements Updateable {
         }
     }
 
+    /**
+     * Gets the first block out of the yard.
+     *
+     * @param line
+     * @return TrackBlock
+     */
     public static TrackBlock getFirstBlock(String line) {
         for (TrackBlock tb : blocks) {
-            if (tb.line.equalsIgnoreCase(line) && tb.switchBlockId == 0
-                    && (Math.abs(tb.switchDirection) == 2
-                    || (tb.switchDirection == 1 && tb.prevBlockDir == 1)
-                    || (tb.switchDirection == -1 && tb.nextBlockDir == 1))) {
-                return tb;
+            if (tb.block == 0 && tb.line.equalsIgnoreCase(line)) {
+                return getBlock(tb.line, tb.nextBlockId);
             }
         }
         System.out.println("Track block not found.");
         return null;
     }
 
+    /**
+     * Returns the default route of a line.
+     *
+     * @param line
+     * @return Array of ints with the blocks traversed
+     */
     public static ArrayList<Integer> getDefaultLine(String line) {
         ArrayList<Integer> defaultLine = new ArrayList<>();
         // Red line temporarily hard coded
@@ -411,7 +539,9 @@ public class TrackModel implements Updateable {
             }
             return defaultLine;
         }
-
+        //
+        // Iterates through blocks to find valid route.
+        //
         try {
             TrackBlock first = getFirstBlock(line);
             int swit = 0;
@@ -437,24 +567,29 @@ public class TrackModel implements Updateable {
                             cur = rs.getInt(8);
                             valid = false;
                         }
-
                         if (first != null && first.block == prev) {
                             first = null;
                             continue;
                         }
-
                         swit = rs.getInt(8);
                     } else {
                         break;
+
                     }
                 }
             }
         } catch (SQLException ex) {
-            Logger.getLogger(TrackModel.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(TrackModel.class
+                    .getName()).log(Level.SEVERE, null, ex);
         }
         return defaultLine;
     }
 
+    /**
+     * Gets total number of track blocks.
+     *
+     * @return block count
+     */
     public static int getBlockCount() {
         if (!doTablesExist()) {
             return 0;
@@ -465,9 +600,6 @@ public class TrackModel implements Updateable {
                 ResultSet rs = dbHelper.query(conn, "SELECT COUNT(BLOCK) FROM BLOCKS;");
                 if (rs.next()) {
                     count = rs.getInt(1);
-                } else {
-                    System.out.println("Invalid.");
-
                 }
             }
         } catch (SQLException ex) {
@@ -476,6 +608,12 @@ public class TrackModel implements Updateable {
         return count;
     }
 
+    /**
+     * Gets total number of track blocks for a line.
+     *
+     * @param line
+     * @return block count
+     */
     public static int getBlockCount(String line) {
         if (!doTablesExist()) {
             return 0;
@@ -487,9 +625,6 @@ public class TrackModel implements Updateable {
                 ResultSet rs = dbHelper.query(conn, "SELECT COUNT(BLOCK) FROM BLOCKS WHERE LINE='" + line + "';");
                 if (rs.next()) {
                     count = rs.getInt(1);
-                } else {
-                    System.out.println("Invalid line.");
-
                 }
             }
         } catch (SQLException ex) {
@@ -498,6 +633,13 @@ public class TrackModel implements Updateable {
         return count;
     }
 
+    /**
+     * Sets a message to the yard.
+     *
+     * @param trainId
+     * @param driverId
+     * @param tmc
+     */
     public void setYardMessage(int trainId, int driverId, TrackMovementCommand tmc) {
         for (TrainData td : trains) {
             if (td.trainModel.id() == trainId) {
@@ -509,11 +651,6 @@ public class TrackModel implements Updateable {
                 td.trainModel.trackCircuit().send(tmc);
             }
         }
-    }
-
-    private void sendBeacon(BeaconRadio radio) {
-//        radio.send();
-
     }
 
     /**
@@ -529,6 +666,12 @@ public class TrackModel implements Updateable {
         }
     }
 
+    /**
+     * Retrieves a yard block for a specific line.
+     *
+     * @param line
+     * @return
+     */
     public TrackBlock getYardBlock(String line) {
         for (TrackBlock tb : blocks) {
             if (tb.line.equalsIgnoreCase(line) && tb.block == 0) {
@@ -541,11 +684,9 @@ public class TrackModel implements Updateable {
     /**
      * Returns the closest track block to a given GlobalCoordinate.
      *
-     * Not mathematically sound, but good enough??? for our purposes
-     *
      * @param gc
      * @param line
-     * @return
+     * @return TrackBlock
      */
     public TrackBlock getClosestBlock(GlobalCoordinates gc, String line) {
         line = line.toLowerCase();
@@ -557,6 +698,9 @@ public class TrackModel implements Updateable {
             if (closest == null) {
                 closest = temp;
             }
+            //
+            // Calculates distance between a point and block. Keeps if it's shorter.
+            //
             double tempDist = getDistanceTo(temp, gc);
             if (tempDist < minDist) {
                 minDist = tempDist;
@@ -586,10 +730,25 @@ public class TrackModel implements Updateable {
         return startDistance < endDistance;
     }
 
+    /**
+     * Gets the distance from a GlobalCoordinate to a specific track block.
+     *
+     * @param tb
+     * @param gc
+     * @return distance
+     */
     private double getDistanceTo(TrackBlock tb, GlobalCoordinates gc) {
         return getDistanceTo(tb.line, tb.block, gc);
     }
 
+    /**
+     * Gets the distance from a GlobalCoordinate to a specific track block.
+     *
+     * @param line
+     * @param block
+     * @param gc
+     * @return distance
+     */
     public double getDistanceTo(String line, int block, GlobalCoordinates gc) {
         TrackBlock tb = getBlock(line, block);
         double minDist = 99999;
@@ -603,21 +762,38 @@ public class TrackModel implements Updateable {
         return minDist;
     }
 
+    /**
+     * Gets the coordinates for a certain distance along a specific track block.
+     *
+     * @param tb
+     * @param meters
+     * @return GlobalCoordinates
+     */
     private GlobalCoordinates getPositionAlongBlock(TrackBlock tb, double meters) {
         return getPositionAlongBlock(tb.line, tb.block, meters);
     }
 
+    /**
+     * Gets the coordinates for a certain distance along a specific track block.
+     *
+     * @param line
+     * @param block
+     * @param meters
+     * @return GlobalCoordinates
+     */
     public GlobalCoordinates getPositionAlongBlock(String line, int block, double meters) {
         TrackBlock tb = getBlock(line, block);
         if (meters > tb.length) {
             return null;
         }
-        // Special case if block is yard
+        // Special case if block is the yard
         if (tb.length == 0) {
             return tb.start;
         }
         double newX, newY;
-
+        //
+        // Math
+        //
         if (tb.curvature == 0) {
             double xDiff = tb.xEnd - tb.xStart;
             double yDiff = tb.yEnd - tb.yStart;
@@ -638,16 +814,27 @@ public class TrackModel implements Updateable {
         return GlobalCoordinates.ORIGIN.addYards(newY * TrackBlock.METER_TO_YARD_MULTIPLIER, newX * TrackBlock.METER_TO_YARD_MULTIPLIER);
     }
 
+    /**
+     * Calculates the distance a given GlobalCoordinate is along a specific
+     * track block.
+     *
+     * @param line
+     * @param block
+     * @param gc
+     * @return distance
+     */
     public double getDistanceAlongBlock(String line, int block, GlobalCoordinates gc) {
         TrackBlock tb = getBlock(line, block);
-        // Special case if block is yard
+        // Special case if block is the yard
         if (tb.length == 0) {
             return tb.start.distanceTo(gc);
         }
         double distance = 0;
         GlobalCoordinates lowerBound = tb.start;
         GlobalCoordinates upperBound = tb.end;
-
+        //
+        // Math
+        //
         for (int i = 1; i <= 20; i++) {
             double temp = tb.length / (Math.pow(2, i));
 
@@ -663,13 +850,21 @@ public class TrackModel implements Updateable {
         }
         return distance;
     }
-    int count = 0;
+
+    // Counter for update cycle
+    private int count = 0;
 
     @Override
     public void update(int time) {
+        //
+        // Tries to update UI every two seconds.
+        //
         if (count == 2000 / time) {
             TrackBlock curBlock;
             for (TrainData td : trains) {
+                //
+                // Manages occupied track blocks.
+                //
                 curBlock = getClosestBlock(td.trainModel.location(), td.trackBlock.line);
                 if (!curBlock.isOccupied) {
                     setOccupancy(curBlock.line, curBlock.block, true);
@@ -681,6 +876,9 @@ public class TrackModel implements Updateable {
                     td.trackBlock = curBlock;
                 }
             }
+            //
+            // Refreshes UI.
+            //
             if (tmf != null) {
                 tmf.refreshTables();
             }
@@ -689,6 +887,11 @@ public class TrackModel implements Updateable {
         count++;
     }
 
+    /**
+     * Testing stuff, please ignore.
+     *
+     * @param line
+     */
     private void testing(String line) {
         for (TrackBlock tb : blocks) {
             for (int i = 1; i < tb.length; i += 5) {
@@ -704,10 +907,14 @@ public class TrackModel implements Updateable {
             for (int i = 0; i <= tb.length; i++) {
                 double d = getDistanceAlongBlock(tb.line, tb.block, getPositionAlongBlock(tb, i));
                 System.out.println(i - d);
+
             }
         }
     }
 
+    /**
+     * Class used for keeping track of the last block a train was on.
+     */
     protected class TrainData {
 
         public TrainModel trainModel;
