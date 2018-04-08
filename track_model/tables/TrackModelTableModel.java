@@ -1,5 +1,6 @@
 package track_model.tables;
 
+import java.util.Vector;
 import javax.swing.table.DefaultTableModel;
 
 public class TrackModelTableModel extends DefaultTableModel {
@@ -34,4 +35,35 @@ public class TrackModelTableModel extends DefaultTableModel {
         return new TrackModelTableModel(STATION_COLUMNS, 0);
     }
 
+    public static Vector getBlockColumnNames() {
+        Vector<Object> v = new Vector<>();
+        for (Object o : BLOCK_COLUMNS) {
+            v.add(o);
+        }
+        return v;
+    }
+
+    public static Vector getSwitchColumnNames() {
+        Vector<Object> v = new Vector<>();
+        for (Object o : SWITCH_COLUMNS) {
+            v.add(o);
+        }
+        return v;
+    }
+
+    public static Vector getCrossingColumnNames() {
+        Vector<Object> v = new Vector<>();
+        for (Object o : CROSSING_COLUMNS) {
+            v.add(o);
+        }
+        return v;
+    }
+
+    public static Vector getStationColumnNames() {
+        Vector<Object> v = new Vector<>();
+        for (Object o : STATION_COLUMNS) {
+            v.add(o);
+        }
+        return v;
+    }
 }

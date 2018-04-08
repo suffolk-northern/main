@@ -13,6 +13,7 @@ import java.io.InputStreamReader;
 import java.sql.*;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
@@ -36,6 +37,11 @@ public class TrackModelFrame extends javax.swing.JFrame {
     private final TrackModel tm;
     private TrackModelMapFrame tmmf;
 
+    private TrackModelTableModel blockTableModel = TrackModelTableModel.getBlockTableModel();
+    private TrackModelTableModel switchTableModel = TrackModelTableModel.getSwitchTableModel();
+    private TrackModelTableModel crossingTableModel = TrackModelTableModel.getCrossingTableModel();
+    private TrackModelTableModel stationTableModel = TrackModelTableModel.getStationTableModel();
+
     /**
      * Creates new form TrackModelFrame
      */
@@ -43,6 +49,11 @@ public class TrackModelFrame extends javax.swing.JFrame {
         this.tm = tm;
         this.dbHelper = tm.dbHelper;
         initComponents();
+
+        blockTable.setModel(blockTableModel);
+        switchTable.setModel(switchTableModel);
+        crossingTable.setModel(crossingTableModel);
+        stationTable.setModel(stationTableModel);;
 
         if (tm.doTablesExist()) {
             refreshTables();
@@ -373,78 +384,73 @@ public class TrackModelFrame extends javax.swing.JFrame {
         if (tmmf != null) {
             tmmf.repaint();
         }
-
-        TrackModelTableModel blockTableModel = TrackModelTableModel.getBlockTableModel();
-        TrackModelTableModel switchTableModel = TrackModelTableModel.getSwitchTableModel();
-        TrackModelTableModel crossingTableModel = TrackModelTableModel.getCrossingTableModel();
-        TrackModelTableModel stationTableModel = TrackModelTableModel.getStationTableModel();
-
-        blockTable.setModel(blockTableModel);
-        switchTable.setModel(switchTableModel);
-        crossingTable.setModel(crossingTableModel);
-        stationTable.setModel(stationTableModel);;
+        Vector<Vector<Object>> blockVector = new Vector<Vector<Object>>();
+        Vector<Vector<Object>> switchVector = new Vector<>();
+        Vector<Vector<Object>> crossingVector = new Vector<>();
+        Vector<Vector<Object>> stationVector = new Vector<>();
+        Vector<Object> row;
 
         for (TrackBlock tb : tm.blocks) {
             if (tb.block != 0 && (!occupancyCheckBox.isSelected() || tb.isOccupied)) {
-                Object rowData[] = {
-                    tb.line.toUpperCase(),
-                    tb.section,
-                    tb.block,
-                    tb.length * TrackBlock.METER_TO_YARD_MULTIPLIER,
-                    tb.curvature,
-                    tb.grade,
-                    tb.speedLimit * TrackBlock.KILOMETER_TO_MILE_MULTIPLIER,
-                    tb.isUnderground ? "UNDERGROUND" : "",
-                    tb.isPowerOn ? "POWER" : "OUTAGE",
-                    tb.isOccupied ? "OCCUPIED" : (tb.closedForMaintenance ? "CLOSED" : ""),
-                    tb.isHeaterOn ? "ON" : "OFF",
-                    tb.message
-                };
-                blockTableModel.addRow(rowData);
+                row = new Vector<>();
+                row.add(tb.line.toUpperCase());
+                row.add(tb.section);
+                row.add(tb.block);
+                row.add(tb.length * TrackBlock.METER_TO_YARD_MULTIPLIER);
+                row.add(tb.curvature);
+                row.add(tb.grade);
+                row.add(tb.speedLimit * TrackBlock.KILOMETER_TO_MILE_MULTIPLIER);
+                row.add(tb.isUnderground ? "UNDERGROUND" : "");
+                row.add(tb.isPowerOn ? "POWER" : "OUTAGE");
+                row.add(tb.isOccupied ? "OCCUPIED" : (tb.closedForMaintenance ? "CLOSED" : ""));
+                row.add(tb.isHeaterOn ? "ON" : "OFF");
+                row.add(tb.message);
+                blockVector.add(row);
             }
 
             if (tb.isSwitch) {
-                Object rowData2[] = {
-                    tb.line.toUpperCase(),
-                    tb.section,
-                    tb.block,
-                    tb.prevBlockId,
-                    tb.prevBlockDir,
-                    tb.nextBlockId,
-                    tb.nextBlockDir,
-                    tb.switchBlockId == 0 ? "YARD" : tb.switchBlockId,
-                    tb.switchDirection,
-                    tb.switchPosition == 0 ? "YARD" : tb.switchPosition
-                };
-                switchTableModel.addRow(rowData2);
+                row = new Vector<>();
+                row.add(tb.line.toUpperCase());
+                row.add(tb.section);
+                row.add(tb.block);
+                row.add(tb.prevBlockId);
+                row.add(tb.prevBlockDir);
+                row.add(tb.nextBlockId);
+                row.add(tb.nextBlockDir);
+                row.add(tb.switchBlockId == 0 ? "YARD" : tb.switchBlockId);
+                row.add(tb.switchDirection);
+                row.add(tb.switchPosition == 0 ? "YARD" : tb.switchPosition);
+                switchVector.add(row);
             }
 
             if (tb.isCrossing) {
                 Crossing c = tm.getCrossing(tb.line, tb.block);
-                Object rowData3[] = {
-                    tb.line.toUpperCase(),
-                    tb.section,
-                    tb.block,
-                    tb.length,
-                    tb.isOccupied ? "OCCUPIED" : (tb.closedForMaintenance ? "CLOSED" : ""),
-                    c.signal ? "ON" : "OFF"
-                };
-                crossingTableModel.addRow(rowData3);
+                row = new Vector<>();
+                row.add(tb.line.toUpperCase());
+                row.add(tb.section);
+                row.add(tb.block);
+                row.add(tb.length);
+                row.add(tb.isOccupied ? "OCCUPIED" : (tb.closedForMaintenance ? "CLOSED" : ""));
+                row.add(c.signal ? "ON" : "OFF");
+                crossingVector.add(row);
             }
 
             if (tb.isStation) {
                 Station s = tm.getStation(tb.line, tb.block);
-
-                Object rowData4[] = {
-                    s.line.toUpperCase(),
-                    s.section,
-                    s.block,
-                    s.name,
-                    s.passengers
-                };
-                stationTableModel.addRow(rowData4);
+                row = new Vector<>();
+                row.add(s.line.toUpperCase());
+                row.add(s.section);
+                row.add(s.block);
+                row.add(s.name);
+                row.add(s.passengers);
+                stationVector.add(row);
             }
         }
+
+        blockTableModel.setDataVector(blockVector, TrackModelTableModel.getBlockColumnNames());
+        switchTableModel.setDataVector(switchVector, TrackModelTableModel.getSwitchColumnNames());
+        crossingTableModel.setDataVector(crossingVector, TrackModelTableModel.getCrossingColumnNames());
+        stationTableModel.setDataVector(stationVector, TrackModelTableModel.getStationColumnNames());
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
