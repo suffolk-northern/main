@@ -10,6 +10,8 @@ public class LineSchedule {
 	private ArrayList<Integer> driverIDs;
 	private ArrayList<TrainSchedule> trainSchedules;
 	private ArrayList<Integer> trainIDs;
+	private ArrayList<StationSchedule> stationSchedules;
+	private ArrayList<String> stationNames;
 	
 	public LineSchedule(ArrayList<DriverSchedule> ds, ArrayList<TrainSchedule> ts)
 	{
@@ -21,6 +23,11 @@ public class LineSchedule {
 		trainIDs = new ArrayList<Integer>();
 		for (TrainSchedule tSched : ts)
 			trainIDs.add(tSched.getID());
+	}
+	
+	public void generateStationSchedules()
+	{
+		// TODO: implement this
 	}
 	
 	public DriverSchedule getDriverSchedule(int driverID)
