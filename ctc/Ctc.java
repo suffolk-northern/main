@@ -439,9 +439,15 @@ public class Ctc implements Updateable{
 	public static void enableMBO(String line)
 	{
 		if(line.equalsIgnoreCase("green"))
+		{
 			greenradio.enableMovingBlock();
+			greenradio.showController();
+		}
 		else if(line.equalsIgnoreCase("red"))
+		{
 			redradio.enableMovingBlock();
+			redradio.showController();
+		}
 	}
 	
 	public static void disableMBO(String line)
@@ -598,7 +604,7 @@ public class Ctc implements Updateable{
 
 	private static double calcAuth(ArrayDeque<Block> route, Block start, Block end) {
 		
-		System.out.println("calc auth");
+		//System.out.println("calc auth");
 		
 		double auth = 0;
 
@@ -1093,7 +1099,7 @@ public class Ctc implements Updateable{
 		//}
 		
 
-		System.out.println();
+		//System.out.println();
 		
 		String msg = speed + " " + auth;
 		
