@@ -5,6 +5,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.io.File;
 import java.sql.Time;
+import javax.swing.table.DefaultTableModel;
 
 import mbo.schedules.ScheduleWriter;
 import mbo.schedules.LineSchedule;
@@ -19,12 +20,14 @@ public class MboSchedulerUI extends javax.swing.JFrame
 	private int[] throughput;
 	private Time start;
 	private Time end;
+	private String lineName;
 	
     /**
      * Creates new form Scheduler
      */
-    public MboSchedulerUI() {
+    public MboSchedulerUI(String ln) {
         initComponents();
+		lineName = ln;
 		scheduleRequest = false;
     }
 
@@ -62,7 +65,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         jLabel4 = new javax.swing.JLabel();
-        jButton2 = new javax.swing.JButton();
+        finishedThroughputButton = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTable2 = new javax.swing.JTable();
@@ -231,7 +234,8 @@ public class MboSchedulerUI extends javax.swing.JFrame
         jButton13.setBounds(260, 440, 310, 25);
 
         jLabel12.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
-        jLabel12.setText("MBO Overlay: Green Line");
+		String titleString = String.format("MBO Overlay: %s Line", lineName);
+        jLabel12.setText(titleString);
         jPanel1.add(jLabel12);
         jLabel12.setBounds(290, 20, 290, 29);
 
@@ -239,16 +243,16 @@ public class MboSchedulerUI extends javax.swing.JFrame
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {"8:00", "300"},
-                {"9:00", "500"},
-                {"10:00", "200"},
-                {"11:00", "300"},
-                {"12:00", "300"},
-                {"13:00", "300"},
-                {"14:00", "300"},
-                {"15:00", "400"},
-                {"16:00", "400"},
-                {"17:00", "100"}
+                {"8:00", "0"},
+                {"9:00", "0"},
+                {"10:00", "0"},
+                {"11:00", "0"},
+                {"12:00", "0"},
+                {"13:00", "0"},
+                {"14:00", "0"},
+                {"15:00", "0"},
+                {"16:00", "0"},
+                {"17:00", "0"}
             },
             new String [] {
                 "Hour", "Throughput"
@@ -268,10 +272,10 @@ public class MboSchedulerUI extends javax.swing.JFrame
         jLabel4.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel4.setText("Enter Throughput");
 
-        jButton2.setText("Return to Scheduler");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        finishedThroughputButton.setText("Return to Scheduler");
+        finishedThroughputButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                finishedThroughputButtonClicked(evt);
             }
         });
 
@@ -290,7 +294,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
                             .addComponent(jLabel4)
                             .addGap(127, 127, 127)))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                        .addComponent(jButton2)
+                        .addComponent(finishedThroughputButton)
                         .addGap(122, 122, 122))))
         );
         jPanel3Layout.setVerticalGroup(
@@ -301,7 +305,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 298, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jButton2)
+                .addComponent(finishedThroughputButton)
                 .addContainerGap(189, Short.MAX_VALUE))
         );
 
@@ -440,9 +444,11 @@ public class MboSchedulerUI extends javax.swing.JFrame
         // Enter throughput button in Panel1
         CardLayout cl = (CardLayout)(getContentPane().getLayout());
         cl.show(getContentPane(), "card3");
+		generateThroughputTable();
     }                                        
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {                                         
+    private void finishedThroughputButtonClicked(ActionEvent evt) 
+	{                                         
         // Return to scheduler button in Panel3
         CardLayout cl = (CardLayout)(getContentPane().getLayout());
         cl.show(getContentPane(), "card2");       
@@ -471,32 +477,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
         String startTime = (String)cb.getSelectedItem();
 		int startHour = Integer.parseInt(startTime.substring(0, 2));
 		start = new Time(startHour, 0, 0);
-		
-//        jTable1.setModel(new javax.swing.table.DefaultTableModel(
-//            new Object [][] {
-//                {"9:00", "500"},
-//                {"10:00", "200"},
-//                {"11:00", "300"},
-//                {"12:00", "300"},
-//                {"13:00", "300"},
-//                {"14:00", "300"},
-//                {"15:00", "400"},
-//                {"16:00", "400"},
-//                {"17:00", "100"}
-//            },
-//            new String [] {
-//                "Hour", "Throughput"
-//            }
-//        ) {
-//            boolean[] canEdit = new boolean [] {
-//                false, true
-//            };
-//
-//            public boolean isCellEditable(int rowIndex, int columnIndex) {
-//                return canEdit [columnIndex];
-//            }
-//        });
-    }                   
+    }  
 	
 	private void endTimeComboChanged(ActionEvent evt)
 	{
@@ -506,6 +487,37 @@ public class MboSchedulerUI extends javax.swing.JFrame
 		end = new Time(endHour, 0, 0);	
 	}
 
+	private void generateThroughputTable()
+	{
+		// TODO: worry about overnight schedules?
+		int startHour = start.getHours();
+		int endHour = end.getHours();
+		int numHours = endHour - startHour + 1;
+		Object[][] tableObject = new Object[2][numHours];
+		int ind = 0;
+		for (int i = startHour; i < endHour; i++)
+		{
+			if (i < 10)
+				tableObject[0][ind] = String.format("0%d:00", i); 
+			else
+				tableObject[0][ind] = String.format("%d:00", i);
+			tableObject[1][ind] = "0";
+		}
+		
+		String[] headers = {"Hour", "Throughput"};		
+		DefaultTableModel mod = new DefaultTableModel(tableObject, headers) 
+		{
+			public boolean isCellEditable(int rowIndex, int colIndex)
+			{
+				if (colIndex == 1)
+					return true;
+				else
+					return false;
+			}
+		};
+		jTable1.setModel(mod);
+	}
+	
     private void jButton11ActionPerformed(java.awt.event.ActionEvent evt) {                                          
         // TODO add your handling code here:
     }                                         
@@ -603,7 +615,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new MboSchedulerUI().setVisible(true);
+                new MboSchedulerUI("Blue").setVisible(true);
             }
         });
     }
@@ -614,7 +626,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
     private javax.swing.JButton jButton11;
     private javax.swing.JButton jButton12;
     private javax.swing.JButton jButton13;
-    private javax.swing.JButton jButton2;
+    private javax.swing.JButton finishedThroughputButton;
     private javax.swing.JButton generateScheduleButton;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;

@@ -127,8 +127,7 @@ public class MboController implements Updateable
 				break;
 			double authority = findAuthority(trainInfo);
 			trainInfo.setAuthority((int) authority);
-			// trainInfo.setSuggestedSpeed(trainInfo.block.getSpeedLimit());
-			trainInfo.setSuggestedSpeed(20);
+			trainInfo.setSuggestedSpeed(trainInfo.block.getSpeedLimit());
 			MboMovementCommand com;
 			try
 			{
@@ -140,13 +139,11 @@ public class MboController implements Updateable
 				System.out.println("Sending 0 speed / authority instead.");
 				com = new MboMovementCommand(0, 0);
 			}
-			System.out.println(trainInfo.getAuthority());
-			System.out.println(trainInfo.getSuggestedSpeed());
 			trainInfo.getRadio().send(com);
-			System.out.println("Sent");
 			GlobalCoordinates loc = trainInfo.getLocation();
 			// TODO: change to distance along block
-			// int trackDist = (int) trainInfo.block.getStart().distanceTo(loc);
+			int blockID = trainInfo.getBlock().getID();
+			// int trackDist = (int) TrackModel.getDistanceTo(lineName, blockID, loc);
 			int trackDist = 0;
 			if (ui != null)
 				ui.updateTrain(trainInfo.getID(), trainInfo.block.getSection(), trainInfo.block.getID(), trackDist, trainInfo.getAuthority(), trainInfo.getSuggestedSpeed());
@@ -156,46 +153,15 @@ public class MboController implements Updateable
 	// TODO: make this more efficient by starting from last known block
 	private int getBlockFromLoc(GlobalCoordinates location)
 	{
-		for (int i = 0; i < line.length; i++)
+		for (int i = 1; i < line.length; i++)
 		{
-			// TODO: change once we have position stuff implemented
-//			TrackBlock curBlock = TrackModel.getBlock(lineName, i);
-//			if (isOnBlock(location, curBlock))
-//				return curBlock;
+			double dist = TrackModel.getDistanceTo(lineName, i, location);
+			if (dist < 1)
+				return i;
 		}
 		// return -1;
 		return 1;
 	}
-	
-	private boolean isOnBlock(GlobalCoordinates location, TrackBlock block)
-	{
-		double tolerance = 5;
-		double startDist = location.distanceTo(block.getStart());
-		double endDist = location.distanceTo(block.getEnd());
-		double distSum = startDist + endDist;
-		double blockLength = block.getStart().distanceTo(block.getEnd());
-		if (Math.abs(distSum - blockLength) < tolerance)
-			return true;
-		else
-			return false;	
-	}
-	
-//	private TrackBlock[] getRoute(TrackBlock block)
-//	{
-//		BlockTracker blocks[] = new BlockTracker[line.length];
-//		int blockInd = defaultLine.indexOf(block);
-//		int maxBlockInd = defaultLine.size();
-//		TrackBlock curBlock = TrackModel.getBlock(lineName, (blockInd + 1) % maxBlockInd);
-//		blocks[0] = curBlock;
-//		int ind = 1;
-//		while (curBlock != block && curBlock != null)
-//		{
-//			blocks[ind] = TrackModel.getBlock(lineName, (blockInd + 1) % maxBlockInd);
-//			blockInd += 1;
-//			ind += 1;
-//		}
-//		return blocks;
-//	}
 	
 	// Adds a train to the set of objects this object communicates with.
 	public void registerTrain(int ID, MboRadio radio)
@@ -275,15 +241,6 @@ public class MboController implements Updateable
 		// TODO: change next and prev blocks based on switch changes
 	}
 	
-//	public void flipSwitch(int switchID)
-//	{
-//		myTrack.sections[0].switches[switchID].flipSwitch();
-//	}
-	
-//	public TrackBlock getDefaultBlock()
-//	{
-//		return myTrack.sections[0].blocks[0];
-//	}
 	
 //	public int changeTrainLocation(int trainID, GlobalCoordinates location)
 //	{

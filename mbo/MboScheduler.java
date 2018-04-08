@@ -38,7 +38,7 @@ public class MboScheduler implements Updateable
 	{
 		if (ui == null)
 		{
-			ui = new MboSchedulerUI();
+			ui = new MboSchedulerUI(lineName);
 			ui.setVisible(false);
 		}
 	}
