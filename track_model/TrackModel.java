@@ -485,8 +485,10 @@ public class TrackModel implements Updateable {
         for (TrainData td : trains) {
             if (td.trainModel.id() == trainId) {
                 String line = td.trackBlock.line;
-                td.trainModel.slew(new Pose(getFirstBlock(line).start,
-                        line.equalsIgnoreCase("green") ? GREEN_LINE_ORIENTATION : RED_LINE_ORIENTATION));
+                if (tmc.authority > 0) {
+                    td.trainModel.slew(new Pose(getFirstBlock(line).start,
+                            line.equalsIgnoreCase("green") ? GREEN_LINE_ORIENTATION : RED_LINE_ORIENTATION));
+                }
                 td.trainModel.trackCircuit().send(tmc);
             }
         }
