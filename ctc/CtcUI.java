@@ -30,6 +30,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.util.ArrayDeque;
 import javax.swing.border.LineBorder;
 import javax.swing.border.SoftBevelBorder;
 import javax.swing.border.BevelBorder;
@@ -42,8 +43,12 @@ import javax.swing.border.EtchedBorder;
  */
 public class CtcUI extends javax.swing.JFrame {
 
+	public static final int TRACKCOLS = 9;
 	public Ctc ctc;
 	private JFrame frame;
+	private static javax.swing.table.DefaultTableModel trackModel;
+	private static String[] greenBlocks;
+	private static String[] redBlocks;
 
 	public CtcUI(Ctc ctc) {
 		this.ctc = ctc;
@@ -91,7 +96,7 @@ public class CtcUI extends javax.swing.JFrame {
 		scheduleButton = new javax.swing.JButton();
 		closeTrack = new javax.swing.JRadioButton();
 
-		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(javax.swing.WindowConstants.HIDE_ON_CLOSE);
 
 		jLabel7.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
 		jLabel7.setText("Train Select");
@@ -112,7 +117,8 @@ public class CtcUI extends javax.swing.JFrame {
 		jLabel16.setVisible(false);
 
 		trackTable.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
-		trackTable.setModel(new javax.swing.table.DefaultTableModel(
+		
+		trackModel = new javax.swing.table.DefaultTableModel(
 				new Object[][]{
 					{"", "", "", "", null, "", "", null, null},
 					{"", "", "", "", null, "", "", null, null},
@@ -148,7 +154,8 @@ public class CtcUI extends javax.swing.JFrame {
 				new String[]{
 					"Line", "Section", "Number", "Occupancy", "Switch", "Signals", "Status", "RR Xing", "Station"
 				}
-		));
+		);
+		trackTable.setModel(trackModel);
 		jScrollPane1.setViewportView(trackTable);
 
 		trackTable.getModel().addTableModelListener(trainTable);
@@ -161,7 +168,7 @@ public class CtcUI extends javax.swing.JFrame {
 		trackTable.getColumnModel().getColumn(8).setMinWidth(80);
 
 		blockSelect.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
-		blockSelect.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "YARD"}));
+		blockSelect.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{}));
 
 		blueThrough.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
 		blueThrough.setText("               ");
@@ -205,7 +212,7 @@ public class CtcUI extends javax.swing.JFrame {
 		});
 
 		trainSelect.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
-		trainSelect.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"1", "2"}));
+		trainSelect.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"0"}));
 
 		jLabel12.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
 		jLabel12.setText("Line");
@@ -214,8 +221,14 @@ public class CtcUI extends javax.swing.JFrame {
 		jLabel1.setText("Trains");
 
 		lineSelect.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
-		lineSelect.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"Blue"}));
-
+		lineSelect.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"Green","Red"}));
+		lineSelect.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				lineSelectActionPerformed(evt);
+			}
+		});
+		
+		
 		jLabel2.setFont(new java.awt.Font("Tahoma", 0, 35)); // NOI18N
 		jLabel2.setText("Track");
 
@@ -979,7 +992,9 @@ public class CtcUI extends javax.swing.JFrame {
     */
     private void fixedBlockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fixedBlockActionPerformed
 		// TODO add your handling code here:
-		System.out.println("Transfer control to fixed block");
+		//System.out.println("Transfer control to fixed block");
+		ctc.disableMBO("green");
+		//ctc.disableMBO("red");
     }//GEN-LAST:event_fixedBlockActionPerformed
 
 
@@ -995,9 +1010,9 @@ public class CtcUI extends javax.swing.JFrame {
 			speed = Double.parseDouble(speedSelect.getText());
 		}
 
-		//ctc.routeTrain(train, line.toLowerCase(), block, speed);
+		ctc.routeTrain(train, line, block, speed);
 		
-		ctc.sendSpeedAuthShort(train, speed, 100);
+		//ctc.sendSpeedAuthShort(train, speed, 100);
     }//GEN-LAST:event_dispatchButtonActionPerformed
 
 	protected static void updateTrainTable(Object[][] rows, int count) {
@@ -1023,25 +1038,51 @@ public class CtcUI extends javax.swing.JFrame {
 	}
 
 	protected static void updateTrackTable(Object[][] rows, int count) {
+ 
+		ArrayDeque<String> greens = new ArrayDeque<String>();
+		ArrayDeque<String> reds = new ArrayDeque<String>();
+		
+		String line;
+		
+		trackModel.setRowCount(count);
+		
+		trackTable.setModel(trackModel);
+		
+		for (int i = 0; i < trackTable.getRowCount(); i++) 
+		{
+			line = (String)rows[i][0];
 
-		if (!trackTable.getValueAt(0, 0).equals("")) {
-			for (int k = 0; k < count; k++) {
-				for (int i = 0; i < trackTable.getRowCount(); i++) {
-					if (trackTable.getValueAt(i, 1) != null && (trackTable.getValueAt(i, 1)).equals(rows[k][1]) && (trackTable.getValueAt(i, 2)).equals((rows[k][2]))) {
-						for (int j = 1; j < trackTable.getColumnCount(); j++) {
-							trackTable.setValueAt(rows[k][j], i, j);
-						}
-					}
-				}
+			if(line.equalsIgnoreCase("Green"))
+			{
+				greens.add(rows[i][1] + "" + rows[i][2]);
 			}
-		} else {
-			for (int i = 0; i < count; i++) {
-				for (int j = 0; j < trackTable.getColumnCount(); j++) {
-					trackTable.setValueAt(rows[i][j], i, j);
-				}
+			else if(line.equalsIgnoreCase("Red"))
+			{
+				reds.add(rows[i][1] + "" + rows[i][2]);
+			}
+
+			for (int j = 0; j < trackTable.getColumnCount(); j++) 
+			{
+				trackTable.setValueAt(rows[i][j], i, j);
 			}
 		}
-
+		
+		int sizegreen = greens.size();
+		int sizered = reds.size();
+		
+		greenBlocks = new String[sizegreen];
+		redBlocks = new String[sizered];
+		
+		for(int i = 0; i < sizegreen; i++)
+		{
+			greenBlocks[i] = greens.poll();
+		}
+		
+		for(int i = 0; i < sizered; i++)
+		{
+			redBlocks[i] = reds.poll();
+		}
+		
 	}
 
 	protected void updateThroughput(double through) {
@@ -1083,6 +1124,19 @@ public class CtcUI extends javax.swing.JFrame {
 
     }//GEN-LAST:event_closeTrackActionPerformed
 
+	private void lineSelectActionPerformed(java.awt.event.ActionEvent evt)
+	{
+		if(lineSelect.getSelectedIndex() == 0)
+		{
+			blockSelect.setModel(new javax.swing.DefaultComboBoxModel<>(greenBlocks));
+		}
+		else
+		{
+			blockSelect.setModel(new javax.swing.DefaultComboBoxModel<>(redBlocks));
+		}
+				
+	}
+	
     private void scheduleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_scheduleButtonActionPerformed
 		// TODO add your handling code here:
     }//GEN-LAST:event_scheduleButtonActionPerformed
@@ -1093,17 +1147,22 @@ public class CtcUI extends javax.swing.JFrame {
 
     private void MovingBlockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MovingBlockActionPerformed
 		// TODO add your handling code here:
-		System.out.println("Transfer control to MBO");
+		//System.out.println("Transfer control to MBO");
+		ctc.enableMBO("Green");
+		//ctc.enableMBO("Red");
+		
     }//GEN-LAST:event_MovingBlockActionPerformed
 
     private void manualModeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manualModeActionPerformed
 		// TODO add your handling code here:
-		System.out.println("Manual mode");
+		//System.out.println("Manual mode");
+		ctc.manMode();
     }//GEN-LAST:event_manualModeActionPerformed
 
     private void autoModeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoModeActionPerformed
 		// TODO add your handling code here:
-		System.out.println("Automatic mode");
+		//System.out.println("Automatic mode");
+		ctc.autoMode();
     }//GEN-LAST:event_autoModeActionPerformed
 
 	/**

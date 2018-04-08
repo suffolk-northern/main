@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Roger Xue
+ *
+ * Track Model UI in tabular form.
  */
 package track_model;
 
@@ -13,6 +13,7 @@ import java.io.InputStreamReader;
 import java.sql.*;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
@@ -32,15 +33,33 @@ import track_model.tables.TrackModelTableModel;
  */
 public class TrackModelFrame extends javax.swing.JFrame {
 
+    // Database helper.
     private final DbHelper dbHelper;
+    // Reference to TrackModel so it can access block data.
+    private final TrackModel tm;
+    // Map frame.
+    private TrackModelMapFrame tmmf;
+
+    // TableModels used for displaying data.
+    private TrackModelTableModel blockTableModel = TrackModelTableModel.getBlockTableModel();
+    private TrackModelTableModel switchTableModel = TrackModelTableModel.getSwitchTableModel();
+    private TrackModelTableModel crossingTableModel = TrackModelTableModel.getCrossingTableModel();
+    private TrackModelTableModel stationTableModel = TrackModelTableModel.getStationTableModel();
 
     /**
      * Creates new form TrackModelFrame
      */
-    public TrackModelFrame(DbHelper dbHelper) {
-        this.dbHelper = dbHelper;
+    public TrackModelFrame(TrackModel tm) {
+        this.tm = tm;
+        this.dbHelper = tm.dbHelper;
         initComponents();
-        if (TrackModel.doTablesExist()) {
+
+        blockTable.setModel(blockTableModel);
+        switchTable.setModel(switchTableModel);
+        crossingTable.setModel(crossingTableModel);
+        stationTable.setModel(stationTableModel);;
+
+        if (tm.doTablesExist()) {
             refreshTables();
         }
     }
@@ -68,6 +87,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
         stationScrollPane = new javax.swing.JScrollPane();
         stationTable = new StationTable();
         occupancyCheckBox = new javax.swing.JCheckBox();
+        mapButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Track Model");
@@ -116,6 +136,13 @@ public class TrackModelFrame extends javax.swing.JFrame {
             }
         });
 
+        mapButton.setText("Launch Visual Track Model");
+        mapButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mapButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -125,6 +152,8 @@ public class TrackModelFrame extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(tabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 876, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
+                        .addComponent(mapButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(murphButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(occupancyCheckBox)
@@ -138,19 +167,27 @@ public class TrackModelFrame extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(tabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 479, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(clearButton)
-                    .addComponent(importButton)
-                    .addComponent(murphButton)
-                    .addComponent(occupancyCheckBox))
+                .addComponent(tabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 485, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(clearButton)
+                        .addComponent(importButton))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(murphButton)
+                        .addComponent(mapButton)
+                        .addComponent(occupancyCheckBox)))
                 .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Clears existing tables.
+     *
+     * @param evt
+     */
     private void clearButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearButtonActionPerformed
         int response = JOptionPane.showConfirmDialog(null, "Clearing will wipe all existing track data. Continue?", "Confirm",
                 JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
@@ -172,9 +209,12 @@ public class TrackModelFrame extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_clearButtonActionPerformed
-
+    /**
+     * Launches file chooser to import data file.
+     *
+     * @param evt
+     */
     private void importButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importButtonActionPerformed
-
         int response = JOptionPane.showConfirmDialog(null, "Importing new track will wipe all existing track data. Continue?", "Confirm",
                 JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
         if (response == JOptionPane.YES_OPTION) {
@@ -185,31 +225,60 @@ public class TrackModelFrame extends javax.swing.JFrame {
             if (returnValue == JFileChooser.APPROVE_OPTION) {
                 initializeDatabase();
                 populateDatabase(jfc.getSelectedFile());
+                tm.initializeLocalArrays();
                 refreshTables();
             }
         }
     }//GEN-LAST:event_importButtonActionPerformed
-
+    /**
+     * Launches Murph Frame when pressed for simulating failures.
+     *
+     * @param evt
+     */
     private void murphButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_murphButtonActionPerformed
-        MurphFrame mf = new MurphFrame(this, blockTable, crossingTable, dbHelper);
+        MurphFrame mf = new MurphFrame(tm.blocks, dbHelper);
         mf.setLocationRelativeTo(this);
         mf.setVisible(true);
     }//GEN-LAST:event_murphButtonActionPerformed
-
+    /**
+     * Choose to display only occupied blocks.
+     *
+     * @param evt
+     */
     private void occupancyCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_occupancyCheckBoxActionPerformed
         if (TrackModel.doTablesExist()) {
             refreshTables();
         }
     }//GEN-LAST:event_occupancyCheckBoxActionPerformed
+    /**
+     * Launches the map UI.
+     *
+     * @param evt
+     */
+    private void mapButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mapButtonActionPerformed
+        tmmf = new TrackModelMapFrame();
+        tmmf.add(new TrackModelMapPanel(tm));
+        tmmf.setLocationByPlatform(true);
+        tmmf.pack();
+        tmmf.setVisible(true);
+    }//GEN-LAST:event_mapButtonActionPerformed
 
+    /**
+     * Initializes the database.
+     */
     private void initializeDatabase() {
         try {
             Connection conn = dbHelper.getConnection();
+            //
+            // Drop old tables if they are there.
+            //
             dbHelper.execute(conn, "DROP TABLE IF EXISTS BLOCKS");
             dbHelper.execute(conn, "DROP TABLE IF EXISTS CONNECTIONS");
             dbHelper.execute(conn, "DROP TABLE IF EXISTS CROSSINGS");
             dbHelper.execute(conn, "DROP TABLE IF EXISTS STATIONS");
-
+            //
+            // Creates tables.
+            //
             dbHelper.execute(conn, "CREATE TABLE BLOCKS (\n"
                     + " line text NOT NULL,\n"
                     + " section varchar(1),\n"
@@ -219,15 +288,10 @@ public class TrackModelFrame extends javax.swing.JFrame {
                     + " grade float,\n"
                     + " speed_limit integer,\n"
                     + " underground boolean,\n"
-                    + " power boolean,\n"
-                    + " occupied boolean,\n"
-                    + " heater boolean,\n"
-                    + " message varchar(128),\n"
                     + " x float,\n"
                     + " y float,\n"
                     + " track_controller integer,\n"
                     + " tc_orientation integer,\n"
-                    + " maintenance boolean,\n"
                     + " xcenter float,\n"
                     + " ycenter float,\n"
                     + " PRIMARY KEY (line, block)\n"
@@ -266,28 +330,35 @@ public class TrackModelFrame extends javax.swing.JFrame {
         }
     }
 
+    /**
+     * Populates tables from a file.
+     *
+     * @param trackDataFile
+     */
     private void populateDatabase(File trackDataFile) {
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(trackDataFile)));
-
+            //
+            // PreparedStatements for committing.
+            //
             Connection conn = dbHelper.getConnection();
             conn.setAutoCommit(false);
-            PreparedStatement blockStmt = conn.prepareStatement("INSERT INTO BLOCKS VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+            PreparedStatement blockStmt = conn.prepareStatement("INSERT INTO BLOCKS VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
             PreparedStatement connStmt = conn.prepareStatement("INSERT INTO CONNECTIONS VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
             PreparedStatement crossingStmt = conn.prepareStatement("INSERT INTO CROSSINGS VALUES(?, ?, ?);");
             PreparedStatement stationStmt = conn.prepareStatement("INSERT INTO STATIONS VALUES(?, ?, ?, ?, ?, ?);");
-
-            blockStmt.setString(1, "YARD");
-            blockStmt.setInt(3, -1);
-            blockStmt.setBoolean(9, true);
-            blockStmt.addBatch();
-
+            //
+            // Parses through supplid CSV file.
+            //
             String line;
             while ((line = br.readLine()) != null) {
-                if (line.contains("%") || line.contains("Red")) {
+                if (line.contains("%")) {
                     continue;
                 }
                 List<String> items = Arrays.asList(line.split(","));
+                //
+                // Sets blocks table contents.
+                //
                 blockStmt.setString(1, items.get(0));
                 blockStmt.setString(2, items.get(1));
                 blockStmt.setInt(3, Integer.parseInt(items.get(2)));
@@ -296,19 +367,16 @@ public class TrackModelFrame extends javax.swing.JFrame {
                 blockStmt.setFloat(6, Float.parseFloat(items.get(5)));
                 blockStmt.setInt(7, Integer.parseInt(items.get(6)));
                 blockStmt.setBoolean(8, line.contains("UNDERGROUND"));
-                blockStmt.setBoolean(9, true);
-                blockStmt.setBoolean(10, false);
-                blockStmt.setBoolean(11, false);
-                blockStmt.setString(12, "");
-                blockStmt.setFloat(13, Float.parseFloat(items.get(10)));
-                blockStmt.setFloat(14, Float.parseFloat(items.get(11)));
-                blockStmt.setInt(15, Integer.parseInt(items.get(18)));
-                blockStmt.setInt(16, Integer.parseInt(items.get(19)));
-                blockStmt.setBoolean(17, false);
-                blockStmt.setFloat(18, Float.parseFloat(items.get(20)));
-                blockStmt.setFloat(19, Float.parseFloat(items.get(21)));
+                blockStmt.setFloat(9, Float.parseFloat(items.get(10)));
+                blockStmt.setFloat(10, Float.parseFloat(items.get(11)));
+                blockStmt.setInt(11, Integer.parseInt(items.get(18)));
+                blockStmt.setInt(12, Integer.parseInt(items.get(19)));
+                blockStmt.setFloat(13, Float.parseFloat(items.get(20)));
+                blockStmt.setFloat(14, Float.parseFloat(items.get(21)));
                 blockStmt.addBatch();
-
+                //
+                // Sets connection table contents.
+                //
                 connStmt.setString(1, items.get(0));
                 connStmt.setString(2, items.get(1));
                 connStmt.setInt(3, Integer.parseInt(items.get(2)));
@@ -326,13 +394,18 @@ public class TrackModelFrame extends javax.swing.JFrame {
                     connStmt.setNull(10, java.sql.Types.INTEGER);
                 }
                 connStmt.addBatch();
-
+                //
+                // Sets crossing table contents.
+                //
                 if (line.contains("CROSSING")) {
                     crossingStmt.setString(1, items.get(0));
                     crossingStmt.setInt(2, Integer.parseInt(items.get(2)));
                     crossingStmt.setBoolean(3, false);
                     crossingStmt.addBatch();
                 }
+                //
+                // Sets station table contents.
+                //
                 if (line.contains("STATION")) {
                     List<String> swag = Arrays.asList(items.get(7).split(";"));
                     stationStmt.setString(1, items.get(0));
@@ -357,89 +430,96 @@ public class TrackModelFrame extends javax.swing.JFrame {
         }
     }
 
+    /**
+     * Refreshes the table data.
+     */
     protected void refreshTables() {
-
-        TrackModelTableModel blockTableModel = TrackModelTableModel.getBlockTableModel();
-        TrackModelTableModel switchTableModel = TrackModelTableModel.getSwitchTableModel();
-        TrackModelTableModel crossingTableModel = TrackModelTableModel.getCrossingTableModel();
-        TrackModelTableModel stationTableModel = TrackModelTableModel.getStationTableModel();
-
-        blockTable.setModel(blockTableModel);
-        switchTable.setModel(switchTableModel);
-        crossingTable.setModel(crossingTableModel);
-        stationTable.setModel(stationTableModel);
-
-        try {
-            Connection conn = dbHelper.getConnection();
-
-            ResultSet rs = occupancyCheckBox.isSelected()
-                    ? dbHelper.query(conn, "SELECT * FROM BLOCKS WHERE OCCUPIED")
-                    : dbHelper.query(conn, "SELECT * FROM BLOCKS");
-            while (rs.next()) {
-                Object rowData[] = {
-                    rs.getString(1),
-                    rs.getString(2),
-                    rs.getInt(3),
-                    rs.getDouble(4) * TrackBlock.METER_TO_YARD_MULTIPLIER,
-                    rs.getDouble(5),
-                    rs.getDouble(6),
-                    rs.getInt(7) * TrackBlock.KILOMETER_TO_MILE_MULTIPLIER,
-                    rs.getBoolean(8) ? "UNDERGROUND" : "",
-                    rs.getBoolean(9) ? "POWER" : "OUTAGE",
-                    rs.getBoolean(10) ? "OCCUPIED" : (rs.getBoolean(17) ? "CLOSED" : ""),
-                    rs.getBoolean(11) ? "ON" : "OFF",
-                    rs.getString(12)
-                };
-                blockTableModel.addRow(rowData);
-            }
-
-            rs = dbHelper.query(conn, "SELECT * FROM CONNECTIONS WHERE SWITCH_BLOCK;");
-            while (rs.next()) {
-                Object rowData2[] = {
-                    rs.getString(1),
-                    rs.getString(2),
-                    rs.getInt(3),
-                    rs.getInt(4),
-                    rs.getInt(5),
-                    rs.getInt(6),
-                    rs.getInt(7),
-                    rs.getInt(8) == -1 ? "YARD" : rs.getInt(8),
-                    rs.getInt(9),
-                    rs.getInt(10) == -1 ? "YARD" : rs.getInt(10)
-                };
-                switchTableModel.addRow(rowData2);
-            }
-
-            rs = dbHelper.query(conn, "SELECT * FROM CROSSINGS NATURAL JOIN BLOCKS;");
-            while (rs.next()) {
-                Object rowData[] = {
-                    rs.getString(1),
-                    rs.getString(4),
-                    rs.getInt(2),
-                    rs.getDouble(5),
-                    rs.getBoolean(11) ? "OCCUPIED" : (rs.getBoolean(18) ? "CLOSED" : ""),
-                    rs.getBoolean(3) ? "ON" : "OFF"
-                };
-                crossingTableModel.addRow(rowData);
-            }
-
-            rs = dbHelper.query(conn, "SELECT * FROM STATIONS;");
-            while (rs.next()) {
-                Object rowData[] = {
-                    rs.getString(1),
-                    rs.getString(2),
-                    rs.getInt(3),
-                    rs.getString(4),
-                    rs.getInt(5)
-                };
-                stationTableModel.addRow(rowData);
-            }
-
-            rs.close();
-            conn.close();
-        } catch (SQLException ex) {
-            Logger.getLogger(TrackModelFrame.class.getName()).log(Level.SEVERE, null, ex);
+        //
+        // Refreshes the map UI.
+        //
+        if (tmmf != null) {
+            tmmf.repaint();
         }
+        //
+        // Prepares new fresh vectors.
+        //
+        Vector<Vector<Object>> blockVector = new Vector<Vector<Object>>();
+        Vector<Vector<Object>> switchVector = new Vector<>();
+        Vector<Vector<Object>> crossingVector = new Vector<>();
+        Vector<Vector<Object>> stationVector = new Vector<>();
+        Vector<Object> row;
+        //
+        // Populates block vector.
+        //
+        for (TrackBlock tb : tm.blocks) {
+            if (tb.block != 0 && (!occupancyCheckBox.isSelected() || tb.isOccupied)) {
+                row = new Vector<>();
+                row.add(tb.line.toUpperCase());
+                row.add(tb.section);
+                row.add(tb.block);
+                row.add(tb.length * TrackBlock.METER_TO_YARD_MULTIPLIER);
+                row.add(tb.curvature);
+                row.add(tb.grade);
+                row.add(tb.speedLimit * TrackBlock.KILOMETER_TO_MILE_MULTIPLIER);
+                row.add(tb.isUnderground ? "UNDERGROUND" : "");
+                row.add(tb.isPowerOn ? "POWER" : "OUTAGE");
+                row.add(tb.isOccupied ? "OCCUPIED" : (tb.closedForMaintenance ? "CLOSED" : ""));
+                row.add(tb.isHeaterOn ? "ON" : "OFF");
+                row.add(tb.message);
+                blockVector.add(row);
+            }
+            //
+            // Populates switch vector.
+            //
+            if (tb.isSwitch) {
+                row = new Vector<>();
+                row.add(tb.line.toUpperCase());
+                row.add(tb.section);
+                row.add(tb.block);
+                row.add(tb.prevBlockId);
+                row.add(tb.prevBlockDir);
+                row.add(tb.nextBlockId);
+                row.add(tb.nextBlockDir);
+                row.add(tb.switchBlockId == 0 ? "YARD" : tb.switchBlockId);
+                row.add(tb.switchDirection);
+                row.add(tb.switchPosition == 0 ? "YARD" : tb.switchPosition);
+                switchVector.add(row);
+            }
+            //
+            // Populates crossing vector.
+            //
+            if (tb.isCrossing) {
+                Crossing c = tm.getCrossing(tb.line, tb.block);
+                row = new Vector<>();
+                row.add(tb.line.toUpperCase());
+                row.add(tb.section);
+                row.add(tb.block);
+                row.add(tb.length);
+                row.add(tb.isOccupied ? "OCCUPIED" : (tb.closedForMaintenance ? "CLOSED" : ""));
+                row.add(c.signal ? "ON" : "OFF");
+                crossingVector.add(row);
+            }
+            //
+            // Populates station vector.
+            //
+            if (tb.isStation) {
+                Station s = tm.getStation(tb.line, tb.block);
+                row = new Vector<>();
+                row.add(s.line.toUpperCase());
+                row.add(s.section);
+                row.add(s.block);
+                row.add(s.name);
+                row.add(s.passengers);
+                stationVector.add(row);
+            }
+        }
+        //
+        // Replace existing vector with new vector.
+        //
+        blockTableModel.setDataVector(blockVector, TrackModelTableModel.getBlockColumnNames());
+        switchTableModel.setDataVector(switchVector, TrackModelTableModel.getSwitchColumnNames());
+        crossingTableModel.setDataVector(crossingVector, TrackModelTableModel.getCrossingColumnNames());
+        stationTableModel.setDataVector(stationVector, TrackModelTableModel.getStationColumnNames());
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -449,6 +529,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
     private javax.swing.JScrollPane crossingScrollPane;
     public javax.swing.JTable crossingTable;
     private javax.swing.JButton importButton;
+    private javax.swing.JButton mapButton;
     private javax.swing.JButton murphButton;
     private javax.swing.JCheckBox occupancyCheckBox;
     private javax.swing.JScrollPane stationScrollPane;

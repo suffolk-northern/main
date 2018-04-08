@@ -29,6 +29,8 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="tabbedPane" pref="876" max="32767" attributes="0"/>
                   <Group type="102" attributes="0">
+                      <Component id="mapButton" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Component id="murphButton" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Component id="occupancyCheckBox" min="-2" max="-2" attributes="0"/>
@@ -46,13 +48,18 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="tabbedPane" pref="479" max="32767" attributes="0"/>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="clearButton" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="importButton" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="murphButton" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="occupancyCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
+              <Component id="tabbedPane" pref="485" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="clearButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="importButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="103" alignment="0" groupAlignment="3" attributes="0">
+                      <Component id="murphButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="mapButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="occupancyCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -184,6 +191,14 @@
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="occupancyCheckBoxActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="mapButton">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Launch Visual Track Model"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mapButtonActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>
