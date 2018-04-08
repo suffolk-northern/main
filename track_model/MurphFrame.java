@@ -48,7 +48,6 @@ public class MurphFrame extends javax.swing.JFrame {
         setResizable(false);
 
         blockComboBox.setMaximumRowCount(24);
-        blockComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Block 1", "Block 2", "Block 3", "Block 4", "Block 5" }));
 
         breakRailButton.setText("Broken Rail");
         breakRailButton.addActionListener(new java.awt.event.ActionListener() {

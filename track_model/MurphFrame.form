@@ -69,15 +69,6 @@
     <Component class="javax.swing.JComboBox" name="blockComboBox">
       <Properties>
         <Property name="maximumRowCount" type="int" value="24"/>
-        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-          <StringArray count="5">
-            <StringItem index="0" value="Block 1"/>
-            <StringItem index="1" value="Block 2"/>
-            <StringItem index="2" value="Block 3"/>
-            <StringItem index="3" value="Block 4"/>
-            <StringItem index="4" value="Block 5"/>
-          </StringArray>
-        </Property>
       </Properties>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>

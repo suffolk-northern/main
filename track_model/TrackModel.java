@@ -3,7 +3,6 @@
  *
  * Main Track Model.
  */
-
 package track_model;
 
 import java.sql.Connection;
@@ -55,7 +54,6 @@ public class TrackModel implements Updateable {
      */
     public TrackModel() {
         initializeLocalArrays();
-
     }
 
     /**
@@ -104,13 +102,14 @@ public class TrackModel implements Updateable {
      */
     protected void initializeLocalArrays() {
         blocks = new ArrayList<>();
+        ArrayList<TrackBlock> blocksTemp = new ArrayList<>();   // Dumb way for program initialization without track database.
         crossings = new ArrayList<>();
         stations = new ArrayList<>();
         //
         // Generates yard blocks.
         //
-        blocks.add(generateYardBlock("green"));
-        blocks.add(generateYardBlock("red"));
+        blocksTemp.add(generateYardBlock("green"));
+        blocksTemp.add(generateYardBlock("red"));
         //
         // Gathers data from database.
         //
@@ -119,7 +118,7 @@ public class TrackModel implements Updateable {
                 try (Connection conn = dbHelper.getConnection()) {
                     ResultSet rs = dbHelper.query(conn, "SELECT LINE, BLOCK FROM BLOCKS WHERE BLOCK > 0;");
                     while (rs.next()) {
-                        blocks.add(getBlockFromDatabase(rs.getString("Line"), rs.getInt("Block")));
+                        blocksTemp.add(getBlockFromDatabase(rs.getString("Line"), rs.getInt("Block")));
                     }
                     rs = dbHelper.query(conn, "SELECT LINE, BLOCK FROM CROSSINGS;");
                     while (rs.next()) {
@@ -135,8 +134,12 @@ public class TrackModel implements Updateable {
                 Logger.getLogger(TrackModel.class.getName()).log(Level.SEVERE, null, ex);
             }
         } else {
-            JOptionPane.showMessageDialog(null, "Track database not found. Trains were not registered.\n\nPlease import track database.", "Warning", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Track database not found.\n\nPlease import track database or train control system will shut down.", "Warning", JOptionPane.WARNING_MESSAGE);
         }
+        //
+        // Sets up blocks array so program can continue. It's dumb. DO NOT CHANGE.
+        //
+        blocks = blocksTemp;
     }
 
     /**
@@ -147,6 +150,26 @@ public class TrackModel implements Updateable {
         tmf.setDefaultCloseOperation(javax.swing.WindowConstants.HIDE_ON_CLOSE);
         tmf.setLocationRelativeTo(null);
         tmf.setVisible(true);
+    }
+
+    /**
+     * Launches initial integration UI if no track database is loaded.
+     * Difference is it kills the whole program if no database is loaded.
+     */
+    public void launchInitialUI() {
+        tmf = new TrackModelFrame(this);
+        tmf.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        tmf.setLocationRelativeTo(null);
+        tmf.setVisible(true);
+    }
+
+    /**
+     * Changes close operation on initial UI after database is loaded. Don't
+     * want it to exit the whole program on close so now it'll dispose itself on
+     * close.
+     */
+    public void resetInitialUICloseOperation() {
+        tmf.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     }
 
     /**
@@ -168,7 +191,7 @@ public class TrackModel implements Updateable {
      *
      * @return doTablesExist
      */
-    protected static boolean doTablesExist() {
+    public static boolean doTablesExist() {
         boolean exist = false;
         try {
             try (Connection conn = dbHelper.getConnection()) {
@@ -660,6 +683,7 @@ public class TrackModel implements Updateable {
      * @param line
      */
     public void registerTrain(TrainModel tm, String line) {
+        line = line.toLowerCase();
         if (doTablesExist()) {
             trains.add(new TrainData(tm, getYardBlock(line)));
             tm.slew(new Pose(getYardBlock(line).start, GREEN_LINE_ORIENTATION));

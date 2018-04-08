@@ -18,6 +18,10 @@ import java.awt.EventQueue;
 // FIXME: naming convention: pick Ctc and Mbo or CTC and MBO
 //
 import ctc.Ctc;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+//import mbo.Mbo;
+import track_controller.TrackController;
 import mbo.MboController;
 import mbo.MboScheduler;
 import mbo.CtcRadio;
@@ -59,6 +63,23 @@ public class Main
 		ctc = new Ctc();
 
 		trackModel = new TrackModel();
+                
+                //
+                // Forces user to load track database into program.
+                // Will exit otherwise.
+                //
+                if (!trackModel.doTablesExist())    {
+                    try{
+                        trackModel.launchInitialUI();
+                        while(trackModel.getBlockCount() < 3)  {
+                            Thread.sleep(1000);
+                        }
+                        Thread.sleep(1000);
+                        trackModel.resetInitialUICloseOperation();
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
 		
 		MboController mboCont = new MboController("green");
 		MboScheduler mboSched = new MboScheduler("green");
