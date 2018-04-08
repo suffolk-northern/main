@@ -138,7 +138,7 @@ public class Ctc implements Updateable{
 		updateTrack();
 		updateTrains();
 		
-		
+		/*
 		for(Block blk : greenline)
 		{
 			System.out.println(blk.display());
@@ -161,7 +161,7 @@ public class Ctc implements Updateable{
 			
 			System.out.println(blk.nextBlockDir + " " + blk.prevBlockDir);
 		}
-		
+		*/
 		
 		
 	}
@@ -501,7 +501,7 @@ public class Ctc implements Updateable{
 	private static void routeTrain(Train train, Block dest, double sp) {
 		ArrayDeque<Block> route = findRoute(train, train.getLoc(), dest);
 
-		printRoute(route);
+		//printRoute(route);
 
 		train.setRoute(route);
 
@@ -1085,8 +1085,8 @@ public class Ctc implements Updateable{
 		}
 
 		//System.out.println("To Track Controller");
-		System.out.println("Train " + train.getID() + " at location " + loc.display());
-		System.out.println("Send speed = " + speed + ", authority = " + auth);
+		//System.out.println("Train " + train.getID() + " at location " + loc.display());
+		//System.out.println("Send speed = " + speed + ", authority = " + auth);
 		
 		//if (swpos != null) {
 		//	System.out.println("Next switch position, in block: " + sw.display() + " from: " + from.display() + " to: " + to.display());
