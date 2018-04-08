@@ -27,12 +27,13 @@ public class MboController implements Updateable
 	// private TrackModel myTrack;
 	private MboControllerUI ui;
 	private String lineName;
-	private boolean enabled = false;
+	private boolean enabled;
 	private CtcRadio ctcRadio;
 	
 	public MboController(String ln)
 	{
 		lineName = ln;
+		enabled = false;
 	}
 	
 	public void launchUI()
@@ -121,32 +122,35 @@ public class MboController implements Updateable
 		
 		updateSwitches();
 		
-		for (TrainTracker trainInfo:trains)
+		if (enabled == true)
 		{
-			if (trainInfo == null)
-				break;
-			double authority = findAuthority(trainInfo);
-			trainInfo.setAuthority((int) authority);
-			trainInfo.setSuggestedSpeed(trainInfo.block.getSpeedLimit());
-			MboMovementCommand com;
-			try
+			for (TrainTracker trainInfo:trains)
 			{
-				com = new MboMovementCommand(trainInfo.getSuggestedSpeed(), trainInfo.getAuthority());
+				if (trainInfo == null)
+					break;
+				double authority = findAuthority(trainInfo);
+				trainInfo.setAuthority((int) authority);
+				trainInfo.setSuggestedSpeed(trainInfo.block.getSpeedLimit());
+				MboMovementCommand com;
+				try
+				{
+					com = new MboMovementCommand(trainInfo.getSuggestedSpeed(), trainInfo.getAuthority());
+				}
+				catch (IllegalArgumentException e)
+				{
+					System.out.println("MBO tried to send an invalid speed / authority.");
+					System.out.println("Sending 0 speed / authority instead.");
+					com = new MboMovementCommand(0, 0);
+				}
+				trainInfo.getRadio().send(com);
+				GlobalCoordinates loc = trainInfo.getLocation();
+				// TODO: change to distance along block
+				int blockID = trainInfo.getBlock().getID();
+				// int trackDist = (int) TrackModel.getDistanceTo(lineName, blockID, loc);
+				int trackDist = 0;
+				if (ui != null)
+					ui.updateTrain(trainInfo.getID(), trainInfo.block.getSection(), trainInfo.block.getID(), trackDist, trainInfo.getAuthority(), trainInfo.getSuggestedSpeed());
 			}
-			catch (IllegalArgumentException e)
-			{
-				System.out.println("MBO tried to send an invalid speed / authority.");
-				System.out.println("Sending 0 speed / authority instead.");
-				com = new MboMovementCommand(0, 0);
-			}
-			trainInfo.getRadio().send(com);
-			GlobalCoordinates loc = trainInfo.getLocation();
-			// TODO: change to distance along block
-			int blockID = trainInfo.getBlock().getID();
-			// int trackDist = (int) TrackModel.getDistanceTo(lineName, blockID, loc);
-			int trackDist = 0;
-			if (ui != null)
-				ui.updateTrain(trainInfo.getID(), trainInfo.block.getSection(), trainInfo.block.getID(), trackDist, trainInfo.getAuthority(), trainInfo.getSuggestedSpeed());
 		}
 	}
 	
