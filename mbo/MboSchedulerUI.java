@@ -7,8 +7,7 @@ import java.io.File;
 import java.sql.Time;
 import javax.swing.table.*;
 
-import mbo.schedules.ScheduleWriter;
-import mbo.schedules.LineSchedule;
+import mbo.schedules.*;
 /**
  *
  * @author Kaylene Stocking
@@ -21,7 +20,6 @@ public class MboSchedulerUI extends javax.swing.JFrame
 	private Time start;
 	private Time end;
 	private String lineName;
-	private String[] stationNames;
 	
     /**
      * Creates new form Scheduler
@@ -59,7 +57,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
         generateScheduleButton = new javax.swing.JButton();
         jProgressBar1 = new javax.swing.JProgressBar();
         jSeparator1 = new javax.swing.JSeparator();
-        jButton4 = new javax.swing.JButton();
+        viewShceduleButton = new javax.swing.JButton();
         exportScheduleButton = new javax.swing.JButton();
         jLabel11 = new javax.swing.JLabel();
         jRadioButton1 = new javax.swing.JRadioButton();
@@ -183,16 +181,16 @@ public class MboSchedulerUI extends javax.swing.JFrame
         mainPanel.add(jSeparator1);
         jSeparator1.setBounds(120, 270, 141, 10);
 
-        jButton4.setText("View Schedule");
-        jButton4.addActionListener(new ActionListener() 
+        viewShceduleButton.setText("View Schedule");
+        viewShceduleButton.addActionListener(new ActionListener() 
 		{
             public void actionPerformed(ActionEvent evt) 
 			{
-                jButton4ActionPerformed(evt);
+                viewScheduleButtonClicked(evt);
             }
         });
-        mainPanel.add(jButton4);
-        jButton4.setBounds(50, 360, 117, 25);
+        mainPanel.add(viewShceduleButton);
+        viewShceduleButton.setBounds(50, 360, 117, 25);
 
         exportScheduleButton.setText("Export Schedule");
         exportScheduleButton.addActionListener(new ActionListener() 
@@ -345,17 +343,10 @@ public class MboSchedulerUI extends javax.swing.JFrame
 
         stationScheduleTable.setModel(new DefaultTableModel(
             new Object [][] {
-                {"8:00:00", "Departure", "1", "3"},
-                {"8:20:00", "Departure", "2", "4"},
-                {"8:40:00", "Departure", "3", "5"},
-                {"9:00:00", "Departure", "4", "6"},
-                {"9:10:00", "Arrival", "1", "3"},
-                {"9:15:00", "Departure", "5", "1"},
-                {"9:30:00", "Departure", "1", "3"},
-                {"9:45:00", "Arrival", "2", "4"}
+                {"Not initialized", "Not initialized", "Not initialized"}
             },
             new String [] {
-                "Time", "Action", "Train ID", "Driver ID"
+                "Time", "Action", "Train ID"
             }
         ) {
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -496,10 +487,14 @@ public class MboSchedulerUI extends javax.swing.JFrame
 		scheduleRequest = true;
     }                                        
 
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {                                         
-        // View schedule button in Panel1
+    private void viewScheduleButtonClicked(java.awt.event.ActionEvent evt) {                                         
+        // View schedule button in main panel
+		if (!schedule.stationSchedulesExist())
+			schedule.generateStationSchedules();
+		String defaultStation = schedule.getStationNames().get(0);
+		generateStationTable(defaultStation);
         CardLayout cl = (CardLayout)(getContentPane().getLayout());
-        cl.show(getContentPane(), "card4");       
+        cl.show(getContentPane(), "card4");  
     }                                        
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {                                         
@@ -557,6 +552,33 @@ public class MboSchedulerUI extends javax.swing.JFrame
 			}
 		};
 		throughputTable.setModel(mod);
+	}
+	
+	public void generateStationTable(String stationName)
+	{
+		StationSchedule ss = schedule.getStationSchedule(stationName);
+		int numEvents = ss.getEvents().size();
+		Object[][] tableObject = new Object[3][];
+		int ind = 0;
+		for (StationEvent se : ss.getEvents())
+		{
+			tableObject[ind][0] = se.getTime().toString();
+			if (se.getEvent() == TrainEvent.EventType.ARRIVAL)
+				tableObject[ind][1] = "ARRIVAL";
+			else
+				tableObject[ind][1] = "DEPARTURE";
+			tableObject[ind][2] = String.format("%d", se.getTrainID());
+		}
+		
+		String[] headers = {"Time", "Action", "Train ID"};
+		DefaultTableModel mod = new DefaultTableModel(tableObject, headers)
+		{
+			public boolean isCellEditable(int rowIndex, int colIndex)
+			{
+				return false;
+			}		
+		};
+		stationScheduleTable.setModel(mod);
 	}
 	
     private void jButton11ActionPerformed(java.awt.event.ActionEvent evt) {                                          
@@ -690,7 +712,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
     private javax.swing.JButton jButton13;
     private javax.swing.JButton finishedThroughputButton;
     private javax.swing.JButton generateScheduleButton;
-    private javax.swing.JButton jButton4;
+    private javax.swing.JButton viewShceduleButton;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton exportScheduleButton;
     private javax.swing.JButton jButton7;

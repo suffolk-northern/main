@@ -9,20 +9,13 @@ import java.sql.Time;
 public class StationEvent {
 	private Time eventTime;
 	private int trainID;
-	private int driverID;
-	private EventType event;
+	private TrainEvent.EventType event;
 	
-	public StationEvent(Time et, int tID, int dID, EventType e)
+	public StationEvent(Time et, int tID, TrainEvent.EventType e)
 	{
 		eventTime = et;
 		trainID = tID;
-		driverID = dID;
 		event = e;
-	}
-	
-	public enum EventType
-	{
-		ARRIVAL, DEPARTURE
 	}
 	
 	public Time getTime()
@@ -35,12 +28,7 @@ public class StationEvent {
 		return trainID;
 	}
 	
-	public int getDriverID()
-	{
-		return driverID;
-	}
-	
-	public EventType getEvent()
+	public TrainEvent.EventType getEvent()
 	{
 		return event;
 	}
