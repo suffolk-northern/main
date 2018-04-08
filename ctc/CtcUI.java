@@ -1156,13 +1156,15 @@ public class CtcUI extends javax.swing.JFrame {
     private void manualModeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manualModeActionPerformed
 		// TODO add your handling code here:
 		//System.out.println("Manual mode");
-		ctc.manMode();
+		ctc.manMode("green");
+		//ctc.manMode("red");
     }//GEN-LAST:event_manualModeActionPerformed
 
     private void autoModeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoModeActionPerformed
 		// TODO add your handling code here:
 		//System.out.println("Automatic mode");
-		ctc.autoMode();
+		ctc.autoMode("green");
+		//ctc.autoMode("red");
     }//GEN-LAST:event_autoModeActionPerformed
 
 	/**
