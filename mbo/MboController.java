@@ -82,7 +82,7 @@ public class MboController implements Updateable
 				int prevBlock = curBlock.getPrevBlockId();
 				int speedLimit = curBlock.getSpeedLimit();
 				char section = curBlock.getSection();
-				line[i+1] = new BlockTracker(i+1, nextBlock, prevBlock, blockLength, speedLimit, section);
+				line[i+1] = new BlockTracker(i+1, nextBlock, prevBlock, blockLength, speedLimit, section, null);
 			}
 		}
 	}
@@ -237,7 +237,7 @@ public class MboController implements Updateable
 	{
 		if (ctcRadio == null)
 			return;
-		int[][] switches = ctcRadio.getSwitchStates();
+		int[][] switches = ctcRadio.getSwitchStates(lineName);
 		// TODO: change next and prev blocks based on switch changes
 	}
 	

@@ -34,7 +34,7 @@ public class MboControllerUI extends JFrame
 	{
 		frame = new JFrame("MBOController");
 		frame.setLayout(null);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		frame.setSize(1500, 1500);
 		mainPanel = new JPanel();
 		mainPanel.setLayout(null);
