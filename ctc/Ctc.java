@@ -453,9 +453,15 @@ public class Ctc implements Updateable{
 	public static void disableMBO(String line)
 	{
 		if(line.equalsIgnoreCase("green"))
+		{
 			greenradio.disableMovingBlock();
+			greenradio.hideController();
+		}
 		else if(line.equalsIgnoreCase("red"))
+		{
 			redradio.disableMovingBlock();
+			redradio.hideController();
+		}
 	}
 	
 	public static void autoMode()
