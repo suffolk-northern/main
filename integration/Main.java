@@ -116,7 +116,7 @@ public class Main
 		
 		// CTC <--> MBO
 		CtcRadio ctcRadio = new CtcRadio(mboCont, mboSched, ctc);
-		//ctc.registerMbo(ctcRadio);
+		ctc.setCtcRadios(ctcRadio,null);
 		mboCont.registerCtc(ctcRadio);
 		
 		// Track Model <---> MBO
