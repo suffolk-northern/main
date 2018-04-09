@@ -28,7 +28,6 @@ public class UI extends javax.swing.JFrame {
 
     // FIXME: see imports
     private Ctc ctc;
-    //private Mbo mbo;
     private TrackModel trackModel;
     private TrainModel trainModel;
     private TrainController trainController;

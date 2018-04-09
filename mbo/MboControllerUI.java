@@ -34,7 +34,7 @@ public class MboControllerUI extends JFrame
 	{
 		frame = new JFrame("MBOController");
 		frame.setLayout(null);
-		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setSize(1500, 1500);
 		mainPanel = new JPanel();
 		mainPanel.setLayout(null);
@@ -115,6 +115,11 @@ public class MboControllerUI extends JFrame
 		model.setValueAt(location, trainRow, 3);
 		model.setValueAt(authority, trainRow, 4);
 		model.setValueAt(speed, trainRow, 5);
+	}
+	
+	public void removeTrain(int trainID)
+	{
+		// TODO: implement this
 	}
 		
 	public static void main(String args[]) {

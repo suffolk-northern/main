@@ -6,7 +6,7 @@ import java.io.*;
  * @author Kaylene Stocking
  */
 public class ScheduleWriter {
-	LineSchedule sched;
+	private LineSchedule sched;
 	
 	public ScheduleWriter(LineSchedule newSched)
 	{

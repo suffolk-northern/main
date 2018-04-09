@@ -36,16 +36,8 @@ public class MboScheduler implements Updateable
 	
 	public void launchUI()
 	{
-		if (ui == null)
-		{
-			ui = new MboSchedulerUI();
-		}
-	}
-	
-	public void showUI()
-	{
-		if (ui != null)
-			ui.setVisible(true);
+		ui = new MboSchedulerUI(lineName);
+		ui.setVisible(true);
 	}
 	
 	public void hideUI()
