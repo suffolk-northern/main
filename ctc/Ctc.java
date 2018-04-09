@@ -627,6 +627,7 @@ public class Ctc implements Updateable{
 		//System.out.println("calc auth");
 		
 		double auth = 0;
+		boolean flipped = false;
 
 		ArrayDeque<Block> temp = route.clone();
 		Block block = temp.poll();
@@ -656,6 +657,9 @@ public class Ctc implements Updateable{
 					auth += block.length;
 					success = false;
 					
+					if(flipped)
+						return auth;
+					
 					// check if it is safe to flip switch
 					if(block.sw_to.peekFirst().occupied == false && block.sw_to.peekLast().occupied == false)
 					{
@@ -664,6 +668,7 @@ public class Ctc implements Updateable{
 						{
 							block.sw_curr_to = temp.peek();
 							updateTrack();
+							flipped = true;
 						}
 					}
 					
@@ -674,6 +679,9 @@ public class Ctc implements Updateable{
 				{
 					success = false;
 					
+					if(flipped)
+						return auth;
+					
 					// check if it is safe to flip switch
 					if(block.sw_from.peekFirst().occupied == false && block.sw_from.peekLast().occupied == false)
 					{
@@ -682,6 +690,7 @@ public class Ctc implements Updateable{
 						{
 							block.sw_curr_from = prev;
 							updateTrack();
+							flipped = true;
 						}
 					}
 
@@ -697,6 +706,9 @@ public class Ctc implements Updateable{
 				{
 					auth += block.length;
 				}
+				
+				flipped = true;
+				
 			} else {
 				auth += block.length;
 			}
@@ -1289,12 +1301,12 @@ public class Ctc implements Updateable{
 
 		}
 
-		/*
+		
 		ArrayDeque<Block> rtemp = route.clone();
 		while(!rtemp.isEmpty())
 			System.out.print(rtemp.poll().display() + " ");
 		System.out.println();
-		*/
+		
 		
 		return route;
 	}
