@@ -1067,18 +1067,21 @@ public class CtcUI extends javax.swing.JFrame {
 			}
 		}
 		
-		int sizegreen = greens.size();
-		int sizered = reds.size();
+		int sizegreen = greens.size() + 1;
+		int sizered = reds.size() + 1;
 		
 		greenBlocks = new String[sizegreen];
 		redBlocks = new String[sizered];
 		
-		for(int i = 0; i < sizegreen; i++)
+		greenBlocks[0] = "YARD";
+		redBlocks[0] = "YARD";
+		
+		for(int i = 1; i < sizegreen; i++)
 		{
 			greenBlocks[i] = greens.poll();
 		}
 		
-		for(int i = 0; i < sizered; i++)
+		for(int i = 1; i < sizered; i++)
 		{
 			redBlocks[i] = reds.poll();
 		}
