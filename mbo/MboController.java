@@ -40,7 +40,7 @@ public class MboController implements Updateable
 	{
 		if (ui == null)
 		{
-			ui = new MboControllerUI();
+			ui = new MboControllerUI(lineName);
 			for (TrainTracker trainInfo : trains)
 			{
 				int ID = trainInfo.getID();
@@ -81,9 +81,7 @@ public class MboController implements Updateable
 	{
 		if (line == null)
 		{
-			System.out.println("Initializing line");
 			int numBlocks = TrackModel.getBlockCount(lineName);
-			System.out.printf("Num blocks initalized: %d", numBlocks);
 			line = new BlockTracker[numBlocks+1];
 			for (int i = 0; i < numBlocks; i++)
 			{
