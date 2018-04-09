@@ -110,7 +110,7 @@ public class Ctc implements Updateable{
 				}
 				
 				if(train != null)
-					train.location = block;
+					train.setLoc(block);
 			}
 		}
 	}
@@ -1273,6 +1273,8 @@ public class Ctc implements Updateable{
 			maxlen = redline.size();
 		}
 		
+		initFrom = train.getPrevBlock();
+		
 		findRouteRec(start, dest, new ArrayDeque<Block>());
 
 		int minsize = Integer.MAX_VALUE;
@@ -1299,6 +1301,7 @@ public class Ctc implements Updateable{
 
 	private static ArrayDeque<ArrayDeque<Block>> routes;
 	private static int maxlen;
+	private static Block initFrom;
 
 	private static void findRouteRec(Block start, Block dest, ArrayDeque<Block> route) {
 		
@@ -1314,7 +1317,7 @@ public class Ctc implements Updateable{
 		
 		Block cameFrom = route.peekLast();
 		if(cameFrom == null)
-			cameFrom = new Block();
+			cameFrom = initFrom;
 		
 		route.add(start);
 		//explored.add(start);
@@ -1557,6 +1560,7 @@ public class Ctc implements Updateable{
 		protected double deadline;
 		protected int passengers;
 		protected int driverID;
+		protected Block lastBlock;
 
 		public Train() {
 			ID = 0;
@@ -1568,6 +1572,7 @@ public class Ctc implements Updateable{
 			deadline = 0;
 			passengers = 0;
 			driverID = 0;
+			lastBlock = null;
 		}
 
 		public Train(int id, Block loc, int dID) {
@@ -1580,6 +1585,7 @@ public class Ctc implements Updateable{
 			deadline = 0;
 			passengers = 0;
 			driverID = dID;
+			lastBlock = null;
 
 		}
 
@@ -1593,13 +1599,28 @@ public class Ctc implements Updateable{
 			deadline = 0;
 			passengers = 0;
 			driverID = 0;
+			lastBlock = null;
 		}
 
+		private Block getPrevBlock()
+		{
+			if(lastBlock != null)
+				return lastBlock;
+			
+			return new Block();
+		}
+		
+		private void setPrevBlock(Block pb)
+		{
+			lastBlock = pb;
+		}
+		
 		private ArrayDeque<Block> getRoute() {
 			return route;
 		}
 
 		private void setLoc(Block newLoc) {
+			lastBlock = location;
 			location = newLoc;
 		}
 
