@@ -40,8 +40,8 @@ public class TrackModel implements Updateable {
     private static final Orientation GREEN_LINE_ORIENTATION = Orientation.radians(0.9 * Math.PI);
     private static final Orientation RED_LINE_ORIENTATION = Orientation.radians(0.3737 * Math.PI);
     // Hard-coded initial yard coordinates.
-    private static final double YARD_X_LOCATION = 600;
-    private static final double YARD_Y_LOCATION = -2100;
+    private static final double YARD_X_LOCATION = 550;
+    private static final double YARD_Y_LOCATION = -2200;
 
     /**
      * For testing purposes.

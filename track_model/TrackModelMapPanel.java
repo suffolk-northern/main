@@ -37,6 +37,7 @@ public class TrackModelMapPanel extends JPanel {
     private int xBound = 20;
     private int yBound = 500;
     // Object images.
+    private Image yardArt = null;
     private Image stationArt = null;
     private Image crossingArt = null;
     private Image mainLogoArt = null;
@@ -85,6 +86,7 @@ public class TrackModelMapPanel extends JPanel {
      */
     private void getImages() {
         try {
+            yardArt = ImageIO.read(getClass().getResource("images/yard-333px.png"));
             stationArt = ImageIO.read(getClass().getResource("images/station-100px.png"));
             crossingArt = ImageIO.read(getClass().getResource("images/crossing-200px.png"));
             mainLogoArt = ImageIO.read(getClass().getResource("images/logo-2000px.png"));
@@ -141,6 +143,15 @@ public class TrackModelMapPanel extends JPanel {
             double xEnd = xBound + (tb.end.longitude() - minLon) * lonMultiplier;
             double yEnd = yBound - (tb.end.latitude() - minLat) * latMultiplier;
             //
+            // Adds yard clipart.
+            //
+            if (tb.block == 0) {
+                int width = yardArt.getWidth(this) * xDimension / 7000;
+                int height = yardArt.getHeight(this) * xDimension / 7000;
+                g2.drawImage(yardArt, (int) xStart - width, (int) yStart - height, width, height, this);
+                continue;
+            }
+            //
             // Sets color of track block.
             // 
             g2.setStroke(new BasicStroke(0));
@@ -152,7 +163,7 @@ public class TrackModelMapPanel extends JPanel {
             //
             // Boldens occupied track blocks.
             //
-            if (tb.isOccupied && tb.block != 0) {
+            if (tb.isOccupied) {
                 g2.setStroke(new BasicStroke(2));
                 g2.setColor(Color.black);
                 g2.setFont(new Font("default", Font.BOLD, 16));
@@ -173,11 +184,14 @@ public class TrackModelMapPanel extends JPanel {
         for (TrainData td : tm.trains) {
             double x = xBound + (td.trainModel.location().longitude() - minLon) * lonMultiplier;
             double y = yBound - (td.trainModel.location().latitude() - minLat) * latMultiplier;
-            g2.setColor(Color.magenta);
             if (td.trackBlock.block == 0) {
+                g2.setColor(td.trackBlock.line.equalsIgnoreCase("green") ? Color.green : Color.red);
+                g2.fillOval(((int) x - 5) + (yardCount % 5) * 10, ((int) y - 5) + (int) (yardCount / 5) * 10, 10, 10);
                 yardCount++;
-                g2.fillOval(((int) x - 5) + (yardCount % 5), ((int) y - 5), 10, 10);
             } else {
+                g2.setColor(Color.black);
+                g2.fillOval((int) x - 6, (int) y - 6, 12, 12);
+                g2.setColor(td.trackBlock.line.equalsIgnoreCase("green") ? Color.green : Color.red);
                 g2.fillOval((int) x - 5, (int) y - 5, 10, 10);
                 g2.drawString(Integer.toString(td.trainModel.id()), (int) x + 15, (int) y + 15);
             }
@@ -191,13 +205,12 @@ public class TrackModelMapPanel extends JPanel {
      */
     private void plopStations(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
+        int width = stationArt.getWidth(this) * xDimension / 3000;
+        int height = stationArt.getHeight(this) * xDimension / 3000;
         for (Station s : tm.stations) {
             double x = xBound + (s.getLocation().longitude() - minLon) * lonMultiplier;
             double y = yBound - (s.getLocation().latitude() - minLat) * latMultiplier;
-            g2.drawImage(stationArt, (int) x - 5, (int) y - 5,
-                    stationArt.getWidth(this) * xDimension / 3000,
-                    stationArt.getHeight(this) * xDimension / 3000,
-                    this);
+            g2.drawImage(stationArt, (int) (x - width * 0.8), (int) (y - width * 0.8), width, height, this);
         }
     }
 
@@ -208,14 +221,13 @@ public class TrackModelMapPanel extends JPanel {
      */
     private void plopCrossings(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
+        int width = crossingArt.getWidth(this) * xDimension / 6000;
+        int height = crossingArt.getHeight(this) * xDimension / 6000;
         for (Crossing c : tm.crossings) {
             TrackBlock tb = tm.getBlock(c.line, c.block);
             double x = xBound + (tb.start.longitude() - minLon) * lonMultiplier;
             double y = yBound - (tb.start.latitude() - minLat) * latMultiplier;
-            g2.drawImage(crossingArt, (int) x, (int) y,
-                    crossingArt.getWidth(this) * xDimension / 6000,
-                    crossingArt.getHeight(this) * xDimension / 6000,
-                    this);
+            g2.drawImage(crossingArt, (int) (x - width * 0.75), (int) (y - height * 0.75), width, height, this);
         }
     }
 
