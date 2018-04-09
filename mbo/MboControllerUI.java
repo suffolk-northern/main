@@ -37,17 +37,19 @@ public class MboControllerUI extends JFrame
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setSize(1500, 1500);
 		mainPanel = new JPanel();
-		mainPanel.setLayout(null);
+		mainPanel.setLayout(new GridBagLayout());
 		trainPanel = new JScrollPane();
-		trainPanel.setPreferredSize(new Dimension(750, 750));
+		// trainPanel.setPreferredSize(new Dimension(750, 750));
 		trainTable = new JTable();
 		lineName = new JLabel();
 		
 		lineName.setText("Blue Line");
-		lineName.setPreferredSize(new Dimension(200, 100));
+		// lineName.setPreferredSize(new Dimension(200, 100));
 		
-		mainPanel.add(lineName, BorderLayout.NORTH);
-		mainPanel.add(trainPanel, BorderLayout.CENTER);
+		GridBagConstraints c = new GridBagConstraints();
+		
+		mainPanel.add(lineName);
+		mainPanel.add(trainPanel);
 		trainPanel.setViewportView(trainTable);
 		
 		tableHeader = new String[] {"Train ID", "Section", "Block", "Location (yards)", "Authority (yards)", "Suggested speed (mph)"};
@@ -60,21 +62,12 @@ public class MboControllerUI extends JFrame
 		};
 		trainTable.setModel(new javax.swing.table.DefaultTableModel(tableContents, tableHeader)
 		{
-		   boolean[] canEdit = new boolean[] {false, false, false, false, false, false};
-
 		   public boolean isCellEditable(int rowIndex, int columnIndex) 
 		   {
-			   return canEdit [columnIndex];
+			   return false;
 		   }
 		}
 		);
-		
-		trainTable.getColumn(0).setPreferredWidth(50);
-		trainTable.getColumn(1).setPreferredWidth(50);
-		trainTable.getColumn(2).setPreferredWidth(50);
-		trainTable.getColumn(3).setPreferredWidth(50);
-		trainTable.getColumn(4).setPreferredWidth(50);
-		trainTable.getColumn(5).setPreferredWidth(50);
 		
 		frame.add(mainPanel);
 		mainPanel.setPreferredSize(new Dimension(1000, 1000));

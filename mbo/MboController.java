@@ -56,12 +56,6 @@ public class MboController implements Updateable
 		}
 	}
 	
-	public void showUI()
-	{
-		if (ui != null)
-			ui.setVisible(true);
-	}
-	
 	public void hideUI()
 	{
 		if (ui != null)
