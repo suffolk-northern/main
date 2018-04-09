@@ -204,6 +204,8 @@ public class TrackModelFrame extends javax.swing.JFrame {
                 ((DefaultTableModel) switchTable.getModel()).setRowCount(0);
                 ((DefaultTableModel) crossingTable.getModel()).setRowCount(0);
                 ((DefaultTableModel) stationTable.getModel()).setRowCount(0);
+
+                tm.initializeLocalArrays();
             } catch (SQLException ex) {
                 Logger.getLogger(TrackModelFrame.class.getName()).log(Level.SEVERE, null, ex);
             }

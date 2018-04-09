@@ -10,6 +10,8 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
+import java.nio.file.FileSystems;
 import javax.swing.JPanel;
 import track_model.TrackModel.TrainData;
 
@@ -27,6 +29,8 @@ public class TrackModelMapPanel extends JPanel {
     // Display margins.
     private final int X_BOUND = 20;
     private final int Y_BOUND = 640;
+    // Object images.
+    private final Image stationArt = null;
 
     /**
      * Initializes map panel.
@@ -36,6 +40,7 @@ public class TrackModelMapPanel extends JPanel {
     public TrackModelMapPanel(TrackModel tm) {
         this.tm = tm;
         setBounds();
+        getImages();
     }
 
     /**
@@ -58,6 +63,12 @@ public class TrackModelMapPanel extends JPanel {
         }
         latMultiplier = 600 / (maxLat - minLat);
         lonMultiplier = 600 / (maxLon - minLon);
+    }
+
+    /**
+     * Gets images to put on map.
+     */
+    private void getImages() {
     }
 
     @Override
