@@ -25,7 +25,9 @@ public class TrackModelMapFrame extends javax.swing.JFrame {
         this.add(tmmp);
         this.setLocationByPlatform(true);
         this.pack();
-
+        //
+        // Responds to resizing.
+        //
         this.addComponentListener(new ComponentListener() {
             @Override
             public void componentResized(ComponentEvent e) {

@@ -68,10 +68,10 @@ public class TrackModelMapPanel extends JPanel {
     }
 
     /**
-     * Establishes window bounds.
+     * Establishes window bounds and performs calculations on how to manage
+     * display dimensions.
      */
     private void setBounds() {
-        System.out.println(xDimension + " " + yDimension);
         lonMultiplier = (xDimension - 60) / (maxLon - minLon);
         latMultiplier = (yDimension * 0.866) / (maxLat - minLat);
         X_BOUND = 20;
@@ -90,6 +90,11 @@ public class TrackModelMapPanel extends JPanel {
         }
     }
 
+    /**
+     * Responds to TrackModelMapFrame resize.
+     *
+     * @param d
+     */
     protected void windowResize(Dimension d) {
         xDimension = d.width;
         yDimension = d.height;
