@@ -118,7 +118,7 @@ public class TrainControllerUI extends javax.swing.JFrame {
 
         jToolBar1.setRollover(true);
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setBackground(new java.awt.Color(255, 255, 255));
         setMaximumSize(new java.awt.Dimension(1000000, 1000000));
         setPreferredSize(new java.awt.Dimension(1200, 1200));
