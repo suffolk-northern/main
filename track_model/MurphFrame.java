@@ -17,6 +17,9 @@ public class MurphFrame extends javax.swing.JFrame {
 
 	/**
 	 * Creates new form MurphFrame
+	 *
+	 * @param blocks
+	 * @param dbHelper
 	 */
 	public MurphFrame(ArrayList<TrackBlock> blocks, DbHelper dbHelper) {
 		initComponents();
@@ -24,6 +27,13 @@ public class MurphFrame extends javax.swing.JFrame {
 		this.dbHelper = dbHelper;
 		if (TrackModel.doTablesExist()) {
 			populateDropdown();
+		} else {
+			//
+			// Disables buttons if no track data.
+			//
+			breakPowerButton.setEnabled(false);
+			breakRailButton.setEnabled(false);
+			breakTrackCircuitButton.setEnabled(false);
 		}
 	}
 
