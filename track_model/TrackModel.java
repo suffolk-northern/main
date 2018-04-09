@@ -726,7 +726,8 @@ public class TrackModel implements Updateable {
             // Calculates distance between a point and block. Keeps if it's shorter.
             //
             double tempDist = getDistanceTo(temp, gc);
-            if (tempDist < minDist) {
+            if (tempDist < minDist
+                    || (tempDist == minDist && temp.block > closest.block)) {
                 minDist = tempDist;
                 closest = temp;
             }

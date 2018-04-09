@@ -464,14 +464,28 @@ public class Ctc implements Updateable{
 		}
 	}
 	
-	public static void autoMode()
+	public static void autoMode(String line)
 	{
-		
+		if(line.equalsIgnoreCase("green"))
+		{
+			
+		}
+		else if(line.equalsIgnoreCase("red"))
+		{
+			
+		}
 	}
 	
-	public static void manMode()
+	public static void manMode(String line)
 	{
-		
+		if(line.equalsIgnoreCase("green"))
+		{
+			
+		}
+		else if(line.equalsIgnoreCase("red"))
+		{
+			
+		}
 	}
 
 	private static Train getTrain(int ID) {
