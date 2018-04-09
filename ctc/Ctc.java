@@ -1305,6 +1305,10 @@ public class Ctc implements Updateable{
 		System.out.println();
 		*/
 		
+		Block cameFrom = route.peekLast();
+		if(cameFrom == null)
+			cameFrom = new Block();
+		
 		route.add(start);
 		//explored.add(start);
 
@@ -1330,19 +1334,19 @@ public class Ctc implements Updateable{
 				if(block.nextBlockDir == 1)
 				{
 					blkToAdd = block.getSwitchTo().clone().peekFirst();
-					if(!route.peekLast().equals(blkToAdd))
+					if(!cameFrom.equals(blkToAdd))
 						neighbors.add(blkToAdd);
 				}
 				if(block.switchDir < 2 && block.switchDir > -2)
 				{
 					blkToAdd = block.getSwitchTo().clone().peekLast();
-					if(!route.peekLast().equals(blkToAdd))
+					if(!cameFrom.equals(blkToAdd))
 						neighbors.add(blkToAdd);
 				}
 				if(block.prevBlockDir == 1)
 				{
 					blkToAdd = block.prev;
-					if(!route.peekLast().equals(blkToAdd))
+					if(!cameFrom.equals(blkToAdd))
 						neighbors.add(blkToAdd);
 				}
 			}
@@ -1351,19 +1355,19 @@ public class Ctc implements Updateable{
 				if(block.nextBlockDir == 1)
 				{
 					blkToAdd = block.next;
-					if(!route.peekLast().equals(blkToAdd))
+					if(!cameFrom.equals(blkToAdd))
 						neighbors.add(blkToAdd);
 				}
 				if(block.switchDir < 2 && block.switchDir > -2)
 				{
 					blkToAdd = block.getSwitchFrom().clone().peekLast();
-					if(!route.peekLast().equals(blkToAdd))
+					if(!cameFrom.equals(blkToAdd))
 						neighbors.add(blkToAdd);
 				}
 				if(block.prevBlockDir == 1)
 				{
 					blkToAdd = block.getSwitchFrom().clone().peekFirst();
-					if(!route.peekLast().equals(blkToAdd))
+					if(!cameFrom.equals(blkToAdd))
 						neighbors.add(blkToAdd);
 				}
 			}
@@ -1373,13 +1377,13 @@ public class Ctc implements Updateable{
 			if(block.nextBlockDir == 1)
 			{
 				blkToAdd = block.next;
-				if(!route.peekLast().equals(blkToAdd))
+				if(!cameFrom.equals(blkToAdd))
 						neighbors.add(blkToAdd);
 			}
 			if(block.prevBlockDir == 1)
 			{
 				blkToAdd = block.prev;
-				if(!route.peekLast().equals(blkToAdd))
+				if(!cameFrom.equals(blkToAdd))
 						neighbors.add(blkToAdd);
 			}
 		}
