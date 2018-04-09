@@ -110,8 +110,10 @@ public class Ctc implements Updateable{
 				}
 				
 				if(train != null)
-					train.location = block;
+					train.setLoc(block);
 			}
+			
+			updateAuth(block);
 		}
 	}
 	
@@ -138,7 +140,7 @@ public class Ctc implements Updateable{
 		updateTrack();
 		updateTrains();
 		
-		/*
+		
 		for(Block blk : greenline)
 		{
 			System.out.println(blk.display());
@@ -159,9 +161,12 @@ public class Ctc implements Updateable{
 				System.out.println("Next " + blk.sw_to.peekLast().display());
 			}
 			
-			System.out.println(blk.nextBlockDir + " " + blk.prevBlockDir);
+			System.out.print(blk.nextBlockDir + " " + blk.prevBlockDir);
+			if(blk.sw)
+				System.out.print(blk.switchDir);
+			System.out.println();
 		}
-		*/
+		
 		
 		
 	}
@@ -627,6 +632,7 @@ public class Ctc implements Updateable{
 		//System.out.println("calc auth");
 		
 		double auth = 0;
+		boolean flipped = false;
 
 		ArrayDeque<Block> temp = route.clone();
 		Block block = temp.poll();
@@ -656,6 +662,9 @@ public class Ctc implements Updateable{
 					auth += block.length;
 					success = false;
 					
+					if(flipped)
+						return auth;
+					
 					// check if it is safe to flip switch
 					if(block.sw_to.peekFirst().occupied == false && block.sw_to.peekLast().occupied == false)
 					{
@@ -664,6 +673,7 @@ public class Ctc implements Updateable{
 						{
 							block.sw_curr_to = temp.peek();
 							updateTrack();
+							flipped = true;
 						}
 					}
 					
@@ -674,6 +684,9 @@ public class Ctc implements Updateable{
 				{
 					success = false;
 					
+					if(flipped)
+						return auth;
+					
 					// check if it is safe to flip switch
 					if(block.sw_from.peekFirst().occupied == false && block.sw_from.peekLast().occupied == false)
 					{
@@ -682,6 +695,7 @@ public class Ctc implements Updateable{
 						{
 							block.sw_curr_from = prev;
 							updateTrack();
+							flipped = true;
 						}
 					}
 
@@ -697,6 +711,9 @@ public class Ctc implements Updateable{
 				{
 					auth += block.length;
 				}
+				
+				flipped = true;
+				
 			} else {
 				auth += block.length;
 			}
@@ -1266,14 +1283,16 @@ public class Ctc implements Updateable{
 		
 		if(dest.line.equalsIgnoreCase("green"))
 		{
-			max = greenline.size();
+			maxlen = 2* greenline.size();
 		}
 		else if(dest.line.equalsIgnoreCase("red"))
 		{
-			max = redline.size();
+			maxlen = 2 * redline.size();
 		}
 		
-		findRouteRec(start, dest, new ArrayDeque<Block>(), max);
+		initFrom = train.getPrevBlock();
+		
+		findRouteRec(start, dest, new ArrayDeque<Block>());
 
 		int minsize = Integer.MAX_VALUE;
 		ArrayDeque<Block> curr;
@@ -1287,12 +1306,21 @@ public class Ctc implements Updateable{
 
 		}
 
+		
+		ArrayDeque<Block> rtemp = route.clone();
+		while(!rtemp.isEmpty())
+			System.out.print(rtemp.poll().display() + " ");
+		System.out.println();
+		
+		
 		return route;
 	}
 
 	private static ArrayDeque<ArrayDeque<Block>> routes;
+	private static int maxlen;
+	private static Block initFrom;
 
-	private static void findRouteRec(Block start, Block dest, ArrayDeque<Block> route, int max) {
+	private static void findRouteRec(Block start, Block dest, ArrayDeque<Block> route) {
 		
 		/*
 		// for debugging
@@ -1304,18 +1332,25 @@ public class Ctc implements Updateable{
 		System.out.println();
 		*/
 		
+		Block cameFrom = route.peekLast();
+		if(cameFrom == null)
+			cameFrom = initFrom;
+		
 		route.add(start);
 		//explored.add(start);
 
-		if (route.size() > max) {
+		if (route.size() > maxlen) {
 			return;
 		}
 
 		if (start.equals(dest)) {
 			routes.add(route);
+			if(route.size() < maxlen)
+				maxlen = route.size();
 			return;
 		}
 
+		Block blkToAdd;
 		Block block = start;
 		ArrayDeque<Block> neighbors = new ArrayDeque<Block>();
 
@@ -1323,35 +1358,91 @@ public class Ctc implements Updateable{
 		{
 			if(isForwardSwitch(block))
 			{
-				if(block.nextBlockDir == 1)
-					neighbors.add(block.getSwitchTo().clone().peekFirst());
-				if(block.switchDir < 2 && block.switchDir > -2)
-					neighbors.add(block.getSwitchTo().clone().peekLast());
+				if(block.nextBlockDir == 1 && !block.sw_to.contains(cameFrom))
+				{
+					blkToAdd = block.getSwitchTo().clone().peekFirst();
+					if(!cameFrom.equals(blkToAdd))
+						neighbors.add(blkToAdd);
+				}
+				if(block.switchDir < 2 && block.switchDir > -2 && !block.sw_to.contains(cameFrom))
+				{
+					blkToAdd = block.getSwitchTo().clone().peekLast();
+					if(!cameFrom.equals(blkToAdd))
+						neighbors.add(blkToAdd);
+				}
 				if(block.prevBlockDir == 1)
-					neighbors.add(block.prev);
+				{
+					blkToAdd = block.prev;
+					if(!cameFrom.equals(blkToAdd))
+						neighbors.add(blkToAdd);
+				}
 			}
 			else
-			{
+			{			
 				if(block.nextBlockDir == 1)
-					neighbors.add(block.next);
-				if(block.switchDir < 2 && block.switchDir > -2)
-					neighbors.add(block.getSwitchFrom().clone().peekLast());
-				if(block.prevBlockDir == 1)
-					neighbors.add(block.getSwitchFrom().clone().peekFirst());
+				{
+					blkToAdd = block.next;
+					if(!cameFrom.equals(blkToAdd))
+						neighbors.add(blkToAdd);
+				}
+				if(block.switchDir < 2 && block.switchDir > -2 && !block.sw_from.contains(cameFrom))
+				{
+					blkToAdd = block.getSwitchFrom().clone().peekLast();
+					if(!cameFrom.equals(blkToAdd))
+						neighbors.add(blkToAdd);
+				}
+				if(block.prevBlockDir == 1 && !block.sw_from.contains(cameFrom))
+				{
+					blkToAdd = block.getSwitchFrom().clone().peekFirst();
+					if(!cameFrom.equals(blkToAdd))
+						neighbors.add(blkToAdd);
+				}
 			}
 		} 
 		else 
 		{
 			if(block.nextBlockDir == 1)
-				neighbors.add(block.next);
+			{
+				blkToAdd = block.next;
+				if(!cameFrom.equals(blkToAdd))
+						neighbors.add(blkToAdd);
+			}
 			if(block.prevBlockDir == 1)
-				neighbors.add(block.prev);
+			{
+				blkToAdd = block.prev;
+				if(!cameFrom.equals(blkToAdd))
+						neighbors.add(blkToAdd);
+			}
 		}
-
+		
+		/*
+		// for debugging
+		ArrayDeque<Block> ntemp = neighbors.clone();
+		System.out.print("\nblock: ");
+		System.out.println(start.display());
+		System.out.print("neighbors: ");
+		while(!ntemp.isEmpty())
+			System.out.print(ntemp.poll().display() + " ");
+		System.out.println();
+		System.out.print("route: ");
+		ArrayDeque<Block> rtemp = route.clone();
+		while(!rtemp.isEmpty())
+			System.out.print(rtemp.poll().display() + " ");
+		System.out.println();
+		*/
+		
 		while (!neighbors.isEmpty()) {
 			block = neighbors.poll();
-			//if(!explored.contains(block))
-			findRouteRec(block, dest, route.clone(),max);
+			
+			while(block.num == 0 && dest.num != 0)
+			{
+				if(neighbors.isEmpty())
+					return;
+		
+				block = neighbors.poll();
+			}
+				
+			findRouteRec(block, dest, route.clone());
 
 		}
 
@@ -1495,6 +1586,7 @@ public class Ctc implements Updateable{
 		protected double deadline;
 		protected int passengers;
 		protected int driverID;
+		protected Block lastBlock;
 
 		public Train() {
 			ID = 0;
@@ -1506,6 +1598,7 @@ public class Ctc implements Updateable{
 			deadline = 0;
 			passengers = 0;
 			driverID = 0;
+			lastBlock = null;
 		}
 
 		public Train(int id, Block loc, int dID) {
@@ -1518,6 +1611,7 @@ public class Ctc implements Updateable{
 			deadline = 0;
 			passengers = 0;
 			driverID = dID;
+			lastBlock = null;
 
 		}
 
@@ -1531,13 +1625,28 @@ public class Ctc implements Updateable{
 			deadline = 0;
 			passengers = 0;
 			driverID = 0;
+			lastBlock = null;
 		}
 
+		private Block getPrevBlock()
+		{
+			if(lastBlock != null)
+				return lastBlock;
+			
+			return new Block();
+		}
+		
+		private void setPrevBlock(Block pb)
+		{
+			lastBlock = pb;
+		}
+		
 		private ArrayDeque<Block> getRoute() {
 			return route;
 		}
 
 		private void setLoc(Block newLoc) {
+			lastBlock = location;
 			location = newLoc;
 		}
 
