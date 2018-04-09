@@ -834,7 +834,7 @@ public class UI
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new UI(new TrainModel(0)).setVisible(true);
+                //new UI(new TrainModel(0)).setVisible(true);
             }
         });
     }
