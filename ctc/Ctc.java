@@ -112,6 +112,8 @@ public class Ctc implements Updateable{
 				if(train != null)
 					train.setLoc(block);
 			}
+			
+			updateAuth(block);
 		}
 	}
 	
