@@ -1280,11 +1280,11 @@ public class Ctc implements Updateable{
 		
 		if(dest.line.equalsIgnoreCase("green"))
 		{
-			maxlen = greenline.size();
+			maxlen = 2* greenline.size();
 		}
 		else if(dest.line.equalsIgnoreCase("red"))
 		{
-			maxlen = redline.size();
+			maxlen = 2 * redline.size();
 		}
 		
 		initFrom = train.getPrevBlock();
@@ -1430,6 +1430,15 @@ public class Ctc implements Updateable{
 		
 		while (!neighbors.isEmpty()) {
 			block = neighbors.poll();
+			
+			while(block.num == 0 && dest.num != 0)
+			{
+				if(neighbors.isEmpty())
+					return;
+		
+				block = neighbors.poll();
+			}
+				
 			findRouteRec(block, dest, route.clone());
 
 		}
