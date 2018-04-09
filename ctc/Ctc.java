@@ -1266,14 +1266,14 @@ public class Ctc implements Updateable{
 		
 		if(dest.line.equalsIgnoreCase("green"))
 		{
-			max = greenline.size();
+			maxlen = greenline.size();
 		}
 		else if(dest.line.equalsIgnoreCase("red"))
 		{
-			max = redline.size();
+			maxlen = redline.size();
 		}
 		
-		findRouteRec(start, dest, new ArrayDeque<Block>(), max);
+		findRouteRec(start, dest, new ArrayDeque<Block>());
 
 		int minsize = Integer.MAX_VALUE;
 		ArrayDeque<Block> curr;
@@ -1291,8 +1291,9 @@ public class Ctc implements Updateable{
 	}
 
 	private static ArrayDeque<ArrayDeque<Block>> routes;
+	private static int maxlen;
 
-	private static void findRouteRec(Block start, Block dest, ArrayDeque<Block> route, int max) {
+	private static void findRouteRec(Block start, Block dest, ArrayDeque<Block> route) {
 		
 		/*
 		// for debugging
@@ -1307,15 +1308,18 @@ public class Ctc implements Updateable{
 		route.add(start);
 		//explored.add(start);
 
-		if (route.size() > max) {
+		if (route.size() > maxlen) {
 			return;
 		}
 
 		if (start.equals(dest)) {
 			routes.add(route);
+			if(route.size() < maxlen)
+				maxlen = route.size();
 			return;
 		}
 
+		Block blkToAdd;
 		Block block = start;
 		ArrayDeque<Block> neighbors = new ArrayDeque<Block>();
 
@@ -1324,34 +1328,81 @@ public class Ctc implements Updateable{
 			if(isForwardSwitch(block))
 			{
 				if(block.nextBlockDir == 1)
-					neighbors.add(block.getSwitchTo().clone().peekFirst());
+				{
+					blkToAdd = block.getSwitchTo().clone().peekFirst();
+					if(!route.peekLast().equals(blkToAdd))
+						neighbors.add(blkToAdd);
+				}
 				if(block.switchDir < 2 && block.switchDir > -2)
-					neighbors.add(block.getSwitchTo().clone().peekLast());
+				{
+					blkToAdd = block.getSwitchTo().clone().peekLast();
+					if(!route.peekLast().equals(blkToAdd))
+						neighbors.add(blkToAdd);
+				}
 				if(block.prevBlockDir == 1)
-					neighbors.add(block.prev);
+				{
+					blkToAdd = block.prev;
+					if(!route.peekLast().equals(blkToAdd))
+						neighbors.add(blkToAdd);
+				}
 			}
 			else
 			{
 				if(block.nextBlockDir == 1)
-					neighbors.add(block.next);
+				{
+					blkToAdd = block.next;
+					if(!route.peekLast().equals(blkToAdd))
+						neighbors.add(blkToAdd);
+				}
 				if(block.switchDir < 2 && block.switchDir > -2)
-					neighbors.add(block.getSwitchFrom().clone().peekLast());
+				{
+					blkToAdd = block.getSwitchFrom().clone().peekLast();
+					if(!route.peekLast().equals(blkToAdd))
+						neighbors.add(blkToAdd);
+				}
 				if(block.prevBlockDir == 1)
-					neighbors.add(block.getSwitchFrom().clone().peekFirst());
+				{
+					blkToAdd = block.getSwitchFrom().clone().peekFirst();
+					if(!route.peekLast().equals(blkToAdd))
+						neighbors.add(blkToAdd);
+				}
 			}
 		} 
 		else 
 		{
 			if(block.nextBlockDir == 1)
-				neighbors.add(block.next);
+			{
+				blkToAdd = block.next;
+				if(!route.peekLast().equals(blkToAdd))
+						neighbors.add(blkToAdd);
+			}
 			if(block.prevBlockDir == 1)
-				neighbors.add(block.prev);
+			{
+				blkToAdd = block.prev;
+				if(!route.peekLast().equals(blkToAdd))
+						neighbors.add(blkToAdd);
+			}
 		}
-
+		
+		/*
+		// for debugging
+		ArrayDeque<Block> ntemp = neighbors.clone();
+		System.out.print("\nblock: ");
+		System.out.println(start.display());
+		System.out.print("neighbors: ");
+		while(!ntemp.isEmpty())
+			System.out.print(ntemp.poll().display() + " ");
+		System.out.println();
+		System.out.print("route: ");
+		ArrayDeque<Block> rtemp = route.clone();
+		while(!rtemp.isEmpty())
+			System.out.print(rtemp.poll().display() + " ");
+		System.out.println();
+		*/
+		
 		while (!neighbors.isEmpty()) {
 			block = neighbors.poll();
-			//if(!explored.contains(block))
-			findRouteRec(block, dest, route.clone(),max);
+			findRouteRec(block, dest, route.clone());
 
 		}
 
