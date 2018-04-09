@@ -1287,6 +1287,13 @@ public class Ctc implements Updateable{
 
 		}
 
+		/*
+		ArrayDeque<Block> rtemp = route.clone();
+		while(!rtemp.isEmpty())
+			System.out.print(rtemp.poll().display() + " ");
+		System.out.println();
+		*/
+		
 		return route;
 	}
 
@@ -1351,7 +1358,7 @@ public class Ctc implements Updateable{
 				}
 			}
 			else
-			{
+			{			
 				if(block.nextBlockDir == 1)
 				{
 					blkToAdd = block.next;
