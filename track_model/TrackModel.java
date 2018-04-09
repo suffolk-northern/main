@@ -15,6 +15,7 @@ import javax.swing.JOptionPane;
 
 import train_model.Pose;
 import train_model.TrainModel;
+import train_model.communication.BeaconMessage;
 import train_model.communication.TrackMovementCommand;
 
 import updater.Updateable;
@@ -33,6 +34,7 @@ public class TrackModel implements Updateable {
     protected static ArrayList<TrackBlock> blocks = new ArrayList<>();
     protected static ArrayList<Crossing> crossings = new ArrayList<>();
     protected static ArrayList<Station> stations = new ArrayList<>();
+    protected static ArrayList<Beacon> beacons = new ArrayList<>();
 
     // Hard-coded initial orientations.
     private static final Orientation GREEN_LINE_ORIENTATION = Orientation.radians(0.9 * Math.PI);
@@ -54,6 +56,7 @@ public class TrackModel implements Updateable {
      */
     public TrackModel() {
         initializeLocalArrays();
+        beacons.add(new Beacon(getPositionAlongBlock("green", 63, 20), "TEST BEACON"));
     }
 
     /**
@@ -140,6 +143,17 @@ public class TrackModel implements Updateable {
         // Sets up blocks array so program can continue. It's dumb. DO NOT CHANGE.
         //
         blocks = blocksTemp;
+        //
+        // Gets station locations and sets beacons.
+        //
+        for (Station s : stations) {
+            TrackBlock tb = getBlock(s.line, s.block);
+            s.setLocation(getPositionAlongBlock(tb, tb.length / 2));
+            s.setBeaconPrev(new Beacon(getPositionAlongBlock(tb, 10), s.block + " PREV"));
+            s.setBeaconNext(new Beacon(getPositionAlongBlock(tb, tb.length - 10), s.block + " NEXT"));
+            beacons.add(s.beaconPrev);
+            beacons.add(s.beaconNext);
+        }
     }
 
     /**
@@ -347,7 +361,7 @@ public class TrackModel implements Updateable {
      * @param block
      * @return Station
      */
-    private static Station getStationFromDatabase(String line, int block) {
+    private Station getStationFromDatabase(String line, int block) {
         if (!doTablesExist()) {
             return null;
         }
@@ -360,7 +374,6 @@ public class TrackModel implements Updateable {
                     s = new Station(line, block);
                     s.setSection(rs.getString(2).charAt(0));
                     s.setName(rs.getString(4));
-                    s.setBeacon(rs.getString(6));
                 } else {
                     System.out.println("Invalid station.");
                 }
@@ -395,7 +408,7 @@ public class TrackModel implements Updateable {
      * @param block
      * @return Crossing
      */
-    private static Crossing getCrossingFromDatabase(String line, int block) {
+    private Crossing getCrossingFromDatabase(String line, int block) {
         if (!doTablesExist()) {
             return null;
         }
@@ -899,6 +912,12 @@ public class TrackModel implements Updateable {
                         setOccupancy(td.trackBlock.line, td.trackBlock.block, false);
                     }
                     td.trackBlock = curBlock;
+                }
+
+                for (Beacon b : beacons) {
+                    if (td.trainModel.location().distanceTo(b.location) < 5) {
+                        td.trainModel.beaconRadio().send(new BeaconMessage(b.message));
+                    }
                 }
             }
             //
