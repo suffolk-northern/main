@@ -456,6 +456,7 @@ public class TrackModel implements Updateable {
 		TrackBlock tb = getBlock(line, block);
 		if (tb != null) {
 			tb.closedForMaintenance = maintain;
+			tb.isOccupied = maintain;
 			if (tmf != null) {
 				tmf.refreshTables();
 			}
@@ -471,7 +472,7 @@ public class TrackModel implements Updateable {
 	 */
 	protected static void setOccupancy(String line, int block, boolean occupied) {
 		TrackBlock tb = getBlock(line, block);
-		if (tb != null && block != 0) {
+		if (tb != null && block != 0 && !tb.closedForMaintenance) {
 			tb.isOccupied = occupied;
 			if (tmf != null) {
 				tmf.refreshTables();

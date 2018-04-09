@@ -41,6 +41,7 @@ public class TrackModelMapPanel extends JPanel {
 	private Image stationArt = null;
 	private Image crossingArt = null;
 	private Image mainLogoArt = null;
+	private Image coneArt = null;
 
 	/**
 	 * Initializes map panel.
@@ -90,6 +91,7 @@ public class TrackModelMapPanel extends JPanel {
 			stationArt = ImageIO.read(getClass().getResource("images/station-100px.png"));
 			crossingArt = ImageIO.read(getClass().getResource("images/crossing-200px.png"));
 			mainLogoArt = ImageIO.read(getClass().getResource("images/logo-2000px.png"));
+			coneArt = ImageIO.read(getClass().getResource("images/cone-296px.png"));
 		} catch (IOException ex) {
 			Logger.getLogger(TrackModelMapPanel.class.getName()).log(Level.SEVERE, null, ex);
 		}
@@ -114,7 +116,7 @@ public class TrackModelMapPanel extends JPanel {
 		plopStations(g);
 		plopCrossings(g);
 		plopTrack(g);
-//        plopBeacons(g);
+//		plopBeacons(g);
 		plopTrains(g);
 	}
 
@@ -168,6 +170,16 @@ public class TrackModelMapPanel extends JPanel {
 				g2.setColor(Color.black);
 				g2.setFont(new Font("default", Font.BOLD, 16));
 				g2.drawString(Integer.toString(tb.block), (int) xStart + 5, (int) yStart + 5);
+			}
+			//
+			// Checks maintenance status
+			//
+			if (tb.closedForMaintenance) {
+				int width = coneArt.getWidth(this) * xDimension / 10000;
+				int height = coneArt.getHeight(this) * xDimension / 10000;
+				double x = xBound + ((tb.start.longitude() + tb.end.longitude()) / 2 - minLon) * lonMultiplier;
+				double y = yBound - ((tb.start.latitude() + tb.end.latitude()) / 2 - minLat) * latMultiplier;
+				g2.drawImage(coneArt, (int) (x - width * 0.8), (int) (y - width * 0.8), width, height, this);
 			}
 			g.drawLine((int) xStart, (int) yStart, (int) xEnd, (int) yEnd);
 		}

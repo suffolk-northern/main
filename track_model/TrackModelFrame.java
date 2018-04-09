@@ -462,7 +462,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
 				row.add(tb.speedLimit * TrackBlock.KILOMETER_TO_MILE_MULTIPLIER);
 				row.add(tb.isUnderground ? "UNDERGROUND" : "");
 				row.add(tb.isPowerOn ? "POWER" : "OUTAGE");
-				row.add(tb.isOccupied ? "OCCUPIED" : (tb.closedForMaintenance ? "CLOSED" : ""));
+				row.add(tb.closedForMaintenance ? "CLOSED" : (tb.isOccupied ? "OCCUPIED" : ""));
 				row.add(tb.isHeaterOn ? "ON" : "OFF");
 				row.add(tb.message);
 				blockVector.add(row);
