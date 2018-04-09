@@ -8,36 +8,65 @@ package track_model;
 
 public class TrackBlock {
 
+    // Track line.
     protected String line;
+    // Track section.
     protected char section;
+    // Track block id.
     protected int block;
+    // Length of block.
     protected double length;
+    // Curvature of block. Negative is counterclockwise. Positive is clockwise.
     protected double curvature;
+    // Grade of track.
     protected double grade;
-    protected int direction;
+    // Speed limit in m/s.
     protected int speedLimit;
+    // Is underground.
     protected boolean isUnderground = false;
+    // Is the power on.
     protected boolean isPowerOn = true;
+    // Is it currently occupied.
     protected boolean isOccupied = false;
+    // Is the heater on.
     protected boolean isHeaterOn = false;
+    // Is it closed for maintenance.
     protected boolean closedForMaintenance = false;
+    // Last message sent. Just for show.
     protected String message = "";
+    // Geographic coordinates
     protected GlobalCoordinates start, end;
 
+    // Coordinates in meter. Used for math.
     protected double xStart, xEnd, yStart, yEnd;
+    // Center of track with curvature.
     protected double xCenter, yCenter;
 
+    // Id of next block.
     protected int nextBlockId;
+    // Can train travel to next block?
     protected int nextBlockDir;
+    // Id of previous block.
     protected int prevBlockId;
+    // Can train travel to previous block?
     protected int prevBlockDir;
 
+    // Id of switch block.
     protected int switchBlockId;
+    // How is switch oriented?
+    // Positive number is forward switch.
+    // Negative number if backward switch.
+    // 1 means switch can be accessed from main line.
+    // 2 means switch can not be accessed from main line.
     protected int switchDirection;
+    // Current id of switch block position
     protected int switchPosition;
 
+    // Is block a switch?
     protected boolean isSwitch = false;
+    // Does block have a station?
     protected boolean isStation = false;
+    // Does block have a crossing?
     protected boolean isCrossing = false;
 
     public static final double METER_TO_YARD_MULTIPLIER = 1.09361;
@@ -104,14 +133,6 @@ public class TrackBlock {
 
     protected void setGrade(double grade) {
         this.grade = grade;
-    }
-
-    public int getDirection() {
-        return direction;
-    }
-
-    protected void setDirection(int direction) {
-        this.direction = direction;
     }
 
     public int getSpeedLimit() {
@@ -289,7 +310,6 @@ public class TrackBlock {
                 + "\tLength: " + length + "\n"
                 + "\tCurvature: " + curvature + "\n"
                 + "\tGrade: " + grade + "\n"
-                + "\tDirection: " + direction + "\n"
                 + "\tUnderground: " + isUnderground + "\n"
                 + "\tPower: " + isPowerOn + "\n"
                 + "\tOccupied: " + isOccupied + "\n"
