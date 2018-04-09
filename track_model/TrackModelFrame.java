@@ -258,10 +258,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
      * @param evt
      */
     private void mapButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mapButtonActionPerformed
-        tmmf = new TrackModelMapFrame();
-        tmmf.add(new TrackModelMapPanel(tm));
-        tmmf.setLocationByPlatform(true);
-        tmmf.pack();
+        tmmf = new TrackModelMapFrame(tm);
         tmmf.setVisible(true);
     }//GEN-LAST:event_mapButtonActionPerformed
 
