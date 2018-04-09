@@ -140,7 +140,7 @@ public class Ctc implements Updateable{
 		updateTrack();
 		updateTrains();
 		
-		/*
+		
 		for(Block blk : greenline)
 		{
 			System.out.println(blk.display());
@@ -161,9 +161,12 @@ public class Ctc implements Updateable{
 				System.out.println("Next " + blk.sw_to.peekLast().display());
 			}
 			
-			System.out.println(blk.nextBlockDir + " " + blk.prevBlockDir);
+			System.out.print(blk.nextBlockDir + " " + blk.prevBlockDir);
+			if(blk.sw)
+				System.out.print(blk.switchDir);
+			System.out.println();
 		}
-		*/
+		
 		
 		
 	}
@@ -1355,13 +1358,13 @@ public class Ctc implements Updateable{
 		{
 			if(isForwardSwitch(block))
 			{
-				if(block.nextBlockDir == 1)
+				if(block.nextBlockDir == 1 && !block.sw_to.contains(cameFrom))
 				{
 					blkToAdd = block.getSwitchTo().clone().peekFirst();
 					if(!cameFrom.equals(blkToAdd))
 						neighbors.add(blkToAdd);
 				}
-				if(block.switchDir < 2 && block.switchDir > -2)
+				if(block.switchDir < 2 && block.switchDir > -2 && !block.sw_to.contains(cameFrom))
 				{
 					blkToAdd = block.getSwitchTo().clone().peekLast();
 					if(!cameFrom.equals(blkToAdd))
