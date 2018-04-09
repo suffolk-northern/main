@@ -34,11 +34,12 @@ public class TrackModelMapPanel extends JPanel {
     private int xDimension = 600;
     private int yDimension = 600;
     // Display margins.
-    private int X_BOUND = 20;
-    private int Y_BOUND = 500;
+    private int xBound = 20;
+    private int yBound = 500;
     // Object images.
     private Image stationArt = null;
     private Image crossingArt = null;
+    private Image mainLogoArt = null;
 
     /**
      * Initializes map panel.
@@ -75,8 +76,8 @@ public class TrackModelMapPanel extends JPanel {
     private void setBounds() {
         lonMultiplier = (xDimension - 60) / (maxLon - minLon);
         latMultiplier = (yDimension * 0.866) / (maxLat - minLat);
-        X_BOUND = 20;
-        Y_BOUND = (int) (yDimension * 0.9);
+        xBound = 20;
+        yBound = (int) (yDimension * 0.9);
     }
 
     /**
@@ -84,8 +85,9 @@ public class TrackModelMapPanel extends JPanel {
      */
     private void getImages() {
         try {
-            stationArt = ImageIO.read(getClass().getResource("images/station-20px.png"));
-            crossingArt = ImageIO.read(getClass().getResource("images/crossing-20px.png"));
+            stationArt = ImageIO.read(getClass().getResource("images/station-100px.png"));
+            crossingArt = ImageIO.read(getClass().getResource("images/crossing-200px.png"));
+            mainLogoArt = ImageIO.read(getClass().getResource("images/logo-2000px.png"));
         } catch (IOException ex) {
             Logger.getLogger(TrackModelMapPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -106,11 +108,24 @@ public class TrackModelMapPanel extends JPanel {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
+        plopBackground(g);
         plopStations(g);
         plopCrossings(g);
         plopTrack(g);
 //        plopBeacons(g);
         plopTrains(g);
+    }
+
+    /**
+     * Plop background items.
+     *
+     * @param g
+     */
+    private void plopBackground(Graphics g) {
+        g.drawImage(mainLogoArt, 20, 20,
+                mainLogoArt.getWidth(this) * xDimension / 5000,
+                mainLogoArt.getHeight(this) * xDimension / 5000,
+                this);
     }
 
     /**
@@ -121,10 +136,10 @@ public class TrackModelMapPanel extends JPanel {
     private void plopTrack(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
         for (TrackBlock tb : tm.blocks) {
-            double xStart = X_BOUND + (tb.start.longitude() - minLon) * lonMultiplier;
-            double yStart = Y_BOUND - (tb.start.latitude() - minLat) * latMultiplier;
-            double xEnd = X_BOUND + (tb.end.longitude() - minLon) * lonMultiplier;
-            double yEnd = Y_BOUND - (tb.end.latitude() - minLat) * latMultiplier;
+            double xStart = xBound + (tb.start.longitude() - minLon) * lonMultiplier;
+            double yStart = yBound - (tb.start.latitude() - minLat) * latMultiplier;
+            double xEnd = xBound + (tb.end.longitude() - minLon) * lonMultiplier;
+            double yEnd = yBound - (tb.end.latitude() - minLat) * latMultiplier;
             //
             // Sets color of track block.
             // 
@@ -153,13 +168,19 @@ public class TrackModelMapPanel extends JPanel {
      * @param g
      */
     private void plopTrains(Graphics g) {
+        int yardCount = 0;
         Graphics2D g2 = (Graphics2D) g;
         for (TrainData td : tm.trains) {
-            double x = X_BOUND + (td.trainModel.location().longitude() - minLon) * lonMultiplier;
-            double y = Y_BOUND - (td.trainModel.location().latitude() - minLat) * latMultiplier;
+            double x = xBound + (td.trainModel.location().longitude() - minLon) * lonMultiplier;
+            double y = yBound - (td.trainModel.location().latitude() - minLat) * latMultiplier;
             g2.setColor(Color.magenta);
-            g2.fillOval((int) x - 5, (int) y - 5, 10, 10);
-            g2.drawString(Integer.toString(td.trainModel.id()), (int) x + 15, (int) y + 15);
+            if (td.trackBlock.block == 0) {
+                yardCount++;
+                g2.fillOval(((int) x - 5) + (yardCount % 5), ((int) y - 5), 10, 10);
+            } else {
+                g2.fillOval((int) x - 5, (int) y - 5, 10, 10);
+                g2.drawString(Integer.toString(td.trainModel.id()), (int) x + 15, (int) y + 15);
+            }
         }
     }
 
@@ -171,9 +192,12 @@ public class TrackModelMapPanel extends JPanel {
     private void plopStations(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
         for (Station s : tm.stations) {
-            double x = X_BOUND + (s.getLocation().longitude() - minLon) * lonMultiplier;
-            double y = Y_BOUND - (s.getLocation().latitude() - minLat) * latMultiplier;
-            g2.drawImage(stationArt, (int) x - 5, (int) y - 5, this);
+            double x = xBound + (s.getLocation().longitude() - minLon) * lonMultiplier;
+            double y = yBound - (s.getLocation().latitude() - minLat) * latMultiplier;
+            g2.drawImage(stationArt, (int) x - 5, (int) y - 5,
+                    stationArt.getWidth(this) * xDimension / 3000,
+                    stationArt.getHeight(this) * xDimension / 3000,
+                    this);
         }
     }
 
@@ -186,17 +210,20 @@ public class TrackModelMapPanel extends JPanel {
         Graphics2D g2 = (Graphics2D) g;
         for (Crossing c : tm.crossings) {
             TrackBlock tb = tm.getBlock(c.line, c.block);
-            double x = X_BOUND + (tb.start.longitude() - minLon) * lonMultiplier;
-            double y = Y_BOUND - (tb.start.latitude() - minLat) * latMultiplier;
-            g2.drawImage(crossingArt, (int) x - 5, (int) y - 5, this);
+            double x = xBound + (tb.start.longitude() - minLon) * lonMultiplier;
+            double y = yBound - (tb.start.latitude() - minLat) * latMultiplier;
+            g2.drawImage(crossingArt, (int) x, (int) y,
+                    crossingArt.getWidth(this) * xDimension / 6000,
+                    crossingArt.getHeight(this) * xDimension / 6000,
+                    this);
         }
     }
 
     private void plopBeacons(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
         for (Beacon b : tm.beacons) {
-            double x = X_BOUND + (b.location.longitude() - minLon) * lonMultiplier;
-            double y = Y_BOUND - (b.location.latitude() - minLat) * latMultiplier;
+            double x = xBound + (b.location.longitude() - minLon) * lonMultiplier;
+            double y = yBound - (b.location.latitude() - minLat) * latMultiplier;
             g2.setColor(Color.CYAN);
             g2.fillOval((int) x, (int) y, 5, 5);
         }
