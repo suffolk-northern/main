@@ -1,37 +1,26 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Roger Xue
+ *
+ * A JFrame that can be used to simulate track failures.
  */
 package track_model;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.JTable;
 
-/**
- *
- * @author Gowest
- */
 public class MurphFrame extends javax.swing.JFrame {
 
-    private TrackModelFrame tmf;
-    private JTable blocks, crossings;
+    // JTable data used to populate dropdowns
+    private final ArrayList<TrackBlock> blocks;
+    // Database helper
     private final DbHelper dbHelper;
 
     /**
      * Creates new form MurphFrame
      */
-    public MurphFrame(TrackModelFrame tmf, JTable blocks, JTable crossings, DbHelper dbHelper) {
+    public MurphFrame(ArrayList<TrackBlock> blocks, DbHelper dbHelper) {
         initComponents();
-        this.tmf = tmf;
         this.blocks = blocks;
-        this.crossings = crossings;
         this.dbHelper = dbHelper;
         if (TrackModel.doTablesExist()) {
             populateDropdown();
@@ -48,40 +37,39 @@ public class MurphFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jComboBox1 = new javax.swing.JComboBox<>();
-        jButton1 = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
+        blockComboBox = new javax.swing.JComboBox<>();
+        breakRailButton = new javax.swing.JButton();
+        selectBlockLabel = new javax.swing.JLabel();
+        breakTrackCircuitButton = new javax.swing.JButton();
+        breakPowerButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Track Model Failure Tests");
         setResizable(false);
 
-        jComboBox1.setMaximumRowCount(24);
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Block 1", "Block 2", "Block 3", "Block 4", "Block 5" }));
+        blockComboBox.setMaximumRowCount(24);
 
-        jButton1.setText("Broken Rail");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        breakRailButton.setText("Broken Rail");
+        breakRailButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                breakRailButtonActionPerformed(evt);
             }
         });
 
-        jLabel1.setText("Select Block:");
+        selectBlockLabel.setText("Select Block:");
 
-        jButton2.setText("Track Circuit Failure");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        breakTrackCircuitButton.setText("Track Circuit Failure");
+        breakTrackCircuitButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                breakTrackCircuitButtonActionPerformed(evt);
             }
         });
 
-        jButton3.setText("Power Failure");
-        jButton3.setToolTipText("");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        breakPowerButton.setText("Power Failure");
+        breakPowerButton.setToolTipText("");
+        breakPowerButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                breakPowerButtonActionPerformed(evt);
             }
         });
 
@@ -93,15 +81,15 @@ public class MurphFrame extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
+                        .addComponent(selectBlockLabel)
                         .addGap(18, 18, 18)
-                        .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(blockComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButton1)
+                        .addComponent(breakRailButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton2)
+                        .addComponent(breakTrackCircuitButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton3)
+                        .addComponent(breakPowerButton)
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -110,71 +98,72 @@ public class MurphFrame extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1))
+                    .addComponent(blockComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(selectBlockLabel))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
-                    .addComponent(jButton2)
-                    .addComponent(jButton3))
+                    .addComponent(breakRailButton)
+                    .addComponent(breakTrackCircuitButton)
+                    .addComponent(breakPowerButton))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void breakRailButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_breakRailButtonActionPerformed
         breakTrack();
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_breakRailButtonActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void breakTrackCircuitButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_breakTrackCircuitButtonActionPerformed
         breakTrack();
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_breakTrackCircuitButtonActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+    private void breakPowerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_breakPowerButtonActionPerformed
         breakPower();
-    }//GEN-LAST:event_jButton3ActionPerformed
-
+    }//GEN-LAST:event_breakPowerButtonActionPerformed
+    /**
+     * Populates the drop down.
+     */
     private void populateDropdown() {
         ArrayList<String> blockList = new ArrayList<>();
-        try {
-            Connection conn = dbHelper.getConnection();
-            ResultSet rs = dbHelper.query(conn, "SELECT LINE, SECTION, BLOCK FROM BLOCKS;");
-            while (rs.next()) {
-                if (!rs.getString(1).equalsIgnoreCase("YARD")) {
-                    blockList.add("Line: " + rs.getString(1) + ", Section: " + rs.getString(2) + ", Block: " + rs.getInt(3));
-                }
+        for (TrackBlock tb : blocks) {
+            if (tb.block != 0) {
+                blockList.add("Line: " + tb.line.toUpperCase() + ", Section: " + tb.section + ", Block: " + tb.block);
             }
-            jComboBox1.setModel(new DefaultComboBoxModel(blockList.toArray()));
-            conn.close();
-        } catch (SQLException ex) {
-            Logger.getLogger(MurphFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
+        blockComboBox.setModel(new DefaultComboBoxModel(blockList.toArray()));
     }
 
+    /**
+     * Breaks a segment of the selected track block.
+     */
     private void breakTrack() {
-        String line = jComboBox1.getSelectedItem().toString().split(",")[0];
+        String line = blockComboBox.getSelectedItem().toString().split(",")[0];
         line = line.substring(line.lastIndexOf(" "), line.length()).trim();
-        String block = jComboBox1.getSelectedItem().toString().split(",")[2];
+        String block = blockComboBox.getSelectedItem().toString().split(",")[2];
         block = block.substring(block.lastIndexOf(" "), block.length()).trim();
 
         TrackModel.setMaintenance(line, Integer.parseInt(block), true);
     }
 
+    /**
+     * Induces power outage on the selected track block.
+     */
     private void breakPower() {
-        String line = jComboBox1.getSelectedItem().toString().split(",")[0];
+        String line = blockComboBox.getSelectedItem().toString().split(",")[0];
         line = line.substring(line.lastIndexOf(" "), line.length()).trim();
-        String block = jComboBox1.getSelectedItem().toString().split(",")[2];
+        String block = blockComboBox.getSelectedItem().toString().split(",")[2];
         block = block.substring(block.lastIndexOf(" "), block.length()).trim();
 
         TrackModel.setPower(line, Integer.parseInt(block), false);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JComboBox<String> jComboBox1;
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JComboBox<String> blockComboBox;
+    private javax.swing.JButton breakPowerButton;
+    private javax.swing.JButton breakRailButton;
+    private javax.swing.JButton breakTrackCircuitButton;
+    private javax.swing.JLabel selectBlockLabel;
     // End of variables declaration//GEN-END:variables
 }
