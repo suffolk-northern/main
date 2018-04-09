@@ -1358,13 +1358,13 @@ public class Ctc implements Updateable{
 					if(!cameFrom.equals(blkToAdd))
 						neighbors.add(blkToAdd);
 				}
-				if(block.switchDir < 2 && block.switchDir > -2)
+				if(block.switchDir < 2 && block.switchDir > -2 && !block.sw_from.contains(cameFrom))
 				{
 					blkToAdd = block.getSwitchFrom().clone().peekLast();
 					if(!cameFrom.equals(blkToAdd))
 						neighbors.add(blkToAdd);
 				}
-				if(block.prevBlockDir == 1)
+				if(block.prevBlockDir == 1 && !block.sw_from.contains(cameFrom))
 				{
 					blkToAdd = block.getSwitchFrom().clone().peekFirst();
 					if(!cameFrom.equals(blkToAdd))
