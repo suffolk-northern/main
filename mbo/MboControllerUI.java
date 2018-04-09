@@ -104,6 +104,7 @@ public class MboControllerUI extends JFrame
 		}
 		trainIDs.add(trainID);
 		int row = trainIDs.indexOf(trainID);
+		System.out.printf("Adding train %d to row %d%n", trainID, row);
 		updateRow(row, trainID, section, block, location, authority, speed);
 		numTrains += 1;
 	}
@@ -111,6 +112,7 @@ public class MboControllerUI extends JFrame
 	public void updateTrain(int trainID, char section, int block, int location, int authority, int speed)
 	{
 		int row = trainIDs.indexOf(trainID);
+		System.out.printf("Updatating train %d in row %d%n", trainID, row);
 		if (row == -1)
 		{
 			addTrain(trainID, section, block, location, authority, speed);
@@ -123,6 +125,7 @@ public class MboControllerUI extends JFrame
 	public void removeTrain(int trainID)
 	{
 		int row = trainIDs.indexOf(trainID);
+		System.out.printf("Removing train %d from row %d%n", trainID, row);
 		clearRow(row);
 		trainIDs.remove(row);
 	}
@@ -141,6 +144,7 @@ public class MboControllerUI extends JFrame
 	private void clearRow(int row)
 	{
 		TableModel model = trainTable.getModel();
+		model.setValueAt(null, row, 0);
 		model.setValueAt(null, row, 1);
 		model.setValueAt(null, row, 2);
 		model.setValueAt(null, row, 3);
@@ -148,7 +152,8 @@ public class MboControllerUI extends JFrame
 		model.setValueAt(null, row, 5);		
 	}
 		
-	public static void main(String args[]) {
+	public static void main(String args[]) 
+	{
 		/* Set the Nimbus look and feel */
 		//<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
 		/* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
