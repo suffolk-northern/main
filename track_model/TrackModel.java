@@ -894,12 +894,13 @@ public class TrackModel implements Updateable {
 
     @Override
     public void update(int time) {
-        //
-        // Tries to update UI every two seconds.
-        //
-        if (count == 2000 / time) {
-            TrackBlock curBlock;
-            for (TrainData td : trains) {
+
+        TrackBlock curBlock;
+        for (TrainData td : trains) {
+            //
+            // Tries to update UI every two seconds.
+            //
+            if (count == 2000 / time) {
                 //
                 // Manages occupied track blocks.
                 //
@@ -912,21 +913,23 @@ public class TrackModel implements Updateable {
                         setOccupancy(td.trackBlock.line, td.trackBlock.block, false);
                     }
                     td.trackBlock = curBlock;
+                    //
+                    // Refreshes UI.
+                    //
                 }
-
-                for (Beacon b : beacons) {
-                    if (td.trainModel.location().distanceTo(b.location) < 5) {
-                        td.trainModel.beaconRadio().send(new BeaconMessage(b.message));
-                    }
+                if (tmf != null) {
+                    tmf.refreshTables();
                 }
+                count = 0;
             }
             //
-            // Refreshes UI.
+            // Needs to check beacons constantly.
             //
-            if (tmf != null) {
-                tmf.refreshTables();
+            for (Beacon b : beacons) {
+                if (td.trainModel.location().distanceTo(b.location) < 5) {
+                    td.trainModel.beaconRadio().send(new BeaconMessage(b.message));
+                }
             }
-            count = 0;
         }
         count++;
     }
@@ -951,7 +954,6 @@ public class TrackModel implements Updateable {
             for (int i = 0; i <= tb.length; i++) {
                 double d = getDistanceAlongBlock(tb.line, tb.block, getPositionAlongBlock(tb, i));
                 System.out.println(i - d);
-
             }
         }
     }

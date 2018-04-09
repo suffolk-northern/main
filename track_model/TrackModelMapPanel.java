@@ -47,7 +47,9 @@ public class TrackModelMapPanel extends JPanel {
      */
     public TrackModelMapPanel(TrackModel tm) {
         this.tm = tm;
-
+        //
+        // Gets maximum and minimum longitude and latitude of track blocks.
+        //
         for (TrackBlock tb : tm.blocks) {
             if (tb.start.latitude() > maxLat) {
                 maxLat = tb.start.latitude();
@@ -62,7 +64,6 @@ public class TrackModelMapPanel extends JPanel {
                 minLon = tb.start.longitude();
             }
         }
-
         setBounds();
         getImages();
     }
@@ -108,6 +109,7 @@ public class TrackModelMapPanel extends JPanel {
         plopStations(g);
         plopCrossings(g);
         plopTrack(g);
+//        plopBeacons(g);
         plopTrains(g);
     }
 
@@ -187,6 +189,16 @@ public class TrackModelMapPanel extends JPanel {
             double x = X_BOUND + (tb.start.longitude() - minLon) * lonMultiplier;
             double y = Y_BOUND - (tb.start.latitude() - minLat) * latMultiplier;
             g2.drawImage(crossingArt, (int) x - 5, (int) y - 5, this);
+        }
+    }
+
+    private void plopBeacons(Graphics g) {
+        Graphics2D g2 = (Graphics2D) g;
+        for (Beacon b : tm.beacons) {
+            double x = X_BOUND + (b.location.longitude() - minLon) * lonMultiplier;
+            double y = Y_BOUND - (b.location.latitude() - minLat) * latMultiplier;
+            g2.setColor(Color.CYAN);
+            g2.fillOval((int) x, (int) y, 5, 5);
         }
     }
 }
