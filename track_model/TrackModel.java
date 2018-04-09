@@ -56,7 +56,6 @@ public class TrackModel implements Updateable {
 	 */
 	public TrackModel() {
 		initializeLocalArrays();
-		beacons.add(new Beacon(getPositionAlongBlock("green", 63, 20), "TEST BEACON"));
 	}
 
 	/**
