@@ -347,7 +347,7 @@ public class TrackModel implements Updateable {
      * @param block
      * @return Station
      */
-    private static Station getStationFromDatabase(String line, int block) {
+    private Station getStationFromDatabase(String line, int block) {
         if (!doTablesExist()) {
             return null;
         }
@@ -360,7 +360,6 @@ public class TrackModel implements Updateable {
                     s = new Station(line, block);
                     s.setSection(rs.getString(2).charAt(0));
                     s.setName(rs.getString(4));
-                    s.setBeacon(rs.getString(6));
                 } else {
                     System.out.println("Invalid station.");
                 }
@@ -395,7 +394,7 @@ public class TrackModel implements Updateable {
      * @param block
      * @return Crossing
      */
-    private static Crossing getCrossingFromDatabase(String line, int block) {
+    private Crossing getCrossingFromDatabase(String line, int block) {
         if (!doTablesExist()) {
             return null;
         }

@@ -18,7 +18,10 @@ public class Station {
     // Passengers at the station
     protected int passengers;
     // Beacon message
-    protected String beacon;
+    protected Beacon beaconPrev;
+    protected Beacon beaconNext;
+    // Location
+    protected GlobalCoordinates location;
 
     /**
      * Initializes Station object.
@@ -63,12 +66,28 @@ public class Station {
         this.name = name;
     }
 
-    public String getBeacon() {
-        return beacon;
+    public GlobalCoordinates getLocation() {
+        return location;
     }
 
-    protected void setBeacon(String beacon) {
-        this.beacon = beacon;
+    protected void setLocation(GlobalCoordinates location) {
+        this.location = location;
+    }
+
+    public Beacon getBeaconPrev() {
+        return beaconPrev;
+    }
+
+    protected void setBeaconPrev(Beacon beaconPrev) {
+        this.beaconPrev = beaconPrev;
+    }
+
+    public Beacon getBeaconNext() {
+        return beaconNext;
+    }
+
+    protected void setBeaconNext(Beacon beaconNext) {
+        this.beaconNext = beaconNext;
     }
 
     /**
@@ -84,7 +103,6 @@ public class Station {
     public String toString() {
         return "Hi, I'm Station " + name + " of the " + line + " Line, Section " + section + ".\n"
                 + "\tBlock: " + block + "\n"
-                + "\tPassengers: " + passengers + "\n"
-                + "\tBeacon Message: " + beacon;
+                + "\tPassengers: " + passengers;
     }
 }
