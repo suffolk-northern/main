@@ -100,7 +100,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
 		throughputMessageLabel = new JLabel();	
 		scheduleMessageLabel = new JLabel();
 		
-        setDefaultCloseOperation(javax.swing.WindowConstants.HIDE_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         getContentPane().setLayout(new CardLayout());
 		
 		// Main panel

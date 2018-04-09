@@ -44,7 +44,7 @@ public class CtcRadio {
 	
 	public void showController()
 	{
-		mboCont.showUI();
+		mboCont.launchUI();
 	}
 	
 	public void hideController()
@@ -54,7 +54,7 @@ public class CtcRadio {
 	
 	public void showScheduler()
 	{
-		mboSched.showUI();
+		mboSched.launchUI();
 	}
 	
 	public void hideScheduler()
