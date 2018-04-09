@@ -75,7 +75,7 @@ public class Main
                             Thread.sleep(1000);
                         }
                         Thread.sleep(1000);
-                        trackModel.resetInitialUICloseOperation();
+                        trackModel.closeInitialUI();
                     } catch (InterruptedException ex) {
                         Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                     }

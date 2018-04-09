@@ -168,8 +168,8 @@ public class TrackModel implements Updateable {
      * want it to exit the whole program on close so now it'll dispose itself on
      * close.
      */
-    public void resetInitialUICloseOperation() {
-        tmf.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+    public void closeInitialUI() {
+        tmf.dispose();
     }
 
     /**
