@@ -251,7 +251,7 @@ public class TestFrame extends javax.swing.JFrame {
             String block = jComboBox1.getSelectedItem().toString().split(",")[2];
             block = block.substring(block.lastIndexOf(" "), block.length()).trim();
 
-            TrackModel.setBlockMessage(line, Integer.parseInt(block), message);
+//            TrackModel.setBlockMessage(line, Integer.parseInt(block), message);
         }
     }//GEN-LAST:event_jButton5ActionPerformed
 
@@ -309,7 +309,7 @@ public class TestFrame extends javax.swing.JFrame {
             }
             jComboBox2.setModel(new DefaultComboBoxModel(blockList.toArray()));
 
-            rs = stat.executeQuery("SELECT * FROM CONNECTIONS WHERE SWITCH_BLOCK;");
+            rs = stat.executeQuery("SELECT * FROM CONNECTIONS WHERE SWITCH_VALID;");
             blockList = new ArrayList<>();
             while (rs.next()) {
                 blockList.add("Line: " + rs.getString(1) + ", Section: " + rs.getString(2) + ", Block: " + rs.getInt(3));
@@ -344,7 +344,7 @@ public class TestFrame extends javax.swing.JFrame {
     private final ArrayList<Integer> trainz = new ArrayList<>();
 
     private void runTrain() {
-        ArrayList<Integer> blocks = TrackModel.getDefaultLine("Green");
+        ArrayList<Integer> blocks = TrackModel.getDefaultLine("green");
         trainz.add(0);
         int counter = trainz.size() - 1;
         Timer timer = new Timer(0, new ActionListener() {
@@ -365,7 +365,7 @@ public class TestFrame extends javax.swing.JFrame {
                 trainz.set(counter, pos + 1);
             }
         });
-        timer.setDelay(50);
+        timer.setDelay(250);
         timer.start();
     }
 

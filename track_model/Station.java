@@ -1,14 +1,31 @@
+/*
+ * Roger Xue
+ *
+ * Railway station object.
+ */
 package track_model;
 
 public class Station {
 
-    private String line;
-    private char section;
-    private int block;
-    private String name;
-    private int passengers;
-    private String beacon;
+    // Track line
+    protected String line;
+    // Track section
+    protected char section;
+    // Track block
+    protected int block;
+    // Station name
+    protected String name;
+    // Passengers at the station
+    protected int passengers;
+    // Beacon message
+    protected String beacon;
 
+    /**
+     * Initializes Station object.
+     *
+     * @param line
+     * @param block
+     */
     public Station(String line, int block) {
         this.line = line;
         this.block = block;
@@ -54,6 +71,11 @@ public class Station {
         this.beacon = beacon;
     }
 
+    /**
+     * Generates passengers at the station.
+     *
+     * @return passengers
+     */
     public static int generatePassengers() {
         return (int) (Math.random() * 20);
     }
