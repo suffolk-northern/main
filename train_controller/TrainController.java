@@ -23,7 +23,7 @@ public class TrainController implements Updateable
 
 	double currentSpeed;		// Model states
 
-	int speedCMD;			// Commands from track
+	double speedCMD;			// Commands from track
 	int currAuth;
 
 	double MAXSPEED = 19.4;		// Controller's own vars
@@ -33,7 +33,7 @@ public class TrainController implements Updateable
 	double powerCMD;
 	double brakeCMD;	
 	double brakePowerConv = 1;
-	int setSpeed;
+	double setSpeed;
 	double error;
 	double timeConstant = 5;
 	double Kp = 2.5 / timeConstant;
@@ -159,22 +159,23 @@ public class TrainController implements Updateable
 
 	public double getSpeed()
 	{
-		return link.speed() * 2.23694;
+		return link.speed() * 2.23694; // convert mps to mph
 	}
 
 	public int getCTCspeed()
 	{
-		return speedCMD;
+		double ret = speedCMD * 2.23694;
+		return (int)ret ; // convert mps to mph
 	}
 
 	public double getCTCauth()
 	{
-		return currAuth;
+		return currAuth * 1.09361; // convert m to yd
 	}
 
 	public double getMovingAuth()
 	{
-		return movingAuth;
+		return movingAuth * 1.09361; // convert m to yd
 	}
 
 	public int getStationsToDisplay()
@@ -227,13 +228,13 @@ public class TrainController implements Updateable
 		MboMovementCommand mboMsg = link.receiveFromMbo();
 		if (mboMsg!=null)
 		{
-			speedCMD = mboMsg.speed;
+			speedCMD = (double)mboMsg.speed * 0.277778; // convert kph to mps
 			currAuth = mboMsg.authority;
 			movingAuth = currAuth;
 		}
 		if (ctcMsg!=null)
 		{
-			speedCMD = ctcMsg.speed;
+			speedCMD = (double)ctcMsg.speed *  0.277778; // convert kph to mps
 			currAuth = ctcMsg.authority;
 			movingAuth = currAuth;
 		}
@@ -244,6 +245,7 @@ public class TrainController implements Updateable
 
 
 	// millis is ignored as this is not a model module
+	// All units are meters and seconds
 	public void update(int millis) 
 	{
 		lastSpeed = link.speed();
@@ -254,20 +256,20 @@ public class TrainController implements Updateable
 		// Set desired speed
 		if(manualMode)
 		{
-			setSpeed = driverSetSpeed;
+			setSpeed = (double)driverSetSpeed * 0.44704;
 			movingAuth = currAuth; // authority never expires
 		}
 		else
 			setSpeed = speedCMD;
 
 		// If authority is about to expire
-		currentSpeed = link.speed() * 2.23694; // convert to mph
+		currentSpeed = link.speed();
 		disable = false;
 		if(movingAuth<=30)
 		{
 			setSpeed = 0;
 			link.serviceBrake(Math.max(1, 1 - movingAuth/20));
-			powerCMD = -1*mass*(1-movingAuth/20)*MAX_SDECEL*currentSpeed*0.44704/MAXPOWER;
+			powerCMD = -1*mass*(1-movingAuth/20)*MAX_SDECEL*currentSpeed/MAXPOWER;
 			disable = true;
 		}
 
@@ -287,15 +289,16 @@ public class TrainController implements Updateable
 			queueFill = queue.length;
 
 		// Compute power and brake commands. Default power cmd => max braking
-		powerCMD = -1*mass*currentSpeed*0.44704*MAX_SDECEL/MAXPOWER;
-		if(!manualBrake & !disable)
+		if(manualMode)
+			powerCMD = -1*mass*currentSpeed*MAX_SDECEL/MAXPOWER;
+		if( ((manualMode & !manualBrake) | !manualMode) & !disable)
 		{
 			powerCMD = Kp*error*currentSpeed*mass;
 			powerCMD += Ki*averageError*currentSpeed*mass;
 			powerCMD /= MAXPOWER;
 			if(powerCMD > 1)
 				powerCMD = 1;
-			brakePowerConv = Math.min( 1.0, -1 * powerCMD*MAXPOWER / (mass * currentSpeed * 0.44704 * MAX_SDECEL) );
+			brakePowerConv = Math.min( 1.0, -1 * powerCMD*MAXPOWER / (mass * currentSpeed * MAX_SDECEL) );
 			link.power( Math.max(0.0, powerCMD) );		
 			link.serviceBrake( Math.max(0.0, brakePowerConv) );
 		}
@@ -309,7 +312,6 @@ public class TrainController implements Updateable
 				stationsToDisplay = -1*d;
 		else
 			stationsToDisplay = d;
-
 	}
 
 }
