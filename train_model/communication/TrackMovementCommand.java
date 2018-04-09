@@ -13,19 +13,16 @@ package train_model.communication;
 public class TrackMovementCommand
 {
 	// Member bounds
-	public static final int MAX_SPEED = 35;
-
-	// Speed member must be a multiple of this
-	public static final int SPEED_MULTIPLE = 5;
+	public static final int MAX_SPEED = 70;
 
 	// Target speed
 	//
-	// Units: MPH (miles per hour)
+	// Units: kilometer per hour
 	public int speed;
 
 	// Distance allowed to travel before stopping
 	//
-	// Units: yard
+	// Units: meter
 	public int authority;
 
 	// Constructs a TrackMovementCommand as a copy of another.
@@ -44,9 +41,6 @@ public class TrackMovementCommand
 	{
 		if (speed < 0 || speed > MAX_SPEED)
 			throw new IllegalArgumentException("speed bounds");
-
-		if (speed % SPEED_MULTIPLE != 0)
-			throw new IllegalArgumentException("speed multiple");
 
 		if (authority < 0)
 			throw new IllegalArgumentException("authority range");
