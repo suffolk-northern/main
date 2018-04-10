@@ -148,11 +148,6 @@ public class PointMass
 		double displacementYChangeYards =
 			yardsPerMeter * displacementYChange;
 
-		pose.position = pose.position.addYards(
-			displacementYChangeYards,
-			displacementXChangeYards
-		);
-
 		speed = speedFinal;
 
 		if (speed < 0.0) speed = 0.0;
