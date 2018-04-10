@@ -47,6 +47,8 @@ public class UI
     {
         final double HP_PER_WATT = 0.001341022;
         final double MPH_PER_MPS = 2.236936;
+        final double MPH_PER_KPH = 0.6213712;
+        final double Y_PER_M = 1.093613;
         final double POUND_PER_NEWTON = 0.224809;
 
         TrainModel train = (TrainModel) o;
@@ -98,9 +100,10 @@ public class UI
 
         beaconRxString.setText("\"" + beaconMessage.string + "\"");
 
-        trackRxSpeed.setText(String.format("%d mph", trackMessage.speed));
-        trackRxAuthority.setText(
-		String.format("%d y", trackMessage.authority));
+        trackRxSpeed.setText(String.format("%.1f mph",
+                                           MPH_PER_KPH * trackMessage.speed));
+        trackRxAuthority.setText(String.format("%.1f y",
+                                           Y_PER_M * trackMessage.authority));
 
         // TODO: use real interface for this
         mboTxLatitude.setText(String.format(
@@ -116,8 +119,10 @@ public class UI
             (longitude % 3600.0) * 3600.0
         ));
 
-        mboRxSpeed.setText(String.format("%d mph", mboMessage.speed));
-        mboRxAuthority.setText(String.format("%d y", mboMessage.authority));
+        mboRxSpeed.setText(String.format("%.1f mph",
+                                         MPH_PER_KPH * mboMessage.speed));
+        mboRxAuthority.setText(String.format("%.1f y",
+                                         Y_PER_M * mboMessage.authority));
     }
 
     // Celsius to Fahrenheit
