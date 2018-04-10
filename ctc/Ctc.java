@@ -668,7 +668,7 @@ public class Ctc implements Updateable{
 					// check if it is safe to flip switch
 					if(block.sw_to.peekFirst().occupied == false && block.sw_to.peekLast().occupied == false)
 					{
-						success = trackmodel.flipSwitch(block.line,block.num);
+						success = getFlip(block);
 						if(success)
 						{
 							block.sw_curr_to = temp.peek();
@@ -690,7 +690,7 @@ public class Ctc implements Updateable{
 					// check if it is safe to flip switch
 					if(block.sw_from.peekFirst().occupied == false && block.sw_from.peekLast().occupied == false)
 					{
-						success = trackmodel.flipSwitch(block.line,block.num);
+						success = getFlip(block);
 						if(success)
 						{
 							block.sw_curr_from = prev;
@@ -889,10 +889,29 @@ public class Ctc implements Updateable{
 		
 		for(Train train : trains)
 		{
-			if(getFirstSwitch(train.route).equals(swblock))
+			if(getFirstSwitch(train.route).peekFirst().equals(swblock))
 			{
 				mytrains.add(train);
 			}
+		}
+		
+		Train closest = null;
+		double dist = Integer.MAX_VALUE;
+		
+		for(Train train : mytrains)
+		{
+			if(getDistOnRoute(train,swblock) < dist)
+			{
+				dist = getDistOnRoute(train,swblock);
+				closest = train;
+			}
+		}
+		
+		// if switch is not in right config, flip it
+		Block desired = getFirstSwitch(closest.route).peekLast();
+		if((isForwardSwitch(swblock) && !swblock.sw_curr_to.equals(desired)) || (isBackwardSwitch(swblock) && !swblock.sw_curr_from.equals(desired)))
+		{
+			flipped = trackmodel.flipSwitch(swblock.line,swblock.num);
 		}
 		
 		return flipped;
@@ -902,23 +921,74 @@ public class Ctc implements Updateable{
 	{
 		ArrayDeque<Block> rtemp = train.route.clone();
 		double dist = 0;
+		Block curr = null;
+		
+		while(!rtemp.isEmpty())
+		{
+			curr = rtemp.poll();
+			if(curr.equals(train.location))
+				break;
+		}
+		
+		while(!rtemp.isEmpty() && !curr.equals(block))
+		{
+			curr = rtemp.poll();
+			dist += curr.length;
+		}
 		
 		return dist;
 	}
 	
-	private static Block getFirstSwitch(ArrayDeque<Block> route)
+	private static ArrayDeque<Block> getFirstSwitch(ArrayDeque<Block> route)
 	{
+		ArrayDeque<Block> retsw = null;
 		Block sw = null;
+		Block prev = null;
+		Block next = null;
 		ArrayDeque<Block> rtemp = route.clone();
 		
 		while(!rtemp.isEmpty())
 		{
+			prev = sw;
 			sw = rtemp.poll();
 			if(sw.sw)
-				return sw;
+			{
+				retsw = new ArrayDeque<Block>();
+				retsw.add(sw);
+				
+				if(!rtemp.isEmpty())
+					next = rtemp.poll();
+				
+				if(isForwardSwitch(sw))
+				{
+					if(prev != null && sw.sw_to.contains(prev))
+					{
+						retsw.add(prev);
+						return retsw;
+					}
+					else if(next != null && sw.sw_to.contains(next))
+					{
+						retsw.add(next);
+						return retsw;
+					}
+				}
+				else if(isBackwardSwitch(sw))
+				{
+					if(prev != null && sw.sw_from.contains(prev))
+					{
+						retsw.add(prev);
+						return retsw;
+					}
+					else if(next != null && sw.sw_from.contains(next))
+					{
+						retsw.add(next);
+						return retsw;
+					}
+				}
+			}
 		}
 		
-		return sw;
+		return retsw;
 	}
 	
 	private static void updateTrains() {
