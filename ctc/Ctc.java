@@ -882,7 +882,45 @@ public class Ctc implements Updateable{
 		ui.updateTrackTable(rows, greenline.size() - 1 /*+ redline.size() - 1*/);
 	}
 
-
+	private static boolean getFlip(Block swblock)
+	{
+		boolean flipped = false;
+		ArrayDeque<Train> mytrains = new ArrayDeque<Train>();
+		
+		for(Train train : trains)
+		{
+			if(getFirstSwitch(train.route).equals(swblock))
+			{
+				mytrains.add(train);
+			}
+		}
+		
+		return flipped;
+	}
+	
+	private static double getDistOnRoute(Train train, Block block)
+	{
+		ArrayDeque<Block> rtemp = train.route.clone();
+		double dist = 0;
+		
+		return dist;
+	}
+	
+	private static Block getFirstSwitch(ArrayDeque<Block> route)
+	{
+		Block sw = null;
+		ArrayDeque<Block> rtemp = route.clone();
+		
+		while(!rtemp.isEmpty())
+		{
+			sw = rtemp.poll();
+			if(sw.sw)
+				return sw;
+		}
+		
+		return sw;
+	}
+	
 	private static void updateTrains() {
 		// for all trains in trains
 		Object[][] rows = new Object[trains.size()][TRAINCOLS];
@@ -1139,6 +1177,7 @@ public class Ctc implements Updateable{
 		//System.out.println();
 		
 		String msg = speed + " " + auth;
+		System.out.println(train.ID + " at " + train.location.display() + ": " + msg);
 		
 		TrackMovementCommand tmc = new TrackMovementCommand((int)speed,(int)auth);
 		
@@ -1648,6 +1687,7 @@ public class Ctc implements Updateable{
 		private void setLoc(Block newLoc) {
 			lastBlock = location;
 			location = newLoc;
+			route.poll();
 		}
 
 		public Block getLoc() {
