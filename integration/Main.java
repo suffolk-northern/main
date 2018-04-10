@@ -64,23 +64,23 @@ public class Main
 		ctc = new Ctc();
 
 		trackModel = new TrackModel();
-                
-                //
-                // Forces user to load track database into program.
-                // Will exit otherwise.
-                //
-                if (!trackModel.doTablesExist())    {
-                    try{
-                        trackModel.launchInitialUI();
-                        while(trackModel.getBlockCount() < 3)  {
-                            Thread.sleep(1000);
-                        }
-                        Thread.sleep(1000);
-                        trackModel.resetInitialUICloseOperation();
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
+
+		//
+		// Forces user to load track database into program.
+		// Will exit otherwise.
+		//
+		if (!trackModel.doTablesExist()) {
+			try {
+				trackModel.launchInitialUI();
+				while (trackModel.getBlockCount() < 3) {
+					Thread.sleep(1000);
+				}
+				Thread.sleep(1000);
+				trackModel.closeInitialUI();
+			} catch (InterruptedException ex) {
+				Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+			}
+		}
 		
 		MboController mboCont = new MboController("Green");
 		MboScheduler mboSched = new MboScheduler("Green");
