@@ -10,6 +10,7 @@ import java.util.Observable;
 
 import track_model.GlobalCoordinates;
 import track_model.Orientation;
+import track_model.TrackModel;
 import train_model.PointHeat;
 import train_model.PointMass;
 import train_model.Pose;
@@ -84,8 +85,7 @@ public class TrainModel
 	// identifier
 	private final int id;
 
-	private final PointMass pointMass =
-		new PointMass(MASS_EMPTY, INITIAL_POSE);
+	private final PointMass pointMass;
 
 	// watts
 	private double enginePower = 0.0;
@@ -113,10 +113,14 @@ public class TrainModel
 
 	private int notifyObserversCount = 0;
 
+	private final TrackModel track;
+
 	// Constructs a TrainModel with the given identifier.
-	public TrainModel(int id)
+	public TrainModel(int id, TrackModel track)
 	{
 		this.id = id;
+		this.track = track;
+		this.pointMass = new PointMass(MASS_EMPTY, INITIAL_POSE, track);
 	}
 
 	// Returns this train's identifier.
