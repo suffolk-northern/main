@@ -45,6 +45,8 @@ public class TrackModel implements Updateable {
 
 	/**
 	 * For testing purposes.
+	 *
+	 * @param args
 	 */
 	public static void main(String[] args) {
 		TrackModel tm = new TrackModel();
@@ -939,13 +941,15 @@ public class TrackModel implements Updateable {
 	 *
 	 * @param line
 	 */
-	private void testing(String line) {
+	private void testing() {
 		for (TrackBlock tb : blocks) {
 			for (int i = 1; i < tb.length; i += 5) {
 				GlobalCoordinates gc = getPositionAlongBlock(tb, i);
 				if (gc != null) {
-					System.out.println(gc.latitude() + "," + gc.longitude() + " Closest: " + getClosestBlock(gc, line).block);
-
+					TrackBlock close = getClosestBlock(gc, tb.line);
+					if (close.block != tb.block) {
+						System.out.println("problem expected: " + tb.block + ", returned: " + close.block + ", " + i);
+					}
 				}
 			}
 		}
@@ -953,7 +957,9 @@ public class TrackModel implements Updateable {
 		for (TrackBlock tb : blocks) {
 			for (int i = 0; i <= tb.length; i++) {
 				double d = getDistanceAlongBlock(tb.line, tb.block, getPositionAlongBlock(tb, i));
-				System.out.println(i - d);
+				if (i - d > 5) {
+					System.out.println("problem " + tb.block + ", " + i + " meters");
+				}
 			}
 		}
 	}
