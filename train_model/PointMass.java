@@ -9,6 +9,7 @@ package train_model;
 import track_model.TrackModel;
 import track_model.TrackBlock;
 import track_model.Orientation;
+import track_model.GlobalCoordinates;
 import train_model.Pose;
 
 // Physics point mass
@@ -180,9 +181,13 @@ public class PointMass
 			displacement = forward ? 0.1 : block.getLength() - 0.1;
 		}
 
+		GlobalCoordinates oldPosition = pose.position;
+
 		pose.position = track.getPositionAlongBlock(LINE,
 		                                            blockId,
 		                                            displacement);
+
+		pose.orientation = oldPosition.directionTo(pose.position);
 	}
 
 	// How much mass (in kilograms) weighs this many pounds
