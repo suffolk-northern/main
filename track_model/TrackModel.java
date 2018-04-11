@@ -383,6 +383,22 @@ public class TrackModel implements Updateable {
 	}
 
 	/**
+	 * Gets the two branches of a switch.
+	 *
+	 * @param line
+	 * @param block
+	 * @return
+	 */
+	public int[] getBranchesOfSwitch(String line, int block) {
+		TrackBlock tb = getBlock(line, block);
+		if (tb == null || !tb.isSwitch) {
+			return null;
+		}
+		int[] branches = {tb.switchBlockId, tb.switchDirection > 0 ? tb.nextBlockId : tb.prevBlockId};
+		return branches;
+	}
+
+	/**
 	 * Retrieves a Station.
 	 *
 	 * @param line
