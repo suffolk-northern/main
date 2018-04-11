@@ -47,6 +47,7 @@ public class Ctc implements Updateable{
 
 	public static Updater updater;
 	public static int period;
+	public static Clock clock;
 	
 	public static double through = 0;
 
@@ -469,7 +470,8 @@ public class Ctc implements Updateable{
 	public Ctc() {
 		ctc = this;
 		ui = new CtcUI(ctc);
-		//showUI();
+		
+		clock = new Clock();		
 
 		/*
 		blueline.add(new Block("blue", true));
