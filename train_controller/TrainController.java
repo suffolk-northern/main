@@ -6,6 +6,7 @@ import java.lang.Math;
 import train_model.communication.ControllerLink;
 import train_model.communication.TrackMovementCommand;
 import train_model.communication.MboMovementCommand;
+import train_model.DoorLocation;
 import updater.Updateable;
 
 
@@ -19,41 +20,39 @@ public class TrainController implements Updateable
 	boolean rightDoorsCMD;
 	boolean leftDoorsCMD;
 	boolean heaterOnCMD;
-	int driverSetSpeed;
 
-	double currentSpeed;		// Model states
+	double currentSpeed;
+	double lastSpeed = 0.0; 	// to calc displacement
 
-	double speedCMD;			// Commands from track
-	int currAuth;
 
-	double MAXSPEED = 19.4;		// Controller's own vars
+	double MAXSPEED = 19.4;	
 	double MAXPOWER = 120000;
 	double MAX_SDECEL = 1.2;
 	double mass = 50*907.185;
-	double powerCMD;
-	double brakeCMD;	
-	double brakePowerConv = 1;
-	double setSpeed;
 	double error;
 	double timeConstant = 5;
-	double Kp = 2.5 / timeConstant;
-	double Ki = 0.25;
+	double Kp = 0.98; 		// Range: 0 -> 0.5
+	double Ki = 1 - Kp;
 	double [] queue = new double[5000];
 	int queueInsert = 0;
 	int queueFill = 0;
 	double averageError;
-	TreeMap<Integer, Double> stations = new TreeMap<>();
-	double distanceFromLastStation = 0.0;
-	int stationCounter = 1;
-	int stationsToDisplay = 1;
-	boolean manualBrake;
-	double movingAuth = 0.0;
-	double lastAuth = 0.0;
-	double lastSpeed = 0.0;
-	boolean returning = false;
-	boolean disable = false;
-	ArrayList<String> ads = new ArrayList<>();
 
+	int driverSetSpeed;
+	double speedCMD;		// ctc/mbo cmd
+	double setSpeed;	
+	double powerCMD;		// to link
+	double loopPower;
+
+	boolean manualBrake;
+	double brakeCMD;		// to link
+	double loopBrake;
+        double startBrake;
+
+	int currAuth;			// ctc/mbo cmd
+	double movingAuth = 0.0;
+
+	ArrayList<String> ads = new ArrayList<>();
 
 	public TrainController() 
 	{
@@ -64,19 +63,9 @@ public class TrainController implements Updateable
 		driverSetSpeed = 0;
 		manualBrake = true;
 
-		// Relative station distances
-		stations.put(1, 240.0);
-		stations.put(2, 590.0);
-		stations.put(3, 1400.0);
-		stations.put(4, 440.0);
-		stations.put(5, 620.0);
-		stations.put(6, 620.0);
-		stations.put(7, 300.0);
-		stations.put(8, 900.0);
-		stations.put(9, 900.0);
-
+		ads.add("Come to Pitt, the #1 public university in northeast Oakland");
 		ads.add("Broken frisbee? Get a new one today! Visit getnewfrisbee.com");
-		ads.add("Got blisters on your feet from playing frisbee? Visit frisbeecleats.com");
+		ads.add("Got blisters on your feet from playing frisbee? Visit betterfrisbeecleats.com");
 		ads.add("Do your teamates make fun of you because you can't catch a frisbee? Visit frisbeelessons.com");
 		ads.add("Can't hold a conversation without bringing up frisbee? Visit frisbeefreaksanonymous.com");
 	}
@@ -96,23 +85,14 @@ public class TrainController implements Updateable
 
 	// Setters/getters for driver GUI
 
-	public boolean getBrakesEngaged()
+	public void setKs(double p)
 	{
-		if(brakePowerConv > 0)
-			return true;
-		return false;
+		Kp = p;
+		Ki = 1 - p;
 	}
 
 	public void setBrakesEngaged(boolean command)
 	{
-		if(manualMode)
-		{
-			if(command)
-			{
-				link.serviceBrake(1.0);
-				link.power(0);
-			}
-		}
 		manualBrake = command;
 	}
 
@@ -138,6 +118,22 @@ public class TrainController implements Updateable
 	{
 		return link.lights();
 	}
+        
+        public void setLeftDoors(boolean cmd)
+        {
+		if(cmd)
+			link.openDoor(DoorLocation.left);
+		else
+			link.closeDoor(DoorLocation.left);
+        }
+        
+        public void setRightDoors(boolean cmd)
+        {
+		if(cmd)
+			link.openDoor(DoorLocation.right);
+		else
+			link.closeDoor(DoorLocation.right);
+        }
 
 	public void setHeater(boolean command)
 	{
@@ -154,70 +150,41 @@ public class TrainController implements Updateable
 
 	public double getPowerKW() 
 	{
-		return MAXPOWER * powerCMD / 1000;
+		double b = mass * brakeCMD * MAX_SDECEL * currentSpeed / 1000;
+		double p = MAXPOWER * powerCMD / 1000;
+		if(b > p)
+		{
+			assert p == 0;
+			return -1 * b;
+		}
+		assert b == 0;
+		return p;
 	}
 
 	public double getSpeed()
 	{
-		return link.speed() * 2.23694; // convert mps to mph
+		return link.speed() * 2.23694;	 // convert mps to mph
 	}
 
-	public int getCTCspeed()
+	public double getCTCspeed()
 	{
-		double ret = speedCMD * 2.23694;
-		return (int)ret ; // convert mps to mph
+		return speedCMD * 2.2369;	// convert mps to mph
 	}
 
 	public double getCTCauth()
 	{
-		return currAuth * 1.09361; // convert m to yd
+		return currAuth * 1.09361;	 // convert m to yd
 	}
 
 	public double getMovingAuth()
 	{
-		return movingAuth * 1.09361; // convert m to yd
-	}
-
-	public int getStationsToDisplay()
-	{
-		return stationsToDisplay;
-	}
-
-
-	// Distance from last station
-	private int updateStationDistance(int millis) 
-	{
-	int correction = 0;
-	if (stationCounter == 9) 
-	{
-		returning = true;
-	}
-	if (stationCounter <= 1) 
-	{
-		if (stationCounter < 1)
-			stationCounter = 2;
-		returning = false;
-	}
-	if (returning)
-		correction = 1;
-	if ( distanceFromLastStation > stations.get(stationCounter - correction) )
-	{
-		distanceFromLastStation = 0.0;
-		if (returning)
-			return stationCounter--;
-		return stationCounter++;
-	}
-	else
-		distanceFromLastStation += 1760 * displacement(millis) / 3600;
-	if(returning)
-		return -1 * stationCounter + 1;
-	return -1 * stationCounter;	
+		return movingAuth * 1.09361;	 // convert m to yd
 	}
 
 	// Calculates train displacement since last update
 	private double displacement(int millis)
 	{
-		double avgSpeed = (link.speed() + lastSpeed)*2.23694 / 2;
+		double avgSpeed = (link.speed() + lastSpeed) / 2;
 		return (double)millis/1000 * avgSpeed;
 	}
 
@@ -239,80 +206,66 @@ public class TrainController implements Updateable
 			movingAuth = currAuth;
 		}
 		movingAuth -= displacement(millis);
-		if(movingAuth<0)
-			movingAuth = 0;
+		if(movingAuth < 0)
+		{
+			// TODO flash console light or something
+		}
 	}
-
 
 	// millis is ignored as this is not a model module
 	// All units are meters and seconds
 	public void update(int millis) 
 	{
-		lastSpeed = link.speed();
+		lastSpeed = currentSpeed;
+		currentSpeed = link.speed();
 
 		// Update authority
 		authority(millis);
 
 		// Set desired speed
 		if(manualMode)
-		{
-			setSpeed = (double)driverSetSpeed * 0.44704;
-			movingAuth = currAuth; // authority never expires
-		}
+			setSpeed = (double)driverSetSpeed * 0.44704;	// mph -> mps
 		else
 			setSpeed = speedCMD;
 
-		// If authority is about to expire
-		currentSpeed = link.speed();
-		disable = false;
-		if(movingAuth<=30)
-		{
-			setSpeed = 0;
-			link.serviceBrake(Math.max(1, 1 - movingAuth/20));
-			powerCMD = -1*mass*(1-movingAuth/20)*MAX_SDECEL*currentSpeed/MAXPOWER;
-			disable = true;
-		}
-
 		// Obtain error and average error
-		if(currentSpeed == 0)
-			currentSpeed = 0.01;
-		error = (double)setSpeed - currentSpeed;
+		error = setSpeed - currentSpeed;
 		queue[queueInsert++] = error;
 		if(queueInsert%queue.length == 0)
 			queueInsert = 0;
 		averageError = 0;
-		for(int i=0; i<queueFill; i++)
+		for(int i=0; i < queueFill; i++)
 		{
 			averageError += queue[i] / queueFill;
 		}
 		if(++queueFill > queue.length)
 			queueFill = queue.length;
 
-		// Compute power and brake commands. Default power cmd => max braking
-		if(manualMode)
-			powerCMD = -1*mass*currentSpeed*MAX_SDECEL/MAXPOWER;
-		if( ((manualMode & !manualBrake) | !manualMode) & !disable)
+		////  C O N T R O L    L O O P  /////////
+		loopPower = Kp * error * currentSpeed * mass;
+		loopPower += Ki * averageError * currentSpeed * mass;
+		loopPower /= MAXPOWER;
+		if(currentSpeed == 0)
+			loopPower = 0.01;
+		powerCMD = loopPower;
+		if(powerCMD > 1)
+			powerCMD = 1;
+		if(powerCMD < 0)
+			powerCMD = 0;
+		loopBrake = -1 * loopPower * MAXPOWER / (mass * currentSpeed * MAX_SDECEL);
+		brakeCMD = loopBrake;
+		if(brakeCMD > 1)
+			brakeCMD = 1;
+		if(brakeCMD < 0)
+			brakeCMD = 0;
+		// If driver braking in manual mode, or if authority about to expire
+		if((manualBrake && manualMode) || movingAuth - 0.1 <= Math.pow(currentSpeed,2) / (2 * MAX_SDECEL))
 		{
-			powerCMD = Kp*error*currentSpeed*mass;
-			powerCMD += Ki*averageError*currentSpeed*mass;
-			powerCMD /= MAXPOWER;
-			if(powerCMD > 1)
-				powerCMD = 1;
-			brakePowerConv = Math.min( 1.0, -1 * powerCMD*MAXPOWER / (mass * currentSpeed * MAX_SDECEL) );
-			link.power( Math.max(0.0, powerCMD) );		
-			link.serviceBrake( Math.max(0.0, brakePowerConv) );
+			brakeCMD = 1;
+			powerCMD = 0;
 		}
-
-		// Update stations to display on map
-		int d = updateStationDistance(millis);
-		if(distanceFromLastStation<20)
-			if(returning)
-				stationsToDisplay = -1*d+1;
-			else
-				stationsToDisplay = -1*d;
-		else
-			stationsToDisplay = d;
+		link.power(powerCMD);		
+		link.serviceBrake(brakeCMD);
+		//////////////////////////////////////////
 	}
-
 }
-
