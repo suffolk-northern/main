@@ -188,6 +188,8 @@ public class Main
 			simulationUpdatePeriod,
 			updateables.toArray(new Updateable[0])
 		);
+		
+		ctc.setUpdater(simulationUpdatePeriod, updater);
 
 		updater.scheduleAtFixedRate(wallUpdatePeriod);
 	}

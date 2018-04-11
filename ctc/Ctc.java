@@ -17,6 +17,7 @@ import track_model.TrackModel;
 import track_model.TrackBlock;
 import track_model.Station;
 import train_model.communication.TrackMovementCommand;
+import updater.*;
 import mbo.CtcRadio;
 
 /**
@@ -44,6 +45,9 @@ public class Ctc implements Updateable{
 	
 	public static ArrayDeque<Train> dispatched = new ArrayDeque<Train>();
 
+	public static Updater updater;
+	public static int period;
+	
 	public static double through = 0;
 
 	public static void showUI() {
@@ -213,6 +217,17 @@ public class Ctc implements Updateable{
     }
 	 */
 	//public static void main(String[] args)
+	
+	public void setUpdater(int per, Updater u)
+	{
+		period = per;
+		updater = u;
+	}
+	
+	protected void changeSpeedUp(int speedup)
+	{
+		updater.scheduleAtFixedRate(period / speedup);
+	}
 	
 	public void setTrackModel(TrackModel tm)
 	{
