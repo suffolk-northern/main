@@ -115,6 +115,7 @@ public class TrackModelMapPanel extends JPanel {
 		plopBackground(g);
 		plopStations(g);
 		plopCrossings(g);
+		plopSwitches(g);
 		plopTrack(g);
 //		plopBeacons(g);
 		plopTrains(g);
@@ -172,7 +173,7 @@ public class TrackModelMapPanel extends JPanel {
 				g2.drawString(Integer.toString(tb.block), (int) xStart + 5, (int) yStart + 5);
 			}
 			//
-			// Checks maintenance status
+			// Checks maintenance status and adds cone.
 			//
 			if (tb.closedForMaintenance) {
 				int width = coneArt.getWidth(this) * xDimension / 10000;
@@ -182,6 +183,50 @@ public class TrackModelMapPanel extends JPanel {
 				g2.drawImage(coneArt, (int) (x - width * 0.8), (int) (y - width * 0.8), width, height, this);
 			}
 			g.drawLine((int) xStart, (int) yStart, (int) xEnd, (int) yEnd);
+			//
+			// Adds connection to yard.
+			//
+			if (tb.isSwitch && tb.switchBlockId == 0) {
+				TrackBlock yard = tm.getBlock(tb.line, 0);
+				xEnd = xBound + (yard.end.longitude() - minLon) * lonMultiplier;
+				yEnd = yBound - (yard.end.latitude() - minLat) * latMultiplier;
+				g.drawLine((int) xStart, (int) yStart, (int) xEnd, (int) yEnd);
+			}
+		}
+	}
+
+	/**
+	 * Places track blocks on map.
+	 *
+	 * @param g
+	 */
+	private void plopSwitches(Graphics g) {
+		Graphics2D g2 = (Graphics2D) g;
+		for (TrackBlock tb : tm.blocks) {
+			if (tb.isSwitch) {
+				TrackBlock active = tm.getBlock(tb.line, tb.switchPosition);
+				double xStart = xBound + (active.start.longitude() - minLon) * lonMultiplier;
+				double yStart = yBound - (active.start.latitude() - minLat) * latMultiplier;
+				double xEnd = xBound + (active.end.longitude() - minLon) * lonMultiplier;
+				double yEnd = yBound - (active.end.latitude() - minLat) * latMultiplier;
+				//
+				// Adds yard switch.
+				//
+				if (active.block == 0) {
+					xStart = xBound + (tb.start.longitude() - minLon) * lonMultiplier;
+					yStart = yBound - (tb.start.latitude() - minLat) * latMultiplier;
+				}
+				//
+				// Sets color of track block.
+				// 
+				g2.setStroke(new BasicStroke(4));
+				if (active.line.equalsIgnoreCase("green")) {
+					g2.setColor(Color.green);
+				} else {
+					g2.setColor(Color.red);
+				}
+				g.drawLine((int) xStart, (int) yStart, (int) xEnd, (int) yEnd);
+			}
 		}
 	}
 

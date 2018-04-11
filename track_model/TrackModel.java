@@ -40,8 +40,8 @@ public class TrackModel implements Updateable {
 	private static final Orientation GREEN_LINE_ORIENTATION = Orientation.radians(0.9 * Math.PI);
 	private static final Orientation RED_LINE_ORIENTATION = Orientation.radians(0.3737 * Math.PI);
 	// Hard-coded initial yard coordinates.
-	private static final double YARD_X_LOCATION = 550;
-	private static final double YARD_Y_LOCATION = -2200;
+	private static final double YARD_X_LOCATION = 1100;
+	private static final double YARD_Y_LOCATION = -1900;
 
 	/**
 	 * For testing purposes.
@@ -141,6 +141,10 @@ public class TrackModel implements Updateable {
 			JOptionPane.showMessageDialog(null, "Track database not found.\n\nPlease import track database or train control system will shut down.", "Warning", JOptionPane.WARNING_MESSAGE);
 		}
 		//
+		// Shifts switches.
+		//
+		shiftSwitches(blocksTemp);
+		//s
 		// Sets up blocks array so program can continue. It's dumb. DO NOT CHANGE.
 		//
 		blocks = blocksTemp;
@@ -328,6 +332,26 @@ public class TrackModel implements Updateable {
 			Logger.getLogger(TrackModel.class.getName()).log(Level.SEVERE, null, ex);
 		}
 		return tb;
+	}
+
+	/**
+	 * Shifts switches to be more magical. :)
+	 * Forward going switches are shifted back one.
+	 *
+	 * @param tbs
+	 */
+	private void shiftSwitches(ArrayList<TrackBlock> tbs) {
+		for (int i = 0; i < tbs.size(); i++) {
+			TrackBlock oldSwitch = tbs.get(i);
+			if (oldSwitch.isSwitch && oldSwitch.switchDirection > 0) {
+				TrackBlock newSwitch = tbs.get(i - 1);
+				newSwitch.isSwitch = true;
+				newSwitch.switchBlockId = oldSwitch.switchBlockId;
+				newSwitch.switchDirection = oldSwitch.switchDirection;
+				newSwitch.switchPosition = oldSwitch.switchPosition;
+				oldSwitch.isSwitch = false;
+			}
+		}
 	}
 
 	/**
