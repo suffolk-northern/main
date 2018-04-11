@@ -12,21 +12,18 @@ package train_model.communication;
 
 public class MboMovementCommand
 {
-	// Number of yards in a mile
-	private static final int YARDS_PER_MILE = 1760;
-
 	// Member bounds
-	public static final int MAX_SPEED = 35;
-	public static final int MAX_AUTHORITY = YARDS_PER_MILE;
+	public static final int MAX_SPEED = 70;
+	public static final int MAX_AUTHORITY = 3000;
 
 	// Target speed
 	//
-	// Units: MPH (miles per hour)
+	// Units: kilometer per hour
 	public int speed;
 
 	// Distance allowed to travel before stopping
 	//
-	// Units: yard
+	// Units: meter
 	public int authority;
 
 	// Constructs a MboMovementCommand as a copy of another.

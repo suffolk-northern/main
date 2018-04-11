@@ -64,23 +64,23 @@ public class Main
 		ctc = new Ctc();
 
 		trackModel = new TrackModel();
-                
-                //
-                // Forces user to load track database into program.
-                // Will exit otherwise.
-                //
-                if (!trackModel.doTablesExist())    {
-                    try{
-                        trackModel.launchInitialUI();
-                        while(trackModel.getBlockCount() < 3)  {
-                            Thread.sleep(1000);
-                        }
-                        Thread.sleep(1000);
-                        trackModel.resetInitialUICloseOperation();
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
+
+		//
+		// Forces user to load track database into program.
+		// Will exit otherwise.
+		//
+		if (!trackModel.doTablesExist()) {
+			try {
+				trackModel.launchInitialUI();
+				while (trackModel.getBlockCount() < 3) {
+					Thread.sleep(1000);
+				}
+				Thread.sleep(1000);
+				trackModel.closeInitialUI();
+			} catch (InterruptedException ex) {
+				Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+			}
+		}
 		
 		MboController mboCont = new MboController("Green");
 		MboScheduler mboSched = new MboScheduler("Green");
@@ -96,7 +96,7 @@ public class Main
 		for (int i = 0; i < numberOfTrains; ++i)
 		{
 			trainControllers[i] = new TrainController();
-			trainModels[i] = new TrainModel(i);
+			trainModels[i] = new TrainModel(i, trackModel);
 		}
 
 		singleTrainController = trainControllers[0];
@@ -188,6 +188,8 @@ public class Main
 			simulationUpdatePeriod,
 			updateables.toArray(new Updateable[0])
 		);
+		
+		ctc.setUpdater(simulationUpdatePeriod, updater);
 
 		updater.scheduleAtFixedRate(wallUpdatePeriod);
 	}

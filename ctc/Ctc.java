@@ -17,6 +17,7 @@ import track_model.TrackModel;
 import track_model.TrackBlock;
 import track_model.Station;
 import train_model.communication.TrackMovementCommand;
+import updater.*;
 import mbo.CtcRadio;
 
 /**
@@ -44,6 +45,9 @@ public class Ctc implements Updateable{
 	
 	public static ArrayDeque<Train> dispatched = new ArrayDeque<Train>();
 
+	public static Updater updater;
+	public static int period;
+	
 	public static double through = 0;
 
 	public static void showUI() {
@@ -55,13 +59,37 @@ public class Ctc implements Updateable{
 		// ask track model for updates
 		TrackBlock tb;
 		
+		toUpdate = new ArrayDeque<Block>();
+		brokenBlocks = new ArrayDeque<Block>();
+		
 		for(Block block : greenline)
 		{
 			tb = trackmodel.getBlock(block.line, block.num);
 			// update block properties
 			updateBlock(block, tb);
-			
 		}
+		
+		ArrayDeque<Block> btemp = toUpdate.clone();
+		
+		for(Block b : btemp)
+		{
+			b.occupied = trackmodel.getBlock(b.line, b.num).isIsOccupied();
+		}
+		/*
+		for(Block b : brokenBlocks)
+		{
+			b.broken = true;
+		}
+		*/
+		btemp = toUpdate.clone();
+		
+		for(Block b : btemp)
+		{
+			updateAuth(b);
+		}
+		
+		toUpdate = new ArrayDeque<Block>();
+		brokenBlocks = new ArrayDeque<Block>();
 		
 		for(Block block : redline)
 		{
@@ -71,46 +99,112 @@ public class Ctc implements Updateable{
 			
 		}
 		
+		/*
+		for(Block b : brokenBlocks)
+		{
+			b.broken = true;
+		}
+		*/
+		btemp = toUpdate.clone();
+		
+		for(Block b : btemp)
+		{
+			b.occupied = trackmodel.getBlock(b.line, b.num).isIsOccupied();
+		}
+		
+		btemp = toUpdate.clone();
+		
+		for(Block b : btemp)
+		{
+			updateAuth(b);
+		}
+		
 		updateTrack();
 		updateTrains();
 		return;
 	}
 	
+	private static ArrayDeque<Block> toUpdate;
+	private static ArrayDeque<Block> brokenBlocks;
+	
 	private static void updateBlock(Block block, TrackBlock tb)
 	{
-		Train train;
+		Train train = null;
 		boolean oldOcc = block.occupied;
+		boolean newOcc = false;
 		
 		if(block.num != 0)
-			block.occupied = tb.isIsOccupied();
+			newOcc = tb.isIsOccupied();
 		else
-			block.occupied = false;
+			newOcc = false;
 		
-		if(block.occupied != oldOcc)
+		if(newOcc != oldOcc)
 		{
+			toUpdate.add(block);
+			
 			// do some train logic
-			if(block.occupied)
+			if(newOcc)
 			{
 				if(isForwardSwitch(block))
 				{
-					train = getTrain(block.prev);
+					if(block.prev.occupied)
+						train = getTrain(block.prev);
+					if(train == null && block.sw_curr_to.occupied)
+						train = getTrain(block.sw_curr_to);
+					
+					//System.out.println("forward switch");
 				}
 				else if(isBackwardSwitch(block))
 				{
-					train = getTrain(block.sw_curr_from);
+					if(block.sw_from.contains(getBlock(block.line,0)))
+					{
+						train = dispatched.poll();
+						//System.out.println("yard");
+					}
+					else
+					{
+						if(block.next.occupied)
+							train = getTrain(block.next);
+						if(train == null && block.sw_curr_from.occupied)
+							train = getTrain(block.sw_curr_from);
+					}
+					
+					//System.out.println("backward switch");
 				}
 				else if(block.prev.num == 0)
 				{
 					train = dispatched.poll();
+					//System.out.println("yard");
 				}
 				else
 				{
 					//System.out.println("Train moved from " + block.prev.line + " " + block.prev.num);
-					train = getTrain(block.prev);
+					if(block.prev.occupied)
+						train = getTrain(block.prev);
+					if(train == null && block.next.occupied)
+						train = getTrain(block.next);
+
+					//System.out.println("normal");
 				}
 				
 				if(train != null)
-					train.location = block;
+				{
+					//System.out.println(train.ID + " moved to " + block.display());
+					train.setLoc(block);
+				}
+				else
+				{
+					//System.out.println("no train found");
+					block.broken = true;
+				}
+			}
+			else if(!newOcc && isForwardSwitch(block))
+			{
+				 if(block.sw_curr_to.equals(getBlock(block.line,0)))
+				 {
+					 train = getTrain(block);
+					 train.setLoc(getBlock(block.line,0));
+				 }
 			}
 		}
 	}
@@ -123,6 +217,17 @@ public class Ctc implements Updateable{
     }
 	 */
 	//public static void main(String[] args)
+	
+	public void setUpdater(int per, Updater u)
+	{
+		period = per;
+		updater = u;
+	}
+	
+	protected void changeSpeedUp(int speedup)
+	{
+		updater.scheduleAtFixedRate(period / speedup);
+	}
 	
 	public void setTrackModel(TrackModel tm)
 	{
@@ -159,7 +264,10 @@ public class Ctc implements Updateable{
 				System.out.println("Next " + blk.sw_to.peekLast().display());
 			}
 			
-			System.out.println(blk.nextBlockDir + " " + blk.prevBlockDir);
+			System.out.print(blk.nextBlockDir + " " + blk.prevBlockDir);
+			if(blk.sw)
+				System.out.print(blk.switchDir);
+			System.out.println();
 		}
 		*/
 		
@@ -235,6 +343,7 @@ public class Ctc implements Updateable{
 					blk.setSwitch(bl.getSwitchDirection(), blockf.clone(), blockt.clone());
 					blk.prev = getBlock(line,bl.getPrevBlockId());
 					
+					
 				}
 				// prev block aka backward switch
 				else
@@ -251,6 +360,17 @@ public class Ctc implements Updateable{
 					
 					blk.setSwitch(bl.getSwitchDirection(), blockf.clone(), blockt.clone());
 					blk.next = getBlock(line,bl.getNextBlockId());
+					
+					blk.sw_curr_to = blk;
+					
+					if(from.equals(getBlock(from.line,bl.getSwitchPosition())))
+					{
+						blk.sw_curr_from = from;
+					}
+					else if(extra.equals(getBlock(from.line,bl.getSwitchPosition())))
+					{
+						blk.sw_curr_from = extra;						
+					}
 				}
 			}
 			else
@@ -330,6 +450,17 @@ public class Ctc implements Updateable{
 					blk.setSwitch(bl.getSwitchDirection(), blockf.clone(), blockt.clone());
 					blk.prev = getBlock(line,bl.getPrevBlockId());
 					
+					blk.sw_curr_from = blk;
+					
+					if(to.equals(getBlock(to.line,bl.getSwitchPosition())))
+					{
+						blk.sw_curr_to = to;
+					}
+					else if(extra.equals(getBlock(to.line,bl.getSwitchPosition())))
+					{
+						blk.sw_curr_to = extra;						
+					}
+					
 				}
 				// prev block aka backward switch
 				else
@@ -346,6 +477,17 @@ public class Ctc implements Updateable{
 					
 					blk.setSwitch(bl.getSwitchDirection(), blockf.clone(), blockt.clone());
 					blk.next = getBlock(line,bl.getNextBlockId());
+					
+					blk.sw_curr_to = blk;
+					
+					if(from.equals(getBlock(from.line,bl.getSwitchPosition())))
+					{
+						blk.sw_curr_from = from;
+					}
+					else if(extra.equals(getBlock(from.line,bl.getSwitchPosition())))
+					{
+						blk.sw_curr_from = extra;						
+					}
 				}
 			}
 			else
@@ -464,14 +606,28 @@ public class Ctc implements Updateable{
 		}
 	}
 	
-	public static void autoMode()
+	public static void autoMode(String line)
 	{
-		
+		if(line.equalsIgnoreCase("green"))
+		{
+			
+		}
+		else if(line.equalsIgnoreCase("red"))
+		{
+			
+		}
 	}
 	
-	public static void manMode()
+	public static void manMode(String line)
 	{
-		
+		if(line.equalsIgnoreCase("green"))
+		{
+			
+		}
+		else if(line.equalsIgnoreCase("red"))
+		{
+			
+		}
 	}
 
 	private static Train getTrain(int ID) {
@@ -613,7 +769,11 @@ public class Ctc implements Updateable{
 		//System.out.println("calc auth");
 		
 		double auth = 0;
+		boolean flipped = false;
 
+		if(route.isEmpty())
+			return auth;
+		
 		ArrayDeque<Block> temp = route.clone();
 		Block block = temp.poll();
 		Block prev = null;
@@ -631,9 +791,11 @@ public class Ctc implements Updateable{
 			block = temp.poll();
 
 			// check for trains in the way
-			if (block.isOccupied()) 
+			if (block.occupied || block.broken) 
 			{
-				auth -= prev.length;
+				if(!prev.equals(route.peekFirst()))
+					auth -= prev.length;
+				
 				return auth;
 			} // check switches are in correct position
 			else if (block.hasSwitch()) {
@@ -642,14 +804,18 @@ public class Ctc implements Updateable{
 					auth += block.length;
 					success = false;
 					
+					if(flipped)
+						return auth;
+					
 					// check if it is safe to flip switch
 					if(block.sw_to.peekFirst().occupied == false && block.sw_to.peekLast().occupied == false)
 					{
-						success = trackmodel.flipSwitch(block.line,block.num);
+						success = getFlip(block);
 						if(success)
 						{
 							block.sw_curr_to = temp.peek();
 							updateTrack();
+							flipped = true;
 						}
 					}
 					
@@ -660,20 +826,26 @@ public class Ctc implements Updateable{
 				{
 					success = false;
 					
+					if(flipped)
+						return auth;
+					
 					// check if it is safe to flip switch
 					if(block.sw_from.peekFirst().occupied == false && block.sw_from.peekLast().occupied == false)
 					{
-						success = trackmodel.flipSwitch(block.line,block.num);
+						success = getFlip(block);
 						if(success)
 						{
 							block.sw_curr_from = prev;
 							updateTrack();
+							flipped = true;
 						}
 					}
 
 					if(!success)
 					{	
-						auth -= prev.length;
+						if(!prev.equals(route.peekFirst()))
+							auth -= prev.length;
+						
 						return auth;
 					}
 					
@@ -683,6 +855,9 @@ public class Ctc implements Updateable{
 				{
 					auth += block.length;
 				}
+				
+				flipped = true;
+				
 			} else {
 				auth += block.length;
 			}
@@ -793,7 +968,13 @@ public class Ctc implements Updateable{
 			}
 
 			rows[count][5] = "";
-			rows[count][6] = "";
+			
+			if(block.closed)
+				rows[count][6] = "Closed";
+			else if(block.broken)
+				rows[count][6] = "Broken";
+			else
+				rows[count][6] = "";
 
 			if (!block.rrxing) {
 				rows[count][7] = "";
@@ -851,7 +1032,117 @@ public class Ctc implements Updateable{
 		ui.updateTrackTable(rows, greenline.size() - 1 /*+ redline.size() - 1*/);
 	}
 
-
+	private static boolean getFlip(Block swblock)
+	{
+		boolean flipped = false;
+		ArrayDeque<Train> mytrains = new ArrayDeque<Train>();
+		
+		for(Train train : trains)
+		{
+			if(getFirstSwitch(train.route).peekFirst().equals(swblock))
+			{
+				mytrains.add(train);
+			}
+		}
+		
+		Train closest = null;
+		double dist = Integer.MAX_VALUE;
+		
+		for(Train train : mytrains)
+		{
+			if(getDistOnRoute(train,swblock) < dist)
+			{
+				dist = getDistOnRoute(train,swblock);
+				closest = train;
+			}
+		}
+		
+		// if switch is not in right config, flip it
+		Block desired = getFirstSwitch(closest.route).peekLast();
+		if((isForwardSwitch(swblock) && !swblock.sw_curr_to.equals(desired)) || (isBackwardSwitch(swblock) && !swblock.sw_curr_from.equals(desired)))
+		{
+			//System.out.println("Old switch pos: " + trackmodel.getBlock(swblock.line,swblock.num).getSwitchPosition());
+			flipped = trackmodel.flipSwitch(swblock.line,swblock.num);
+			//System.out.println("New switch pos: " + trackmodel.getBlock(swblock.line,swblock.num).getSwitchPosition());
+		}
+		
+		return flipped;
+	}
+	
+	private static double getDistOnRoute(Train train, Block block)
+	{
+		ArrayDeque<Block> rtemp = train.route.clone();
+		double dist = 0;
+		Block curr = null;
+		
+		while(!rtemp.isEmpty())
+		{
+			curr = rtemp.poll();
+			if(curr.equals(train.location))
+				break;
+		}
+		
+		while(!rtemp.isEmpty() && !curr.equals(block))
+		{
+			curr = rtemp.poll();
+			dist += curr.length;
+		}
+		
+		return dist;
+	}
+	
+	private static ArrayDeque<Block> getFirstSwitch(ArrayDeque<Block> route)
+	{
+		ArrayDeque<Block> retsw = null;
+		Block sw = null;
+		Block prev = null;
+		Block next = null;
+		ArrayDeque<Block> rtemp = route.clone();
+		
+		while(!rtemp.isEmpty())
+		{
+			prev = sw;
+			sw = rtemp.poll();
+			if(sw.sw)
+			{
+				retsw = new ArrayDeque<Block>();
+				retsw.add(sw);
+				
+				if(!rtemp.isEmpty())
+					next = rtemp.poll();
+				
+				if(isForwardSwitch(sw))
+				{
+					if(prev != null && sw.sw_to.contains(prev))
+					{
+						retsw.add(prev);
+						return retsw;
+					}
+					else if(next != null && sw.sw_to.contains(next))
+					{
+						retsw.add(next);
+						return retsw;
+					}
+				}
+				else if(isBackwardSwitch(sw))
+				{
+					if(prev != null && sw.sw_from.contains(prev))
+					{
+						retsw.add(prev);
+						return retsw;
+					}
+					else if(next != null && sw.sw_from.contains(next))
+					{
+						retsw.add(next);
+						return retsw;
+					}
+				}
+			}
+		}
+		
+		return retsw;
+	}
+	
 	private static void updateTrains() {
 		// for all trains in trains
 		Object[][] rows = new Object[trains.size()][TRAINCOLS];
@@ -972,13 +1263,20 @@ public class Ctc implements Updateable{
 			if (train.location.equals(location)) 
 			{
 				if(location.num != 0)
+				{
+					//System.out.println("Train found at " + location.display());
 					return train;
+				}
 				else
+				{
+					//System.out.println("Train dispatched");
 					return dispatched.poll();
+				}
 			}
 		}
 
-		return train;
+		//System.out.println("null");
+		return null;
 	}
 
 	private static Block getStation(String name) {
@@ -1072,6 +1370,25 @@ public class Ctc implements Updateable{
 		
 		return MBOswitches;
 	}
+	
+	protected static void blockMaintenance(String line, String block, boolean close)
+	{
+		if(block.equalsIgnoreCase("YARD"))
+			return;
+		
+		Block bl = getBlock(line,Integer.parseInt(block.substring(1)));
+		
+		trackmodel.setMaintenance(line,Integer.parseInt(block.substring(1)),close);
+		if(!close)
+		{
+			bl.broken = false;
+			bl.closed = false;
+		}
+		else
+		{
+			bl.closed = true;
+		}
+	}
 
 	private static void loadSched() {
 
@@ -1084,17 +1401,17 @@ public class Ctc implements Updateable{
 	private static void sendSpeedAuth(Train train, double speed, double auth) {
 		Block loc = train.getLoc();
 
-		SwitchAndPos swpos = getSwitches(train.getRoute()).peek();
+		//SwitchAndPos swpos = getSwitches(train.getRoute()).peek();
 
 		Block sw = null;
 		Block from = null;
 		Block to = null;
 
-		if (swpos != null) {
-			sw = swpos.getBlock();
-			from = swpos.getFrom();
-			to = swpos.getTo();
-		}
+		//if (swpos != null) {
+		//	sw = swpos.getBlock();
+		//	from = swpos.getFrom();
+		//	to = swpos.getTo();
+		//}
 
 		//System.out.println("To Track Controller");
 		//System.out.println("Train " + train.getID() + " at location " + loc.display());
@@ -1108,6 +1425,7 @@ public class Ctc implements Updateable{
 		//System.out.println();
 		
 		String msg = speed + " " + auth;
+		//System.out.println(train.ID + " at " + train.location.display() + ": " + msg);
 		
 		TrackMovementCommand tmc = new TrackMovementCommand((int)speed,(int)auth);
 		
@@ -1252,14 +1570,16 @@ public class Ctc implements Updateable{
 		
 		if(dest.line.equalsIgnoreCase("green"))
 		{
-			max = greenline.size();
+			maxlen = 2* greenline.size();
 		}
 		else if(dest.line.equalsIgnoreCase("red"))
 		{
-			max = redline.size();
+			maxlen = 2 * redline.size();
 		}
 		
-		findRouteRec(start, dest, new ArrayDeque<Block>(), max);
+		initFrom = train.getPrevBlock();
+		
+		findRouteRec(start, dest, new ArrayDeque<Block>());
 
 		int minsize = Integer.MAX_VALUE;
 		ArrayDeque<Block> curr;
@@ -1273,12 +1593,22 @@ public class Ctc implements Updateable{
 
 		}
 
+		/*
+		System.out.println();
+		ArrayDeque<Block> rtemp = route.clone();
+		while(!rtemp.isEmpty())
+			System.out.print(rtemp.poll().display() + " ");
+		System.out.println();
+		*/
+		
 		return route;
 	}
 
 	private static ArrayDeque<ArrayDeque<Block>> routes;
+	private static int maxlen;
+	private static Block initFrom;
 
-	private static void findRouteRec(Block start, Block dest, ArrayDeque<Block> route, int max) {
+	private static void findRouteRec(Block start, Block dest, ArrayDeque<Block> route) {
 		
 		/*
 		// for debugging
@@ -1290,18 +1620,25 @@ public class Ctc implements Updateable{
 		System.out.println();
 		*/
 		
+		Block cameFrom = route.peekLast();
+		if(cameFrom == null)
+			cameFrom = initFrom;
+		
 		route.add(start);
 		//explored.add(start);
 
-		if (route.size() > max) {
+		if (route.size() > maxlen) {
 			return;
 		}
 
 		if (start.equals(dest)) {
 			routes.add(route);
+			if(route.size() < maxlen)
+				maxlen = route.size();
 			return;
 		}
 
+		Block blkToAdd;
 		Block block = start;
 		ArrayDeque<Block> neighbors = new ArrayDeque<Block>();
 
@@ -1309,35 +1646,91 @@ public class Ctc implements Updateable{
 		{
 			if(isForwardSwitch(block))
 			{
-				if(block.nextBlockDir == 1)
-					neighbors.add(block.getSwitchTo().clone().peekFirst());
-				if(block.switchDir < 2 && block.switchDir > -2)
-					neighbors.add(block.getSwitchTo().clone().peekLast());
+				if(block.nextBlockDir == 1 && !block.sw_to.contains(cameFrom))
+				{
+					blkToAdd = block.getSwitchTo().clone().peekFirst();
+					if(!cameFrom.equals(blkToAdd))
+						neighbors.add(blkToAdd);
+				}
+				if(block.switchDir < 2 && block.switchDir > -2 && !block.sw_to.contains(cameFrom))
+				{
+					blkToAdd = block.getSwitchTo().clone().peekLast();
+					if(!cameFrom.equals(blkToAdd))
+						neighbors.add(blkToAdd);
+				}
 				if(block.prevBlockDir == 1)
-					neighbors.add(block.prev);
+				{
+					blkToAdd = block.prev;
+					if(!cameFrom.equals(blkToAdd))
+						neighbors.add(blkToAdd);
+				}
 			}
 			else
-			{
+			{			
 				if(block.nextBlockDir == 1)
-					neighbors.add(block.next);
-				if(block.switchDir < 2 && block.switchDir > -2)
-					neighbors.add(block.getSwitchFrom().clone().peekLast());
-				if(block.prevBlockDir == 1)
-					neighbors.add(block.getSwitchFrom().clone().peekFirst());
+				{
+					blkToAdd = block.next;
+					if(!cameFrom.equals(blkToAdd))
+						neighbors.add(blkToAdd);
+				}
+				if(block.switchDir < 2 && block.switchDir > -2 && !block.sw_from.contains(cameFrom))
+				{
+					blkToAdd = block.getSwitchFrom().clone().peekLast();
+					if(!cameFrom.equals(blkToAdd))
+						neighbors.add(blkToAdd);
+				}
+				if(block.prevBlockDir == 1 && !block.sw_from.contains(cameFrom))
+				{
+					blkToAdd = block.getSwitchFrom().clone().peekFirst();
+					if(!cameFrom.equals(blkToAdd))
+						neighbors.add(blkToAdd);
+				}
 			}
 		} 
 		else 
 		{
 			if(block.nextBlockDir == 1)
-				neighbors.add(block.next);
+			{
+				blkToAdd = block.next;
+				if(!cameFrom.equals(blkToAdd))
+						neighbors.add(blkToAdd);
+			}
 			if(block.prevBlockDir == 1)
-				neighbors.add(block.prev);
+			{
+				blkToAdd = block.prev;
+				if(!cameFrom.equals(blkToAdd))
+						neighbors.add(blkToAdd);
+			}
 		}
-
+		
+		/*
+		// for debugging
+		ArrayDeque<Block> ntemp = neighbors.clone();
+		System.out.print("\nblock: ");
+		System.out.println(start.display());
+		System.out.print("neighbors: ");
+		while(!ntemp.isEmpty())
+			System.out.print(ntemp.poll().display() + " ");
+		System.out.println();
+		System.out.print("route: ");
+		ArrayDeque<Block> rtemp = route.clone();
+		while(!rtemp.isEmpty())
+			System.out.print(rtemp.poll().display() + " ");
+		System.out.println();
+		*/
+		
 		while (!neighbors.isEmpty()) {
 			block = neighbors.poll();
-			//if(!explored.contains(block))
-			findRouteRec(block, dest, route.clone(),max);
+			
+			while(block.num == 0 && dest.num != 0)
+			{
+				if(neighbors.isEmpty())
+					return;
+		
+				block = neighbors.poll();
+			}
+				
+			findRouteRec(block, dest, route.clone());
 
 		}
 
@@ -1481,6 +1874,7 @@ public class Ctc implements Updateable{
 		protected double deadline;
 		protected int passengers;
 		protected int driverID;
+		protected Block lastBlock;
 
 		public Train() {
 			ID = 0;
@@ -1492,6 +1886,7 @@ public class Ctc implements Updateable{
 			deadline = 0;
 			passengers = 0;
 			driverID = 0;
+			lastBlock = null;
 		}
 
 		public Train(int id, Block loc, int dID) {
@@ -1504,6 +1899,7 @@ public class Ctc implements Updateable{
 			deadline = 0;
 			passengers = 0;
 			driverID = dID;
+			lastBlock = null;
 
 		}
 
@@ -1517,14 +1913,30 @@ public class Ctc implements Updateable{
 			deadline = 0;
 			passengers = 0;
 			driverID = 0;
+			lastBlock = null;
 		}
 
+		private Block getPrevBlock()
+		{
+			if(lastBlock != null)
+				return lastBlock;
+			
+			return new Block();
+		}
+		
+		private void setPrevBlock(Block pb)
+		{
+			lastBlock = pb;
+		}
+		
 		private ArrayDeque<Block> getRoute() {
 			return route;
 		}
 
 		private void setLoc(Block newLoc) {
+			lastBlock = location;
 			location = newLoc;
+			route.poll();
 		}
 
 		public Block getLoc() {
@@ -1576,6 +1988,7 @@ public class Ctc implements Updateable{
 		private boolean rrxing_status;
 		private boolean signal;
 		private boolean broken;
+		private boolean closed;
 		private Block sw_curr_from;
 		private Block sw_curr_to;
 		private boolean hasStation;
@@ -1605,6 +2018,7 @@ public class Ctc implements Updateable{
 			sw_curr_to = null;
 			hasStation = false;
 			station = "";
+			closed = false;
 		}
 
 		public Block(String l, boolean isYard) {
@@ -1628,6 +2042,7 @@ public class Ctc implements Updateable{
 			sw_curr_to = null;
 			hasStation = false;
 			station = "";
+			closed = false;
 		}
 
 		public Block(String l, char sec, int n, double len, int nextdir, int prevdir, Block nextb, Block prevb, boolean rr) {
@@ -1657,6 +2072,7 @@ public class Ctc implements Updateable{
 			station = "";
 			nextBlockDir = nextdir;
 			prevBlockDir = prevdir;
+			closed = false;
 		}
 
 		public Block(String l, char sec, int n, double len, int nextdir, int prevdir, Block nextb, Block prevb, boolean rr, int swID, int swdir, ArrayDeque<Block> swf, ArrayDeque<Block> swt, Block currf, Block currt) {
@@ -1687,6 +2103,7 @@ public class Ctc implements Updateable{
 			nextBlockDir = nextdir;
 			prevBlockDir = prevdir;
 			switchDir = swdir;
+			closed = false;
 		}
 
 		public Block(String l, char sec, int n, double len, int nextdir, int prevdir, Block nextb, Block prevb, boolean rr, boolean stat, String statID) {
@@ -1716,6 +2133,7 @@ public class Ctc implements Updateable{
 			station = statID;
 			nextBlockDir = nextdir;
 			prevBlockDir = prevdir;
+			closed = false;
 		}
 
 		private boolean isOccupied() {

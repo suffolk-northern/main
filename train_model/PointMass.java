@@ -6,7 +6,10 @@
 
 package train_model;
 
+import track_model.TrackModel;
+import track_model.TrackBlock;
 import track_model.Orientation;
+import track_model.GlobalCoordinates;
 import train_model.Pose;
 
 // Physics point mass
@@ -32,12 +35,22 @@ public class PointMass
 	private Pose pose;
 	private double speed = 0.0;
 
+	private final TrackModel track;
+	private TrackBlock block = null;
+	private double displacement = 0.0;
+	private int lastBlockId = 0;
+	private boolean forward = true;
+	private final String LINE = "green";
+
 	// Constructs a PointMass as a copy of another object.
 	public PointMass(PointMass other)
 	{
 		this.mass  = other.mass;
 		this.pose  = other.pose;
 		this.speed = other.speed;
+		this.track = other.track;
+		this.displacement = other.displacement;
+		this.lastBlockId = other.lastBlockId;
 	}
 
 	// Constructs a PointMass with given intrinsic properties and initial
@@ -52,10 +65,11 @@ public class PointMass
 	//   Parameter pose is the initial position and direction.
 	//
 	//   Velocity starts at zero.
-	public PointMass(double mass, Pose pose)
+	public PointMass(double mass, Pose pose, TrackModel track)
 	{
 		this.mass = mass;
 		this.pose = new Pose(pose);
+		this.track = track;
 	}
 
 	// Returns the current pose.
@@ -121,13 +135,13 @@ public class PointMass
 		double speedFinal   = speed + speedChange;
 		double speedAverage = speedInitial + 0.5 * speedChange;
 
+		double displacementChange = speedAverage * timeSeconds;
+
 		// meters
-		double displacementXChange =
-			speedAverage * Math.sin(pose.orientation.radians())
-			* timeSeconds;
-		double displacementYChange =
-			speedAverage * Math.cos(pose.orientation.radians())
-			* timeSeconds;
+		double displacementXChange = displacementChange
+				* Math.sin(pose.orientation.radians());
+		double displacementYChange = displacementChange
+				* Math.cos(pose.orientation.radians());
 
 		// yards
 		double displacementXChangeYards =
@@ -135,14 +149,45 @@ public class PointMass
 		double displacementYChangeYards =
 			yardsPerMeter * displacementYChange;
 
-		pose.position = pose.position.addYards(
-			displacementYChangeYards,
-			displacementXChangeYards
-		);
-
 		speed = speedFinal;
 
 		if (speed < 0.0) speed = 0.0;
+
+		if (displacementChange < 0.00001)
+			return;
+
+		// Steer trains.
+
+		if (block == null)
+			block = track.getClosestBlock(pose.position, LINE);
+
+		int blockId = block.getBlock();
+		double length = block.getLength();
+
+		if (forward)
+			displacement += displacementChange;
+		else
+			displacement -= displacementChange;
+
+		if (displacement < 0.0 || displacement > length) {
+			if (forward)
+				++blockId;
+			else
+				--blockId;
+
+			block = track.getBlock(LINE, blockId);
+
+			forward = track.getSide(pose.position, LINE, blockId);
+			displacement = forward ? 0.1 : block.getLength() - 0.1;
+		}
+
+		GlobalCoordinates oldPosition = pose.position;
+
+		pose.position = track.getPositionAlongBlock(LINE,
+		                                            blockId,
+		                                            displacement);
+
+		pose.orientation = oldPosition.directionTo(pose.position);
 	}
 
 	// How much mass (in kilograms) weighs this many pounds

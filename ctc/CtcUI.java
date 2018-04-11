@@ -58,7 +58,8 @@ public class CtcUI extends javax.swing.JFrame {
 
 	private void initialize() {
 		jLabel7 = new javax.swing.JLabel();
-		jLabel6 = new javax.swing.JLabel();
+		//jLabel6 = new javax.swing.JLabel();
+		mLineSelect = new javax.swing.JComboBox<String>();
 		dispatchButton = new javax.swing.JButton();
 		jLabel16 = new javax.swing.JLabel();
 		jScrollPane1 = new javax.swing.JScrollPane();
@@ -82,7 +83,7 @@ public class CtcUI extends javax.swing.JFrame {
 		jLabel13 = new javax.swing.JLabel();
 		jScrollPane2 = new javax.swing.JScrollPane();
 		trainTable = new javax.swing.JTable();
-		blueMaintenance = new javax.swing.JComboBox<>();
+		maintenanceBlock = new javax.swing.JComboBox<>();
 		fixedBlock = new javax.swing.JRadioButton();
 		jTextField5 = new javax.swing.JTextField();
 		jLabel3 = new javax.swing.JLabel();
@@ -101,8 +102,13 @@ public class CtcUI extends javax.swing.JFrame {
 		jLabel7.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
 		jLabel7.setText("Train Select");
 
-		jLabel6.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
-		jLabel6.setText("Blue Line");
+		mLineSelect.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
+		mLineSelect.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"Green","Red"}));
+		mLineSelect.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				mLineSelectActionPerformed(evt);
+			}
+		});
 
 		dispatchButton.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
 		dispatchButton.setText("Dispatch");
@@ -180,7 +186,7 @@ public class CtcUI extends javax.swing.JFrame {
 		jLabel19.setText("Multiplier");
 
 		multSelect.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
-		multSelect.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"x1", "x2", "x4", "x10"}));
+		multSelect.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"x1", "x2", "x5", "x10"}));
 		multSelect.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				multSelectActionPerformed(evt);
@@ -283,9 +289,9 @@ public class CtcUI extends javax.swing.JFrame {
 
 		jScrollPane2.setViewportView(trainTable);
 
-		blueMaintenance.setEditable(true);
-		blueMaintenance.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
-		blueMaintenance.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8"}));
+		maintenanceBlock.setEditable(true);
+		maintenanceBlock.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
+		maintenanceBlock.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{}));
 
 		fixedBlock.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
 		fixedBlock.setText("Fixed Block");
@@ -313,7 +319,7 @@ public class CtcUI extends javax.swing.JFrame {
 		});
 
 		jLabel8.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
-		jLabel8.setText("Blue Line");
+		jLabel8.setText("Green Line");
 
 		jLabel18.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
 		jLabel18.setText("passengers/hr");
@@ -384,8 +390,8 @@ public class CtcUI extends javax.swing.JFrame {
 																.addComponent(autoMode))
 														.addComponent(jLabel13)
 														.addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-																.addComponent(blueMaintenance, javax.swing.GroupLayout.Alignment.LEADING, 0, 0, Short.MAX_VALUE)
-																.addComponent(jLabel8, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+																.addComponent(maintenanceBlock, javax.swing.GroupLayout.Alignment.LEADING, 0, 0, Short.MAX_VALUE)
+																.addComponent(mLineSelect, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
 												.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 										.addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
 												.addContainerGap(37, Short.MAX_VALUE)
@@ -398,7 +404,7 @@ public class CtcUI extends javax.swing.JFrame {
 														.addComponent(jLabel10)
 														.addGroup(layout.createSequentialGroup()
 																.addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-																		.addComponent(jLabel6)
+																		.addComponent(jLabel8)
 																		.addComponent(jLabel16))
 																.addGap(50, 50, 50)
 																.addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -487,7 +493,7 @@ public class CtcUI extends javax.swing.JFrame {
 																.addComponent(scheduleButton)))
 												.addGap(1, 1, 1)
 												.addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-														.addComponent(jLabel6)
+														.addComponent(jLabel8)
 														.addComponent(blueThrough, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
 														.addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
 														.addComponent(jLabel17)
@@ -504,9 +510,9 @@ public class CtcUI extends javax.swing.JFrame {
 												.addGap(18, 18, 18)
 												.addComponent(jLabel9)
 												.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-												.addComponent(jLabel8)
+												.addComponent(mLineSelect)
 												.addGap(4, 4, 4)
-												.addComponent(blueMaintenance, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+												.addComponent(maintenanceBlock, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
 												.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
 												.addComponent(openTrack)
 												.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1067,18 +1073,21 @@ public class CtcUI extends javax.swing.JFrame {
 			}
 		}
 		
-		int sizegreen = greens.size();
-		int sizered = reds.size();
+		int sizegreen = greens.size() + 1;
+		int sizered = reds.size() + 1;
 		
 		greenBlocks = new String[sizegreen];
 		redBlocks = new String[sizered];
 		
-		for(int i = 0; i < sizegreen; i++)
+		greenBlocks[0] = "YARD";
+		redBlocks[0] = "YARD";
+		
+		for(int i = 1; i < sizegreen; i++)
 		{
 			greenBlocks[i] = greens.poll();
 		}
 		
-		for(int i = 0; i < sizered; i++)
+		for(int i = 1; i < sizered; i++)
 		{
 			redBlocks[i] = reds.poll();
 		}
@@ -1094,8 +1103,13 @@ public class CtcUI extends javax.swing.JFrame {
 		// TODO add your handling code here:
 
 		// inform user
-		String str = (String) blueMaintenance.getSelectedItem();
-		System.out.println("Block " + str + " opened");
+		String line = (String) mLineSelect.getSelectedItem();
+		String str  = (String) maintenanceBlock.getSelectedItem();
+		
+		
+		//System.out.println("Block " + str + " opened");
+		
+		ctc.blockMaintenance(line,str,false);
 
 		Object obj = "";
 
@@ -1111,8 +1125,12 @@ public class CtcUI extends javax.swing.JFrame {
     private void closeTrackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeTrackActionPerformed
 		// TODO add your handling code here:
 
-		String str = (String) blueMaintenance.getSelectedItem();
-		System.out.println("Block " + str + " closed for maintenance");
+		String line = (String) mLineSelect.getSelectedItem();
+		String str = (String) maintenanceBlock.getSelectedItem();
+		
+		//System.out.println("Block " + str + " closed for maintenance");
+		
+		ctc.blockMaintenance(line,str,true);
 
 		Object obj = "Closed";
 
@@ -1124,6 +1142,18 @@ public class CtcUI extends javax.swing.JFrame {
 
     }//GEN-LAST:event_closeTrackActionPerformed
 
+	private void mLineSelectActionPerformed(java.awt.event.ActionEvent evt)
+	{
+		if(mLineSelect.getSelectedIndex() == 0)
+		{
+			maintenanceBlock.setModel(new javax.swing.DefaultComboBoxModel<>(greenBlocks));
+		}
+		else
+		{
+			maintenanceBlock.setModel(new javax.swing.DefaultComboBoxModel<>(redBlocks));
+		}
+	}
+	
 	private void lineSelectActionPerformed(java.awt.event.ActionEvent evt)
 	{
 		if(lineSelect.getSelectedIndex() == 0)
@@ -1143,6 +1173,12 @@ public class CtcUI extends javax.swing.JFrame {
 
     private void multSelectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_multSelectActionPerformed
 		// TODO add your handling code here:
+		
+		String mult = (String) multSelect.getSelectedItem();
+		int speedup = Integer.parseInt(mult.substring(1));
+		
+		ctc.changeSpeedUp(speedup);
+		
     }//GEN-LAST:event_multSelectActionPerformed
 
     private void MovingBlockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MovingBlockActionPerformed
@@ -1156,13 +1192,15 @@ public class CtcUI extends javax.swing.JFrame {
     private void manualModeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manualModeActionPerformed
 		// TODO add your handling code here:
 		//System.out.println("Manual mode");
-		ctc.manMode();
+		ctc.manMode("green");
+		//ctc.manMode("red");
     }//GEN-LAST:event_manualModeActionPerformed
 
     private void autoModeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoModeActionPerformed
 		// TODO add your handling code here:
 		//System.out.println("Automatic mode");
-		ctc.autoMode();
+		ctc.autoMode("green");
+		//ctc.autoMode("red");
     }//GEN-LAST:event_autoModeActionPerformed
 
 	/**
@@ -1208,7 +1246,8 @@ public class CtcUI extends javax.swing.JFrame {
 	private javax.swing.JRadioButton MovingBlock;
 	private javax.swing.JRadioButton autoMode;
 	private javax.swing.JComboBox<String> blockSelect;
-	private javax.swing.JComboBox<String> blueMaintenance;
+	private javax.swing.JComboBox<String> maintenanceBlock;
+	private javax.swing.JComboBox<String> mLineSelect;
 	private javax.swing.JRadioButton closeTrack;
 	private javax.swing.JButton dispatchButton;
 	private javax.swing.JRadioButton fixedBlock;
@@ -1225,7 +1264,8 @@ public class CtcUI extends javax.swing.JFrame {
 	private javax.swing.JLabel jLabel2;
 	private javax.swing.JLabel jLabel3;
 	private javax.swing.JLabel jLabel5;
-	private javax.swing.JLabel jLabel6;
+	//private javax.swing.JLabel jLabel6;
+	//private javax.swing.JComboBox<String> mLineSelect;
 	private javax.swing.JLabel jLabel7;
 	private javax.swing.JLabel jLabel8;
 	private javax.swing.JLabel jLabel9;
