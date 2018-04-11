@@ -20,8 +20,8 @@ public class Updater
 
 	private Updateable[] objects;
 
-	private Timer timer = new Timer();
-	private TimerTask task = new Task(this);
+	private Timer timer = null;
+	private TimerTask task = null;
 
 	// Constructs an Updater which updates a list of objects in order.
 	//
@@ -55,7 +55,11 @@ public class Updater
 	// Parameter period is the time in milliseconds between iterations.
 	public void scheduleAtFixedRate(int period)
 	{
-		timer.cancel();
+		if (timer != null)
+			timer.cancel();
+		
+		timer = new Timer();
+		task = new Task(this);
 		timer.scheduleAtFixedRate(task, 0, period);
 	}
 
