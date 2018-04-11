@@ -115,7 +115,7 @@ public class TrackModelMapPanel extends JPanel {
 		plopBackground(g);
 		plopStations(g);
 		plopCrossings(g);
-		plopSwitches(g);
+//		plopSwitches(g);
 		plopTrack(g);
 //		plopBeacons(g);
 		plopTrains(g);
@@ -145,15 +145,6 @@ public class TrackModelMapPanel extends JPanel {
 			double yStart = yBound - (tb.start.latitude() - minLat) * latMultiplier;
 			double xEnd = xBound + (tb.end.longitude() - minLon) * lonMultiplier;
 			double yEnd = yBound - (tb.end.latitude() - minLat) * latMultiplier;
-			//
-			// Adds yard clipart.
-			//
-			if (tb.block == 0) {
-				int width = yardArt.getWidth(this) * xDimension / 7000;
-				int height = yardArt.getHeight(this) * xDimension / 7000;
-				g2.drawImage(yardArt, (int) xStart - width, (int) yStart - height, width, height, this);
-				continue;
-			}
 			//
 			// Sets color of track block.
 			// 
@@ -188,9 +179,23 @@ public class TrackModelMapPanel extends JPanel {
 			//
 			if (tb.isSwitch && tb.switchBlockId == 0) {
 				TrackBlock yard = tm.getBlock(tb.line, 0);
+				double xTemp = xStart;
+				double yTemp = yStart;
+				if (tb.switchDirection > 0) {
+					xTemp = xBound + (tb.end.longitude() - minLon) * lonMultiplier;
+					yStart = yBound - (tb.end.latitude() - minLat) * latMultiplier;
+				}
 				xEnd = xBound + (yard.end.longitude() - minLon) * lonMultiplier;
 				yEnd = yBound - (yard.end.latitude() - minLat) * latMultiplier;
-				g.drawLine((int) xStart, (int) yStart, (int) xEnd, (int) yEnd);
+				g.drawLine((int) xTemp, (int) yTemp, (int) xEnd, (int) yEnd);
+			}
+			//
+			// Adds yard clipart.
+			//
+			if (tb.block == 0) {
+				int width = yardArt.getWidth(this) * xDimension / 7000;
+				int height = yardArt.getHeight(this) * xDimension / 7000;
+				g2.drawImage(yardArt, (int) xStart - width, (int) yStart - height, width, height, this);
 			}
 		}
 	}

@@ -7,13 +7,7 @@ package track_model;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.Timer;
@@ -24,16 +18,19 @@ import javax.swing.Timer;
  */
 public class TestFrame extends javax.swing.JFrame {
 
-	private TrackModelFrame tmf;
-	private final DbHelper dbHelper;
+	private final TrackModel tm;
+	private final TrackModelFrame tmf;
 
 	/**
 	 * Creates new form MurphFrame
+	 *
+	 * @param tm
+	 * @param tmf
 	 */
-	public TestFrame(TrackModelFrame tmf, DbHelper dbHelper) {
+	public TestFrame(TrackModel tm, TrackModelFrame tmf) {
 		initComponents();
+		this.tm = tm;
 		this.tmf = tmf;
-		this.dbHelper = dbHelper;
 		if (TrackModel.doTablesExist()) {
 			populateDropdown();
 		}
@@ -239,7 +236,7 @@ public class TestFrame extends javax.swing.JFrame {
 		line = line.substring(line.lastIndexOf(" "), line.length()).trim();
 		String block = jComboBox2.getSelectedItem().toString().split(",")[1];
 		block = block.substring(block.lastIndexOf(" "), block.length() - 1).trim();
-		
+
 		TrackModel.setHeater(line, Integer.parseInt(block), true);
     }//GEN-LAST:event_jButton4ActionPerformed
 
@@ -293,34 +290,24 @@ public class TestFrame extends javax.swing.JFrame {
 
 	private void populateDropdown() {
 		ArrayList<String> blockList = new ArrayList<>();
-		try {
-			Connection conn = dbHelper.getConnection();
-			Statement stat = conn.createStatement();
-
-			ResultSet rs = stat.executeQuery("SELECT * FROM BLOCKS;");
-			while (rs.next()) {
-				blockList.add("Line: " + rs.getString(1) + ", Section: " + rs.getString(2) + ", Block: " + rs.getInt(3));
-			}
-			jComboBox1.setModel(new DefaultComboBoxModel(blockList.toArray()));
-
-			rs = stat.executeQuery("SELECT * FROM STATIONS;");
-			blockList = new ArrayList<>();
-			while (rs.next()) {
-				blockList.add("Station: " + rs.getString(4) + " (Line: " + rs.getString(1) + ", Block: " + rs.getInt(3) + ")");
-			}
-			jComboBox2.setModel(new DefaultComboBoxModel(blockList.toArray()));
-
-			rs = stat.executeQuery("SELECT * FROM CONNECTIONS WHERE SWITCH_VALID;");
-			blockList = new ArrayList<>();
-			while (rs.next()) {
-				blockList.add("Line: " + rs.getString(1) + ", Section: " + rs.getString(2) + ", Block: " + rs.getInt(3));
-			}
-			jComboBox3.setModel(new DefaultComboBoxModel(blockList.toArray()));
-			rs.close();
-			conn.close();
-		} catch (SQLException ex) {
-			Logger.getLogger(TestFrame.class.getName()).log(Level.SEVERE, null, ex);
+		for (TrackBlock tb : tm.blocks) {
+			blockList.add("Line: " + tb.line + ", Section: " + tb.section + ", Block: " + tb.block);
 		}
+		jComboBox1.setModel(new DefaultComboBoxModel(blockList.toArray()));
+
+		blockList = new ArrayList<>();
+		for (Station s : tm.stations) {
+			blockList.add("Station: " + s.name + " (Line: " + s.line + ", Block: " + s.block + ")");
+		}
+		jComboBox2.setModel(new DefaultComboBoxModel(blockList.toArray()));
+
+		blockList = new ArrayList<>();
+		for (TrackBlock tb : tm.blocks) {
+			if (tb.isSwitch) {
+				blockList.add("Line: " + tb.line + ", Section: " + tb.section + ", Block: " + tb.block);
+			}
+		}
+		jComboBox3.setModel(new DefaultComboBoxModel(blockList.toArray()));
 	}
 
 	private void getSomething2() {

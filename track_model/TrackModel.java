@@ -219,7 +219,7 @@ public class TrackModel implements Updateable {
 		tmf.setLocationRelativeTo(null);
 		tmf.setVisible(true);
 		if (doTablesExist()) {
-			TestFrame tf = new TestFrame(tmf, dbHelper);
+			TestFrame tf = new TestFrame(this, tmf);
 			tf.setLocationRelativeTo(tmf);
 			tf.setVisible(true);
 		}
