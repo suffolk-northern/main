@@ -1319,6 +1319,9 @@ public class Ctc implements Updateable{
 	
 	protected static void blockMaintenance(String line, String block, boolean close)
 	{
+		if(block.equalsIgnoreCase("YARD"))
+			return;
+		
 		Block bl = getBlock(line,Integer.parseInt(block.substring(1)));
 		
 		trackmodel.setMaintenance(line,Integer.parseInt(block.substring(1)),close);
