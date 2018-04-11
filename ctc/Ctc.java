@@ -1326,17 +1326,17 @@ public class Ctc implements Updateable{
 	private static void sendSpeedAuth(Train train, double speed, double auth) {
 		Block loc = train.getLoc();
 
-		SwitchAndPos swpos = getSwitches(train.getRoute()).peek();
+		//SwitchAndPos swpos = getSwitches(train.getRoute()).peek();
 
 		Block sw = null;
 		Block from = null;
 		Block to = null;
 
-		if (swpos != null) {
-			sw = swpos.getBlock();
-			from = swpos.getFrom();
-			to = swpos.getTo();
-		}
+		//if (swpos != null) {
+		//	sw = swpos.getBlock();
+		//	from = swpos.getFrom();
+		//	to = swpos.getTo();
+		//}
 
 		//System.out.println("To Track Controller");
 		//System.out.println("Train " + train.getID() + " at location " + loc.display());
