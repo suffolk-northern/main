@@ -527,12 +527,13 @@ public class TrackModel implements Updateable {
 	 *
 	 * @param line
 	 * @param block
-	 * @param heater
+	 * @param heaterStatus
 	 */
-	public static void setHeater(String line, int block, boolean heater) {
+	public static void setHeater(String line, int block, boolean heaterStatus) {
 		TrackBlock tb = getBlock(line, block);
-		if (tb != null) {
-			tb.isHeaterOn = heater;
+		if (tb != null && tb.isStation) {
+			Station s = getStation(line, block);
+			s.heater = heaterStatus;
 			if (tmf != null) {
 				tmf.refreshTables();
 			}

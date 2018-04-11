@@ -4,8 +4,8 @@ import javax.swing.JTable;
 
 public class TrackModelTable extends JTable {
 
-    public TrackModelTable() {
-        super();
-        setFocusable(false);
-    }
+	public TrackModelTable() {
+		super();
+		setFocusable(false);
+	}
 }

@@ -463,7 +463,6 @@ public class TrackModelFrame extends javax.swing.JFrame {
 				row.add(tb.isUnderground ? "UNDERGROUND" : "");
 				row.add(tb.isPowerOn ? "POWER" : "OUTAGE");
 				row.add(tb.closedForMaintenance ? "CLOSED" : (tb.isOccupied ? "OCCUPIED" : ""));
-				row.add(tb.isHeaterOn ? "ON" : "OFF");
 				row.add(tb.message);
 				blockVector.add(row);
 			}
@@ -509,6 +508,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
 				row.add(s.block);
 				row.add(s.name);
 				row.add(s.passengers);
+				row.add(s.heater ? "ON" : "OFF");
 				stationVector.add(row);
 			}
 		}

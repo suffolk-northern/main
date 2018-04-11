@@ -27,8 +27,6 @@ public class TrackBlock {
 	protected boolean isPowerOn = true;
 	// Is it currently occupied.
 	protected boolean isOccupied = false;
-	// Is the heater on.
-	protected boolean isHeaterOn = false;
 	// Is it closed for maintenance.
 	protected boolean closedForMaintenance = false;
 	// Last message sent. Just for show.
@@ -160,14 +158,6 @@ public class TrackBlock {
 
 	protected void setIsPowerOn(boolean isPowerOn) {
 		this.isPowerOn = isPowerOn;
-	}
-
-	public boolean isIsHeaterOn() {
-		return isHeaterOn;
-	}
-
-	protected void setIsHeaterOn(boolean isHeaterOn) {
-		this.isHeaterOn = isHeaterOn;
 	}
 
 	public boolean isIsSwitch() {
@@ -312,7 +302,6 @@ public class TrackBlock {
 				+ "\tUnderground: " + isUnderground + "\n"
 				+ "\tPower: " + isPowerOn + "\n"
 				+ "\tOccupied: " + isOccupied + "\n"
-				+ "\tHeater: " + isHeaterOn + "\n"
 				+ "\tMessage: " + message;
 	}
 }
