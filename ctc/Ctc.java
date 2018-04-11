@@ -917,7 +917,9 @@ public class Ctc implements Updateable{
 
 			rows[count][5] = "";
 			
-			if(block.broken)
+			if(block.closed)
+				rows[count][6] = "Closed";
+			else if(block.broken)
 				rows[count][6] = "Broken";
 			else
 				rows[count][6] = "";
@@ -1313,6 +1315,22 @@ public class Ctc implements Updateable{
 		}
 		
 		return MBOswitches;
+	}
+	
+	protected static void blockMaintenance(String line, String block, boolean close)
+	{
+		Block bl = getBlock(line,Integer.parseInt(block.substring(1)));
+		
+		trackmodel.setMaintenance(line,Integer.parseInt(block.substring(1)),close);
+		if(!close)
+		{
+			bl.broken = false;
+			bl.closed = false;
+		}
+		else
+		{
+			bl.closed = true;
+		}
 	}
 
 	private static void loadSched() {
@@ -1912,6 +1930,7 @@ public class Ctc implements Updateable{
 		private boolean rrxing_status;
 		private boolean signal;
 		private boolean broken;
+		private boolean closed;
 		private Block sw_curr_from;
 		private Block sw_curr_to;
 		private boolean hasStation;
@@ -1941,6 +1960,7 @@ public class Ctc implements Updateable{
 			sw_curr_to = null;
 			hasStation = false;
 			station = "";
+			closed = false;
 		}
 
 		public Block(String l, boolean isYard) {
@@ -1964,6 +1984,7 @@ public class Ctc implements Updateable{
 			sw_curr_to = null;
 			hasStation = false;
 			station = "";
+			closed = false;
 		}
 
 		public Block(String l, char sec, int n, double len, int nextdir, int prevdir, Block nextb, Block prevb, boolean rr) {
@@ -1993,6 +2014,7 @@ public class Ctc implements Updateable{
 			station = "";
 			nextBlockDir = nextdir;
 			prevBlockDir = prevdir;
+			closed = false;
 		}
 
 		public Block(String l, char sec, int n, double len, int nextdir, int prevdir, Block nextb, Block prevb, boolean rr, int swID, int swdir, ArrayDeque<Block> swf, ArrayDeque<Block> swt, Block currf, Block currt) {
@@ -2023,6 +2045,7 @@ public class Ctc implements Updateable{
 			nextBlockDir = nextdir;
 			prevBlockDir = prevdir;
 			switchDir = swdir;
+			closed = false;
 		}
 
 		public Block(String l, char sec, int n, double len, int nextdir, int prevdir, Block nextb, Block prevb, boolean rr, boolean stat, String statID) {
@@ -2052,6 +2075,7 @@ public class Ctc implements Updateable{
 			station = statID;
 			nextBlockDir = nextdir;
 			prevBlockDir = prevdir;
+			closed = false;
 		}
 
 		private boolean isOccupied() {

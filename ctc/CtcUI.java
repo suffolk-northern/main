@@ -1104,10 +1104,12 @@ public class CtcUI extends javax.swing.JFrame {
 
 		// inform user
 		String line = (String) mLineSelect.getSelectedItem();
-		String block = (String) maintenanceBlock.getSelectedItem();
+		String str  = (String) maintenanceBlock.getSelectedItem();
 		
 		
-		System.out.println("Block " + block + " opened");
+		//System.out.println("Block " + str + " opened");
+		
+		ctc.blockMaintenance(line,str,false);
 
 		Object obj = "";
 
@@ -1123,8 +1125,12 @@ public class CtcUI extends javax.swing.JFrame {
     private void closeTrackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeTrackActionPerformed
 		// TODO add your handling code here:
 
+		String line = (String) mLineSelect.getSelectedItem();
 		String str = (String) maintenanceBlock.getSelectedItem();
-		System.out.println("Block " + str + " closed for maintenance");
+		
+		//System.out.println("Block " + str + " closed for maintenance");
+		
+		ctc.blockMaintenance(line,str,true);
 
 		Object obj = "Closed";
 
