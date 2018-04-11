@@ -35,12 +35,14 @@ public class PointMass
 	private Pose pose;
 	private double speed = 0.0;
 
+	// for moving along blocks
+	private final String LINE = "green";
 	private final TrackModel track;
 	private TrackBlock block = null;
 	private double displacement = 0.0;
 	private int lastBlockId = 0;
 	private boolean forward = true;
-	private final String LINE = "green";
+	private boolean fromCommon = false;
 
 	// Constructs a PointMass as a copy of another object.
 	public PointMass(PointMass other)
@@ -161,7 +163,6 @@ public class PointMass
 		if (block == null)
 			block = track.getClosestBlock(pose.position, LINE);
 
-		int blockId = block.getBlock();
 		double length = block.getLength();
 
 		if (forward)
@@ -169,22 +170,13 @@ public class PointMass
 		else
 			displacement -= displacementChange;
 
-		if (displacement < 0.0 || displacement > length) {
-			if (forward)
-				++blockId;
-			else
-				--blockId;
-
-			block = track.getBlock(LINE, blockId);
-
-			forward = track.getSide(pose.position, LINE, blockId);
-			displacement = forward ? 0.1 : block.getLength() - 0.1;
-		}
+		if (displacement < 0.0 || displacement > length)
+			advanceBlock();
 
 		GlobalCoordinates oldPosition = pose.position;
 
 		pose.position = track.getPositionAlongBlock(LINE,
-		                                            blockId,
+		                                            block.getBlock(),
 		                                            displacement);
 
 		pose.orientation = oldPosition.directionTo(pose.position);
@@ -220,6 +212,75 @@ public class PointMass
 		double absValue = power / Math.abs(speed);
 
 		return power >= 0.0 ? absValue : -absValue;
+	}
+
+	// Configures state for the next block.
+	private void advanceBlock()
+	{
+		int id = block.getBlock();
+
+		int nextId = forward ?
+			block.getNextBlockId() :
+			block.getPrevBlockId();
+
+		TrackBlock next = track.getBlock(LINE, nextId);
+
+		boolean isSwitch = block.isIsSwitch();
+		boolean nextIsSwitch = next.isIsSwitch();
+
+		if (isSwitch && nextIsSwitch)
+		{
+			throw new IllegalStateException("algo can't do tat");
+		}
+
+		if (!isSwitch && !nextIsSwitch)
+		{
+			// no switch involved
+
+			block = next;
+		}
+		else if (nextIsSwitch
+		         && next.getSwitchBlockId() == block.getBlock())
+		{
+			// move onto switch from left or right branch
+			//
+			// If switch was facing the wrong way, we miss this
+			// case and go the wrong way.
+
+			block = next;
+			fromCommon = false;
+		}
+		else if (nextIsSwitch)
+		{
+			// move onto switch from common branch
+
+			block = next;
+			fromCommon = true;
+		}
+		else if (isSwitch && fromCommon)
+		{
+			// move onto left or right branch
+
+			block = track.getBlock(LINE, block.getSwitchBlockId());
+		}
+		else if (isSwitch && !fromCommon)
+		{
+			// move onto common branch
+
+			if (block.getSwitchDirection() > 0)
+				block = track.getBlock(LINE,
+				                       block.getPrevBlockId());
+			else
+				block = track.getBlock(LINE,
+				                       block.getNextBlockId());
+		}
+		else
+		{
+			throw new IllegalStateException("algo can't do that");
+		}
+
+		forward = track.getSide(pose.position, LINE, block.getBlock());
+		displacement = forward ? 0.0 : block.getLength();
 	}
 
 	// How much this mass (in kilograms) weighs in pounds force
