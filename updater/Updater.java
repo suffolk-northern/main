@@ -55,6 +55,7 @@ public class Updater
 	// Parameter period is the time in milliseconds between iterations.
 	public void scheduleAtFixedRate(int period)
 	{
+		timer.cancel();
 		timer.scheduleAtFixedRate(task, 0, period);
 	}
 

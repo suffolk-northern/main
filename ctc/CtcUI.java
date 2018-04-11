@@ -180,7 +180,7 @@ public class CtcUI extends javax.swing.JFrame {
 		jLabel19.setText("Multiplier");
 
 		multSelect.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
-		multSelect.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"x1", "x2", "x4", "x10"}));
+		multSelect.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"x1", "x2", "x5", "x10"}));
 		multSelect.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				multSelectActionPerformed(evt);
@@ -1146,6 +1146,12 @@ public class CtcUI extends javax.swing.JFrame {
 
     private void multSelectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_multSelectActionPerformed
 		// TODO add your handling code here:
+		
+		String mult = (String) multSelect.getSelectedItem();
+		int speedup = Integer.parseInt(mult.substring(1));
+		
+		ctc.changeSpeedUp(speedup);
+		
     }//GEN-LAST:event_multSelectActionPerformed
 
     private void MovingBlockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MovingBlockActionPerformed
