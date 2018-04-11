@@ -228,7 +228,7 @@ public class Ctc implements Updateable{
 		updateTrack();
 		updateTrains();
 		
-		
+		/*
 		for(Block blk : greenline)
 		{
 			System.out.println(blk.display());
@@ -254,7 +254,7 @@ public class Ctc implements Updateable{
 				System.out.print(blk.switchDir);
 			System.out.println();
 		}
-		
+		*/
 		
 		
 	}
@@ -1350,7 +1350,7 @@ public class Ctc implements Updateable{
 		//System.out.println();
 		
 		String msg = speed + " " + auth;
-		System.out.println(train.ID + " at " + train.location.display() + ": " + msg);
+		//System.out.println(train.ID + " at " + train.location.display() + ": " + msg);
 		
 		TrackMovementCommand tmc = new TrackMovementCommand((int)speed,(int)auth);
 		
@@ -1518,12 +1518,12 @@ public class Ctc implements Updateable{
 
 		}
 
-		
+		/*
 		ArrayDeque<Block> rtemp = route.clone();
 		while(!rtemp.isEmpty())
 			System.out.print(rtemp.poll().display() + " ");
 		System.out.println();
-		
+		*/
 		
 		return route;
 	}
