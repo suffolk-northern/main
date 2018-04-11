@@ -343,6 +343,7 @@ public class Ctc implements Updateable{
 					blk.setSwitch(bl.getSwitchDirection(), blockf.clone(), blockt.clone());
 					blk.prev = getBlock(line,bl.getPrevBlockId());
 					
+					
 				}
 				// prev block aka backward switch
 				else
@@ -359,6 +360,17 @@ public class Ctc implements Updateable{
 					
 					blk.setSwitch(bl.getSwitchDirection(), blockf.clone(), blockt.clone());
 					blk.next = getBlock(line,bl.getNextBlockId());
+					
+					blk.sw_curr_to = blk;
+					
+					if(from.equals(getBlock(from.line,bl.getSwitchPosition())))
+					{
+						blk.sw_curr_from = from;
+					}
+					else if(extra.equals(getBlock(from.line,bl.getSwitchPosition())))
+					{
+						blk.sw_curr_from = extra;						
+					}
 				}
 			}
 			else
@@ -438,6 +450,17 @@ public class Ctc implements Updateable{
 					blk.setSwitch(bl.getSwitchDirection(), blockf.clone(), blockt.clone());
 					blk.prev = getBlock(line,bl.getPrevBlockId());
 					
+					blk.sw_curr_from = blk;
+					
+					if(to.equals(getBlock(to.line,bl.getSwitchPosition())))
+					{
+						blk.sw_curr_to = to;
+					}
+					else if(extra.equals(getBlock(to.line,bl.getSwitchPosition())))
+					{
+						blk.sw_curr_to = extra;						
+					}
+					
 				}
 				// prev block aka backward switch
 				else
@@ -454,6 +477,17 @@ public class Ctc implements Updateable{
 					
 					blk.setSwitch(bl.getSwitchDirection(), blockf.clone(), blockt.clone());
 					blk.next = getBlock(line,bl.getNextBlockId());
+					
+					blk.sw_curr_to = blk;
+					
+					if(from.equals(getBlock(from.line,bl.getSwitchPosition())))
+					{
+						blk.sw_curr_from = from;
+					}
+					else if(extra.equals(getBlock(from.line,bl.getSwitchPosition())))
+					{
+						blk.sw_curr_from = extra;						
+					}
 				}
 			}
 			else
@@ -737,6 +771,9 @@ public class Ctc implements Updateable{
 		double auth = 0;
 		boolean flipped = false;
 
+		if(route.isEmpty())
+			return auth;
+		
 		ArrayDeque<Block> temp = route.clone();
 		Block block = temp.poll();
 		Block prev = null;
