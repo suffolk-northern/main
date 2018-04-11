@@ -171,9 +171,14 @@ public class MboController implements Updateable
 	// TODO: make this more efficient by starting from last known block
 	private int getBlockFromLoc(GlobalCoordinates location)
 	{
+		if (location == null || line == null)
+			return -1;
 		for (int i = 1; i < line.length; i++)
 		{
-			double dist = trackModel.getDistanceAlongBlock(lineName, i, location);
+			TrackBlock closestBlock = trackModel.getClosestBlock(location, lineName);
+			if (closestBlock == null)
+				return -1;
+			double dist = trackModel.getDistanceTo(lineName, closestBlock.getBlock(), location);
 			if (dist < 1)
 				return i;
 		}
@@ -292,6 +297,8 @@ public class MboController implements Updateable
 		if (ctcRadio == null)
 			return;
 		int[][] switchPos = ctcRadio.getSwitchStates(lineName);
+		if (switchPos == null)
+			return;
 		for (int i = 0; i < switchPos.length; i++)
 		{
 			SwitchTracker switchSet = null;

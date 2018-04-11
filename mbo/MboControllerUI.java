@@ -104,7 +104,7 @@ public class MboControllerUI extends JFrame
 		}
 		trainIDs.add(trainID);
 		int row = trainIDs.indexOf(trainID);
-		System.out.printf("Adding train %d to row %d%n", trainID, row);
+		// System.out.printf("Adding train %d to row %d%n", trainID, row);
 		updateRow(row, trainID, section, block, location, authority, speed);
 		numTrains += 1;
 	}
@@ -112,7 +112,7 @@ public class MboControllerUI extends JFrame
 	public void updateTrain(int trainID, char section, int block, int location, int authority, int speed)
 	{
 		int row = trainIDs.indexOf(trainID);
-		System.out.printf("Updatating train %d in row %d%n", trainID, row);
+		// System.out.printf("Updatating train %d in row %d%n", trainID, row);
 		if (row == -1)
 		{
 			addTrain(trainID, section, block, location, authority, speed);
@@ -125,7 +125,7 @@ public class MboControllerUI extends JFrame
 	public void removeTrain(int trainID)
 	{
 		int row = trainIDs.indexOf(trainID);
-		System.out.printf("Removing train %d from row %d%n", trainID, row);
+		// System.out.printf("Removing train %d from row %d%n", trainID, row);
 		clearRow(row);
 		trainIDs.remove(row);
 	}

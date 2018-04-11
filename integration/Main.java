@@ -135,6 +135,7 @@ public class Main
 		
 		// Track Model <---> MBO
 		mboCont.initLine();
+		mboCont.registerTrackModel(trackModel);
 		// mboSched.initLine();
 
 		// train model <---> MBO
