@@ -343,6 +343,9 @@ public class TrackModel implements Updateable {
 	private void shiftSwitches(ArrayList<TrackBlock> tbs) {
 		for (int i = 0; i < tbs.size(); i++) {
 			TrackBlock oldSwitch = tbs.get(i);
+			//
+			// If it's a forward switch, switches the switch info to the previous block.
+			//
 			if (oldSwitch.isSwitch && oldSwitch.switchDirection > 0) {
 				TrackBlock newSwitch = tbs.get(i - 1);
 				newSwitch.isSwitch = true;
@@ -350,11 +353,12 @@ public class TrackModel implements Updateable {
 				newSwitch.switchDirection = oldSwitch.switchDirection;
 				newSwitch.switchPosition = oldSwitch.switchPosition;
 				oldSwitch.isSwitch = false;
-
+				//
+				// The next block of blocks connected to forward switch get shifted back.
+				//
 				for (int j = 0; j < tbs.size(); j++) {
 					TrackBlock switchBlock = tbs.get(j);
 					if (newSwitch.switchBlockId == switchBlock.block && newSwitch.line.equalsIgnoreCase(switchBlock.line)) {
-						System.out.println(switchBlock.block + " = " + newSwitch.block);
 						switchBlock.nextBlockId = newSwitch.block;
 					}
 				}
