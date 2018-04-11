@@ -295,7 +295,15 @@ public class Ctc implements Updateable{
 		{
 			bl = trackmodel.getBlock(line, i);
 			
-			if(bl.isIsCrossing())
+			if(bl.isIsSwitch() && bl.isIsStation())
+			{
+				block = new Block(line,bl.getSection(),bl.getBlock(),bl.getLength(),bl.getNextBlockDir(),bl.getPrevBlockDir(),null,null,false,0,bl.getSwitchDirection(),null,null,null,null);
+				block.station = trackmodel.getStation(line,bl.getBlock()).getName(); 
+				block.hasStation = true;
+				switches.add(block);
+				greenline.add(block);
+			}
+			else if(bl.isIsCrossing())
 			{
 				greenline.add(new Block(line,bl.getSection(),bl.getBlock(),bl.getLength(),bl.getNextBlockDir(),bl.getPrevBlockDir(),null,null,true));
 			}
