@@ -56,6 +56,7 @@ public class Ctc implements Updateable{
 		TrackBlock tb;
 		
 		toUpdate = new ArrayDeque<Block>();
+		brokenBlocks = new ArrayDeque<Block>();
 		
 		for(Block block : greenline)
 		{
@@ -70,7 +71,12 @@ public class Ctc implements Updateable{
 		{
 			b.occupied = trackmodel.getBlock(b.line, b.num).isIsOccupied();
 		}
-		
+		/*
+		for(Block b : brokenBlocks)
+		{
+			b.broken = true;
+		}
+		*/
 		btemp = toUpdate.clone();
 		
 		for(Block b : btemp)
@@ -79,6 +85,7 @@ public class Ctc implements Updateable{
 		}
 		
 		toUpdate = new ArrayDeque<Block>();
+		brokenBlocks = new ArrayDeque<Block>();
 		
 		for(Block block : redline)
 		{
@@ -88,6 +95,12 @@ public class Ctc implements Updateable{
 			
 		}
 		
+		/*
+		for(Block b : brokenBlocks)
+		{
+			b.broken = true;
+		}
+		*/
 		btemp = toUpdate.clone();
 		
 		for(Block b : btemp)
@@ -108,6 +121,7 @@ public class Ctc implements Updateable{
 	}
 	
 	private static ArrayDeque<Block> toUpdate;
+	private static ArrayDeque<Block> brokenBlocks;
 	
 	private static void updateBlock(Block block, TrackBlock tb)
 	{
@@ -134,14 +148,14 @@ public class Ctc implements Updateable{
 					if(train == null && block.sw_curr_to.occupied)
 						train = getTrain(block.sw_curr_to);
 					
-					System.out.println("forward switch");
+					//System.out.println("forward switch");
 				}
 				else if(isBackwardSwitch(block))
 				{
 					if(block.sw_from.contains(getBlock(block.line,0)))
 					{
 						train = dispatched.poll();
-						System.out.println("yard");
+						//System.out.println("yard");
 					}
 					else
 					{
@@ -151,12 +165,12 @@ public class Ctc implements Updateable{
 							train = getTrain(block.sw_curr_from);
 					}
 					
-					System.out.println("backward switch");
+					//System.out.println("backward switch");
 				}
 				else if(block.prev.num == 0)
 				{
 					train = dispatched.poll();
-					System.out.println("yard");
+					//System.out.println("yard");
 				}
 				else
 				{
@@ -166,13 +180,19 @@ public class Ctc implements Updateable{
 					if(train == null && block.next.occupied)
 						train = getTrain(block.next);
 
-					System.out.println("normal");
+					//System.out.println("normal");
 				}
 				
 				if(train != null)
+				{
+					//System.out.println(train.ID + " moved to " + block.display());
 					train.setLoc(block);
+				}
 				else
-					System.out.println("no train found");
+				{
+					//System.out.println("no train found");
+					block.broken = true;
+				}
 			}
 			else if(!newOcc && isForwardSwitch(block))
 			{
@@ -719,9 +739,11 @@ public class Ctc implements Updateable{
 			block = temp.poll();
 
 			// check for trains in the way
-			if (block.isOccupied()) 
+			if (block.occupied || block.broken) 
 			{
-				auth -= prev.length;
+				if(!prev.equals(route.peekFirst()))
+					auth -= prev.length;
+				
 				return auth;
 			} // check switches are in correct position
 			else if (block.hasSwitch()) {
@@ -769,7 +791,9 @@ public class Ctc implements Updateable{
 
 					if(!success)
 					{	
-						auth -= prev.length;
+						if(!prev.equals(route.peekFirst()))
+							auth -= prev.length;
+						
 						return auth;
 					}
 					
@@ -892,7 +916,11 @@ public class Ctc implements Updateable{
 			}
 
 			rows[count][5] = "";
-			rows[count][6] = "";
+			
+			if(block.broken)
+				rows[count][6] = "Broken";
+			else
+				rows[count][6] = "";
 
 			if (!block.rrxing) {
 				rows[count][7] = "";
@@ -1179,13 +1207,20 @@ public class Ctc implements Updateable{
 			if (train.location.equals(location)) 
 			{
 				if(location.num != 0)
+				{
+					//System.out.println("Train found at " + location.display());
 					return train;
+				}
 				else
+				{
+					//System.out.println("Train dispatched");
 					return dispatched.poll();
+				}
 			}
 		}
 
-		return train;
+		System.out.println("null");
+		return null;
 	}
 
 	private static Block getStation(String name) {
