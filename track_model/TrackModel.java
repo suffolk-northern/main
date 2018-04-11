@@ -40,8 +40,8 @@ public class TrackModel implements Updateable {
 	private static final Orientation GREEN_LINE_ORIENTATION = Orientation.radians(0.9 * Math.PI);
 	private static final Orientation RED_LINE_ORIENTATION = Orientation.radians(0.3737 * Math.PI);
 	// Hard-coded initial yard coordinates.
-	private static final double YARD_X_LOCATION = 550;
-	private static final double YARD_Y_LOCATION = -2200;
+	private static final double YARD_X_LOCATION = 1100;
+	private static final double YARD_Y_LOCATION = -1900;
 
 	/**
 	 * For testing purposes.
@@ -141,15 +141,39 @@ public class TrackModel implements Updateable {
 			JOptionPane.showMessageDialog(null, "Track database not found.\n\nPlease import track database or train control system will shut down.", "Warning", JOptionPane.WARNING_MESSAGE);
 		}
 		//
+		// Shifts switches.
+		//
+		shiftSwitches(blocksTemp);
+		//s
 		// Sets up blocks array so program can continue. It's dumb. DO NOT CHANGE.
 		//
 		blocks = blocksTemp;
 		//
 		// Gets station locations and sets beacons.
 		//
-		for (Station s : stations) {
+		for (int i = 0; i < stations.size(); i++) {
+			Station s = stations.get(i);
+			Station dupe = null;
 			TrackBlock tb = getBlock(s.line, s.block);
-			s.setLocation(getPositionAlongBlock(tb, tb.length / 2));
+			//
+			// Checks for stations attributed to multiple blocks.
+			//
+			for (int j = 0; j < i; j++) {
+				Station temp = stations.get(j);
+				if (s.name.equalsIgnoreCase(temp.name)) {
+					dupe = temp;
+					break;
+				}
+			}
+			if (dupe != null) {
+				GlobalCoordinates sLocation = getPositionAlongBlock(tb, tb.length / 2);
+				double newLon = (sLocation.longitude() + dupe.location.longitude()) / 2;
+				double newLat = (sLocation.latitude() + dupe.location.latitude()) / 2;
+				s.setLocation(new GlobalCoordinates(newLat, newLon));
+				dupe.setLocation(new GlobalCoordinates(newLat, newLon));
+			} else {
+				s.setLocation(getPositionAlongBlock(tb, tb.length / 2));
+			}
 			s.setBeaconPrev(new Beacon(getPositionAlongBlock(tb, 10), s.block + " PREV"));
 			s.setBeaconNext(new Beacon(getPositionAlongBlock(tb, tb.length - 10), s.block + " NEXT"));
 			beacons.add(s.beaconPrev);
@@ -308,6 +332,26 @@ public class TrackModel implements Updateable {
 			Logger.getLogger(TrackModel.class.getName()).log(Level.SEVERE, null, ex);
 		}
 		return tb;
+	}
+
+	/**
+	 * Shifts switches to be more magical. :)
+	 * Forward going switches are shifted back one.
+	 *
+	 * @param tbs
+	 */
+	private void shiftSwitches(ArrayList<TrackBlock> tbs) {
+		for (int i = 0; i < tbs.size(); i++) {
+			TrackBlock oldSwitch = tbs.get(i);
+			if (oldSwitch.isSwitch && oldSwitch.switchDirection > 0) {
+				TrackBlock newSwitch = tbs.get(i - 1);
+				newSwitch.isSwitch = true;
+				newSwitch.switchBlockId = oldSwitch.switchBlockId;
+				newSwitch.switchDirection = oldSwitch.switchDirection;
+				newSwitch.switchPosition = oldSwitch.switchPosition;
+				oldSwitch.isSwitch = false;
+			}
+		}
 	}
 
 	/**
@@ -527,12 +571,13 @@ public class TrackModel implements Updateable {
 	 *
 	 * @param line
 	 * @param block
-	 * @param heater
+	 * @param heaterStatus
 	 */
-	public static void setHeater(String line, int block, boolean heater) {
+	public static void setHeater(String line, int block, boolean heaterStatus) {
 		TrackBlock tb = getBlock(line, block);
-		if (tb != null) {
-			tb.isHeaterOn = heater;
+		if (tb != null && tb.isStation) {
+			Station s = getStation(line, block);
+			s.heater = heaterStatus;
 			if (tmf != null) {
 				tmf.refreshTables();
 			}

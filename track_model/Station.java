@@ -22,6 +22,8 @@ public class Station {
 	protected Beacon beaconNext;
 	// Location
 	protected GlobalCoordinates location;
+	// Is heater on
+	protected boolean heater = false;
 
 	/**
 	 * Initializes Station object.
@@ -88,6 +90,14 @@ public class Station {
 
 	protected void setBeaconNext(Beacon beaconNext) {
 		this.beaconNext = beaconNext;
+	}
+
+	public boolean isHeater() {
+		return heater;
+	}
+
+	protected void setHeater(boolean heater) {
+		this.heater = heater;
 	}
 
 	/**
