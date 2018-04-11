@@ -350,6 +350,14 @@ public class TrackModel implements Updateable {
 				newSwitch.switchDirection = oldSwitch.switchDirection;
 				newSwitch.switchPosition = oldSwitch.switchPosition;
 				oldSwitch.isSwitch = false;
+
+				for (int j = 0; j < tbs.size(); j++) {
+					TrackBlock switchBlock = tbs.get(j);
+					if (newSwitch.switchBlockId == switchBlock.block && newSwitch.line.equalsIgnoreCase(switchBlock.line)) {
+						System.out.println(switchBlock.block + " = " + newSwitch.block);
+						switchBlock.nextBlockId = newSwitch.block;
+					}
+				}
 			}
 		}
 	}
