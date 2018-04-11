@@ -1061,7 +1061,9 @@ public class Ctc implements Updateable{
 		Block desired = getFirstSwitch(closest.route).peekLast();
 		if((isForwardSwitch(swblock) && !swblock.sw_curr_to.equals(desired)) || (isBackwardSwitch(swblock) && !swblock.sw_curr_from.equals(desired)))
 		{
+			//System.out.println("Old switch pos: " + trackmodel.getBlock(swblock.line,swblock.num).getSwitchPosition());
 			flipped = trackmodel.flipSwitch(swblock.line,swblock.num);
+			//System.out.println("New switch pos: " + trackmodel.getBlock(swblock.line,swblock.num).getSwitchPosition());
 		}
 		
 		return flipped;
@@ -1273,7 +1275,7 @@ public class Ctc implements Updateable{
 			}
 		}
 
-		System.out.println("null");
+		//System.out.println("null");
 		return null;
 	}
 
@@ -1592,6 +1594,7 @@ public class Ctc implements Updateable{
 		}
 
 		/*
+		System.out.println();
 		ArrayDeque<Block> rtemp = route.clone();
 		while(!rtemp.isEmpty())
 			System.out.print(rtemp.poll().display() + " ");
