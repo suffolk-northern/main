@@ -55,13 +55,30 @@ public class Ctc implements Updateable{
 		// ask track model for updates
 		TrackBlock tb;
 		
+		toUpdate = new ArrayDeque<Block>();
+		
 		for(Block block : greenline)
 		{
 			tb = trackmodel.getBlock(block.line, block.num);
 			// update block properties
 			updateBlock(block, tb);
-			
 		}
+		
+		ArrayDeque<Block> btemp = toUpdate.clone();
+		
+		for(Block b : btemp)
+		{
+			b.occupied = trackmodel.getBlock(b.line, b.num).isIsOccupied();
+		}
+		
+		btemp = toUpdate.clone();
+		
+		for(Block b : btemp)
+		{
+			updateAuth(b);
+		}
+		
+		toUpdate = new ArrayDeque<Block>();
 		
 		for(Block block : redline)
 		{
@@ -71,49 +88,100 @@ public class Ctc implements Updateable{
 			
 		}
 		
+		btemp = toUpdate.clone();
+		
+		for(Block b : btemp)
+		{
+			b.occupied = trackmodel.getBlock(b.line, b.num).isIsOccupied();
+		}
+		
+		btemp = toUpdate.clone();
+		
+		for(Block b : btemp)
+		{
+			updateAuth(b);
+		}
+		
 		updateTrack();
 		updateTrains();
 		return;
 	}
 	
+	private static ArrayDeque<Block> toUpdate;
+	
 	private static void updateBlock(Block block, TrackBlock tb)
 	{
-		Train train;
+		Train train = null;
 		boolean oldOcc = block.occupied;
+		boolean newOcc = false;
 		
 		if(block.num != 0)
-			block.occupied = tb.isIsOccupied();
+			newOcc = tb.isIsOccupied();
 		else
-			block.occupied = false;
+			newOcc = false;
 		
-		if(block.occupied != oldOcc)
+		if(newOcc != oldOcc)
 		{
+			toUpdate.add(block);
+			
 			// do some train logic
-			if(block.occupied)
+			if(newOcc)
 			{
 				if(isForwardSwitch(block))
 				{
-					train = getTrain(block.prev);
+					if(block.prev.occupied)
+						train = getTrain(block.prev);
+					if(train == null && block.sw_curr_to.occupied)
+						train = getTrain(block.sw_curr_to);
+					
+					System.out.println("forward switch");
 				}
 				else if(isBackwardSwitch(block))
 				{
-					train = getTrain(block.sw_curr_from);
+					if(block.sw_from.contains(getBlock(block.line,0)))
+					{
+						train = dispatched.poll();
+						System.out.println("yard");
+					}
+					else
+					{
+						if(block.next.occupied)
+							train = getTrain(block.next);
+						if(train == null && block.sw_curr_from.occupied)
+							train = getTrain(block.sw_curr_from);
+					}
+					
+					System.out.println("backward switch");
 				}
 				else if(block.prev.num == 0)
 				{
 					train = dispatched.poll();
+					System.out.println("yard");
 				}
 				else
 				{
 					//System.out.println("Train moved from " + block.prev.line + " " + block.prev.num);
-					train = getTrain(block.prev);
+					if(block.prev.occupied)
+						train = getTrain(block.prev);
+					if(train == null && block.next.occupied)
+						train = getTrain(block.next);
+
+					System.out.println("normal");
 				}
 				
 				if(train != null)
 					train.setLoc(block);
+				else
+					System.out.println("no train found");
 			}
-			
-			updateAuth(block);
+			else if(!newOcc && isForwardSwitch(block))
+			{
+				 if(block.sw_curr_to.equals(getBlock(block.line,0)))
+				 {
+					 train = getTrain(block);
+					 train.setLoc(getBlock(block.line,0));
+				 }
+			}
 		}
 	}
 	
