@@ -66,8 +66,9 @@ public class MboController implements Updateable
 	}
 	
 	public void hideUI()
-	{
-		ui.dispose();
+	{	
+		if (ui != null)
+			ui.dispose();
 		ui = null;
 	}
 	
@@ -147,8 +148,8 @@ public class MboController implements Updateable
 		for (int i = 0; i < trains.size(); i++) 
 		{
 			TrainTracker trainInfo = trains.get(i);
-			
 			int newBlock = getBlockFromLoc(trainInfo.getLocation());
+			System.out.printf("Train %d is on block %d%n", trainInfo.getID(), newBlock);
 			if (newBlock > 0)
 				trainInfo.block = line[newBlock];
 		}
@@ -179,8 +180,7 @@ public class MboController implements Updateable
 				GlobalCoordinates loc = trainInfo.getLocation();
 				// TODO: change to distance along block
 				int blockID = trainInfo.getBlock().getID();
-				// int trackDist = (int) TrackModel.getDistanceTo(lineName, blockID, loc);
-				int trackDist = 0;
+				int trackDist = (int) trackModel.getDistanceAlongBlock(lineName, blockID, trainInfo.getCurrentPosition());
 				if (ui != null)
 					ui.updateTrain(trainInfo.getID(), trainInfo.block.getSection(), trainInfo.block.getID(), trackDist, trainInfo.getAuthority(), trainInfo.getSuggestedSpeed());
 			}
@@ -190,14 +190,15 @@ public class MboController implements Updateable
 	// TODO: make this more efficient by starting from last known block
 	private int getBlockFromLoc(GlobalCoordinates location)
 	{
-//		for (int i = 1; i < line.length; i++)
-//		{
-//			double dist = TrackModel.getDistanceTo(lineName, i, location);
-//			if (dist < 1)
-//				return i;
-//		}
-		// return -1;
-		return 1;
+		if (location == null || line == null)
+			return -1;
+		TrackBlock closestBlock = trackModel.getClosestBlock(location, lineName);
+		if (closestBlock == null)
+			return -1;
+		double dist = trackModel.getDistanceTo(lineName, closestBlock.getBlock(), location);
+		if (dist < 1)
+			return closestBlock.getBlock();
+		return -1;
 	}
 	
 	// Adds a train to the set of objects this object communicates with.
