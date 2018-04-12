@@ -27,6 +27,8 @@ public class MboSchedulerUI extends javax.swing.JFrame
     public MboSchedulerUI(String ln) {
         initComponents();
 		lineName = ln;
+		if (lineName == null)
+			System.out.println("Name is null");
 		scheduleRequest = false;
 		
 		// Default start and end times are 9 AM and 5 PM
@@ -275,7 +277,9 @@ public class MboSchedulerUI extends javax.swing.JFrame
         jButton13.setBounds(260, 440, 310, 25);
 
         jLabel12.setFont(new java.awt.Font("Tahoma", 0, 24)); 
+		System.out.println(lineName);
 		String titleString = String.format("MBO Overlay: %s Line", lineName);
+		System.out.println(titleString);
         jLabel12.setText(titleString);
         mainPanel.add(jLabel12);
         jLabel12.setBounds(290, 20, 290, 29);

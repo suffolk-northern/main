@@ -167,7 +167,7 @@ public class MboController implements Updateable
 		updateSwitches();
 //		for (SwitchTracker st : switches)
 //			st.printInfo();
-//		System.out.println(line[85].getNext());
+//		System.out.println(line[100].getNext());
 
 		if (enabled == true)
 		{
@@ -273,6 +273,10 @@ public class MboController implements Updateable
 		double authority = -1*distLeftInBlock;
 		boolean blocked = false;
 		boolean forward = train.isGoingForward();
+//		if (forward)
+//			System.out.printf("In block %d, going forward%n", curBlock.getID());
+//		else
+//			System.out.printf("In block %d, going backward%n", curBlock.getID());
 		for (int i = 0; i < line.length; i++)
 		{
 			for (int j = 0; j < trainBlocks.size(); j++)
@@ -297,8 +301,13 @@ public class MboController implements Updateable
 			
 			if (forward)
 			{
-				if (curBlock.getNext() < 0 || !line[curBlock.getNext()].canGoForward())
+				if (curBlock.getNext() < 0)
 					blocked = true;
+				else if (line[curBlock.getNext()].getNext() == curBlock.getID())
+				{
+					if (!line[curBlock.getNext()].canGoBackward())
+						blocked = true;
+				}
 			}
 			else 
 			{
@@ -312,7 +321,7 @@ public class MboController implements Updateable
 				break;
 			if (forward)
 			{
-				System.out.printf("About to check block %d%n", curBlock.getNext());
+				System.out.printf("About to check block %d going forwards%n", curBlock.getNext());
 				BlockTracker nextBlock = line[curBlock.getNext()];
 				if (nextBlock.getID() < curBlock.getID())
 					forward = false;
@@ -320,7 +329,7 @@ public class MboController implements Updateable
 			}
 			else
 			{
-				System.out.printf("About to check block %d%n", curBlock.getNext());
+				System.out.printf("About to check block %d going backwards%n", curBlock.getNext());
 				BlockTracker prevBlock = line[curBlock.getPrev()];
 				if (prevBlock.getID() > curBlock.getID())
 					forward = true;
@@ -362,8 +371,8 @@ public class MboController implements Updateable
 			switchPos[2][1] = 57;
 			switchPos[3][0] = 0;
 			switchPos[3][1] = 62;
-			switchPos[4][0] = 101;
-			switchPos[4][1] = 76;
+			switchPos[4][0] = 76;
+			switchPos[4][1] = 77;
 			switchPos[5][0] = 85;
 			switchPos[5][1] = 100;
 		}
