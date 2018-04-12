@@ -298,6 +298,8 @@ public class MboController implements Updateable
 			if (blocked)
 				break;
 			
+			if (curBlock.getNext() < 0)
+				break;
 			curBlock = line[curBlock.getNext()];
 		}
 		
