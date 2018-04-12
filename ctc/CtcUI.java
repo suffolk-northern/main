@@ -85,7 +85,7 @@ public class CtcUI extends javax.swing.JFrame {
 		trainTable = new javax.swing.JTable();
 		maintenanceBlock = new javax.swing.JComboBox<>();
 		fixedBlock = new javax.swing.JRadioButton();
-		jTextField5 = new javax.swing.JTextField();
+		clockDisp = new javax.swing.JTextField();
 		jLabel3 = new javax.swing.JLabel();
 		jLabel17 = new javax.swing.JLabel();
 		MovingBlock = new javax.swing.JRadioButton();
@@ -96,6 +96,10 @@ public class CtcUI extends javax.swing.JFrame {
 		jLabel5 = new javax.swing.JLabel();
 		scheduleButton = new javax.swing.JButton();
 		closeTrack = new javax.swing.JRadioButton();
+		container = new JPanel();
+		scrPane = new JScrollPane(container);
+		getContentPane().add(scrPane);
+		
 
 		setDefaultCloseOperation(javax.swing.WindowConstants.HIDE_ON_CLOSE);
 
@@ -120,7 +124,7 @@ public class CtcUI extends javax.swing.JFrame {
 
 		jLabel16.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
 		jLabel16.setText("Red Line");
-		jLabel16.setVisible(false);
+		jLabel16.setVisible(true);
 
 		trackTable.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
 		
@@ -240,7 +244,7 @@ public class CtcUI extends javax.swing.JFrame {
 
 		jTextField4.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
 		jTextField4.setText("               ");
-		jTextField4.setVisible(false);
+		jTextField4.setVisible(true);
 
 		jLabel13.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
 		jLabel13.setText("Control Transfer");
@@ -301,8 +305,8 @@ public class CtcUI extends javax.swing.JFrame {
 			}
 		});
 
-		jTextField5.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
-		jTextField5.setText("10:02");
+		clockDisp.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
+		clockDisp.setText("00:00");
 
 		jLabel3.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
 		jLabel3.setText("Block");
@@ -323,7 +327,7 @@ public class CtcUI extends javax.swing.JFrame {
 
 		jLabel18.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
 		jLabel18.setText("passengers/hr");
-		jLabel18.setVisible(false);
+		jLabel18.setVisible(true);
 
 		jLabel14.setFont(new java.awt.Font("Tahoma", 0, 40)); // NOI18N
 		jLabel14.setText("CTC");
@@ -367,10 +371,12 @@ public class CtcUI extends javax.swing.JFrame {
 		manOrAuto.add(manualMode);
 		manOrAuto.add(autoMode);
 
-		javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-		getContentPane().setLayout(layout);
+		javax.swing.GroupLayout layout = new javax.swing.GroupLayout(container);
+		//getContentPane().setLayout(layout);
+		container.setLayout(layout);
 		layout.setHorizontalGroup(
 				layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+						//.addComponent(scrPane,javax.swing.GroupLayout.DEFAULT_SIZE,1200,Short.MAX_VALUE)
 						.addGroup(layout.createSequentialGroup()
 								.addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
 										.addGroup(layout.createSequentialGroup()
@@ -443,7 +449,7 @@ public class CtcUI extends javax.swing.JFrame {
 																.addComponent(jLabel19))
 														.addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 857, javax.swing.GroupLayout.PREFERRED_SIZE)
 														.addGroup(layout.createSequentialGroup()
-																.addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+																.addComponent(clockDisp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
 																.addGap(18, 18, 18)
 																.addComponent(multSelect, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
 								.addGap(79, 79, 79))
@@ -495,7 +501,7 @@ public class CtcUI extends javax.swing.JFrame {
 												.addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
 														.addComponent(jLabel8)
 														.addComponent(blueThrough, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-														.addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+														.addComponent(clockDisp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
 														.addComponent(jLabel17)
 														.addComponent(multSelect, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
 												.addGap(3, 3, 3)
@@ -1269,6 +1275,7 @@ public class CtcUI extends javax.swing.JFrame {
 	private javax.swing.JLabel jLabel2;
 	private javax.swing.JLabel jLabel3;
 	private javax.swing.JLabel jLabel5;
+	private javax.swing.JPanel container;
 	//private javax.swing.JLabel jLabel6;
 	//private javax.swing.JComboBox<String> mLineSelect;
 	private javax.swing.JLabel jLabel7;
@@ -1278,7 +1285,7 @@ public class CtcUI extends javax.swing.JFrame {
 	private javax.swing.JScrollPane jScrollPane2;
 	private javax.swing.JTextField blueThrough;
 	private javax.swing.JTextField jTextField4;
-	private javax.swing.JTextField jTextField5;
+	private javax.swing.JTextField clockDisp;
 	private javax.swing.JComboBox<String> lineSelect;
 	private javax.swing.JRadioButton manualMode;
 	private javax.swing.JComboBox<String> multSelect;
@@ -1288,6 +1295,7 @@ public class CtcUI extends javax.swing.JFrame {
 	private static javax.swing.JTable trackTable;
 	private javax.swing.JComboBox<String> trainSelect;
 	private static javax.swing.JTable trainTable;
+	private javax.swing.JScrollPane scrPane;
 
 	/**
     // Variables declaration - do not modify//GEN-BEGIN:variables

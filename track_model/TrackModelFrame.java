@@ -39,6 +39,8 @@ public class TrackModelFrame extends javax.swing.JFrame {
 	private final TrackModel tm;
 	// Map frame.
 	private TrackModelMapFrame tmmf;
+	// Murph frame.
+	private MurphFrame mf;
 
 	// TableModels used for displaying data.
 	private TrackModelTableModel blockTableModel = TrackModelTableModel.getBlockTableModel();
@@ -238,7 +240,9 @@ public class TrackModelFrame extends javax.swing.JFrame {
 	 * @param evt
 	 */
     private void murphButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_murphButtonActionPerformed
-		MurphFrame mf = new MurphFrame(tm.blocks, dbHelper);
+		if (mf == null) {
+			mf = new MurphFrame(tm.blocks, dbHelper);
+		}
 		mf.setLocationRelativeTo(this);
 		mf.setVisible(true);
     }//GEN-LAST:event_murphButtonActionPerformed
@@ -258,7 +262,9 @@ public class TrackModelFrame extends javax.swing.JFrame {
 	 * @param evt
 	 */
     private void mapButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mapButtonActionPerformed
-		tmmf = new TrackModelMapFrame(tm);
+		if (tmmf == null) {
+			tmmf = new TrackModelMapFrame(tm);
+		}
 		tmmf.setVisible(true);
     }//GEN-LAST:event_mapButtonActionPerformed
 
@@ -474,12 +480,13 @@ public class TrackModelFrame extends javax.swing.JFrame {
 				row.add(tb.line.toUpperCase());
 				row.add(tb.section);
 				row.add(tb.block);
-				row.add(tb.prevBlockId);
-				row.add(tb.prevBlockDir);
-				row.add(tb.nextBlockId);
-				row.add(tb.nextBlockDir);
-				row.add(tb.switchBlockId == 0 ? "YARD" : tb.switchBlockId);
-				row.add(tb.switchDirection);
+
+				int common = tb.switchDirection > 0 ? tb.prevBlockId : tb.nextBlockId;
+				int straight = tb.switchDirection < 0 ? tb.prevBlockId : tb.nextBlockId;
+				int diverging = tb.switchBlockId;
+				row.add(common == 0 ? "YARD" : common);
+				row.add(straight == 0 ? "YARD" : straight);
+				row.add(diverging == 0 ? "YARD" : diverging);
 				row.add(tb.switchPosition == 0 ? "YARD" : tb.switchPosition);
 				switchVector.add(row);
 			}
