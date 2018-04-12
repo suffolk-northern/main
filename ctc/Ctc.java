@@ -295,7 +295,15 @@ public class Ctc implements Updateable{
 		{
 			bl = trackmodel.getBlock(line, i);
 			
-			if(bl.isIsCrossing())
+			if(bl.isIsSwitch() && bl.isIsStation())
+			{
+				block = new Block(line,bl.getSection(),bl.getBlock(),bl.getLength(),bl.getNextBlockDir(),bl.getPrevBlockDir(),null,null,false,0,bl.getSwitchDirection(),null,null,null,null);
+				block.station = trackmodel.getStation(line,bl.getBlock()).getName(); 
+				block.hasStation = true;
+				switches.add(block);
+				greenline.add(block);
+			}
+			else if(bl.isIsCrossing())
 			{
 				greenline.add(new Block(line,bl.getSection(),bl.getBlock(),bl.getLength(),bl.getNextBlockDir(),bl.getPrevBlockDir(),null,null,true));
 			}
@@ -343,7 +351,14 @@ public class Ctc implements Updateable{
 					blk.setSwitch(bl.getSwitchDirection(), blockf.clone(), blockt.clone());
 					blk.prev = getBlock(line,bl.getPrevBlockId());
 					
-					
+					if(to.equals(getBlock(to.line,bl.getSwitchPosition())))
+					{
+						blk.sw_curr_to = to;
+					}
+					else if(extra.equals(getBlock(to.line,bl.getSwitchPosition())))
+					{
+						blk.sw_curr_to = extra;						
+					}
 				}
 				// prev block aka backward switch
 				else
@@ -813,7 +828,6 @@ public class Ctc implements Updateable{
 						success = getFlip(block);
 						if(success)
 						{
-							block.sw_curr_to = temp.peek();
 							updateTrack();
 							flipped = true;
 						}
@@ -835,7 +849,6 @@ public class Ctc implements Updateable{
 						success = getFlip(block);
 						if(success)
 						{
-							block.sw_curr_from = prev;
 							updateTrack();
 							flipped = true;
 						}
@@ -1064,6 +1077,13 @@ public class Ctc implements Updateable{
 			//System.out.println("Old switch pos: " + trackmodel.getBlock(swblock.line,swblock.num).getSwitchPosition());
 			flipped = trackmodel.flipSwitch(swblock.line,swblock.num);
 			//System.out.println("New switch pos: " + trackmodel.getBlock(swblock.line,swblock.num).getSwitchPosition());
+			if(flipped)
+			{
+				if(isForwardSwitch(swblock))
+					swblock.sw_curr_to = desired;
+				else
+					swblock.sw_curr_from = desired;
+			}
 		}
 		
 		return flipped;
@@ -1163,7 +1183,12 @@ public class Ctc implements Updateable{
 
 			if (train.route == null) {
 				rows[count][3] = "";
-			} else {
+			} 
+			else if(train.route.isEmpty())
+			{
+				rows[count][3] = "" + train.location.section + train.location.num;
+			}
+			else {
 				rows[count][3] = "" + train.route.getLast().section + train.route.getLast().num;
 			}
 
