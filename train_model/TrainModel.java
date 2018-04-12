@@ -208,6 +208,12 @@ public class TrainModel
 		return new GlobalCoordinates(pointMass.pose().position);
 	}
 
+	// Returns the current block location as block ID.
+	public int block()
+	{
+		return pointMass.block();
+	}
+
 	// Returns the current orientation.
 	public Orientation orientation()
 	{
