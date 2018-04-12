@@ -78,6 +78,12 @@ public class PointMass
 		return new Pose(pose);
 	}
 
+	// Returns the current block location as block ID.
+	public int block()
+	{
+		return block != null ? block.getBlock() : 0;
+	}
+
 	// Sets a new pose instantaneously.
 	//
 	// Sets the speed to zero.
