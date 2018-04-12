@@ -828,7 +828,6 @@ public class Ctc implements Updateable{
 						success = getFlip(block);
 						if(success)
 						{
-							block.sw_curr_to = temp.peek();
 							updateTrack();
 							flipped = true;
 						}
@@ -850,7 +849,6 @@ public class Ctc implements Updateable{
 						success = getFlip(block);
 						if(success)
 						{
-							block.sw_curr_from = prev;
 							updateTrack();
 							flipped = true;
 						}
@@ -1079,6 +1077,13 @@ public class Ctc implements Updateable{
 			//System.out.println("Old switch pos: " + trackmodel.getBlock(swblock.line,swblock.num).getSwitchPosition());
 			flipped = trackmodel.flipSwitch(swblock.line,swblock.num);
 			//System.out.println("New switch pos: " + trackmodel.getBlock(swblock.line,swblock.num).getSwitchPosition());
+			if(flipped)
+			{
+				if(isForwardSwitch(swblock))
+					swblock.sw_curr_to = desired;
+				else
+					swblock.sw_curr_from = desired;
+			}
 		}
 		
 		return flipped;
