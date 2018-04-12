@@ -149,7 +149,7 @@ public class MboController implements Updateable
 		{
 			TrainTracker trainInfo = trains.get(i);
 			int newBlock = getBlockFromLoc(trainInfo.getLocation());
-			System.out.printf("Train %d is on block %d%n", trainInfo.getID(), newBlock);
+			// System.out.printf("Train %d is on block %d%n", trainInfo.getID(), newBlock);
 			if (newBlock > 0)
 				trainInfo.block = line[newBlock];
 		}
