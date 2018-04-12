@@ -68,10 +68,10 @@ public class MboSchedulerUI extends javax.swing.JFrame
         jButton12 = new javax.swing.JButton();
         jButton13 = new javax.swing.JButton();
         jLabel12 = new javax.swing.JLabel();
-        jPanel3 = new javax.swing.JPanel();
+        throughputPanel = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         throughputTable = new javax.swing.JTable();
-        jLabel4 = new javax.swing.JLabel();
+        throughputTitleLabel = new javax.swing.JLabel();
         finishedThroughputButton = new javax.swing.JButton();
         schedulePanel = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -282,13 +282,66 @@ public class MboSchedulerUI extends javax.swing.JFrame
 
         getContentPane().add(mainPanel, "card2");
 
+
+
+        // jScrollPane1.setViewportView(throughputTable);
+
+//        throughputTitleLabel.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+//        throughputTitleLabel.setText("Enter Throughput");
+		
+
+
+
+
+//        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+//        jPanel3.setLayout(jPanel3Layout);
+//        jPanel3Layout.setHorizontalGroup(
+//            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+//            .addGroup(jPanel3Layout.createSequentialGroup()
+//                .addContainerGap()
+//                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+//                    .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+//                        .addGroup(jPanel3Layout.createSequentialGroup()
+//                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 373, javax.swing.GroupLayout.PREFERRED_SIZE)
+//                            .addContainerGap())
+//                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+//                            .addComponent(throughputTitleLabel)
+//                            .addGap(127, 127, 127)))
+//                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+//                        .addComponent(finishedThroughputButton)
+//                        .addGap(122, 122, 122))))
+//        );
+//        jPanel3Layout.setVerticalGroup(
+//            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+//            .addGroup(jPanel3Layout.createSequentialGroup()
+//                .addGap(30, 30, 30)
+//                .addComponent(throughputTitleLabel)
+//                .addGap(18, 18, 18)
+//                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 298, javax.swing.GroupLayout.PREFERRED_SIZE)
+//				// .addGap(18, 18, 18)
+//				// .addComponent(throughputMessageLabel)
+//                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+//                .addComponent(finishedThroughputButton)
+//                .addContainerGap(189, Short.MAX_VALUE))
+//        );
+
+		// Throughput Panel
+
+		throughputPanel.setLayout(new GridBagLayout());
+		
+		GridBagConstraints c = new GridBagConstraints();
+		
+		throughputTitleLabel.setFont(new Font("Tahoma", 0, 18));
+		throughputTitleLabel.setText(String.format("Enter Throughput", lineName));
+		c.gridx = 0;
+		c.gridy = 0;
+		throughputPanel.add(throughputTitleLabel, c);
+		
         throughputTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {"Not initialized", "Not initialized"},
             },
-            new String [] {
-                "Hour", "Throughput"
-            }
+            new String [] {"Hour", "Throughput"}
         ) {
             boolean[] canEdit = new boolean [] {
                 false, true
@@ -298,55 +351,32 @@ public class MboSchedulerUI extends javax.swing.JFrame
                 return canEdit [columnIndex];
             }
         });
-
-        jScrollPane1.setViewportView(throughputTable);
-
-        jLabel4.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jLabel4.setText("Enter Throughput");
 		
-		throughputMessageLabel.setFont(new java.awt.Font("Tahoma", 0, 14));	
-		throughputMessageLabel.setText("Testing testing testing");
-
+		c.gridx = 0;
+		c.gridy = 1;
+		jScrollPane1.setViewportView(throughputTable);
+		throughputPanel.add(jScrollPane1, c);
+		
         finishedThroughputButton.setText("Return to Scheduler");
-        finishedThroughputButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        finishedThroughputButton.addActionListener(new java.awt.event.ActionListener() 
+		{
+            public void actionPerformed(ActionEvent evt) 
+			{
                 finishedThroughputButtonClicked(evt);
             }
         });
+		c.gridx = 0;
+		c.gridy = 2;
+		throughputPanel.add(finishedThroughputButton);
+		
+		throughputMessageLabel.setFont(new java.awt.Font("Tahoma", 0, 14));	
+		throughputMessageLabel.setText("Testing testing testing");
+		c.gridx = 0;
+		c.gridy = 3;
+		throughputPanel.add(throughputMessageLabel, c);
 
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel3Layout.createSequentialGroup()
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 373, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addContainerGap())
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                            .addComponent(jLabel4)
-                            .addGap(127, 127, 127)))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                        .addComponent(finishedThroughputButton)
-                        .addGap(122, 122, 122))))
-        );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGap(30, 30, 30)
-                .addComponent(jLabel4)
-                .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 298, javax.swing.GroupLayout.PREFERRED_SIZE)
-				// .addGap(18, 18, 18)
-				// .addComponent(throughputMessageLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(finishedThroughputButton)
-                .addContainerGap(189, Short.MAX_VALUE))
-        );
-
-        getContentPane().add(jPanel3, "card3");
+        getContentPane().add(throughputPanel, "card3");
+	
 
 		// Schedule panel
 		
@@ -761,7 +791,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel throughputTitleLabel;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel individualScheduleLabel;
@@ -769,7 +799,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel mainPanel;
     private javax.swing.JPanel schedulePanel;
-    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel throughputPanel;
     private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JRadioButton jRadioButton1;
     private javax.swing.JRadioButton jRadioButton2;
