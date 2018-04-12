@@ -351,7 +351,14 @@ public class Ctc implements Updateable{
 					blk.setSwitch(bl.getSwitchDirection(), blockf.clone(), blockt.clone());
 					blk.prev = getBlock(line,bl.getPrevBlockId());
 					
-					
+					if(to.equals(getBlock(to.line,bl.getSwitchPosition())))
+					{
+						blk.sw_curr_to = to;
+					}
+					else if(extra.equals(getBlock(to.line,bl.getSwitchPosition())))
+					{
+						blk.sw_curr_to = extra;						
+					}
 				}
 				// prev block aka backward switch
 				else
