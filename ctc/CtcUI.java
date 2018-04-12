@@ -1055,7 +1055,7 @@ public class CtcUI extends javax.swing.JFrame {
 			}
 		
 			
-			trainSelect.setModel(new javax.swing.DefaultComboBoxModel<>(trainIDs));
+			
 
 	}
 
@@ -1180,6 +1180,8 @@ public class CtcUI extends javax.swing.JFrame {
 		{
 			blockSelect.setModel(new javax.swing.DefaultComboBoxModel<>(redBlocks));
 		}
+		
+		trainSelect.setModel(new javax.swing.DefaultComboBoxModel<>(trainIDs));
 				
 	}
 	
