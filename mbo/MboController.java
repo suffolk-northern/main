@@ -158,8 +158,8 @@ public class MboController implements Updateable
 		}
 		
 		updateSwitches();
-//		for (SwitchTracker st : switches)
-//			st.printInfo();
+		for (SwitchTracker st : switches)
+			st.printInfo();
 //		System.out.println(line[75].getNext());
 
 		if (enabled == true)
@@ -245,7 +245,7 @@ public class MboController implements Updateable
 		GlobalCoordinates trainLoc = train.getCurrentPosition();
 		double trainDist = trackModel.getDistanceAlongBlock(lineName, curBlock.getID(), trainLoc); 
 		double distLeftInBlock = 0;
-		if (train.isGoingForward())
+		if (!train.isGoingForward())
 			distLeftInBlock = train.getBlock().getLength() - trainDist;
 		else
 			distLeftInBlock = trainDist;
@@ -295,10 +295,20 @@ public class MboController implements Updateable
 			else if (!train.isGoingForward() && curBlock.getPrev() < 0)
 				blocked = true;
 			
+			// System.out.printf("Current authority: %f%n", authority);
+			
 			if (blocked)
 				break;
-			
-			curBlock = line[curBlock.getNext()];
+			if (train.isGoingForward())
+			{
+				System.out.printf("About to check block %d%n", curBlock.getNext());
+				curBlock = line[curBlock.getNext()];
+			}
+			else
+			{
+				System.out.printf("About to check block %d%n", curBlock.getNext());
+				curBlock = line[curBlock.getPrev()];
+			}
 		}
 		
 		if (authority > MAX_AUTHORITY)
