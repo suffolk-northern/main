@@ -1197,7 +1197,7 @@ public class Ctc implements Updateable{
 			}
 
 			rows[count][4] = "";
-			rows[count][5] = train.authority;
+			rows[count][5] = train.authority * 1.09361; // convert to yards
 			rows[count][6] = train.setpoint_speed;
 			rows[count][7] = train.passengers;
 
@@ -1448,6 +1448,8 @@ public class Ctc implements Updateable{
 		
 
 		//System.out.println();
+		
+		speed = speed * 1.60934; // convert to kph from mph
 		
 		String msg = speed + " " + auth;
 		//System.out.println(train.ID + " at " + train.location.display() + ": " + msg);
