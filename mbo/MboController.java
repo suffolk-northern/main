@@ -31,6 +31,9 @@ public class MboController implements Updateable
 	private String lineName;
 	private boolean enabled;
 	private CtcRadio ctcRadio;
+	private TrackModel trackModel;
+	
+	private ArrayList<SwitchTracker> switches;
 	
 	private static int MAX_AUTHORITY = 3000; // m
 	
@@ -45,7 +48,7 @@ public class MboController implements Updateable
 	{
 		if (ui == null)
 		{
-			ui = new MboControllerUI();
+			ui = new MboControllerUI(lineName);
 			for (TrainTracker trainInfo : trains)
 			{
 				int ID = trainInfo.getID();
@@ -61,12 +64,6 @@ public class MboController implements Updateable
 		}
 	}
 	
-	public void showUI()
-	{
-		if (ui != null)
-			ui.setVisible(true);
-	}
-	
 	public void hideUI()
 	{	
 		if (ui != null)
@@ -77,6 +74,11 @@ public class MboController implements Updateable
 	public void registerCtc(CtcRadio cr)
 	{
 		ctcRadio = cr;
+	}
+	
+	public void registerTrackModel(TrackModel tm)
+	{
+		trackModel = tm;
 	}
 	
 	public void enableMboController()
@@ -91,11 +93,10 @@ public class MboController implements Updateable
 	
 	public void initLine()
 	{
+		ArrayList<Integer> switchIDs = new ArrayList<>();
 		if (line == null)
 		{
-			System.out.println("Initializing line");
 			int numBlocks = TrackModel.getBlockCount(lineName);
-			System.out.printf("Num blocks initalized: %d", numBlocks);
 			line = new BlockTracker[numBlocks+1];
 			for (int i = 0; i <= numBlocks; i++)
 			{
@@ -167,6 +168,7 @@ public class MboController implements Updateable
 			{
 				if (trainInfo == null)
 					break;
+				updateLocation(trainInfo);
 				double authority = findAuthority(trainInfo);
 				trainInfo.setAuthority((int) authority);
 				trainInfo.setSuggestedSpeed(trainInfo.block.getSpeedLimit());
@@ -304,6 +306,19 @@ public class MboController implements Updateable
 		return authority;
 	}
 	
+	private void updateLocation(TrainTracker train)
+	{
+		GlobalCoordinates newLocation = train.getRadio().receive();
+		double newDistance = trackModel.getDistanceAlongBlock(lineName, train.getBlock().getID(), newLocation);
+		double oldDistance = trackModel.getDistanceAlongBlock(lineName, train.getBlock().getID(), train.getLastPosition());
+		if (newDistance > oldDistance)
+			train.setGoingForward(true);
+		else
+			train.setGoingForward(false);
+		train.setLastPosition(train.getCurrentPosition());
+		train.setCurrentPosition(newLocation);
+	}
+	
 	private void updateSwitches()
 	{
 		if (ctcRadio == null)
@@ -396,7 +411,6 @@ public class MboController implements Updateable
 			}
  		}
 	}
-	
 	
 //	public int changeTrainLocation(int trainID, GlobalCoordinates location)
 //	{
