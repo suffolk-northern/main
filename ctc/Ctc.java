@@ -229,6 +229,14 @@ public class Ctc implements Updateable{
 		updater.scheduleAtFixedRate(period / speedup);
 	}
 	
+	public void setTrain(int ID)
+	{
+		Train train = new Train(ID,getBlock("green",0),0);
+		trains.add(train);
+		
+		updateTrains();
+	}
+	
 	public void setTrackModel(TrackModel tm)
 	{
 		this.trackmodel = tm;
@@ -237,8 +245,8 @@ public class Ctc implements Updateable{
 		//initRed();
 		
 		// add trains to yards
-		Train train = new Train(0,getBlock("green",0),0);
-		trains.add(train);
+		//Train train = new Train(0,getBlock("green",0),0);
+		//trains.add(train);
 		
 		updateTrack();
 		updateTrains();
