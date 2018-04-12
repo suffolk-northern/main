@@ -8,6 +8,8 @@ package mbo;
 
 import java.util.ArrayList;
 import java.lang.Math.*;
+import java.util.HashSet;
+import java.util.Set;
 
 import updater.Updateable;
 import track_model.GlobalCoordinates;
@@ -155,7 +157,10 @@ public class MboController implements Updateable
 		}
 		
 		updateSwitches();
-		
+//		for (SwitchTracker st : switches)
+//			st.printInfo();
+//		System.out.println(line[75].getNext());
+
 		if (enabled == true)
 		{
 			for (TrainTracker trainInfo:trains)
@@ -280,9 +285,9 @@ public class MboController implements Updateable
 			blocked = false;
 			authority += curBlock.getLength();
 			
-			// TODO: take switches into account
 			if (train.isGoingForward() && curBlock.getNext() < 0)
 			{
+				// System.out.printf("Got here with authority %f%n", authority);
 				blocked = true;
 			}
 			else if (!train.isGoingForward() && curBlock.getPrev() < 0)
@@ -305,13 +310,27 @@ public class MboController implements Updateable
 			return;
 		int[][] switchPos = ctcRadio.getSwitchStates(lineName);
 		if (switchPos == null)
-			return;
+		{
+			switchPos = new int[6][2];
+			switchPos[0][0] = 11;
+			switchPos[0][1] = 12;
+			switchPos[1][0] = 28;
+			switchPos[1][1] = 29;
+			switchPos[2][0] = 0;
+			switchPos[2][1] = 57;
+			switchPos[3][0] = 0;
+			switchPos[3][1] = 62;
+			switchPos[4][0] = 101;
+			switchPos[4][1] = 76;
+			switchPos[5][0] = 85;
+			switchPos[5][1] = 100;
+		}
 		for (int i = 0; i < switchPos.length; i++)
 		{
 			SwitchTracker switchSet = null;
 			for (SwitchTracker s : switches)
 			{
-				for (int j = 0; j < switchPos.length; j++)
+				for (int j = 0; j < switchPos[i].length; j++)
 					if (s.getID() == switchPos[i][j])
 						switchSet = s;
 			}
@@ -319,7 +338,9 @@ public class MboController implements Updateable
 			if (switchSet != null)
 			{
 				int connectedBlock1 = switchPos[i][0];
+				switchSet.setConnected(connectedBlock1, true);
 				int connectedBlock2 = switchPos[i][1];
+				switchSet.setConnected(connectedBlock2, true);
 				int unconnectedBlock = -1;
 				for (int j = 0; j < switchSet.getBlocks().length; j++)
 				{
@@ -327,6 +348,7 @@ public class MboController implements Updateable
 					if (block != connectedBlock1 && block != connectedBlock2)
 						unconnectedBlock = block;
 				}
+				switchSet.setConnected(unconnectedBlock, false);
 				
 				if (switchSet.nextIsSwitch(connectedBlock1))
 					line[connectedBlock1].setNextBlock(connectedBlock2);
