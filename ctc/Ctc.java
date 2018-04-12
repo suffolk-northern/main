@@ -10,6 +10,7 @@ package ctc;
  * @author missm
  */
 import java.util.ArrayDeque;
+import java.util.Date;
 import java.util.StringTokenizer;
 
 import updater.Updateable;
@@ -47,6 +48,7 @@ public class Ctc implements Updateable{
 
 	public static Updater updater;
 	public static int period;
+	public static Clock clock;
 	
 	public static double through = 0;
 
@@ -118,6 +120,10 @@ public class Ctc implements Updateable{
 		{
 			updateAuth(b);
 		}
+		
+		clock.advance(time);
+		String clockDisp = String.format("%02d", clock.time().getHours()) + ":" + String.format("%02d",clock.time().getMinutes());
+		ui.updateClock(clockDisp);
 		
 		updateTrack();
 		updateTrains();
@@ -518,8 +524,10 @@ public class Ctc implements Updateable{
 	public Ctc() {
 		ctc = this;
 		ui = new CtcUI(ctc);
-		//showUI();
-
+		
+		clock = new Clock();		
+		
+		
 		/*
 		blueline.add(new Block("blue", true));
 		blueline.add(new Block("blue", 'A', 1, 100, null, null, false));
