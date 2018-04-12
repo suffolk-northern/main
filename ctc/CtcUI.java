@@ -124,7 +124,7 @@ public class CtcUI extends javax.swing.JFrame {
 
 		jLabel16.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
 		jLabel16.setText("Red Line");
-		jLabel16.setVisible(false);
+		jLabel16.setVisible(true);
 
 		trackTable.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
 		
@@ -244,7 +244,7 @@ public class CtcUI extends javax.swing.JFrame {
 
 		jTextField4.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
 		jTextField4.setText("               ");
-		jTextField4.setVisible(false);
+		jTextField4.setVisible(true);
 
 		jLabel13.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
 		jLabel13.setText("Control Transfer");
@@ -327,7 +327,7 @@ public class CtcUI extends javax.swing.JFrame {
 
 		jLabel18.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
 		jLabel18.setText("passengers/hr");
-		jLabel18.setVisible(false);
+		jLabel18.setVisible(true);
 
 		jLabel14.setFont(new java.awt.Font("Tahoma", 0, 40)); // NOI18N
 		jLabel14.setText("CTC");
