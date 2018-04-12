@@ -141,19 +141,10 @@ public class TrackModelMapPanel extends JPanel {
 	private void plopTrack(Graphics g) {
 		Graphics2D g2 = (Graphics2D) g;
 		for (TrackBlock tb : tm.blocks) {
-			double xStart = xBound + (tb.start.longitude() - minLon) * lonMultiplier;
-			double yStart = yBound - (tb.start.latitude() - minLat) * latMultiplier;
-			double xEnd = xBound + (tb.end.longitude() - minLon) * lonMultiplier;
-			double yEnd = yBound - (tb.end.latitude() - minLat) * latMultiplier;
-			//
-			// Adds yard clipart.
-			//
-			if (tb.block == 0) {
-				int width = yardArt.getWidth(this) * xDimension / 7000;
-				int height = yardArt.getHeight(this) * xDimension / 7000;
-				g2.drawImage(yardArt, (int) xStart - width, (int) yStart - height, width, height, this);
-				continue;
-			}
+			double xStart = getXPosition(tb.start.longitude());
+			double yStart = getYPosition(tb.start.latitude());
+			double xEnd = getXPosition(tb.end.longitude());
+			double yEnd = getYPosition(tb.end.latitude());
 			//
 			// Sets color of track block.
 			// 
@@ -178,8 +169,8 @@ public class TrackModelMapPanel extends JPanel {
 			if (tb.closedForMaintenance) {
 				int width = coneArt.getWidth(this) * xDimension / 10000;
 				int height = coneArt.getHeight(this) * xDimension / 10000;
-				double x = xBound + ((tb.start.longitude() + tb.end.longitude()) / 2 - minLon) * lonMultiplier;
-				double y = yBound - ((tb.start.latitude() + tb.end.latitude()) / 2 - minLat) * latMultiplier;
+				double x = getXPosition((tb.start.longitude() + tb.end.longitude()) / 2);
+				double y = getYPosition((tb.start.latitude() + tb.end.latitude()) / 2);
 				g2.drawImage(coneArt, (int) (x - width * 0.8), (int) (y - width * 0.8), width, height, this);
 			}
 			g.drawLine((int) xStart, (int) yStart, (int) xEnd, (int) yEnd);
@@ -188,9 +179,23 @@ public class TrackModelMapPanel extends JPanel {
 			//
 			if (tb.isSwitch && tb.switchBlockId == 0) {
 				TrackBlock yard = tm.getBlock(tb.line, 0);
-				xEnd = xBound + (yard.end.longitude() - minLon) * lonMultiplier;
-				yEnd = yBound - (yard.end.latitude() - minLat) * latMultiplier;
-				g.drawLine((int) xStart, (int) yStart, (int) xEnd, (int) yEnd);
+				double xTemp = xStart;
+				double yTemp = yStart;
+				if (tb.switchDirection > 0) {
+					xTemp = getXPosition(tb.end.longitude());
+					yTemp = getYPosition(tb.end.latitude());
+				}
+				xEnd = getXPosition(yard.end.longitude());
+				yEnd = getYPosition(yard.end.latitude());
+				g.drawLine((int) xTemp, (int) yTemp, (int) xEnd, (int) yEnd);
+			}
+			//
+			// Adds yard clipart.
+			//
+			if (tb.block == 0) {
+				int width = yardArt.getWidth(this) * xDimension / 7000;
+				int height = yardArt.getHeight(this) * xDimension / 7000;
+				g2.drawImage(yardArt, (int) xStart - width, (int) yStart - height, width, height, this);
 			}
 		}
 	}
@@ -213,8 +218,13 @@ public class TrackModelMapPanel extends JPanel {
 				// Adds yard switch.
 				//
 				if (active.block == 0) {
-					xStart = xBound + (tb.start.longitude() - minLon) * lonMultiplier;
-					yStart = yBound - (tb.start.latitude() - minLat) * latMultiplier;
+					if (tb.switchDirection > 0) {
+						xStart = xBound + (tb.end.longitude() - minLon) * lonMultiplier;
+						yStart = yBound - (tb.end.latitude() - minLat) * latMultiplier;
+					} else {
+						xStart = xBound + (tb.start.longitude() - minLon) * lonMultiplier;
+						yStart = yBound - (tb.start.latitude() - minLat) * latMultiplier;
+					}
 				}
 				//
 				// Sets color of track block.
@@ -296,5 +306,25 @@ public class TrackModelMapPanel extends JPanel {
 			g2.setColor(Color.CYAN);
 			g2.fillOval((int) x, (int) y, 5, 5);
 		}
+	}
+
+	/**
+	 * Gets X pixel position based on longitude.
+	 *
+	 * @param longitude
+	 * @return
+	 */
+	private double getXPosition(double longitude) {
+		return xBound + (longitude - minLon) * lonMultiplier;
+	}
+
+	/**
+	 * Gets Y pixel position based on latitude.
+	 *
+	 * @param latitude
+	 * @return
+	 */
+	private double getYPosition(double latitude) {
+		return yBound - (latitude - minLat) * latMultiplier;
 	}
 }

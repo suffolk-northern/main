@@ -219,7 +219,7 @@ public class TrackModel implements Updateable {
 		tmf.setLocationRelativeTo(null);
 		tmf.setVisible(true);
 		if (doTablesExist()) {
-			TestFrame tf = new TestFrame(tmf, dbHelper);
+			TestFrame tf = new TestFrame(this, tmf);
 			tf.setLocationRelativeTo(tmf);
 			tf.setVisible(true);
 		}
@@ -359,9 +359,12 @@ public class TrackModel implements Updateable {
 				for (int j = 0; j < tbs.size(); j++) {
 					TrackBlock switchBlock = tbs.get(j);
 					if (newSwitch.switchBlockId == switchBlock.block
-							&& newSwitch.line.equalsIgnoreCase(switchBlock.line)
-							&& switchBlock.block != 0) {
-						switchBlock.nextBlockId = newSwitch.block;
+							&& newSwitch.line.equalsIgnoreCase(switchBlock.line)) {
+						if (switchBlock.block == 0) {
+							switchBlock.prevBlockId = newSwitch.block;
+						} else {
+							switchBlock.nextBlockId = newSwitch.block;
+						}
 					}
 				}
 			}

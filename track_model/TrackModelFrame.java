@@ -474,12 +474,13 @@ public class TrackModelFrame extends javax.swing.JFrame {
 				row.add(tb.line.toUpperCase());
 				row.add(tb.section);
 				row.add(tb.block);
-				row.add(tb.prevBlockId);
-				row.add(tb.prevBlockDir);
-				row.add(tb.nextBlockId);
-				row.add(tb.nextBlockDir);
-				row.add(tb.switchBlockId == 0 ? "YARD" : tb.switchBlockId);
-				row.add(tb.switchDirection);
+
+				int common = tb.switchDirection > 0 ? tb.prevBlockId : tb.nextBlockId;
+				int straight = tb.switchDirection < 0 ? tb.prevBlockId : tb.nextBlockId;
+				int diverging = tb.switchBlockId;
+				row.add(common == 0 ? "YARD" : common);
+				row.add(straight == 0 ? "YARD" : straight);
+				row.add(diverging == 0 ? "YARD" : diverging);
 				row.add(tb.switchPosition == 0 ? "YARD" : tb.switchPosition);
 				switchVector.add(row);
 			}
