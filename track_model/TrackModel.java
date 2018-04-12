@@ -343,6 +343,9 @@ public class TrackModel implements Updateable {
 	private void shiftSwitches(ArrayList<TrackBlock> tbs) {
 		for (int i = 0; i < tbs.size(); i++) {
 			TrackBlock oldSwitch = tbs.get(i);
+			//
+			// If it's a forward switch, switches the switch info to the previous block.
+			//
 			if (oldSwitch.isSwitch && oldSwitch.switchDirection > 0) {
 				TrackBlock newSwitch = tbs.get(i - 1);
 				newSwitch.isSwitch = true;
@@ -350,6 +353,17 @@ public class TrackModel implements Updateable {
 				newSwitch.switchDirection = oldSwitch.switchDirection;
 				newSwitch.switchPosition = oldSwitch.switchPosition;
 				oldSwitch.isSwitch = false;
+				//
+				// The next block of blocks connected to forward switch get shifted back.
+				//
+				for (int j = 0; j < tbs.size(); j++) {
+					TrackBlock switchBlock = tbs.get(j);
+					if (newSwitch.switchBlockId == switchBlock.block
+							&& newSwitch.line.equalsIgnoreCase(switchBlock.line)
+							&& switchBlock.block != 0) {
+						switchBlock.nextBlockId = newSwitch.block;
+					}
+				}
 			}
 		}
 	}
@@ -380,6 +394,22 @@ public class TrackModel implements Updateable {
 			System.out.println("Not a switch.");
 		}
 		return success;
+	}
+
+	/**
+	 * Gets the two branches of a switch.
+	 *
+	 * @param line
+	 * @param block
+	 * @return
+	 */
+	public int[] getBranchesOfSwitch(String line, int block) {
+		TrackBlock tb = getBlock(line, block);
+		if (tb == null || !tb.isSwitch) {
+			return null;
+		}
+		int[] branches = {tb.switchBlockId, tb.switchDirection > 0 ? tb.nextBlockId : tb.prevBlockId};
+		return branches;
 	}
 
 	/**
