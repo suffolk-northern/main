@@ -1132,7 +1132,12 @@ public class Ctc implements Updateable{
 
 			if (train.route == null) {
 				rows[count][3] = "";
-			} else {
+			} 
+			else if(train.route.isEmpty())
+			{
+				rows[count][3] = "" + train.location.section + train.location.num;
+			}
+			else {
 				rows[count][3] = "" + train.route.getLast().section + train.route.getLast().num;
 			}
 
