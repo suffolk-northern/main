@@ -86,35 +86,37 @@ public class MboControllerUI extends JFrame
 	
 	public void addTrain(int trainID, char section, int blockID, int location, int authority, int speed)
 	{
-		TableModel model = trainTable.getModel();
-		model.setValueAt(trainID, numTrains, 0);
-		model.setValueAt(section, numTrains, 1);
-		model.setValueAt(blockID, numTrains, 2);
-		model.setValueAt(location, numTrains, 3);
-		model.setValueAt(authority, numTrains, 4);
-		model.setValueAt(speed, numTrains, 5);
-//		double lat = train.location().latitude();
-//		double lon = train.location().longitude();
-//		String locString = String.format("%f, %f", lat, lon);
-//		model.setValueAt(locString, numTrains, 1);
+		for (int tID : trainIDs)
+		{
+			if (tID == trainID)
+				return;
+		}
+		trainIDs.add(trainID);
+		int row = trainIDs.indexOf(trainID);
+		// Convert meters to yards
+		int customAuthority = (int) ((double) authority * 1.0936);
+		// Convert kph to mph
+		int customSpeed = (int) ((double) speed * 0.621371);
+		// System.out.printf("Adding train %d to row %d%n", trainID, row);
+		updateRow(row, trainID, section, block, location, customAuthority, customSpeed);
 		numTrains += 1;
 	}
 	
 	public void updateTrain(int trainID, char section, int block, int location, int authority, int speed)
 	{
-		TableModel model = trainTable.getModel();
-		int trainRow = 0;
-		for (int i = 0; i < numTrains; i++)
+		int row = trainIDs.indexOf(trainID);
+		// Convert meters to yards
+		int customAuthority = (int) ((double) authority * 1.0936);
+		// Convert kph to mph
+		int customSpeed = (int) ((double) speed * 0.621371);
+		// System.out.printf("Updatating train %d in row %d%n", trainID, row);
+		if (row == -1)
 		{
-			if(trainID == (int) trainTable.getValueAt(i, 0))
-				trainRow = i;
+			addTrain(trainID, section, block, location, customAuthority, customSpeed);
+			row = trainIDs.indexOf(trainID);
 		}
 		
-		model.setValueAt(section, trainRow, 1);
-		model.setValueAt(block, trainRow, 2);
-		model.setValueAt(location, trainRow, 3);
-		model.setValueAt(authority, trainRow, 4);
-		model.setValueAt(speed, trainRow, 5);
+		updateRow(row, trainID, section, block, location, customAuthority, customSpeed);
 	}
 	
 	public void removeTrain(int trainID)

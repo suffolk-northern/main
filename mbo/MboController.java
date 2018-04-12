@@ -30,6 +30,8 @@ public class MboController implements Updateable
 	private boolean enabled;
 	private CtcRadio ctcRadio;
 	
+	private static int MAX_AUTHORITY = 3000; // m
+	
 	public MboController(String ln)
 	{
 		lineName = ln;
@@ -109,11 +111,9 @@ public class MboController implements Updateable
 				}
 			}
 			
-			System.out.printf("Block 57 next: %d%n", line[57].getNext());
-			
 			for (int switchID : switchIDs)
 			{
-				System.out.printf("Trying to load switch %d%n", switchID);
+				// System.out.printf("Trying to load switch %d%n", switchID);
 				int[] otherSwitchBlocks = trackModel.getBranchesOfSwitch(lineName, switchID);
 				int[] switchBlocks = new int[3];
 				boolean[] switchNext = {false, false, false};
@@ -127,12 +127,12 @@ public class MboController implements Updateable
 				SwitchTracker st = new SwitchTracker(switchID, switchBlocks, switchNext);
 				switches.add(st);
 				
-				
-				System.out.printf("Switch on block: %d%n", switchID);
-				int block = st.getBlocks()[1];
-				System.out.printf("First other block: %d, nextBlock is switch: %s%n", block, st.nextIsSwitch(block));
-				block = st.getBlocks()[2];
-				System.out.printf("First other block: %d, nextBlock is switch: %s%n", block, st.nextIsSwitch(block));
+//				
+//				System.out.printf("Switch on block: %d%n", switchID);
+//				int block = st.getBlocks()[1];
+//				System.out.printf("First other block: %d, nextBlock is switch: %s%n", block, st.nextIsSwitch(block));
+//				block = st.getBlocks()[2];
+//				System.out.printf("First other block: %d, nextBlock is switch: %s%n", block, st.nextIsSwitch(block));
 			}
 		}
 	}
@@ -247,8 +247,11 @@ public class MboController implements Updateable
 		ArrayList<TrainTracker> trainTrains = new ArrayList<>();
 		for (int i = 0; i < trains.size(); i++)
 		{
-			trainBlocks.add(trains.get(i).getBlock());
-			trainTrains.add(trains.get(i));
+			if (trains.get(i) != train)
+			{
+				trainBlocks.add(trains.get(i).getBlock());
+				trainTrains.add(trains.get(i));
+			}
 		}
 		
 		// Start with negative authority since loop takes current block into account
@@ -290,6 +293,8 @@ public class MboController implements Updateable
 			curBlock = line[curBlock.getNext()];
 		}
 		
+		if (authority > MAX_AUTHORITY)
+			return MAX_AUTHORITY;
 		return authority;
 	}
 	
