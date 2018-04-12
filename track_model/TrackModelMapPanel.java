@@ -115,7 +115,7 @@ public class TrackModelMapPanel extends JPanel {
 		plopBackground(g);
 		plopStations(g);
 		plopCrossings(g);
-//		plopSwitches(g);
+		plopSwitches(g);
 		plopTrack(g);
 //		plopBeacons(g);
 		plopTrains(g);
@@ -183,7 +183,7 @@ public class TrackModelMapPanel extends JPanel {
 				double yTemp = yStart;
 				if (tb.switchDirection > 0) {
 					xTemp = xBound + (tb.end.longitude() - minLon) * lonMultiplier;
-					yStart = yBound - (tb.end.latitude() - minLat) * latMultiplier;
+					yTemp = yBound - (tb.end.latitude() - minLat) * latMultiplier;
 				}
 				xEnd = xBound + (yard.end.longitude() - minLon) * lonMultiplier;
 				yEnd = yBound - (yard.end.latitude() - minLat) * latMultiplier;

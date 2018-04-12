@@ -291,7 +291,9 @@ public class TestFrame extends javax.swing.JFrame {
 	private void populateDropdown() {
 		ArrayList<String> blockList = new ArrayList<>();
 		for (TrackBlock tb : tm.blocks) {
-			blockList.add("Line: " + tb.line + ", Section: " + tb.section + ", Block: " + tb.block);
+			if (tb.block != 0) {
+				blockList.add("Line: " + tb.line + ", Section: " + tb.section + ", Block: " + tb.block);
+			}
 		}
 		jComboBox1.setModel(new DefaultComboBoxModel(blockList.toArray()));
 
