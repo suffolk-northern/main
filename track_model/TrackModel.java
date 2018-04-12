@@ -360,7 +360,6 @@ public class TrackModel implements Updateable {
 					TrackBlock switchBlock = tbs.get(j);
 					if (newSwitch.switchBlockId == switchBlock.block
 							&& newSwitch.line.equalsIgnoreCase(switchBlock.line)) {
-						System.out.println(switchBlock.block);
 						if (switchBlock.block == 0) {
 							switchBlock.prevBlockId = newSwitch.block;
 						} else {
