@@ -10,6 +10,7 @@ import train_model.DoorLocation;
 import updater.Updateable;
 
 
+
 public class TrainController implements Updateable
 {
 
@@ -224,7 +225,11 @@ public class TrainController implements Updateable
 
 		// Set desired speed
 		if(manualMode)
+                {
 			setSpeed = (double)driverSetSpeed * 0.44704;	// mph -> mps
+                        if(setSpeed > speedCMD)
+                            setSpeed = speedCMD;
+                }
 		else
 			setSpeed = speedCMD;
 
