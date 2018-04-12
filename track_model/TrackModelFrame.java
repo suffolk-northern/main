@@ -39,6 +39,8 @@ public class TrackModelFrame extends javax.swing.JFrame {
 	private final TrackModel tm;
 	// Map frame.
 	private TrackModelMapFrame tmmf;
+	// Murph frame.
+	private MurphFrame mf;
 
 	// TableModels used for displaying data.
 	private TrackModelTableModel blockTableModel = TrackModelTableModel.getBlockTableModel();
@@ -238,7 +240,9 @@ public class TrackModelFrame extends javax.swing.JFrame {
 	 * @param evt
 	 */
     private void murphButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_murphButtonActionPerformed
-		MurphFrame mf = new MurphFrame(tm.blocks, dbHelper);
+		if (mf == null) {
+			mf = new MurphFrame(tm.blocks, dbHelper);
+		}
 		mf.setLocationRelativeTo(this);
 		mf.setVisible(true);
     }//GEN-LAST:event_murphButtonActionPerformed
@@ -258,7 +262,9 @@ public class TrackModelFrame extends javax.swing.JFrame {
 	 * @param evt
 	 */
     private void mapButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mapButtonActionPerformed
-		tmmf = new TrackModelMapFrame(tm);
+		if (tmmf == null) {
+			tmmf = new TrackModelMapFrame(tm);
+		}
 		tmmf.setVisible(true);
     }//GEN-LAST:event_mapButtonActionPerformed
 
