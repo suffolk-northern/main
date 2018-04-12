@@ -240,7 +240,7 @@ public class PointMass
 			block = next;
 		}
 		else if (nextIsSwitch
-		         && next.getSwitchBlockId() == block.getBlock())
+		         && next.getSwitchPosition() == block.getBlock())
 		{
 			// move onto switch from left or right branch
 			//
@@ -261,7 +261,7 @@ public class PointMass
 		{
 			// move onto left or right branch
 
-			block = track.getBlock(LINE, block.getSwitchBlockId());
+			block = track.getBlock(LINE, block.getSwitchPosition());
 		}
 		else if (isSwitch && !fromCommon)
 		{
