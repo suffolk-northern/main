@@ -19,7 +19,7 @@ public class StationTable extends TrackModelTable {
 				try {
 					super.getTableCellRendererComponent(table, value, false, hasFocus, row, col);
 				} catch (Throwable t) {
-					System.out.println("StationTable error.");
+//					System.out.println("StationTable error.");
 				}
 				return this;
 			}

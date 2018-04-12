@@ -41,7 +41,7 @@ public class SwitchTable extends TrackModelTable {
 						setForeground(Color.BLACK);
 					}
 				} catch (Throwable t) {
-					System.out.println("SwitchTable error.");
+//					System.out.println("SwitchTable error.");
 				}
 				return this;
 			}

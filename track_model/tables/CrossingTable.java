@@ -32,7 +32,7 @@ public class CrossingTable extends TrackModelTable {
 						setForeground(table.getForeground());
 					}
 				} catch (Throwable t) {
-					System.out.println("CrossingTable error.");
+//					System.out.println("CrossingTable error.");
 				}
 				return this;
 			}

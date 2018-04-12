@@ -50,7 +50,7 @@ public class BlockTable extends TrackModelTable {
 						super.getTableCellRendererComponent(table, s, false, hasFocus, row, col);
 					}
 				} catch (Throwable t) {
-					System.out.println("BlockTable error.");
+//					System.out.println("BlockTable error.");
 				}
 				return this;
 			}
