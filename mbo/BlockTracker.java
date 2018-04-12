@@ -11,10 +11,8 @@ package mbo;
  */
 public class BlockTracker {
 	private int ID;
-	private int nextBlockID; 
-	private int prevBlockID; 
-	private boolean prevOpen;
-	private boolean nextOpen;
+	private int nextBlockID; // -1 if there is no next block
+	private int prevBlockID; // -1 if there is no previous block
 	private double length;
 	private int speedLimit;
 	private char section;
@@ -25,8 +23,6 @@ public class BlockTracker {
 		ID = id;
 		nextBlockID = nextId;
 		prevBlockID = prevId;
-		prevOpen = true;
-		nextOpen = true;
 		length = len;
 		speedLimit = limit;
 		section = sec;
@@ -39,19 +35,13 @@ public class BlockTracker {
 	}
 	
 	public int getNext()
-	{	
-		if (nextOpen)
-			return nextBlockID;
-		else
-			return -1;
+	{
+		return nextBlockID;
 	}
 	
 	public int getPrev()
 	{
-		if (prevOpen)
-			return prevBlockID;
-		else
-			return -1;
+		return prevBlockID;
 	}
 	
 	public double getLength()
@@ -74,14 +64,14 @@ public class BlockTracker {
 		return station;
 	}
 	
-	public void setNextBlockOpen(boolean isOpen)
+	public void setNext(int nextId)
 	{
-		nextOpen = isOpen;
+		nextBlockID = nextId;
 	}
 
-	public void setPrevBlockOpen(boolean isOpen)
+	public void setPrev(int prevId)
 	{
-		prevOpen = isOpen;
+		prevBlockID = prevId;
 	}
 	
 }
