@@ -16,7 +16,11 @@ public class StationTable extends TrackModelTable {
 			@Override
 			public Component getTableCellRendererComponent(JTable table,
 					Object value, boolean isSelected, boolean hasFocus, int row, int col) {
-				super.getTableCellRendererComponent(table, value, false, hasFocus, row, col);
+				try {
+					super.getTableCellRendererComponent(table, value, false, hasFocus, row, col);
+				} catch (Throwable t) {
+					System.out.println("StationTable error.");
+				}
 				return this;
 			}
 		});

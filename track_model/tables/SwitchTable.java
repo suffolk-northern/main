@@ -19,24 +19,34 @@ public class SwitchTable extends TrackModelTable {
 			@Override
 			public Component getTableCellRendererComponent(JTable table,
 					Object value, boolean isSelected, boolean hasFocus, int row, int col) {
-				super.getTableCellRendererComponent(table, value, false, hasFocus, row, col);
-				int straight = (table.getModel().getValueAt(row, 4)) instanceof Integer ? (int) table.getModel().getValueAt(row, 4) : 0;
-				int current = (table.getModel().getValueAt(row, 6)) instanceof Integer ? (int) table.getModel().getValueAt(row, 6) : 0;
-				
-				if (straight == current && col == 4) {
-					setBackground(DARK_GREEN);
-					setForeground(Color.WHITE);
-				} else if (straight != current && col == 5) {
-					setBackground(DARK_GREEN);
-					setForeground(Color.WHITE);
-				} else {
-					setBackground(Color.WHITE);
-					setForeground(Color.BLACK);
-				}
+				try {
+					super.getTableCellRendererComponent(table, value, false, hasFocus, row, col);
+					int straight = (table.getModel().getValueAt(row, 4)) instanceof Integer ? (int) table.getModel().getValueAt(row, 4) : 0;
+					int current = (table.getModel().getValueAt(row, 6)) instanceof Integer ? (int) table.getModel().getValueAt(row, 6) : 0;
 
+					if (straight == current && col == 4) {
+						setBackground(DARK_GREEN);
+						setForeground(Color.WHITE);
+					} else if (straight != current && col == 4) {
+						setBackground(Color.RED);
+						setForeground(Color.WHITE);
+					} else if (straight != current && col == 5) {
+						setBackground(DARK_GREEN);
+						setForeground(Color.WHITE);
+					} else if (straight == current && col == 5) {
+						setBackground(Color.RED);
+						setForeground(Color.WHITE);
+					} else {
+						setBackground(Color.WHITE);
+						setForeground(Color.BLACK);
+					}
+				} catch (Throwable t) {
+					System.out.println("SwitchTable error.");
+				}
 				return this;
 			}
-		});
+		}
+		);
 	}
 
 }
