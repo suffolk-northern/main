@@ -122,7 +122,7 @@ public class Ctc implements Updateable{
 		}
 		
 		clock.advance(time);
-		String clockDisp = clock.time().getHours() + ":" + clock.time().getMinutes();
+		String clockDisp = String.format("%02d", clock.time().getHours()) + ":" + String.format("%02d",clock.time().getMinutes());
 		ui.updateClock(clockDisp);
 		
 		updateTrack();
