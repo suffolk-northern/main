@@ -269,8 +269,8 @@ public class Ctc implements Updateable{
 				System.out.print(blk.switchDir);
 			System.out.println();
 		}
-		*/
 		
+		*/
 		
 	}
 	
@@ -814,7 +814,7 @@ public class Ctc implements Updateable{
 				return auth;
 			} // check switches are in correct position
 			else if (block.hasSwitch()) {
-				if (isForwardSwitch(block) && temp.peek() != null && (!block.getSwitchCurrTo().equals(temp.peek()))) 
+				if (isForwardSwitch(block) && temp.peek() != null && block.sw_to.contains(temp.peek()) && (!block.getSwitchCurrTo().equals(temp.peek()))) 
 				{
 					auth += block.length;
 					success = false;
@@ -836,12 +836,45 @@ public class Ctc implements Updateable{
 					if(!success)
 						return auth;
 				} 
-				else if (isBackwardSwitch(block) && prev != null && !block.getSwitchCurrFrom().equals(prev)) 
+				else if(isForwardSwitch(block) && prev != null && block.sw_to.contains(prev) && (!block.getSwitchCurrTo().equals(prev)))
 				{
 					success = false;
 					
 					if(flipped)
+					{
 						return auth;
+					}
+					
+					// check if it is safe to flip switch
+					if(block.sw_to.peekFirst().occupied == false && block.sw_to.peekLast().occupied == false)
+					{
+						success = getFlip(block);
+						if(success)
+						{
+							updateTrack();
+							flipped = true;
+						}
+					}
+
+					if(!success)
+					{	
+						if(!prev.equals(route.peekFirst()))
+							auth -= prev.length;
+						
+						return auth;
+					}
+					
+					auth += block.length;
+				}
+				else if (isBackwardSwitch(block) && prev != null && block.sw_from.contains(prev) && !block.getSwitchCurrFrom().equals(prev)) 
+				{
+					success = false;
+					
+					if(flipped)
+					{
+						return auth;
+					}
+					
 					
 					// check if it is safe to flip switch
 					if(block.sw_from.peekFirst().occupied == false && block.sw_from.peekLast().occupied == false)
@@ -864,6 +897,33 @@ public class Ctc implements Updateable{
 					
 					auth += block.length;
 				} 
+				else if (isBackwardSwitch(block) && temp.peek() != null && block.sw_from.contains(temp.peek()) && !block.getSwitchCurrFrom().equals(temp.peek())) 
+				{
+					auth += block.length;
+					success = false;
+					
+					if(flipped)
+						return auth;
+					
+					// check if it is safe to flip switch
+					if(block.sw_from.peekFirst().occupied == false && block.sw_from.peekLast().occupied == false)
+					{
+						success = getFlip(block);
+						if(success)
+						{
+							updateTrack();
+							flipped = true;
+						}
+					}
+					
+					if(!success)
+					{	
+						if(!prev.equals(route.peekFirst()))
+							auth -= prev.length;
+						
+						return auth;
+					}
+				}
 				else 
 				{
 					auth += block.length;
@@ -1453,6 +1513,9 @@ public class Ctc implements Updateable{
 		
 		String msg = speed + " " + auth;
 		//System.out.println(train.ID + " at " + train.location.display() + ": " + msg);
+		
+		if(auth < 0)
+			auth = 0;
 		
 		TrackMovementCommand tmc = new TrackMovementCommand((int)speed,(int)auth);
 		
