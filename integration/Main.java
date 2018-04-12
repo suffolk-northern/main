@@ -40,10 +40,8 @@ public class Main
 	// FIXME: see imports and initialize()
 	private static Ctc ctc;
 	private static TrackModel trackModel;
-
-	// temporary single references for initial integration
-	private static TrainModel singleTrainModel;
-	private static TrainController singleTrainController;
+	private static TrainModel[] trainModels;
+	private static TrainController[] trainControllers;
 	private static MboController mboController;
 
 	public static void main(String[] args)
@@ -87,20 +85,15 @@ public class Main
 
 		final int numberOfTrains = 3;
 
-		TrainController[] trainControllers =
-			new TrainController[numberOfTrains];
+		trainControllers = new TrainController[numberOfTrains];
 
-		TrainModel[] trainModels =
-			new TrainModel[numberOfTrains];
+		trainModels = new TrainModel[numberOfTrains];
 
 		for (int i = 0; i < numberOfTrains; ++i)
 		{
 			trainControllers[i] = new TrainController();
 			trainModels[i] = new TrainModel(i, trackModel);
 		}
-
-		singleTrainController = trainControllers[0];
-		singleTrainModel = trainModels[0];
 
 		ArrayList<Updateable> trainObjects =
 			new ArrayList<Updateable>();
@@ -169,8 +162,8 @@ public class Main
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				new UI(ctc, trackModel,
-				       singleTrainModel,
-				       singleTrainController)
+				       trainModels,
+				       trainControllers)
 				          .setVisible(true);
 			}
 		});
