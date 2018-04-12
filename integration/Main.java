@@ -135,6 +135,7 @@ public class Main
 		
 		// Track Model <---> MBO
 		mboCont.initLine();
+		mboCont.registerTrackModel(trackModel);
 		// mboSched.initLine();
 
 		// train model <---> MBO
@@ -188,6 +189,8 @@ public class Main
 			simulationUpdatePeriod,
 			updateables.toArray(new Updateable[0])
 		);
+		
+		ctc.setUpdater(simulationUpdatePeriod, updater);
 
 		updater.scheduleAtFixedRate(wallUpdatePeriod);
 	}

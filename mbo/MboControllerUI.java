@@ -13,6 +13,7 @@ package mbo;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.TableModel;
+import java.util.ArrayList;
 
 /**
  *
@@ -24,33 +25,44 @@ public class MboControllerUI extends JFrame
 	private JPanel mainPanel;
 	private JScrollPane trainPanel;
 	private JTable trainTable;
-	private JLabel lineName;
+	private JLabel titleLabel;
 	
 	private int numTrains;
+	private String lineName;
+	ArrayList<Integer> trainIDs;
 	private String[] tableHeader;
 	private Object[][] tableContents;
 	
-	public MboControllerUI()
+	public MboControllerUI(String ln)
 	{
+		lineName = ln;
+		trainIDs = new ArrayList<>();
+		
 		frame = new JFrame("MBOController");
 		frame.setLayout(null);
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		frame.setSize(1500, 1500);
-		mainPanel = new JPanel();
-		mainPanel.setLayout(null);
+		// frame.setSize(1500, 1500);
+		Container mainPanel = frame.getContentPane();
+		mainPanel.setLayout(new GridBagLayout());
 		trainPanel = new JScrollPane();
-		trainPanel.setPreferredSize(new Dimension(750, 750));
 		trainTable = new JTable();
-		lineName = new JLabel();
+		titleLabel = new JLabel();
 		
-		lineName.setText("Blue Line");
-		lineName.setPreferredSize(new Dimension(200, 100));
+		GridBagConstraints c = new GridBagConstraints();
 		
-		mainPanel.add(lineName, BorderLayout.NORTH);
-		mainPanel.add(trainPanel, BorderLayout.CENTER);
+		titleLabel.setFont(new Font("Tahoma", 0, 18));
+		titleLabel.setText(String.format("%s Line", lineName));
+		c.gridx = 0;
+		c.gridy = 0;
+		mainPanel.add(titleLabel, c);
+		
+		c.gridx = 0;
+		c.gridy = 1;
+		mainPanel.add(trainPanel, c);
 		trainPanel.setViewportView(trainTable);
 		
 		tableHeader = new String[] {"Train ID", "Section", "Block", "Location (yards)", "Authority (yards)", "Suggested speed (mph)"};
+		// TODO: extend to extra rows once we start routing lots of trains
 		tableContents = new Object[][]
 		{
 			{null, null, null, null, null, null},
@@ -60,69 +72,88 @@ public class MboControllerUI extends JFrame
 		};
 		trainTable.setModel(new javax.swing.table.DefaultTableModel(tableContents, tableHeader)
 		{
-		   boolean[] canEdit = new boolean[] {false, false, false, false, false, false};
-
 		   public boolean isCellEditable(int rowIndex, int columnIndex) 
 		   {
-			   return canEdit [columnIndex];
+			   return false;
 		   }
 		}
 		);
+
+		int width = 600;
+		trainTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		trainTable.getColumnModel().getColumn(0).setPreferredWidth(width / 10);
+		trainTable.getColumnModel().getColumn(1).setPreferredWidth(width / 10);
+		trainTable.getColumnModel().getColumn(2).setPreferredWidth(width / 10);
+		trainTable.getColumnModel().getColumn(3).setPreferredWidth(width / 5);
+		trainTable.getColumnModel().getColumn(4).setPreferredWidth(width / 5);
+		trainTable.getColumnModel().getColumn(5).setPreferredWidth(3*width / 10);
 		
-		trainTable.getColumn(0).setPreferredWidth(50);
-		trainTable.getColumn(1).setPreferredWidth(50);
-		trainTable.getColumn(2).setPreferredWidth(50);
-		trainTable.getColumn(3).setPreferredWidth(50);
-		trainTable.getColumn(4).setPreferredWidth(50);
-		trainTable.getColumn(5).setPreferredWidth(50);
-		
-		frame.add(mainPanel);
-		mainPanel.setPreferredSize(new Dimension(1000, 1000));
+		trainPanel.setPreferredSize(new Dimension(width, 200));
         frame.pack();
         frame.setVisible(true);
 		
 		numTrains = 0;
 	}
 	
-	public void addTrain(int trainID, char section, int blockID, int location, int authority, int speed)
+	public void addTrain(int trainID, char section, int block, int location, int authority, int speed)
 	{
-		TableModel model = trainTable.getModel();
-		model.setValueAt(trainID, numTrains, 0);
-		model.setValueAt(section, numTrains, 1);
-		model.setValueAt(blockID, numTrains, 2);
-		model.setValueAt(location, numTrains, 3);
-		model.setValueAt(authority, numTrains, 4);
-		model.setValueAt(speed, numTrains, 5);
-//		double lat = train.location().latitude();
-//		double lon = train.location().longitude();
-//		String locString = String.format("%f, %f", lat, lon);
-//		model.setValueAt(locString, numTrains, 1);
+		for (int tID : trainIDs)
+		{
+			if (tID == trainID)
+				return;
+		}
+		trainIDs.add(trainID);
+		int row = trainIDs.indexOf(trainID);
+		// System.out.printf("Adding train %d to row %d%n", trainID, row);
+		updateRow(row, trainID, section, block, location, authority, speed);
 		numTrains += 1;
 	}
 	
 	public void updateTrain(int trainID, char section, int block, int location, int authority, int speed)
 	{
-		TableModel model = trainTable.getModel();
-		int trainRow = 0;
-		for (int i = 0; i < numTrains; i++)
+		int row = trainIDs.indexOf(trainID);
+		// System.out.printf("Updatating train %d in row %d%n", trainID, row);
+		if (row == -1)
 		{
-			if(trainID == (int) trainTable.getValueAt(i, 0))
-				trainRow = i;
+			addTrain(trainID, section, block, location, authority, speed);
+			row = trainIDs.indexOf(trainID);
 		}
 		
-		model.setValueAt(section, trainRow, 1);
-		model.setValueAt(block, trainRow, 2);
-		model.setValueAt(location, trainRow, 3);
-		model.setValueAt(authority, trainRow, 4);
-		model.setValueAt(speed, trainRow, 5);
+		updateRow(row, trainID, section, block, location, authority, speed);
 	}
 	
 	public void removeTrain(int trainID)
 	{
-		// TODO: implement this
+		int row = trainIDs.indexOf(trainID);
+		// System.out.printf("Removing train %d from row %d%n", trainID, row);
+		clearRow(row);
+		trainIDs.remove(row);
+	}
+	
+	private void updateRow(int row, int trainID, char section, int block, int location, int authority, int speed)
+	{
+		TableModel model = trainTable.getModel();
+		model.setValueAt(trainID, row, 0);
+		model.setValueAt(section, row, 1);
+		model.setValueAt(block, row, 2);
+		model.setValueAt(location, row, 3);
+		model.setValueAt(authority, row, 4);
+		model.setValueAt(speed, row, 5);
+	}
+	
+	private void clearRow(int row)
+	{
+		TableModel model = trainTable.getModel();
+		model.setValueAt(null, row, 0);
+		model.setValueAt(null, row, 1);
+		model.setValueAt(null, row, 2);
+		model.setValueAt(null, row, 3);
+		model.setValueAt(null, row, 4);
+		model.setValueAt(null, row, 5);		
 	}
 		
-	public static void main(String args[]) {
+	public static void main(String args[]) 
+	{
 		/* Set the Nimbus look and feel */
 		//<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
 		/* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -149,7 +180,7 @@ public class MboControllerUI extends JFrame
 		/* Create and display the form */
 		java.awt.EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				new MboControllerUI().setVisible(true);
+				new MboControllerUI("Blue");
 			}
 		});
 	}

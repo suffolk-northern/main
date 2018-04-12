@@ -17,6 +17,7 @@ import track_model.TrackModel;
 import track_model.TrackBlock;
 import track_model.Station;
 import train_model.communication.TrackMovementCommand;
+import updater.*;
 import mbo.CtcRadio;
 
 /**
@@ -44,6 +45,9 @@ public class Ctc implements Updateable{
 	
 	public static ArrayDeque<Train> dispatched = new ArrayDeque<Train>();
 
+	public static Updater updater;
+	public static int period;
+	
 	public static double through = 0;
 
 	public static void showUI() {
@@ -214,6 +218,17 @@ public class Ctc implements Updateable{
 	 */
 	//public static void main(String[] args)
 	
+	public void setUpdater(int per, Updater u)
+	{
+		period = per;
+		updater = u;
+	}
+	
+	protected void changeSpeedUp(int speedup)
+	{
+		updater.scheduleAtFixedRate(period / speedup);
+	}
+	
 	public void setTrackModel(TrackModel tm)
 	{
 		this.trackmodel = tm;
@@ -328,6 +343,7 @@ public class Ctc implements Updateable{
 					blk.setSwitch(bl.getSwitchDirection(), blockf.clone(), blockt.clone());
 					blk.prev = getBlock(line,bl.getPrevBlockId());
 					
+					
 				}
 				// prev block aka backward switch
 				else
@@ -344,6 +360,17 @@ public class Ctc implements Updateable{
 					
 					blk.setSwitch(bl.getSwitchDirection(), blockf.clone(), blockt.clone());
 					blk.next = getBlock(line,bl.getNextBlockId());
+					
+					blk.sw_curr_to = blk;
+					
+					if(from.equals(getBlock(from.line,bl.getSwitchPosition())))
+					{
+						blk.sw_curr_from = from;
+					}
+					else if(extra.equals(getBlock(from.line,bl.getSwitchPosition())))
+					{
+						blk.sw_curr_from = extra;						
+					}
 				}
 			}
 			else
@@ -423,6 +450,17 @@ public class Ctc implements Updateable{
 					blk.setSwitch(bl.getSwitchDirection(), blockf.clone(), blockt.clone());
 					blk.prev = getBlock(line,bl.getPrevBlockId());
 					
+					blk.sw_curr_from = blk;
+					
+					if(to.equals(getBlock(to.line,bl.getSwitchPosition())))
+					{
+						blk.sw_curr_to = to;
+					}
+					else if(extra.equals(getBlock(to.line,bl.getSwitchPosition())))
+					{
+						blk.sw_curr_to = extra;						
+					}
+					
 				}
 				// prev block aka backward switch
 				else
@@ -439,6 +477,17 @@ public class Ctc implements Updateable{
 					
 					blk.setSwitch(bl.getSwitchDirection(), blockf.clone(), blockt.clone());
 					blk.next = getBlock(line,bl.getNextBlockId());
+					
+					blk.sw_curr_to = blk;
+					
+					if(from.equals(getBlock(from.line,bl.getSwitchPosition())))
+					{
+						blk.sw_curr_from = from;
+					}
+					else if(extra.equals(getBlock(from.line,bl.getSwitchPosition())))
+					{
+						blk.sw_curr_from = extra;						
+					}
 				}
 			}
 			else
@@ -722,6 +771,9 @@ public class Ctc implements Updateable{
 		double auth = 0;
 		boolean flipped = false;
 
+		if(route.isEmpty())
+			return auth;
+		
 		ArrayDeque<Block> temp = route.clone();
 		Block block = temp.poll();
 		Block prev = null;
@@ -917,7 +969,9 @@ public class Ctc implements Updateable{
 
 			rows[count][5] = "";
 			
-			if(block.broken)
+			if(block.closed)
+				rows[count][6] = "Closed";
+			else if(block.broken)
 				rows[count][6] = "Broken";
 			else
 				rows[count][6] = "";
@@ -1007,7 +1061,9 @@ public class Ctc implements Updateable{
 		Block desired = getFirstSwitch(closest.route).peekLast();
 		if((isForwardSwitch(swblock) && !swblock.sw_curr_to.equals(desired)) || (isBackwardSwitch(swblock) && !swblock.sw_curr_from.equals(desired)))
 		{
+			//System.out.println("Old switch pos: " + trackmodel.getBlock(swblock.line,swblock.num).getSwitchPosition());
 			flipped = trackmodel.flipSwitch(swblock.line,swblock.num);
+			//System.out.println("New switch pos: " + trackmodel.getBlock(swblock.line,swblock.num).getSwitchPosition());
 		}
 		
 		return flipped;
@@ -1219,7 +1275,7 @@ public class Ctc implements Updateable{
 			}
 		}
 
-		System.out.println("null");
+		//System.out.println("null");
 		return null;
 	}
 
@@ -1313,6 +1369,25 @@ public class Ctc implements Updateable{
 		}
 		
 		return MBOswitches;
+	}
+	
+	protected static void blockMaintenance(String line, String block, boolean close)
+	{
+		if(block.equalsIgnoreCase("YARD"))
+			return;
+		
+		Block bl = getBlock(line,Integer.parseInt(block.substring(1)));
+		
+		trackmodel.setMaintenance(line,Integer.parseInt(block.substring(1)),close);
+		if(!close)
+		{
+			bl.broken = false;
+			bl.closed = false;
+		}
+		else
+		{
+			bl.closed = true;
+		}
 	}
 
 	private static void loadSched() {
@@ -1519,6 +1594,7 @@ public class Ctc implements Updateable{
 		}
 
 		/*
+		System.out.println();
 		ArrayDeque<Block> rtemp = route.clone();
 		while(!rtemp.isEmpty())
 			System.out.print(rtemp.poll().display() + " ");
@@ -1912,6 +1988,7 @@ public class Ctc implements Updateable{
 		private boolean rrxing_status;
 		private boolean signal;
 		private boolean broken;
+		private boolean closed;
 		private Block sw_curr_from;
 		private Block sw_curr_to;
 		private boolean hasStation;
@@ -1941,6 +2018,7 @@ public class Ctc implements Updateable{
 			sw_curr_to = null;
 			hasStation = false;
 			station = "";
+			closed = false;
 		}
 
 		public Block(String l, boolean isYard) {
@@ -1964,6 +2042,7 @@ public class Ctc implements Updateable{
 			sw_curr_to = null;
 			hasStation = false;
 			station = "";
+			closed = false;
 		}
 
 		public Block(String l, char sec, int n, double len, int nextdir, int prevdir, Block nextb, Block prevb, boolean rr) {
@@ -1993,6 +2072,7 @@ public class Ctc implements Updateable{
 			station = "";
 			nextBlockDir = nextdir;
 			prevBlockDir = prevdir;
+			closed = false;
 		}
 
 		public Block(String l, char sec, int n, double len, int nextdir, int prevdir, Block nextb, Block prevb, boolean rr, int swID, int swdir, ArrayDeque<Block> swf, ArrayDeque<Block> swt, Block currf, Block currt) {
@@ -2023,6 +2103,7 @@ public class Ctc implements Updateable{
 			nextBlockDir = nextdir;
 			prevBlockDir = prevdir;
 			switchDir = swdir;
+			closed = false;
 		}
 
 		public Block(String l, char sec, int n, double len, int nextdir, int prevdir, Block nextb, Block prevb, boolean rr, boolean stat, String statID) {
@@ -2052,6 +2133,7 @@ public class Ctc implements Updateable{
 			station = statID;
 			nextBlockDir = nextdir;
 			prevBlockDir = prevdir;
+			closed = false;
 		}
 
 		private boolean isOccupied() {
