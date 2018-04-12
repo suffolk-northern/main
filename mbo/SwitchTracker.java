@@ -57,4 +57,16 @@ public class SwitchTracker {
 				connected[i] = isConnected;
 		}
 	}
+	
+	public void printInfo()
+	{
+		System.out.printf("Info for switch at block %d:%n", blockID);
+		for (int i = 0; i < blocks.length; i++)
+		{
+			if (connected[i])
+				System.out.printf("Block %d is connected%n", blocks[i]);
+			else
+				System.out.printf("Block %d is not connected%n", blocks[i]);
+		}
+	}
 }
