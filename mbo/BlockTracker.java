@@ -11,8 +11,8 @@ package mbo;
  */
 public class BlockTracker {
 	private int ID;
-	private int nextBlockID; // -1 if there is no next block
-	private int prevBlockID; // -1 if there is no previous block
+	private int nextBlockID; 
+	private int prevBlockID; 
 	private double length;
 	private int speedLimit;
 	private char section;
@@ -35,7 +35,7 @@ public class BlockTracker {
 	}
 	
 	public int getNext()
-	{
+	{	
 		return nextBlockID;
 	}
 	
@@ -64,14 +64,14 @@ public class BlockTracker {
 		return station;
 	}
 	
-	public void setNext(int nextId)
+	public void setNextBlock(int nextBlock)
 	{
-		nextBlockID = nextId;
+		nextBlockID = nextBlock;
 	}
 
-	public void setPrev(int prevId)
+	public void setPrevBlock(int prevBlock)
 	{
-		prevBlockID = prevId;
+		prevBlockID = prevBlock;
 	}
 	
 }
