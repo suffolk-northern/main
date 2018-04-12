@@ -19,9 +19,6 @@ public class TrainTracker
 	int authority;
 	int suggestedSpeed;
 	MboRadio radio;
-	boolean goingForward;
-	GlobalCoordinates lastPosition;
-	GlobalCoordinates currentPosition;
 	
 	public TrainTracker(int newID, BlockTracker newBlock, MboRadio newRadio)
 	{
@@ -30,9 +27,6 @@ public class TrainTracker
 		authority = 0;
 		suggestedSpeed = 0;
 		radio = newRadio;
-		goingForward = true;
-		lastPosition = GlobalCoordinates.ORIGIN;
-		currentPosition = GlobalCoordinates.ORIGIN;
 	}
 	
 	public void setAuthority(int newAuthority)
@@ -48,21 +42,6 @@ public class TrainTracker
 	public void setBlock(BlockTracker newBlock)
 	{
 		block = newBlock;
-	}
-	
-	public void setGoingForward(boolean direction)
-	{
-		goingForward = direction;
-	}
-	
-	public void setLastPosition(GlobalCoordinates gc)
-	{
-		lastPosition = gc;
-	}
-	
-	public void setCurrentPosition(GlobalCoordinates gc)
-	{
-		currentPosition = gc;
 	}
 	
 	public int getAuthority()
@@ -93,20 +72,5 @@ public class TrainTracker
 	public MboRadio getRadio()
 	{
 		return radio;
-	}
-	
-	public boolean isGoingForward()
-	{
-		return goingForward;
-	}
-	
-	public GlobalCoordinates getLastPosition()
-	{
-		return lastPosition;
-	}
-	
-	public GlobalCoordinates getCurrentPosition()
-	{
-		return currentPosition;
 	}
 }
