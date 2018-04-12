@@ -627,7 +627,11 @@ public class TrainControllerUI extends javax.swing.JFrame {
         double c = controller.getCTCspeed();
         controller.setDriverSpeed(s);
         if(s > c)
-            source.setValue((int)c);
+            if((int)c < c)
+                source.setValue((int)c + 1);
+            else
+                source.setValue((int)c);
+                
     }//GEN-LAST:event_SetSpeedSliderMouseReleased
  
     ActionListener task = new ActionListener() {
