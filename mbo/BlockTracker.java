@@ -17,8 +17,10 @@ public class BlockTracker {
 	private int speedLimit;
 	private char section;
 	private String station;
+	private boolean canGoForward;
+	private boolean canGoBackward;
 	
-	public BlockTracker(int id, int nextId, int prevId, double len, int limit, char sec, String sta)
+	public BlockTracker(int id, int nextId, int prevId, double len, int limit, char sec, String sta, boolean forward, boolean backward)
 	{
 		ID = id;
 		nextBlockID = nextId;
@@ -27,6 +29,8 @@ public class BlockTracker {
 		speedLimit = limit;
 		section = sec;
 		station = sta;
+		canGoForward = forward;
+		canGoBackward = backward;
 	}
 	
 	public int getID()
@@ -62,6 +66,16 @@ public class BlockTracker {
 	public String getStation()
 	{
 		return station;
+	}
+	
+	public boolean canGoForward()
+	{
+		return canGoForward;
+	}
+	
+	public boolean canGoBackward()
+	{
+		return canGoBackward;
 	}
 	
 	public void setNextBlock(int nextBlock)

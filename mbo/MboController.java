@@ -158,8 +158,8 @@ public class MboController implements Updateable
 		}
 		
 		updateSwitches();
-		for (SwitchTracker st : switches)
-			st.printInfo();
+//		for (SwitchTracker st : switches)
+//			st.printInfo();
 //		System.out.println(line[75].getNext());
 
 		if (enabled == true)
