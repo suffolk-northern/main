@@ -119,6 +119,7 @@ public class TrackModelMapPanel extends JPanel {
 		plopTrack(g);
 //		plopBeacons(g);
 		plopTrains(g);
+		printText(g);
 	}
 
 	/**
@@ -306,6 +307,12 @@ public class TrackModelMapPanel extends JPanel {
 			g2.setColor(Color.CYAN);
 			g2.fillOval((int) x, (int) y, 5, 5);
 		}
+	}
+
+	private void printText(Graphics g) {
+		g.setColor(Color.BLACK);
+		g.setFont(new Font("default", Font.BOLD, yDimension / 55));
+		g.drawString("Temperature: " + (int) tm.temperature + "\u00b0F", 20, yDimension - 50);
 	}
 
 	/**
