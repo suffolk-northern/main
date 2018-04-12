@@ -621,6 +621,14 @@ public class Ctc implements Updateable{
 		}
 	}
 	
+	public static void openSchedule(String line)
+	{
+		if(line.equalsIgnoreCase("green"))
+			greenradio.showScheduler();
+		else
+			redradio.showScheduler();
+	}
+	
 	public static void autoMode(String line)
 	{
 		if(line.equalsIgnoreCase("green"))
