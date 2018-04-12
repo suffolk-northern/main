@@ -993,10 +993,20 @@ public class TrackModel implements Updateable {
 						setOccupancy(td.trackBlock.line, td.trackBlock.block, false);
 					}
 					td.trackBlock = curBlock;
-					//
-					// Refreshes UI.
-					//
 				}
+				//
+				// Sends train back to yard
+				//
+				if (td.trackBlock.block == getBlock(td.trackBlock.line, 0).getPrevBlockId()) {
+					if (td.trackBlock.isSwitch && td.trackBlock.switchPosition == 0) {
+						if (getDistanceAlongBlock(td.trackBlock.line, td.trackBlock.block, td.trainModel.location()) > td.trackBlock.length - 5) {
+							td.trainModel.slew(new Pose(getYardBlock(td.trackBlock.line).start, GREEN_LINE_ORIENTATION));
+						}
+					}
+				}
+				//
+				// Refreshes UI.
+				//
 				if (tmf != null) {
 					tmf.refreshTables();
 				}
