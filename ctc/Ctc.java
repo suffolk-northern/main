@@ -200,9 +200,12 @@ public class Ctc implements Updateable{
 			}
 			else if(!newOcc && isForwardSwitch(block))
 			{
+				System.out.println("not occ and forward sw");
 				 if(block.sw_curr_to.equals(getBlock(block.line,0)))
 				 {
+					 System.out.println("train to yard");
 					 train = getTrain(block);
+					 System.out.println(train.ID);
 					 train.setLoc(getBlock(block.line,0));
 				 }
 			}
