@@ -1345,6 +1345,11 @@ public class Ctc implements Updateable{
 			}
 		}
 	}
+	
+	public static void updatePassenger(int departing, int boarding, int trainID, String station)
+	{
+		
+	}
 
 	private static Train getTrain(Block location) {
 		Train train = null;
