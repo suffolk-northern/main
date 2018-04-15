@@ -19,9 +19,7 @@ import java.awt.EventQueue;
 //
 import ctc.Ctc;
 import java.util.logging.Level;
-import java.util.logging.Logger;
-//import mbo.Mbo;
-import track_controller.TrackController;
+//import java.util.logging.Logger;
 import mbo.MboController;
 import mbo.MboScheduler;
 import mbo.CtcRadio;
@@ -137,7 +135,7 @@ public class Main
 		mboCont.registerTrackModel(trackModel);
 
 		mboCont.initLine();
-		// mboSched.initLine();
+		mboSched.initLine();
 
 		// train model <---> MBO
 		for (TrainModel trainModel : trainModels)
@@ -147,6 +145,7 @@ public class Main
 		CtcRadio ctcRadio = new CtcRadio(mboCont, mboSched, ctc);
 		ctc.setCtcRadios(ctcRadio,null);
 		mboCont.registerCtc(ctcRadio);
+		// ctcRadio.showScheduler();
 
 		//
 		// fill updateables
@@ -155,7 +154,7 @@ public class Main
 		// FIXME: see instantiations above
 		updateables.add(ctc);
 		updateables.add(mboCont);
-		//updateables.add(mboSched);
+		updateables.add(mboSched);
 		updateables.add(trackModel);
 		updateables.add(trainMultiplier);
 	}

@@ -1,6 +1,7 @@
 package mbo;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.sql.Time;
 import java.lang.Math;
 
@@ -26,8 +27,13 @@ public class MboScheduler implements Updateable
 	private int dwellTime = 20; // Seconds
 	private int throughputPerTrain = 50;
 	private int numTrains = 20;
+	private int numDrivers = 20;
 	private int minTimeBetweenDispatch = 5*60; // Seconds
 	private int schedIncrement = 60; // Seconds
+	// TODO: check these times
+	private Time shiftStartToBreakStart = new Time(3, 0, 0);
+	private Time breakStartToBreakEnd = new Time(0, 30, 0);
+	private Time breakEndToShiftEnd = new Time(3, 0, 0);
 	
 	public MboScheduler(String ln)
 	{
@@ -80,7 +86,12 @@ public class MboScheduler implements Updateable
 			Time end = ui.getEndTime();
 			int[] throughput = ui.getThroughput();
 			if (start != null && end != null && throughput != null)
+			{
 				lineSched = makeSchedule(start, end, throughput);
+				ui.setSchedule(lineSched);
+				System.out.println("Got here");
+			}
+			
 		}
 	}
 	
@@ -136,12 +147,16 @@ public class MboScheduler implements Updateable
 				trainsNeeded[i] += 1;
 		}
 		
-		ArrayList<Integer> freeTrains = new ArrayList<>();
+		LinkedList<Integer> freeTrains = new LinkedList<>();
 		for (int i = 1; i <= numTrains; i++)
 			freeTrains.add(i);
+		LinkedList<Driver> freeDrivers = new LinkedList<>();
+		for (int i = 1; i <= numDrivers; i++)
+			freeDrivers.add(new Driver(i));
+		LinkedList<Driver> trainDrivers = new LinkedList<>();
 		
-		ArrayList<Integer> trainArr = new ArrayList<>();
-		ArrayList<Time> trainArrTimes = new ArrayList<>();
+		LinkedList<Integer> trainArr = new LinkedList<>();
+		LinkedList<Time> trainArrTimes = new LinkedList<>();
 		
 		int dispatchedTrains = 0;
 		int lastDispatch = 0;
@@ -151,23 +166,62 @@ public class MboScheduler implements Updateable
 		while (curTime.before(end))
 		{
 			int timeSlot = curTime.getHours() - start.getHours();
-			if (curTime.after(trainArrTimes.get(0)))
+			if (!trainArrTimes.isEmpty() && curTime.after(trainArrTimes.peek()))
 			{
-				trainArrTimes.remove(0);
-				int trainID = trainArr.get(0);
-				trainArr.remove(0);
+				trainArrTimes.poll();
+				int trainID = trainArr.poll();
 				freeTrains.add(trainID);
 				dispatchedTrains -= 1;
+				for (Driver d : trainDrivers)
+				{
+					if (d.getTrain() == trainID)
+					{
+						freeDrivers.add(d);
+						trainDrivers.remove(d);
+					}
+				}
 			}
 			if (dispatchedTrains < trainsNeeded[timeSlot] && lastDispatch >= minTimeBetweenDispatch)
 			{
-				TrainSchedule ts = makeTrainSchedule(curTime, freeTrains.get(0));
+				int useTrain = freeTrains.poll();
+				TrainSchedule ts = makeTrainSchedule(curTime, useTrain);
 				trainScheds.add(ts);
 				lastDispatch = 0;
 				dispatchedTrains += 1;
 				// TODO: add logic for adding to the schedules of repeat trains
-				trainArrTimes.add(new Time(curTime.getTime() + getLoopTime().getTime()));
-				freeTrains.remove(0);
+				Time arrTime = new Time(curTime.getTime() + getLoopTime().getTime());
+				trainArrTimes.add(arrTime);
+				Driver useDriver = null;
+				for (Driver d : freeDrivers)
+				{
+					boolean useThisDriver = false;
+					if (arrTime.before(d.getLunchStart()))
+						useThisDriver = true;
+					else if (curTime.after(d.getLunchEnd()) && arrTime.before(d.getShiftEnd()))
+						useThisDriver = true;
+					else if (arrTime.after(d.getShiftEnd()))
+					{
+						freeDrivers.remove(d);
+					}
+					if (useThisDriver)
+					{
+						d.setTrain(useTrain);
+						if (!d.isTimesInitialized())
+						{
+							Time lunchStarts = new Time(curTime.getTime() + shiftStartToBreakStart.getTime());
+							Time lunchEnds = new Time(lunchStarts.getTime() + breakStartToBreakEnd.getTime());
+							Time shiftEnds = new Time(lunchEnds.getTime() + breakEndToShiftEnd.getTime());
+							d.setTimes(lunchStarts, lunchEnds, shiftEnds);
+						}
+					}
+						
+				}
+				if (useDriver != null)
+				{
+					trainDrivers.add(useDriver);
+					freeDrivers.remove(useDriver);
+				}
+				
 			}
 			curTime = new Time(curTime.getTime() + (long) (schedIncrement * 1000));
 			lastDispatch += schedIncrement;
@@ -175,12 +229,11 @@ public class MboScheduler implements Updateable
 		return trainScheds;
 	}
 	
-	private ArrayList<DriverSchedule> makeDriverSchedules(ArrayList<TrainSchedule> trainScheds)
+	private int assignDriver()
 	{
-		// TODO: implement this
 		
-		return null;
 	}
+
 	
 	public LineSchedule makeSchedule(Time start, Time end, int[] throughput)
 	{

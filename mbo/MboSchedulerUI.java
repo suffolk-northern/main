@@ -68,7 +68,6 @@ public class MboSchedulerUI extends javax.swing.JFrame
         jScrollPane5 = new javax.swing.JScrollPane();
         jTable4 = new javax.swing.JTable();
         jButton12 = new javax.swing.JButton();
-        jButton13 = new javax.swing.JButton();
         jLabel12 = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -272,13 +271,9 @@ public class MboSchedulerUI extends javax.swing.JFrame
         mainPanel.add(jButton12);
         jButton12.setBounds(420, 170, 160, 25);
 
-        jButton13.setText("Open MBO Controller");
-        mainPanel.add(jButton13);
-        jButton13.setBounds(260, 440, 310, 25);
-
         jLabel12.setFont(new java.awt.Font("Tahoma", 0, 24)); 
 		System.out.println(lineName);
-		String titleString = String.format("MBO Overlay: %s Line", lineName);
+		String titleString = String.format("MBO Scheduler: %s Line", lineName);
 		System.out.println(titleString);
         jLabel12.setText(titleString);
         mainPanel.add(jLabel12);
@@ -745,7 +740,6 @@ public class MboSchedulerUI extends javax.swing.JFrame
     private javax.swing.JButton jButton10;
     private javax.swing.JButton jButton11;
     private javax.swing.JButton jButton12;
-    private javax.swing.JButton jButton13;
     private javax.swing.JButton finishedThroughputButton;
     private javax.swing.JButton generateScheduleButton;
     private javax.swing.JButton viewShceduleButton;
