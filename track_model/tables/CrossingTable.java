@@ -17,18 +17,22 @@ public class CrossingTable extends TrackModelTable {
 			@Override
 			public Component getTableCellRendererComponent(JTable table,
 					Object value, boolean isSelected, boolean hasFocus, int row, int col) {
-				super.getTableCellRendererComponent(table, value, false, hasFocus, row, col);
-				boolean occupied = ((String) table.getModel().getValueAt(row, 4)).equalsIgnoreCase("OCCUPIED");
-				boolean maintain = ((String) table.getModel().getValueAt(row, 4)).equalsIgnoreCase("CLOSED");
-				if (occupied) {
-					setBackground(Color.RED);
-					setForeground(Color.WHITE);
-				} else if (maintain) {
-					setBackground(Color.GRAY);
-					setForeground(Color.WHITE);
-				} else {
-					setBackground(table.getBackground());
-					setForeground(table.getForeground());
+				try {
+					super.getTableCellRendererComponent(table, value, false, hasFocus, row, col);
+					boolean occupied = ((String) table.getModel().getValueAt(row, 4)).equalsIgnoreCase("OCCUPIED");
+					boolean maintain = ((String) table.getModel().getValueAt(row, 4)).equalsIgnoreCase("CLOSED");
+					if (occupied) {
+						setBackground(Color.RED);
+						setForeground(Color.WHITE);
+					} else if (maintain) {
+						setBackground(Color.GRAY);
+						setForeground(Color.WHITE);
+					} else {
+						setBackground(table.getBackground());
+						setForeground(table.getForeground());
+					}
+				} catch (Throwable t) {
+//					System.out.println("CrossingTable error.");
 				}
 				return this;
 			}
