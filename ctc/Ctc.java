@@ -42,7 +42,7 @@ public class Ctc implements Updateable{
 	public static ArrayDeque<Block> greenline = new ArrayDeque<Block>();
 	public static ArrayDeque<Block> redline = new ArrayDeque<Block>();
 	public static ArrayDeque<Block> switches = new ArrayDeque<Block>();
-	public static ArrayDeqeu<Block> stations = new ArrayDeque<Block>();
+	public static ArrayDeque<Block> stations = new ArrayDeque<Block>();
 	public static ArrayDeque<TrackCon> trackcons = new ArrayDeque<TrackCon>();
 	
 	public static ArrayDeque<Train> dispatched = new ArrayDeque<Train>();
