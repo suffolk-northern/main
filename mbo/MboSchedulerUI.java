@@ -272,9 +272,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
         jButton12.setBounds(420, 170, 160, 25);
 
         jLabel12.setFont(new java.awt.Font("Tahoma", 0, 24)); 
-		System.out.println(lineName);
 		String titleString = String.format("MBO Scheduler: %s Line", lineName);
-		System.out.println(titleString);
         jLabel12.setText(titleString);
         mainPanel.add(jLabel12);
         jLabel12.setBounds(290, 20, 290, 29);
@@ -547,8 +545,6 @@ public class MboSchedulerUI extends javax.swing.JFrame
 		int endHour = end.getHours();
 		int numHours = endHour - startHour + 1;
 		Object[][] tableObject = new Object[numHours][2];
-		System.out.println(startHour);
-		System.out.println(endHour);
 		int ind = 0;
 		for (int i = startHour; i <= endHour; i++)
 		{

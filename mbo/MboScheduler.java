@@ -136,9 +136,10 @@ public class MboScheduler implements Updateable
 		return lastEvent.getTime();
 	}
 	
-	public ArrayList<TrainSchedule> makeTrainSchedules(Time start, Time end, int[] throughput)
+	public LineSchedule makeSchedule(Time start, Time end, int[] throughput)
 	{
 		ArrayList<TrainSchedule> trainScheds = new ArrayList<>();
+		ArrayList<DriverSchedule> driverScheds = new ArrayList<>();
 		int[] trainsNeeded = new int[throughput.length];
 		for (int i = 0; i < throughput.length; i++)
 		{
@@ -220,26 +221,29 @@ public class MboScheduler implements Updateable
 				{
 					trainDrivers.add(useDriver);
 					freeDrivers.remove(useDriver);
+					DriverSchedule ds = makeDriverSchedule(null, useDriver.getID(), curTime, arrTime, useTrain);
+					driverScheds.add(ds);
 				}
 				
 			}
 			curTime = new Time(curTime.getTime() + (long) (schedIncrement * 1000));
 			lastDispatch += schedIncrement;
 		}
-		return trainScheds;
-	}
-	
-	private int assignDriver()
-	{
-		
-	}
-
-	
-	public LineSchedule makeSchedule(Time start, Time end, int[] throughput)
-	{
-		ArrayList<TrainSchedule> ts = makeTrainSchedules(start, end, throughput);
-		ArrayList<DriverSchedule> ds = makeDriverSchedules(ts);
-		LineSchedule ls = new LineSchedule(ds, ts);
+		LineSchedule ls = new LineSchedule(driverScheds, trainScheds);
 		return ls;
+	}
+	
+	public DriverSchedule makeDriverSchedule(DriverSchedule ds, int dID, Time embarkTime, Time disembarkTime, int tID)
+	{
+		// TODO: append to exisiting driver schedule if it exists
+		DriverEvent.EventType embark = DriverEvent.EventType.EMBARK;
+		DriverEvent.EventType disembark = DriverEvent.EventType.DISEMBARK;
+		DriverEvent embarkEvent = new DriverEvent(embarkTime, embark, tID);
+		DriverEvent disembarkEvent = new DriverEvent(disembarkTime, disembark, tID);
+		ArrayList<DriverEvent> driverEvents = new ArrayList<>();
+		driverEvents.add(embarkEvent);
+		driverEvents.add(disembarkEvent);
+		DriverSchedule newDS = new DriverSchedule(dID, driverEvents);
+		return newDS;
 	}
 }
