@@ -131,6 +131,8 @@ public class Main
 		
 		
 		// Track Model <---> MBO
+		mboCont.registerTrackModel(trackModel);
+
 		mboCont.initLine();
 		// mboSched.initLine();
 
@@ -142,7 +144,6 @@ public class Main
 		CtcRadio ctcRadio = new CtcRadio(mboCont, mboSched, ctc);
 		ctc.setCtcRadios(ctcRadio,null);
 		mboCont.registerCtc(ctcRadio);
-
 
 		//
 		// fill updateables

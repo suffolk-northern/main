@@ -10,6 +10,7 @@ package ctc;
  * @author missm
  */
 import java.util.ArrayDeque;
+import java.util.Date;
 import java.util.StringTokenizer;
 
 import updater.Updateable;
@@ -47,6 +48,7 @@ public class Ctc implements Updateable{
 
 	public static Updater updater;
 	public static int period;
+	public static Clock clock;
 	
 	public static double through = 0;
 
@@ -118,6 +120,10 @@ public class Ctc implements Updateable{
 		{
 			updateAuth(b);
 		}
+		
+		clock.advance(time);
+		String clockDisp = String.format("%02d", clock.time().getHours()) + ":" + String.format("%02d",clock.time().getMinutes());
+		ui.updateClock(clockDisp);
 		
 		updateTrack();
 		updateTrains();
@@ -277,8 +283,8 @@ public class Ctc implements Updateable{
 				System.out.print(blk.switchDir);
 			System.out.println();
 		}
-		*/
 		
+		*/
 		
 	}
 	
@@ -526,8 +532,10 @@ public class Ctc implements Updateable{
 	public Ctc() {
 		ctc = this;
 		ui = new CtcUI(ctc);
-		//showUI();
-
+		
+		clock = new Clock();		
+		
+		
 		/*
 		blueline.add(new Block("blue", true));
 		blueline.add(new Block("blue", 'A', 1, 100, null, null, false));
@@ -822,7 +830,7 @@ public class Ctc implements Updateable{
 				return auth;
 			} // check switches are in correct position
 			else if (block.hasSwitch()) {
-				if (isForwardSwitch(block) && temp.peek() != null && (!block.getSwitchCurrTo().equals(temp.peek()))) 
+				if (isForwardSwitch(block) && temp.peek() != null && block.sw_to.contains(temp.peek()) && (!block.getSwitchCurrTo().equals(temp.peek()))) 
 				{
 					auth += block.length;
 					success = false;
@@ -844,12 +852,45 @@ public class Ctc implements Updateable{
 					if(!success)
 						return auth;
 				} 
-				else if (isBackwardSwitch(block) && prev != null && !block.getSwitchCurrFrom().equals(prev)) 
+				else if(isForwardSwitch(block) && prev != null && block.sw_to.contains(prev) && (!block.getSwitchCurrTo().equals(prev)))
 				{
 					success = false;
 					
 					if(flipped)
+					{
 						return auth;
+					}
+					
+					// check if it is safe to flip switch
+					if(block.sw_to.peekFirst().occupied == false && block.sw_to.peekLast().occupied == false)
+					{
+						success = getFlip(block);
+						if(success)
+						{
+							updateTrack();
+							flipped = true;
+						}
+					}
+
+					if(!success)
+					{	
+						if(!prev.equals(route.peekFirst()))
+							auth -= prev.length;
+						
+						return auth;
+					}
+					
+					auth += block.length;
+				}
+				else if (isBackwardSwitch(block) && prev != null && block.sw_from.contains(prev) && !block.getSwitchCurrFrom().equals(prev)) 
+				{
+					success = false;
+					
+					if(flipped)
+					{
+						return auth;
+					}
+					
 					
 					// check if it is safe to flip switch
 					if(block.sw_from.peekFirst().occupied == false && block.sw_from.peekLast().occupied == false)
@@ -872,6 +913,33 @@ public class Ctc implements Updateable{
 					
 					auth += block.length;
 				} 
+				else if (isBackwardSwitch(block) && temp.peek() != null && block.sw_from.contains(temp.peek()) && !block.getSwitchCurrFrom().equals(temp.peek())) 
+				{
+					auth += block.length;
+					success = false;
+					
+					if(flipped)
+						return auth;
+					
+					// check if it is safe to flip switch
+					if(block.sw_from.peekFirst().occupied == false && block.sw_from.peekLast().occupied == false)
+					{
+						success = getFlip(block);
+						if(success)
+						{
+							updateTrack();
+							flipped = true;
+						}
+					}
+					
+					if(!success)
+					{	
+						if(!prev.equals(route.peekFirst()))
+							auth -= prev.length;
+						
+						return auth;
+					}
+				}
 				else 
 				{
 					auth += block.length;
@@ -1205,7 +1273,7 @@ public class Ctc implements Updateable{
 			}
 
 			rows[count][4] = "";
-			rows[count][5] = train.authority;
+			rows[count][5] = train.authority * 1.09361; // convert to yards
 			rows[count][6] = train.setpoint_speed;
 			rows[count][7] = train.passengers;
 
@@ -1457,8 +1525,13 @@ public class Ctc implements Updateable{
 
 		//System.out.println();
 		
+		speed = speed * 1.60934; // convert to kph from mph
+		
 		String msg = speed + " " + auth;
 		//System.out.println(train.ID + " at " + train.location.display() + ": " + msg);
+		
+		if(auth < 0)
+			auth = 0;
 		
 		TrackMovementCommand tmc = new TrackMovementCommand((int)speed,(int)auth);
 		

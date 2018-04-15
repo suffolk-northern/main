@@ -8,6 +8,8 @@ package mbo;
 
 import java.util.ArrayList;
 import java.lang.Math.*;
+import java.util.HashSet;
+import java.util.Set;
 
 import updater.Updateable;
 import track_model.GlobalCoordinates;
@@ -29,18 +31,24 @@ public class MboController implements Updateable
 	private String lineName;
 	private boolean enabled;
 	private CtcRadio ctcRadio;
+	private TrackModel trackModel;
+	
+	private ArrayList<SwitchTracker> switches;
+	
+	private static int MAX_AUTHORITY = 3000; // m
 	
 	public MboController(String ln)
 	{
 		lineName = ln;
 		enabled = false;
+		switches = new ArrayList<>();
 	}
 	
 	public void launchUI()
 	{
 		if (ui == null)
 		{
-			ui = new MboControllerUI();
+			ui = new MboControllerUI(lineName);
 			for (TrainTracker trainInfo : trains)
 			{
 				int ID = trainInfo.getID();
@@ -56,21 +64,21 @@ public class MboController implements Updateable
 		}
 	}
 	
-	public void showUI()
-	{
-		if (ui != null)
-			ui.setVisible(true);
-	}
-	
 	public void hideUI()
-	{
+	{	
 		if (ui != null)
-			ui.setVisible(false);
+			ui.dispose();
+		ui = null;
 	}
 	
 	public void registerCtc(CtcRadio cr)
 	{
 		ctcRadio = cr;
+	}
+	
+	public void registerTrackModel(TrackModel tm)
+	{
+		trackModel = tm;
 	}
 	
 	public void enableMboController()
@@ -85,21 +93,57 @@ public class MboController implements Updateable
 	
 	public void initLine()
 	{
+		ArrayList<Integer> switchIDs = new ArrayList<>();
 		if (line == null)
 		{
-			System.out.println("Initializing line");
 			int numBlocks = TrackModel.getBlockCount(lineName);
-			System.out.printf("Num blocks initalized: %d", numBlocks);
 			line = new BlockTracker[numBlocks+1];
-			for (int i = 0; i < numBlocks; i++)
+			for (int i = 0; i <= numBlocks; i++)
 			{
-				TrackBlock curBlock = TrackModel.getBlock(lineName, i+1);
+				TrackBlock curBlock = TrackModel.getBlock(lineName, i);
 				double blockLength = curBlock.getLength();
 				int nextBlock = curBlock.getNextBlockId();
 				int prevBlock = curBlock.getPrevBlockId();
 				int speedLimit = curBlock.getSpeedLimit();
 				char section = curBlock.getSection();
-				line[i+1] = new BlockTracker(i+1, nextBlock, prevBlock, blockLength, speedLimit, section, null);
+				boolean forwardDir = false;
+				boolean backwardDir = false;
+				if (curBlock.getNextBlockDir() == 1)
+					forwardDir = true;
+				if (curBlock.getPrevBlockDir() == 1)
+					backwardDir = true;
+				line[i] = new BlockTracker(i, nextBlock, prevBlock, blockLength, speedLimit, section, null, forwardDir, backwardDir);
+				if (curBlock.isIsSwitch())
+				{
+					int switchID = curBlock.getBlock();
+					switchIDs.add(switchID);
+				}
+			}
+			
+			for (int switchID : switchIDs)
+			{
+				// System.out.printf("Trying to load switch %d%n", switchID);
+				int[] otherSwitchBlocks = trackModel.getBranchesOfSwitch(lineName, switchID);
+				int[] switchBlocks = new int[3];
+				boolean[] switchNext = {false, false, false};
+				switchBlocks[0] = switchID;
+				switchBlocks[1] = otherSwitchBlocks[0];
+				switchBlocks[2] = otherSwitchBlocks[1];
+				if (line[switchBlocks[0]].getNext() == switchBlocks[1] || line[switchBlocks[0]].getNext() == switchBlocks[2])
+					switchNext[0] = true;
+				if (line[switchBlocks[1]].getNext() == switchID)
+					switchNext[1] = true;
+				if (line[switchBlocks[2]].getNext() == switchID)
+					switchNext[2] = true;
+				SwitchTracker st = new SwitchTracker(switchID, switchBlocks, switchNext);
+				switches.add(st);
+				
+//				
+//				System.out.printf("Switch on block: %d%n", switchID);
+//				int block = st.getBlocks()[1];
+//				System.out.printf("First other block: %d, nextBlock is switch: %s%n", block, st.nextIsSwitch(block));
+//				block = st.getBlocks()[2];
+//				System.out.printf("First other block: %d, nextBlock is switch: %s%n", block, st.nextIsSwitch(block));
 			}
 		}
 	}
@@ -114,20 +158,24 @@ public class MboController implements Updateable
 		for (int i = 0; i < trains.size(); i++) 
 		{
 			TrainTracker trainInfo = trains.get(i);
-			
 			int newBlock = getBlockFromLoc(trainInfo.getLocation());
+			// System.out.printf("Train %d is on block %d%n", trainInfo.getID(), newBlock);
 			if (newBlock > 0)
 				trainInfo.block = line[newBlock];
 		}
 		
 		updateSwitches();
-		
+//		for (SwitchTracker st : switches)
+//			st.printInfo();
+//		System.out.println(line[100].getNext());
+
 		if (enabled == true)
 		{
 			for (TrainTracker trainInfo:trains)
 			{
 				if (trainInfo == null)
 					break;
+				updateLocation(trainInfo);
 				double authority = findAuthority(trainInfo);
 				trainInfo.setAuthority((int) authority);
 				trainInfo.setSuggestedSpeed(trainInfo.block.getSpeedLimit());
@@ -146,8 +194,7 @@ public class MboController implements Updateable
 				GlobalCoordinates loc = trainInfo.getLocation();
 				// TODO: change to distance along block
 				int blockID = trainInfo.getBlock().getID();
-				// int trackDist = (int) TrackModel.getDistanceTo(lineName, blockID, loc);
-				int trackDist = 0;
+				int trackDist = (int) trackModel.getDistanceAlongBlock(lineName, blockID, trainInfo.getCurrentPosition());
 				if (ui != null)
 					ui.updateTrain(trainInfo.getID(), trainInfo.block.getSection(), trainInfo.block.getID(), trackDist, trainInfo.getAuthority(), trainInfo.getSuggestedSpeed());
 			}
@@ -157,14 +204,15 @@ public class MboController implements Updateable
 	// TODO: make this more efficient by starting from last known block
 	private int getBlockFromLoc(GlobalCoordinates location)
 	{
-//		for (int i = 1; i < line.length; i++)
-//		{
-//			double dist = TrackModel.getDistanceTo(lineName, i, location);
-//			if (dist < 1)
-//				return i;
-//		}
-		// return -1;
-		return 1;
+		if (location == null || line == null)
+			return -1;
+		TrackBlock closestBlock = trackModel.getClosestBlock(location, lineName);
+		if (closestBlock == null)
+			return -1;
+		double dist = trackModel.getDistanceTo(lineName, closestBlock.getBlock(), location);
+		if (dist < 1)
+			return closestBlock.getBlock();
+		return -1;
 	}
 	
 	// Adds a train to the set of objects this object communicates with.
@@ -199,52 +247,177 @@ public class MboController implements Updateable
         
 	private double findAuthority(TrainTracker train)
 	{
-		return 50;
-//		BlockTracker curBlock = train.getBlock();
-//		BlockTracker blockingBlock = curBlock;
-//		
-//		// TODO: move this logic to update loop for more efficient
-//		ArrayList<BlockTracker> trainBlocks = new ArrayList<BlockTracker>();
-//		for (int i = 0; i < trains.size(); i++)
-//		{
-//			trainBlocks.add(trains.get(i).getBlock());
-//		}
-//		
-//		double authority = 0;
-//		boolean trainBlocking = false;
-//		for (int i = 0; i < line.length; i++)
-//		{
-//			for (BlockTracker trainBlock : trainBlocks)
-//			{
-//				if (curBlock == trainBlock)
-//				{
-//					// TODO: Change this to the real distance once that's in the track model
-//					double distanceAlongBlock = 0;
-//					authority += distanceAlongBlock;
-//				}
-//				trainBlocking = true;
-//			}
-//			
-//			if (trainBlocking)
-//				break;
-//			
-//			if (curBlock.getNext() < 0)
-//			{
-//				authority += curBlock.getLength();
-//			}
-//		}
-//		
-//		return authority;
+		BlockTracker curBlock = train.getBlock();
+		BlockTracker blockingBlock = curBlock;
+		GlobalCoordinates trainLoc = train.getCurrentPosition();
+		double trainDist = trackModel.getDistanceAlongBlock(lineName, curBlock.getID(), trainLoc); 
+		double distLeftInBlock = 0;
+		if (!train.isGoingForward())
+			distLeftInBlock = train.getBlock().getLength() - trainDist;
+		else
+			distLeftInBlock = trainDist;
+		
+		// TODO: move this logic to update loop for more efficiency
+		ArrayList<BlockTracker> trainBlocks = new ArrayList<>();
+		ArrayList<TrainTracker> trainTrains = new ArrayList<>();
+		for (int i = 0; i < trains.size(); i++)
+		{
+			if (trains.get(i) != train)
+			{
+				trainBlocks.add(trains.get(i).getBlock());
+				trainTrains.add(trains.get(i));
+			}
+		}
+		
+		// Start with negative authority since loop takes current block into account
+		double authority = -1*distLeftInBlock;
+		boolean blocked = false;
+		boolean forward = train.isGoingForward();
+//		if (forward)
+//			System.out.printf("In block %d, going forward%n", curBlock.getID());
+//		else
+//			System.out.printf("In block %d, going backward%n", curBlock.getID());
+		for (int i = 0; i < line.length; i++)
+		{
+			for (int j = 0; j < trainBlocks.size(); j++)
+			{
+				if (curBlock == trainBlocks.get(j))
+				{
+					GlobalCoordinates otherTrainLoc = trainTrains.get(j).getCurrentPosition();
+					double otherTrainDist = trackModel.getDistanceAlongBlock(lineName, trainBlocks.get(j).getID(), otherTrainLoc);
+					if (forward)
+						authority += otherTrainDist;
+					else
+						authority += trainBlocks.get(j).getLength() - otherTrainDist;
+					blocked = true;
+				}
+			}
+			
+			if (blocked)
+				break;
+			
+			blocked = false;
+			authority += curBlock.getLength();
+			
+			if (forward)
+			{
+				if (curBlock.getNext() < 0)
+					blocked = true;
+				else if (line[curBlock.getNext()].getNext() == curBlock.getID())
+				{
+					if (!line[curBlock.getNext()].canGoBackward())
+						blocked = true;
+				}
+			}
+			else 
+			{
+				if (curBlock.getPrev() < 0 || !line[curBlock.getPrev()].canGoBackward())
+					blocked = true;
+			}
+			
+			// System.out.printf("Current authority: %f%n", authority);
+			
+			if (blocked)
+				break;
+			if (forward)
+			{
+				System.out.printf("About to check block %d going forwards%n", curBlock.getNext());
+				BlockTracker nextBlock = line[curBlock.getNext()];
+				if (nextBlock.getID() < curBlock.getID())
+					forward = false;
+				curBlock = nextBlock;
+			}
+			else
+			{
+				System.out.printf("About to check block %d going backwards%n", curBlock.getNext());
+				BlockTracker prevBlock = line[curBlock.getPrev()];
+				if (prevBlock.getID() > curBlock.getID())
+					forward = true;
+				curBlock = prevBlock;
+			}
+		}
+		
+		if (authority > MAX_AUTHORITY)
+			return MAX_AUTHORITY;
+		return authority;
+	}
+	
+	private void updateLocation(TrainTracker train)
+	{
+		GlobalCoordinates newLocation = train.getRadio().receive();
+		double newDistance = trackModel.getDistanceAlongBlock(lineName, train.getBlock().getID(), newLocation);
+		double oldDistance = trackModel.getDistanceAlongBlock(lineName, train.getBlock().getID(), train.getLastPosition());
+		if (newDistance > oldDistance)
+			train.setGoingForward(true);
+		else
+			train.setGoingForward(false);
+		train.setLastPosition(train.getCurrentPosition());
+		train.setCurrentPosition(newLocation);
 	}
 	
 	private void updateSwitches()
 	{
 		if (ctcRadio == null)
 			return;
-		int[][] switches = ctcRadio.getSwitchStates(lineName);
-		// TODO: change next and prev blocks based on switch changes
+		int[][] switchPos = ctcRadio.getSwitchStates(lineName);
+		if (switchPos == null)
+		{
+			switchPos = new int[6][2];
+			switchPos[0][0] = 11;
+			switchPos[0][1] = 12;
+			switchPos[1][0] = 28;
+			switchPos[1][1] = 29;
+			switchPos[2][0] = 0;
+			switchPos[2][1] = 57;
+			switchPos[3][0] = 0;
+			switchPos[3][1] = 62;
+			switchPos[4][0] = 76;
+			switchPos[4][1] = 77;
+			switchPos[5][0] = 85;
+			switchPos[5][1] = 100;
+		}
+		for (int i = 0; i < switchPos.length; i++)
+		{
+			SwitchTracker switchSet = null;
+			for (SwitchTracker s : switches)
+			{
+				for (int j = 0; j < switchPos[i].length; j++)
+					if (s.getID() == switchPos[i][j])
+						switchSet = s;
+			}
+			
+			if (switchSet != null)
+			{
+				int connectedBlock1 = switchPos[i][0];
+				switchSet.setConnected(connectedBlock1, true);
+				int connectedBlock2 = switchPos[i][1];
+				switchSet.setConnected(connectedBlock2, true);
+				int unconnectedBlock = -1;
+				for (int j = 0; j < switchSet.getBlocks().length; j++)
+				{
+					int block = switchSet.getBlocks()[j];
+					if (block != connectedBlock1 && block != connectedBlock2)
+						unconnectedBlock = block;
+				}
+				switchSet.setConnected(unconnectedBlock, false);
+				
+				if (switchSet.nextIsSwitch(connectedBlock1))
+					line[connectedBlock1].setNextBlock(connectedBlock2);
+				else
+					line[connectedBlock1].setPrevBlock(connectedBlock2);
+				
+				if (switchSet.nextIsSwitch(connectedBlock2))
+					line[connectedBlock2].setNextBlock(connectedBlock1);
+				else
+					line[connectedBlock2].setPrevBlock(connectedBlock1);
+				
+				if (switchSet.nextIsSwitch(unconnectedBlock))
+					line[unconnectedBlock].setNextBlock(-1);
+				else
+					line[unconnectedBlock].setPrevBlock(-1);
+			}
+ 		}
 	}
-	
 	
 //	public int changeTrainLocation(int trainID, GlobalCoordinates location)
 //	{

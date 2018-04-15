@@ -1185,6 +1185,11 @@ public class CtcUI extends javax.swing.JFrame {
 				
 	}
 	
+	protected void updateClock(String time)
+	{
+		clockDisp.setText(time);
+	}
+	
     private void scheduleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_scheduleButtonActionPerformed
 		// TODO add your handling code here:
     }//GEN-LAST:event_scheduleButtonActionPerformed
