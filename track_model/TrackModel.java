@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -22,7 +23,7 @@ import updater.Updateable;
 
 public class TrackModel implements Updateable {
 
-	private static int temperature;
+	protected static double temperature = 70;
 	// Main Track Model Frame.
 	private static TrackModelFrame tmf;
 	// Database helper.
@@ -185,9 +186,11 @@ public class TrackModel implements Updateable {
 	 * Launches main UI for integration.
 	 */
 	public void launchUI() {
-		tmf = new TrackModelFrame(this);
-		tmf.setDefaultCloseOperation(javax.swing.WindowConstants.HIDE_ON_CLOSE);
-		tmf.setLocationRelativeTo(null);
+		if (tmf == null) {
+			tmf = new TrackModelFrame(this);
+			tmf.setDefaultCloseOperation(javax.swing.WindowConstants.HIDE_ON_CLOSE);
+			tmf.setLocationRelativeTo(null);
+		}
 		tmf.setVisible(true);
 	}
 
@@ -974,7 +977,18 @@ public class TrackModel implements Updateable {
 
 	@Override
 	public void update(int time) {
-
+		updateTemperature();
+		for (Station s : stations) {
+			if (temperature < 32) {
+				if (!s.heater) {
+					setHeater(s.line, s.block, true);
+				}
+			} else {
+				if (s.heater) {
+					setHeater(s.line, s.block, false);
+				}
+			}
+		}
 		TrackBlock curBlock;
 		for (TrainData td : trains) {
 			//
@@ -1012,6 +1026,26 @@ public class TrackModel implements Updateable {
 			}
 		}
 		count++;
+	}
+
+	private boolean tempIncrease = false;
+	private Random ran = new Random();
+
+	/**
+	 * Updates temperature.
+	 */
+	private void updateTemperature() {
+		if (tempIncrease) {
+			temperature += ran.nextDouble() * 0.1;
+			if (temperature > 105) {
+				tempIncrease = false;
+			}
+		} else {
+			temperature -= ran.nextDouble() * 0.1;
+			if (temperature < -20) {
+				tempIncrease = true;
+			}
+		}
 	}
 
 	/**
