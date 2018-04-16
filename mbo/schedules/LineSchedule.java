@@ -21,10 +21,16 @@ public class LineSchedule {
 		trainSchedules = ts;
 		driverIDs = new ArrayList<Integer>();
 		for (DriverSchedule dSched : ds)
+		{
 			driverIDs.add(dSched.getID());
+			System.out.printf("Line Schedule: driver ID %d%n", dSched.getID());
+		}
 		trainIDs = new ArrayList<Integer>();
 		for (TrainSchedule tSched : ts)
+		{
 			trainIDs.add(tSched.getID());
+			System.out.printf("Line Schedule: train ID %d%n", tSched.getID());
+		}
 		stationsGenerated = false;
 	}
 	

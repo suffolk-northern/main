@@ -485,6 +485,8 @@ public class MboSchedulerUI extends javax.swing.JFrame
 				throughput[i] = 0;
 				throughputError = true;
 			}
+			else
+				throughput[i] = enteredVal;
 		}
 		if (!throughputError)
 		{
@@ -543,7 +545,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
 		// TODO: worry about overnight schedules?
 		int startHour = start.getHours();
 		int endHour = end.getHours();
-		int numHours = endHour - startHour + 1;
+		int numHours = endHour - startHour;
 		Object[][] tableObject = new Object[numHours][2];
 		int ind = 0;
 		for (int i = startHour; i <= endHour; i++)

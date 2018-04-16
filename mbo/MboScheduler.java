@@ -143,9 +143,11 @@ public class MboScheduler implements Updateable
 		int[] trainsNeeded = new int[throughput.length];
 		for (int i = 0; i < throughput.length; i++)
 		{
+			System.out.printf("Throughput: %d%n", throughput[i]);
 			trainsNeeded[i] = throughput[i] / throughputPerTrain;
 			if (throughput[i] % throughputPerTrain != 0)
 				trainsNeeded[i] += 1;
+			System.out.printf("Trains needed: %d%n", trainsNeeded[i]);
 		}
 		
 		LinkedList<Integer> freeTrains = new LinkedList<>();
@@ -167,6 +169,7 @@ public class MboScheduler implements Updateable
 		while (curTime.before(end))
 		{
 			int timeSlot = curTime.getHours() - start.getHours();
+			System.out.printf("Time slot: %d%n", timeSlot);
 			if (!trainArrTimes.isEmpty() && curTime.after(trainArrTimes.peek()))
 			{
 				trainArrTimes.poll();

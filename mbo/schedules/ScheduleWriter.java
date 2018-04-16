@@ -26,9 +26,10 @@ public class ScheduleWriter {
 		{
 			PrintWriter writer = new PrintWriter(file, "UTF-8");
 			writer.println("---Train Schedules---");
+			System.out.println(sched.getTrainIDs().size());
+			System.out.println(sched.getDriverIDs().size());
 			for (int trainID : sched.getTrainIDs())
 			{
-				System.out.println(trainID);
 				TrainSchedule ts = sched.getTrainSchedule(trainID);
 				writer.printf("Train ID: %d\n", trainID);
 				for (TrainEvent te : ts.getEvents())
