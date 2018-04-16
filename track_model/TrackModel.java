@@ -558,10 +558,10 @@ public class TrackModel implements Updateable {
 		}
 	}
 
-	public static int exchangePassengers(int departing) {
+	public static int exchangePassengers(int trainId, int departing, int availableSeats) {
 		int boarding = Station.generatePassengers();
 
-//        ctc.updatePassengers(departing, boarding, train, station);
+        ctc.updatePassengers(departing, boarding, train, station);
 		return boarding;
 	}
 
@@ -1007,7 +1007,6 @@ public class TrackModel implements Updateable {
 		// Needs to check beacons constantly.
 		//
 		for (TrainData td : trains) {
-
 			for (Beacon b : beacons) {
 				if (td.trainModel.location().distanceTo(b.location) < 5) {
 					td.trainModel.beaconRadio().send(new BeaconMessage(b.message));
