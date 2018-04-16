@@ -548,7 +548,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
 		int numHours = endHour - startHour;
 		Object[][] tableObject = new Object[numHours][2];
 		int ind = 0;
-		for (int i = startHour; i <= endHour; i++)
+		for (int i = startHour; i < endHour; i++)
 		{
 			if (i < 10)
 				tableObject[ind][0] = String.format("0%d:00", i); 

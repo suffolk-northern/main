@@ -22,6 +22,7 @@ public class MboScheduler implements Updateable
 	private String lineName;
 	private BlockTracker[] line;
 	private LineSchedule lineSched;
+	private TrackModel trackModel;
 	
 	// Adjustable parameters
 	private int dwellTime = 20; // Seconds
@@ -52,16 +53,24 @@ public class MboScheduler implements Updateable
 			ui.setVisible(false);
 	}
 	
+	public void registerTrackModel(TrackModel tm)
+	{
+		trackModel = tm;
+	}
+	
 	public void initLine()
 	{
+		System.out.println("Got here");
 		if (line == null)
 		{
-			ArrayList<Integer> defaultLine = TrackModel.getDefaultLine(lineName);
+			ArrayList<Integer> defaultLine = trackModel.getDefaultLine(lineName);
 			int numBlocks = defaultLine.size();
+			System.out.printf("Num blocks: %d%n", numBlocks);
 			line = new BlockTracker[numBlocks];
 			for (int i = 0; i < numBlocks; i++)
 			{
 				TrackBlock curBlock = TrackModel.getBlock(lineName, defaultLine.get(i));
+				System.out.printf("Checking block %d%n", curBlock);
 				double blockLength = curBlock.getLength();
 				int nextBlock = curBlock.getNextBlockId();
 				int prevBlock = curBlock.getPrevBlockId();
@@ -70,7 +79,10 @@ public class MboScheduler implements Updateable
 				
 				String stationName = null;
 				if (curBlock.isIsStation())
+				{
 					stationName = TrackModel.getStation(lineName, defaultLine.get(i)).getName();
+					System.out.printf("Station name: %s%n", stationName);
+				}
 					
 				line[i] = new BlockTracker(defaultLine.get(i), nextBlock, prevBlock, blockLength, speedLimit, section, stationName, false, false);
 			}
@@ -116,6 +128,7 @@ public class MboScheduler implements Updateable
 			}
 			else 
 			{
+				System.out.printf("Making events at station %s%n", curBlock.getStation());
 				travelTime = curBlock.getSpeedLimit() * curBlock.getLength();
 				long t = curTime.getTime();
 				Time arrTime = new Time(t + (long) (travelTime / 2));
