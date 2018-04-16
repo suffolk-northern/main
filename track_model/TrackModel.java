@@ -29,7 +29,7 @@ public class TrackModel implements Updateable {
 	// Database helper.
 	protected static final DbHelper dbHelper = new DbHelper();
 	// CTC
-	private Ctc ctc;
+	private static Ctc ctc;
 
 	// ArrayList of registered trains.
 	protected static ArrayList<TrainData> trains = new ArrayList<>();
