@@ -1128,7 +1128,11 @@ public class Ctc implements Updateable{
 		
 		for(Train train : trains)
 		{
-			if(getFirstSwitch(train.route).peekFirst().equals(swblock))
+			if(train.route == null || train.route.isEmpty())
+			{
+				continue;
+			}
+			else if(getFirstSwitch(train.route).peekFirst().equals(swblock))
 			{
 				mytrains.add(train);
 			}
