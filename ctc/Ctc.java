@@ -1968,6 +1968,33 @@ public class Ctc implements Updateable{
 			return to;
 		}
 	}
+	
+	protected static class Schedule{
+		
+		ArrayDeque<ArrayDeque<Block>> schedule;
+		ArrayDeque<String> times;
+		
+		public Schedule()
+		{
+			schedule = new ArrayDeque<ArrayDeque<Block>>();
+		}
+		
+		public void addRoute(ArrayDeque<Block> route)
+		{
+			schedule.add(route);
+		}
+		
+		public ArrayDeque<Block> peekRoute()
+		{
+			return schedule.peekFirst();
+		}
+		
+		public ArrayDeque<Block> getRoute()
+		{
+			return schedule.poll();
+		}
+		
+	}
 
 	protected static class Train {
 
@@ -1981,6 +2008,7 @@ public class Ctc implements Updateable{
 		protected int passengers;
 		protected int driverID;
 		protected Block lastBlock;
+		protected Schedule schedule;
 
 		public Train() {
 			ID = 0;
