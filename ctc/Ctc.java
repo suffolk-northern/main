@@ -258,6 +258,19 @@ public class Ctc implements Updateable{
 		updateTrains();
 		
 		/*
+		// to debug biblocks
+		boolean bi = false;
+		for(Block blk : greenline)
+		{
+			bi = isBi(blk);
+			if(bi)
+			{
+				System.out.println(blk.display());
+			}
+		}
+		*/
+		
+		/*
 		for(Block blk : greenline)
 		{
 			System.out.println(blk.display());
@@ -283,8 +296,8 @@ public class Ctc implements Updateable{
 				System.out.print(blk.switchDir);
 			System.out.println();
 		}
-		
 		*/
+		
 		
 	}
 	
@@ -1577,6 +1590,38 @@ public class Ctc implements Updateable{
 			trackmodel.setBlockMessage(train.location.line, train.location.num, tmc);
 	}
 	
+	private static boolean isBi(Block bl)
+	{
+		boolean biblocks = false;
+		
+			if(bl.sw)
+			{
+				if(isForwardSwitch(bl))
+				{
+					if(bl.prevBlockDir == 1 && (bl.nextBlockDir == 1 || bl.switchDir == 1))
+					{
+						biblocks = true;
+					}
+				}
+				else
+				{
+					if(bl.nextBlockDir == 1 && (bl.prevBlockDir == 1 || bl.switchDir == -1))
+					{
+						biblocks = true;
+					}
+				}
+			}
+			else
+			{
+				if(bl.prevBlockDir == 1 && bl.nextBlockDir == 1)
+				{
+					biblocks = true;
+				}
+			}
+		
+		return biblocks;
+	}
+	
 	private static void combineAuth(TrackCon tc, boolean[] s, boolean[] l, boolean[] r)
 	{
 		// either combine route with current track con authority or just send route as pieces
@@ -2119,6 +2164,7 @@ public class Ctc implements Updateable{
 		private int nextBlockDir;
 		private int prevBlockDir;
 		private int switchDir;
+		private int reserved;
 
 		public Block() {
 			yard = false;
@@ -2142,6 +2188,7 @@ public class Ctc implements Updateable{
 			hasStation = false;
 			station = "";
 			closed = false;
+			reserved = -1;
 		}
 
 		public Block(String l, boolean isYard) {
@@ -2166,6 +2213,7 @@ public class Ctc implements Updateable{
 			hasStation = false;
 			station = "";
 			closed = false;
+			reserved = -1;
 		}
 
 		public Block(String l, char sec, int n, double len, int nextdir, int prevdir, Block nextb, Block prevb, boolean rr) {
@@ -2196,6 +2244,7 @@ public class Ctc implements Updateable{
 			nextBlockDir = nextdir;
 			prevBlockDir = prevdir;
 			closed = false;
+			reserved = -1;
 		}
 
 		public Block(String l, char sec, int n, double len, int nextdir, int prevdir, Block nextb, Block prevb, boolean rr, int swID, int swdir, ArrayDeque<Block> swf, ArrayDeque<Block> swt, Block currf, Block currt) {
@@ -2227,6 +2276,7 @@ public class Ctc implements Updateable{
 			prevBlockDir = prevdir;
 			switchDir = swdir;
 			closed = false;
+			reserved = -1;
 		}
 
 		public Block(String l, char sec, int n, double len, int nextdir, int prevdir, Block nextb, Block prevb, boolean rr, boolean stat, String statID) {
@@ -2257,6 +2307,7 @@ public class Ctc implements Updateable{
 			nextBlockDir = nextdir;
 			prevBlockDir = prevdir;
 			closed = false;
+			reserved = -1;
 		}
 
 		private boolean isOccupied() {
