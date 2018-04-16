@@ -1358,7 +1358,7 @@ public class Ctc implements Updateable{
 		}
 	}
 	
-	public static void updatePassengers(int departing, int boarding, int trainID, String line, int num)
+	public void updatePassengers(int departing, int boarding, int trainID, String line, int num)
 	{
 		Train train = getTrain(trainID);
 		Block st = null;
