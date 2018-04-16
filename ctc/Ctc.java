@@ -741,9 +741,22 @@ public class Ctc implements Updateable{
 
 		}
 		*/
-		double auth = calcAuth(route, route.getFirst(), route.getLast());
+		double auth = calcAuth(train.ID, route, route.getFirst(), route.getLast());
 		double speed = sp; // from ui
 
+		if(!route.isEmpty())
+		{
+			ArrayDeque<Block> rtemp = route.clone();
+			rtemp.poll();
+			Block biblock = rtemp.poll();
+			while(biblock != null && isBi(biblock) && biblock.reserved == -1 && !biblock.occupied)
+			{
+				train.reservedblocks.add(biblock);
+				biblock.reserved = train.ID;
+				biblock = rtemp.poll();
+			}
+		}
+		
 		train.setSpeed(speed);
 		train.setAuth(auth);
 		sendSpeedAuth(train, speed, auth);
@@ -808,9 +821,11 @@ public class Ctc implements Updateable{
 		return false;
 	}
 
-	private static double calcAuth(ArrayDeque<Block> route, Block start, Block end) {
+	private static double calcAuth(int ID, ArrayDeque<Block> route, Block start, Block end) {
 		
 		//System.out.println("calc auth");
+		
+		int res = 0;
 		
 		double auth = 0;
 		boolean flipped = false;
@@ -844,7 +859,7 @@ public class Ctc implements Updateable{
 			block = temp.poll();
 
 			// check for trains in the way
-			if (block.occupied || block.broken) 
+			if (block.occupied || block.broken || (block.reserved != -1 && block.reserved != ID)) 
 			{
 				if(!prev.equals(route.peekFirst()))
 					auth -= prev.length;
@@ -1084,6 +1099,8 @@ public class Ctc implements Updateable{
 				rows[count][6] = "Closed";
 			else if(block.broken)
 				rows[count][6] = "Broken";
+			else if(block.reserved != -1)
+				rows[count][6] = "Reserved by " + block.reserved;
 			else
 				rows[count][6] = "";
 
@@ -1441,7 +1458,19 @@ public class Ctc implements Updateable{
 			train = temp.poll();
 
 			if (train.getRoute() != null && train.getRoute().contains(bl)) {
-				train.setAuth(calcAuth(train.getRoute(), train.getLoc(), train.getRoute().peekLast()));
+				train.setAuth(calcAuth(train.ID, train.getRoute(), train.getLoc(), train.getRoute().peekLast()));
+				if(!train.route.isEmpty())
+				{
+					ArrayDeque<Block> rtemp = train.route.clone();
+					rtemp.poll();
+					Block biblock = rtemp.poll();
+					while(biblock != null && isBi(biblock) && biblock.reserved == -1 && !biblock.occupied)
+					{
+						train.reservedblocks.add(biblock);
+						biblock.reserved = train.ID;
+						biblock = rtemp.poll();
+					}
+				}
 				sendSpeedAuth(train, train.setpoint_speed, train.authority);
 			}
 		}
@@ -2043,6 +2072,7 @@ public class Ctc implements Updateable{
 		protected int passengers;
 		protected int driverID;
 		protected Block lastBlock;
+		protected ArrayDeque<Block> reservedblocks;
 
 		public Train() {
 			ID = 0;
@@ -2055,6 +2085,7 @@ public class Ctc implements Updateable{
 			passengers = 0;
 			driverID = 0;
 			lastBlock = null;
+			reservedblocks = new ArrayDeque<Block>();
 		}
 
 		public Train(int id, Block loc, int dID) {
@@ -2068,7 +2099,7 @@ public class Ctc implements Updateable{
 			passengers = 0;
 			driverID = dID;
 			lastBlock = null;
-
+			reservedblocks = new ArrayDeque<Block>();
 		}
 
 		public Train(int id, Block loc, double auth, double speed, ArrayDeque<Block> r) {
@@ -2082,6 +2113,17 @@ public class Ctc implements Updateable{
 			passengers = 0;
 			driverID = 0;
 			lastBlock = null;
+			reservedblocks = new ArrayDeque<Block>();
+		}
+		
+		private void clearReserved()
+		{
+			for(Block blk : reservedblocks)
+			{
+				blk.reserved = -1;
+			}
+			
+			reservedblocks = new ArrayDeque<Block>();
 		}
 
 		private Block getPrevBlock()
@@ -2105,6 +2147,8 @@ public class Ctc implements Updateable{
 			lastBlock = location;
 			location = newLoc;
 			route.poll();
+			if(!reservedblocks.contains(location))
+				this.clearReserved();
 		}
 
 		public Block getLoc() {
