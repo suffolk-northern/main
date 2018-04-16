@@ -1180,6 +1180,11 @@ public class CtcUI extends javax.swing.JFrame {
 	
     private void scheduleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_scheduleButtonActionPerformed
 		// TODO add your handling code here:
+		
+		String line = (String) lineSelect.getSelectedItem();
+		
+		ctc.openSchedule(line);
+		
     }//GEN-LAST:event_scheduleButtonActionPerformed
 
     private void multSelectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_multSelectActionPerformed
