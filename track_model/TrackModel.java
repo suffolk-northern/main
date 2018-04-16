@@ -561,6 +561,14 @@ public class TrackModel implements Updateable {
 		}
 	}
 
+	/**
+	 * Passengers exchange.
+	 *
+	 * @param trainId
+	 * @param departing
+	 * @param availableSeats
+	 * @return
+	 */
 	public static int exchangePassengers(int trainId, int departing, int availableSeats) {
 		int boarding = Station.generatePassengers();
 		String line = "";
