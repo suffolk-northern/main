@@ -323,12 +323,18 @@ public class TrainModel
 
 	// Opens specified door(s).
 	//
+	// Side effect: Exchanges passengers with the track model for the
+	// nearest station.
+	//
 	// No failure modes. Always succeeds.
 	public void openDoor(DoorLocation location)
 	{
 		int index = doorLocationToIndex(location);
 
 		doors[index] = true;
+
+		// TODO: model passengers
+		track.exchangePassengers(id(), 7, 400);
 	}
 
 	// Closes specified door(s).
