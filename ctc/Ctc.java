@@ -1358,7 +1358,7 @@ public class Ctc implements Updateable{
 		}
 	}
 	
-	public static void updatePassengers(int departing, int boarding, int trainID, String station)
+	public static void updatePassengers(int departing, int boarding, int trainID, String line, int num)
 	{
 		Train train = getTrain(trainID);
 		Block st = null;
@@ -1366,7 +1366,7 @@ public class Ctc implements Updateable{
 		ArrayDeque<Block> stemp = stations.clone();
 		for(Block block : stemp)
 		{
-			if(block.station.equalsIgnoreCase(station))
+			if(block.line.equalsIgnoreCase(line) && block.num == num)
 			{
 				st = block;
 				break;
