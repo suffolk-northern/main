@@ -1000,8 +1000,8 @@ public class TrackModel implements Updateable {
 				if (tmf != null) {
 					tmf.refreshTables();
 				}
-				count = 0;
 			}
+			count = 0;
 		}
 		//
 		// Needs to check beacons constantly.
