@@ -16,7 +16,7 @@ public class Station {
 	// Station name
 	protected String name;
 	// Passengers at the station
-	protected int passengers;
+	protected int passengers = 0;
 	// Beacon message
 	protected Beacon beaconPrev;
 	protected Beacon beaconNext;
@@ -106,7 +106,7 @@ public class Station {
 	 * @return passengers
 	 */
 	public static int generatePassengers() {
-		return (int) (Math.random() * 20);
+		return (int) (Math.random() * 25);
 	}
 
 	@Override

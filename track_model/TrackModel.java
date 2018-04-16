@@ -5,6 +5,7 @@
  */
 package track_model;
 
+import ctc.Ctc;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -27,6 +28,8 @@ public class TrackModel implements Updateable {
 	private static TrackModelFrame tmf;
 	// Database helper.
 	protected static final DbHelper dbHelper = new DbHelper();
+	// CTC
+	private Ctc ctc;
 
 	// ArrayList of registered trains.
 	protected static ArrayList<TrainData> trains = new ArrayList<>();
@@ -560,9 +563,27 @@ public class TrackModel implements Updateable {
 
 	public static int exchangePassengers(int trainId, int departing, int availableSeats) {
 		int boarding = Station.generatePassengers();
+		String line = "";
+		int block = -1;
 
-        ctc.updatePassengers(departing, boarding, train, station);
-		return boarding;
+		for (TrainData td : trains) {
+			if (td.trainModel.id() == trainId) {
+				line = td.trackBlock.line;
+				block = td.trackBlock.block;
+				Station s = getStation(line, block);
+				boarding += s.passengers;
+				s.passengers = 0;
+				if (boarding > availableSeats) {
+					s.passengers = boarding - availableSeats;
+					boarding = availableSeats;
+				}
+			}
+		}
+		if (block != -1) {
+			ctc.updatePassengers(departing, boarding, trainId, line, block);
+			return boarding;
+		}
+		return 0;
 	}
 
 	/**
@@ -767,6 +788,15 @@ public class TrackModel implements Updateable {
 				td.trainModel.trackCircuit().send(tmc);
 			}
 		}
+	}
+
+	/**
+	 * Registers CTC locally.
+	 *
+	 * @param ctc
+	 */
+	public void registerCtc(Ctc ctc) {
+		this.ctc = ctc;
 	}
 
 	/**
