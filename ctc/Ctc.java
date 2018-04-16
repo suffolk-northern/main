@@ -44,6 +44,8 @@ public class Ctc implements Updateable{
 	public static ArrayDeque<Block> switches = new ArrayDeque<Block>();
 	public static ArrayDeque<TrackCon> trackcons = new ArrayDeque<TrackCon>();
 	
+	public static ArrayDeque<Loop> loops = new ArrayDeque<Loop>();
+	
 	public static ArrayDeque<Train> dispatched = new ArrayDeque<Train>();
 
 	public static Updater updater;
@@ -2058,6 +2060,46 @@ public class Ctc implements Updateable{
 		public Block getTo() {
 			return to;
 		}
+	}
+	
+	protected static class Loop{
+		
+		protected ArrayDeque<Block> loop;
+		protected ArrayDeque<Block> bitrack;
+		
+		public Loop()
+		{
+			loop = new ArrayDeque<Block>();
+			bitrack = new ArrayDeque<Block>();
+		}
+		
+		public int trainsOnLoop()
+		{
+			int num = 0;
+			
+			for(Block blk : loop)
+			{
+				for(Train train : trains)
+				{
+					if(train.location.equals(blk))
+					{
+						num++;
+						break;
+					}
+				}
+			}
+			
+			return num;
+		}
+		
+		public boolean atCapacity()
+		{
+			if(trainsOnLoop() >= loop.size()/2)
+				return true;
+			else
+				return false;
+		}
+		
 	}
 
 	protected static class Train {
