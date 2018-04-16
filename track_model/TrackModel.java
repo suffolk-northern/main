@@ -641,6 +641,7 @@ public class TrackModel implements Updateable {
 	 */
 	public static ArrayList<Integer> getDefaultLine(String line) {
 		ArrayList<Integer> defaultLine = new ArrayList<>();
+		line = line.toLowerCase();
 		// Red line temporarily hard coded
 		if (line.equalsIgnoreCase("red")) {
 			int[] redLine = {9, 8, 7, 6, 5, 4, 3, 2, 1, 15, 16, 17, 18, 19, 20,
@@ -658,45 +659,33 @@ public class TrackModel implements Updateable {
 		//
 		// Iterates through blocks to find valid route.
 		//
-		try {
-			TrackBlock first = getFirstBlock(line);
-			int swit = 0;
-			boolean valid = false;
-			int cur = first.block;
-			int prev = first.switchDirection > 0 ? 999 : -1;
+		TrackBlock first = getFirstBlock(line);
+		int swit = 0;
+		boolean valid = false;
+		int cur = first.block;
+		int prev = first.switchDirection > 0 ? 999 : -1;
 
-			try (Connection conn = dbHelper.getConnection()) {
-				while (swit != 0 || !valid) {
-					ResultSet rs = dbHelper.query(conn, "SELECT * FROM CONNECTIONS WHERE LINE='" + line + "' AND BLOCK=" + cur);
-					if (rs.next()) {
-						defaultLine.add(cur);
-						if (cur > prev && rs.getInt(7) == 1) {
-							prev = cur;
-							cur = rs.getInt(6);
-							valid = rs.getInt(9) == 1;
-						} else if (cur < prev && rs.getInt(5) == 1) {
-							prev = cur;
-							cur = rs.getInt(4);
-							valid = rs.getInt(9) == -1;
-						} else {
-							prev = cur;
-							cur = rs.getInt(8);
-							valid = false;
-						}
-						if (first != null && first.block == prev) {
-							first = null;
-							continue;
-						}
-						swit = rs.getInt(8);
-					} else {
-						break;
-
-					}
-				}
+		while (swit != 0 || !valid) {
+			TrackBlock tb = getBlock(line, cur);
+			defaultLine.add(cur);
+			if (cur > prev && tb.nextBlockDir == 1) {
+				prev = cur;
+				cur = tb.nextBlockId;
+				valid = tb.switchDirection == 1;
+			} else if (cur < prev && tb.prevBlockDir == 1) {
+				prev = cur;
+				cur = tb.prevBlockId;
+				valid = tb.switchDirection == -1;
+			} else {
+				prev = cur;
+				cur = tb.switchBlockId;
+				valid = false;
 			}
-		} catch (SQLException ex) {
-			Logger.getLogger(TrackModel.class
-					.getName()).log(Level.SEVERE, null, ex);
+			if (first != null && first.block == prev) {
+				first = null;
+				continue;
+			}
+			swit = tb.switchBlockId;
 		}
 		return defaultLine;
 	}
@@ -716,6 +705,7 @@ public class TrackModel implements Updateable {
 				ResultSet rs = dbHelper.query(conn, "SELECT COUNT(BLOCK) FROM BLOCKS;");
 				if (rs.next()) {
 					count = rs.getInt(1);
+
 				}
 			}
 		} catch (SQLException ex) {
@@ -741,6 +731,7 @@ public class TrackModel implements Updateable {
 				ResultSet rs = dbHelper.query(conn, "SELECT COUNT(BLOCK) FROM BLOCKS WHERE LINE='" + line + "';");
 				if (rs.next()) {
 					count = rs.getInt(1);
+
 				}
 			}
 		} catch (SQLException ex) {
@@ -1037,6 +1028,7 @@ public class TrackModel implements Updateable {
 				double d = getDistanceAlongBlock(tb.line, tb.block, getPositionAlongBlock(tb, i));
 				if (i - d > 5) {
 					System.out.println("problem " + tb.block + ", " + i + " meters");
+
 				}
 			}
 		}
