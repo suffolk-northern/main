@@ -2147,8 +2147,10 @@ public class Ctc implements Updateable{
 			lastBlock = location;
 			location = newLoc;
 			route.poll();
-			if(!reservedblocks.contains(location))
+			if(!reservedblocks.isEmpty() && !reservedblocks.contains(location))
+			{
 				this.clearReserved();
+			}
 		}
 
 		public Block getLoc() {
