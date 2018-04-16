@@ -815,9 +815,15 @@ public class Ctc implements Updateable{
 		boolean success = false;
 
 		// authority does not include our current block
-		while (!block.equals(start)) {
+		while (block != null && !block.equals(start)) {
 			prev = block;
 			block = temp.poll();
+		}
+		
+		if(block == null)
+		{
+			System.out.println("block null with start at " + start.display());
+			return auth;
 		}
 
 		while (!temp.isEmpty()) {
@@ -1541,7 +1547,8 @@ public class Ctc implements Updateable{
 		if(train.location.num == 0)
 		{
 			trackmodel.setYardMessage(train.ID, 0, tmc);
-			dispatched.add(train);
+			if(!dispatched.contains(train))
+				dispatched.add(train);
 		}
 		else
 			trackmodel.setBlockMessage(loc.line, loc.num, tmc);
