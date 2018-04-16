@@ -1512,6 +1512,15 @@ public class Ctc implements Updateable{
 		Block loc = train.getLoc();
 
 		//SwitchAndPos swpos = getSwitches(train.getRoute()).peek();
+		
+		if(loc.num == 0)
+		{
+			if(!dispatched.contains(train))
+				dispatched.add(train);
+		}
+		
+		if(loc.num == 0 && dispatched != null && !dispatched.peekFirst().equals(train))
+			auth = 0;
 
 		Block sw = null;
 		Block from = null;
@@ -1547,8 +1556,6 @@ public class Ctc implements Updateable{
 		if(train.location.num == 0)
 		{
 			trackmodel.setYardMessage(train.ID, 0, tmc);
-			if(!dispatched.contains(train))
-				dispatched.add(train);
 		}
 		else
 			trackmodel.setBlockMessage(loc.line, loc.num, tmc);
