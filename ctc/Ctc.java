@@ -805,6 +805,9 @@ public class Ctc implements Updateable{
 		if(route.isEmpty())
 			return auth;
 		
+		if(start == null || end == null)
+			return auth;
+		
 		ArrayDeque<Block> temp = route.clone();
 		Block block = temp.poll();
 		Block prev = null;
@@ -1128,11 +1131,7 @@ public class Ctc implements Updateable{
 		
 		for(Train train : trains)
 		{
-			if(train.route == null || train.route.isEmpty())
-			{
-				continue;
-			}
-			else if(getFirstSwitch(train.route).peekFirst().equals(swblock))
+			if(train.route != null && !train.route.isEmpty() && getFirstSwitch(train.route) != null && getFirstSwitch(train.route).peekFirst().equals(swblock))
 			{
 				mytrains.add(train);
 			}
