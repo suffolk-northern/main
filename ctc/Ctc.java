@@ -89,7 +89,7 @@ public class Ctc implements Updateable{
 		
 		for(Block b : btemp)
 		{
-			updateAuth(b);
+			//updateAuth(b);
 		}
 		
 		toUpdate = new ArrayDeque<Block>();
@@ -120,7 +120,16 @@ public class Ctc implements Updateable{
 		
 		for(Block b : btemp)
 		{
-			updateAuth(b);
+			//updateAuth(b);
+		}
+		
+		for(Train t : trains)
+		{
+			if(t.route != null && !t.route.isEmpty())
+			{
+				updateAuth(t.location);
+				sendSpeedAuth(t,t.setpoint_speed,t.authority);
+			}
 		}
 		
 		clock.advance(time);
@@ -760,7 +769,7 @@ public class Ctc implements Updateable{
 			{
 				for(Loop loop : loops)
 				{
-					if(containsTrack(rtemp,loop.bitrack))
+					if(loop.bitrack.contains(biblock))
 					{
 						myloop = loop;
 						break;
@@ -877,9 +886,13 @@ public class Ctc implements Updateable{
 			return auth;
 		}
 
+		//System.out.println("Calc auth for train " + ID);
+		
 		while (!temp.isEmpty()) {
 			prev = block;
 			block = temp.poll();
+			
+			//System.out.println("block " + block.display() + " auth " + auth);
 
 			// check for trains in the way
 			if (block.occupied || block.broken || (block.reserved != -1 && block.reserved != ID)) 
@@ -887,6 +900,7 @@ public class Ctc implements Updateable{
 				if(!prev.equals(route.peekFirst()))
 					auth -= prev.length;
 				
+				//System.out.println("Occ or reserved. Auth " + auth + " to train " + ID);
 				return auth;
 			} // check switches are in correct position
 			else if (block.hasSwitch()) {
@@ -1012,6 +1026,7 @@ public class Ctc implements Updateable{
 			}
 		}
 
+		//System.out.println("Auth " + auth + " to train " + ID);
 		return auth;
 	}
 	
@@ -1480,7 +1495,7 @@ public class Ctc implements Updateable{
 		while (!temp.isEmpty()) {
 			train = temp.poll();
 
-			if (train.getRoute() != null && train.getRoute().contains(bl)) {
+			if (train.getRoute() != null && !train.route.isEmpty() /*&& train.getRoute().contains(bl)*/) {
 				train.setAuth(calcAuth(train.ID, train.getRoute(), train.getLoc(), train.getRoute().peekLast()));
 				if(!train.route.isEmpty())
 				{
@@ -1494,7 +1509,7 @@ public class Ctc implements Updateable{
 					{
 						for(Loop loop : loops)
 						{
-							if(containsTrack(rtemp,loop.bitrack) > 0)
+							if(loop.bitrack.contains(biblock))
 							{
 								myloop = loop;
 								break;
@@ -1509,6 +1524,7 @@ public class Ctc implements Updateable{
 						
 						for(Block bib : myloop.bitrack)
 						{
+							//System.out.println("reserving " + bib.display() + " for train " + train.ID);
 							train.reservedblocks.add(bib);
 							bib.reserved = train.ID;
 						}
