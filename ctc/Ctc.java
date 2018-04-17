@@ -753,6 +753,7 @@ public class Ctc implements Updateable{
 			ArrayDeque<Block> rtemp = route.clone();
 			rtemp.poll();
 			Block biblock = rtemp.poll();
+			biblock = rtemp.poll();
 			while(biblock != null && isBi(biblock) && biblock.reserved == -1 && !biblock.occupied)
 			{
 				train.reservedblocks.add(biblock);
@@ -1468,6 +1469,7 @@ public class Ctc implements Updateable{
 					ArrayDeque<Block> rtemp = train.route.clone();
 					rtemp.poll();
 					Block biblock = rtemp.poll();
+					biblock = rtemp.poll();
 					while(biblock != null && isBi(biblock) && biblock.reserved == -1 && !biblock.occupied)
 					{
 						train.reservedblocks.add(biblock);
@@ -2064,6 +2066,22 @@ public class Ctc implements Updateable{
 		}
 	}
 	
+	protected static boolean containsTrack(ArrayDeque<Block> route, ArrayDeque<Block> subtrack)
+	{
+		boolean contains = false;
+		
+		for(Block block : route)
+		{
+			for(Block sblock : subtrack)
+			{
+				if(block.equals(sblock))
+					return true;
+			}
+		}
+		
+		return contains;
+	}
+	
 	protected static void getLoops()
 	{
 		//System.out.println("in loops");
@@ -2224,7 +2242,7 @@ public class Ctc implements Updateable{
 		
 		public boolean atCapacity()
 		{
-			if(trainsOnLoop() >= loop.size()/2)
+			if(trainsOnLoop() >= (loop.size()-2)/2)
 				return true;
 			else
 				return false;
@@ -2319,7 +2337,7 @@ public class Ctc implements Updateable{
 			lastBlock = location;
 			location = newLoc;
 			route.poll();
-			if(!reservedblocks.isEmpty() && !reservedblocks.contains(location))
+			if(!reservedblocks.isEmpty() && !reservedblocks.contains(location) && reservedblocks.contains(lastBlock))
 			{
 				this.clearReserved();
 			}
