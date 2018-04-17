@@ -259,6 +259,8 @@ public class Ctc implements Updateable{
 		updateTrack();
 		updateTrains();
 		
+		getLoops();
+		
 		/*
 		// to debug biblocks
 		boolean bi = false;
@@ -2060,6 +2062,134 @@ public class Ctc implements Updateable{
 		public Block getTo() {
 			return to;
 		}
+	}
+	
+	protected static void getLoops()
+	{
+		//System.out.println("in loops");
+		
+		loops = new ArrayDeque<Loop>();
+		Loop l = null;
+		
+		ArrayDeque<Block> thisline = null;
+		for(int i = 0; i < 2; i++)
+		{
+			if(i==0)
+				thisline = greenline;
+			else
+				thisline = redline;
+			
+			Block blk;
+			for(Block b : thisline)
+			{
+				//System.out.println("start " + b.display());
+				blk = b;
+				
+				if(isBi(blk)  && blk.sw)
+				{
+					//System.out.println("bi switch");
+					l = new Loop();
+					l.bitrack.add(blk);
+					boolean dir;
+					if(isBackwardSwitch(blk))
+					{
+						dir = true;
+						blk = blk.next;
+					}
+					else
+					{
+						dir = false;
+						blk = blk.prev;
+					}
+					
+					while(blk != null && isBi(blk))
+					{
+						//System.out.println(blk.display() + " in bitrack");
+						l.bitrack.add(blk);
+						if(!blk.sw)
+						{
+							if(dir)
+								blk = blk.next;
+							else
+								blk = blk.prev;
+						}
+						else
+						{
+							//System.out.println(blk.display() + " in bitrack");
+							l.bitrack.add(blk);
+							if(dir && blk.nextBlockDir == 1)
+							{
+								blk = blk.sw_to.peekFirst();
+							}
+							else if(dir)
+							{
+								blk = blk.sw_to.peekLast();
+							}
+							else if(!dir && blk.prevBlockDir == 1)
+							{
+								blk = blk.sw_from.peekFirst();
+							}
+							else
+							{
+								blk = blk.sw_from.peekLast();
+							}
+							
+							break;
+						}
+						
+					}
+					
+					while(blk != null && !isBi(blk))
+					{
+						//System.out.println(blk.display() + " in loop");
+						l.loop.add(blk);
+						if(!blk.sw)
+						{
+							if(blk.nextBlockDir == 1)
+								blk = blk.next;
+							else
+								blk = blk.prev;
+						}
+						else
+							break;
+						
+					}
+					
+					//System.out.println("considering whether to add " + blk.display());
+						
+					if(l.bitrack.contains(blk))
+					{
+						//System.out.println("adding loop");
+						loops.add(l);
+					}
+					
+					
+						
+					
+				}
+				
+			}
+		}
+		
+		/*
+		for(Loop loop : loops)
+		{
+			for(Block blk : loop.bitrack)
+			{
+				System.out.print(blk.display() + " ");
+			}
+			
+			System.out.println();
+			
+			for(Block blk : loop.loop)
+			{
+				System.out.print(blk.display() + " ");
+			}
+			
+			System.out.println("\n");
+			
+		}
+		*/
 	}
 	
 	protected static class Loop{
