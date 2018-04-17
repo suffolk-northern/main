@@ -6,6 +6,7 @@ import java.lang.Math;
 import train_model.communication.ControllerLink;
 import train_model.communication.TrackMovementCommand;
 import train_model.communication.MboMovementCommand;
+import train_model.communication.BeaconMessage;
 import train_model.DoorLocation;
 import updater.Updateable;
 
@@ -52,6 +53,8 @@ public class TrainController implements Updateable
 
 	int currAuth;			// ctc/mbo cmd
 	double movingAuth = 0.0;
+        double totalMovingAuth = 0.0;
+        boolean stationInterval = false;
 
 	ArrayList<String> ads = new ArrayList<>();
 
@@ -122,7 +125,7 @@ public class TrainController implements Updateable
         
         public void setLeftDoors(boolean cmd)
         {
-		if(cmd)
+		if(cmd && currentSpeed == 0)
 			link.openDoor(DoorLocation.left);
 		else
 			link.closeDoor(DoorLocation.left);
@@ -130,7 +133,7 @@ public class TrainController implements Updateable
         
         public void setRightDoors(boolean cmd)
         {
-		if(cmd)
+		if(cmd && currentSpeed == 0)
 			link.openDoor(DoorLocation.right);
 		else
 			link.closeDoor(DoorLocation.right);
@@ -196,32 +199,55 @@ public class TrainController implements Updateable
 		MboMovementCommand mboMsg = link.receiveFromMbo();
 		if (mboMsg!=null)
 		{
-			speedCMD = (double)mboMsg.speed * 0.277778; // convert kph to mps
-			currAuth = mboMsg.authority;
-			movingAuth = currAuth;
+                    currAuth = mboMsg.authority;
+                    speedCMD = (double)mboMsg.speed * 0.277778; // convert kph to mps
+                    movingAuth = currAuth;
 		}
 		if (ctcMsg!=null)
 		{
-			speedCMD = (double)ctcMsg.speed *  0.277778; // convert kph to mps
-			currAuth = ctcMsg.authority;
-			movingAuth = currAuth;
+                    currAuth = ctcMsg.authority;
+                    speedCMD = (double)ctcMsg.speed * 0.277778; // convert kph to mps
+                    movingAuth = currAuth;
 		}
-		movingAuth -= displacement(millis);
-		if(movingAuth < 0)
+                double disp = displacement(millis);
+		movingAuth -= disp;
+                totalMovingAuth -= disp;
+		if(movingAuth < 1 && currentSpeed == 0)
 		{
-			// TODO flash console light or something
+                    // train stopped for auth reasons
+                    //if(totalMovingAuth > movingAuth)
+                        
 		}
 	}
-
+        /*
+        private void stationStopper()
+        {
+            BeaconMessage msg = link.receiveFromBeacons();
+            if(msg.string != null)
+            {
+                stationInterval = !stationInterval;
+                if(stationInterval)
+                {
+                    totalMovingAuth = movingAuth;
+                    movingAuth = 160;
+                }
+                
+            }
+        }
+        */
+        
 	// millis is ignored as this is not a model module
 	// All units are meters and seconds
 	public void update(int millis) 
 	{
+                System.out.println("contr disp: " + movingAuth);
+            
 		lastSpeed = currentSpeed;
 		currentSpeed = link.speed();
 
 		// Update authority
 		authority(millis);
+                //stationStopper();
 
 		// Set desired speed
 		if(manualMode)
