@@ -156,27 +156,12 @@ public class TrackModel implements Updateable {
 			Station s = stations.get(i);
 			Station dupe = null;
 			TrackBlock tb = getBlock(s.line, s.block);
+			s.setLocation(getPositionAlongBlock(tb, tb.length / 2));
 			//
-			// Checks for stations attributed to multiple blocks.
+			// Adds beacon at start and end of block.
 			//
-			for (int j = 0; j < i; j++) {
-				Station temp = stations.get(j);
-				if (s.name.equalsIgnoreCase(temp.name)) {
-					dupe = temp;
-					break;
-				}
-			}
-			if (dupe != null) {
-				GlobalCoordinates sLocation = getPositionAlongBlock(tb, tb.length / 2);
-				double newLon = (sLocation.longitude() + dupe.location.longitude()) / 2;
-				double newLat = (sLocation.latitude() + dupe.location.latitude()) / 2;
-				s.setLocation(new GlobalCoordinates(newLat, newLon));
-				dupe.setLocation(new GlobalCoordinates(newLat, newLon));
-			} else {
-				s.setLocation(getPositionAlongBlock(tb, tb.length / 2));
-			}
-			s.setBeaconPrev(new Beacon(getPositionAlongBlock(tb, 10), s.block + " PREV"));
-			s.setBeaconNext(new Beacon(getPositionAlongBlock(tb, tb.length - 10), s.block + " NEXT"));
+			s.setBeaconPrev(new Beacon(tb.start, tb.length / 2 + "," + s.getSide()));
+			s.setBeaconNext(new Beacon(tb.end, tb.length / 2 + "," + s.getSide() / -1));
 			beacons.add(s.beaconPrev);
 			beacons.add(s.beaconNext);
 		}
@@ -455,6 +440,7 @@ public class TrackModel implements Updateable {
 					s = new Station(line, block);
 					s.setSection(rs.getString(2).charAt(0));
 					s.setName(rs.getString(4));
+					s.setSide(rs.getInt(7));
 				} else {
 					System.out.println("Invalid station.");
 				}
