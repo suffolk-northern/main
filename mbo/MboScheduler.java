@@ -101,6 +101,7 @@ public class MboScheduler implements Updateable
 			{
 				lineSched = makeSchedule(start, end, throughput);
 				ui.setSchedule(lineSched);
+				ui.setMessage("Finished generating schedule.");
 				// System.out.println("Got here");
 			}
 			
@@ -128,12 +129,12 @@ public class MboScheduler implements Updateable
 			}
 			else 
 			{
-				System.out.printf("Making events at station %s%n", curBlock.getStation());
+				// System.out.printf("Making events at station %s%n", curBlock.getStation());
 				travelTime = curBlock.getSpeedLimit() * curBlock.getLength();
 				long t = curTime.getTime();
 				Time arrTime = new Time(t + (long) (travelTime / 2));
 				te.add(new TrainEvent(arrTime, arr, curBlock.getStation()));
-				Time depTime = new Time(t + dwellTime + (long) (travelTime / 2));
+				Time depTime = new Time((arrTime.getTime()) + (long) dwellTime);
 				te.add(new TrainEvent(depTime, dep, curBlock.getStation()));
 			}
 		}
@@ -182,7 +183,7 @@ public class MboScheduler implements Updateable
 		while (curTime.before(end))
 		{
 			int timeSlot = curTime.getHours() - start.getHours();
-			System.out.printf("Time slot: %d%n", timeSlot);
+			// System.out.printf("Time slot: %d%n", timeSlot);
 			if (!trainArrTimes.isEmpty() && curTime.after(trainArrTimes.peek()))
 			{
 				trainArrTimes.poll();
