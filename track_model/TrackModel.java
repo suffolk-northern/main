@@ -52,11 +52,6 @@ public class TrackModel implements Updateable {
 	public static void main(String[] args) {
 		TrackModel tm = new TrackModel();
 		tm.launchTestUI();
-		for (Station s : tm.stations) {
-			System.out.println(tm.getBlock(s.line, s.block).length);
-			System.out.println(s.beaconPrev.message);
-			System.out.println(s.beaconNext.message);
-		}
 	}
 
 	/**
