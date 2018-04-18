@@ -903,10 +903,18 @@ public class Ctc implements Updateable{
 				//System.out.println("Occ or reserved. Auth " + auth + " to train " + ID);
 				return auth;
 			} // check switches are in correct position
+			else if(block.equals(end) && block.hasStation && !block.hasSwitch())
+			{
+				auth += block.length / 2;
+			}
 			else if (block.hasSwitch()) {
 				if (isForwardSwitch(block) && temp.peek() != null && block.sw_to.contains(temp.peek()) && (!block.getSwitchCurrTo().equals(temp.peek()))) 
 				{
-					auth += block.length;
+					if(block.equals(end) && block.hasStation)
+						auth += block.length / 2;
+					else
+						auth += block.length;
+					
 					success = false;
 					
 					if(flipped)
@@ -954,7 +962,10 @@ public class Ctc implements Updateable{
 						return auth;
 					}
 					
-					auth += block.length;
+					if(block.equals(end) && block.hasStation)
+						auth += block.length / 2;
+					else
+						auth += block.length;
 				}
 				else if (isBackwardSwitch(block) && prev != null && block.sw_from.contains(prev) && !block.getSwitchCurrFrom().equals(prev)) 
 				{
@@ -985,11 +996,18 @@ public class Ctc implements Updateable{
 						return auth;
 					}
 					
-					auth += block.length;
+					if(block.equals(end) && block.hasStation)
+						auth += block.length / 2;
+					else
+						auth += block.length;
 				} 
 				else if (isBackwardSwitch(block) && temp.peek() != null && block.sw_from.contains(temp.peek()) && !block.getSwitchCurrFrom().equals(temp.peek())) 
 				{
-					auth += block.length;
+					if(block.equals(end) && block.hasStation)
+						auth += block.length / 2;
+					else
+						auth += block.length;
+					
 					success = false;
 					
 					if(flipped)
@@ -1016,12 +1034,16 @@ public class Ctc implements Updateable{
 				}
 				else 
 				{
-					auth += block.length;
+					if(block.equals(end) && block.hasStation)
+						auth += block.length / 2;
+					else
+						auth += block.length;
 				}
 				
 				flipped = true;
 				
-			} else {
+			} 
+			else {
 				auth += block.length;
 			}
 		}
