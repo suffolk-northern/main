@@ -60,17 +60,17 @@ public class MboScheduler implements Updateable
 	
 	public void initLine()
 	{
-		System.out.println("Got here");
+		// System.out.println("Got here");
 		if (line == null)
 		{
 			ArrayList<Integer> defaultLine = trackModel.getDefaultLine(lineName);
 			int numBlocks = defaultLine.size();
-			System.out.printf("Num blocks: %d%n", numBlocks);
+			// System.out.printf("Num blocks: %d%n", numBlocks);
 			line = new BlockTracker[numBlocks];
 			for (int i = 0; i < numBlocks; i++)
 			{
 				TrackBlock curBlock = TrackModel.getBlock(lineName, defaultLine.get(i));
-				System.out.printf("Checking block %d%n", curBlock);
+				// System.out.printf("Checking block %d%n", curBlock.getBlock());
 				double blockLength = curBlock.getLength();
 				int nextBlock = curBlock.getNextBlockId();
 				int prevBlock = curBlock.getPrevBlockId();
@@ -81,7 +81,7 @@ public class MboScheduler implements Updateable
 				if (curBlock.isIsStation())
 				{
 					stationName = TrackModel.getStation(lineName, defaultLine.get(i)).getName();
-					System.out.printf("Station name: %s%n", stationName);
+					// System.out.printf("Station name: %s%n", stationName);
 				}
 					
 				line[i] = new BlockTracker(defaultLine.get(i), nextBlock, prevBlock, blockLength, speedLimit, section, stationName, false, false);
@@ -101,7 +101,7 @@ public class MboScheduler implements Updateable
 			{
 				lineSched = makeSchedule(start, end, throughput);
 				ui.setSchedule(lineSched);
-				System.out.println("Got here");
+				// System.out.println("Got here");
 			}
 			
 		}
@@ -145,7 +145,7 @@ public class MboScheduler implements Updateable
 	{
 		TrainSchedule ts = makeTrainSchedule(new Time(0), 1);
 		int lastEventInd = ts.getEvents().size();
-		TrainEvent lastEvent = ts.getEvents().get(lastEventInd);
+		TrainEvent lastEvent = ts.getEvents().get(lastEventInd-1);
 		return lastEvent.getTime();
 	}
 	
@@ -208,11 +208,15 @@ public class MboScheduler implements Updateable
 				// TODO: add logic for adding to the schedules of repeat trains
 				Time arrTime = new Time(curTime.getTime() + getLoopTime().getTime());
 				trainArrTimes.add(arrTime);
+				trainArr.add(useTrain);
 				Driver useDriver = null;
 				for (Driver d : freeDrivers)
 				{
 					boolean useThisDriver = false;
-					if (arrTime.before(d.getLunchStart()))
+					// Driver won't have times initialized if they haven't been used yet
+					if (!d.isTimesInitialized())
+						useThisDriver = true;
+					else if (arrTime.before(d.getLunchStart()))
 						useThisDriver = true;
 					else if (curTime.after(d.getLunchEnd()) && arrTime.before(d.getShiftEnd()))
 						useThisDriver = true;
