@@ -123,7 +123,12 @@ public class MboScheduler implements Updateable
 			{
 				// In seconds
 				// TODO: check units
-				travelTime = curBlock.getSpeedLimit() * curBlock.getLength();
+				// Block length in m
+				double blockLength = curBlock.getLength();
+				// Speed limit in kph --> m/s
+				double speedLimit = curBlock.getSpeedLimit() * (1000 / 3600);
+				// time to travel block in ms
+				travelTime = (speedLimit / blockLength) * 1000;
 				long t = curTime.getTime();
 				curTime = new Time(t + (long) travelTime);
 			}
@@ -134,7 +139,7 @@ public class MboScheduler implements Updateable
 				long t = curTime.getTime();
 				Time arrTime = new Time(t + (long) (travelTime / 2));
 				te.add(new TrainEvent(arrTime, arr, curBlock.getStation()));
-				Time depTime = new Time((arrTime.getTime()) + (long) dwellTime);
+				Time depTime = new Time((arrTime.getTime()) + (long) dwellTime*1000);
 				te.add(new TrainEvent(depTime, dep, curBlock.getStation()));
 			}
 		}

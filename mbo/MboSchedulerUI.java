@@ -88,13 +88,12 @@ public class MboSchedulerUI extends javax.swing.JFrame
         individualScheduleTable = new javax.swing.JTable();
         individualScheduleLabel = new javax.swing.JLabel();
         chooseStationLabel = new javax.swing.JLabel();
-        jFormattedTextField1 = new javax.swing.JFormattedTextField();
         jScrollPane4 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
         jButton7 = new javax.swing.JButton();
         jButton8 = new javax.swing.JButton();
-        jComboBox4 = new javax.swing.JComboBox<>();
-        jLabel9 = new javax.swing.JLabel();
+        trainScheduleCombo = new javax.swing.JComboBox<>();
+        chooseTrainLabel = new javax.swing.JLabel();
         jButton9 = new javax.swing.JButton();
         jButton10 = new javax.swing.JButton();
         jLabel10 = new javax.swing.JLabel();
@@ -411,7 +410,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
         });
         jScrollPane3.setViewportView(individualScheduleTable);
 
-        schedulePanel.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 80, 380, 180));
+        schedulePanel.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 110, 380, 180));
 
         individualScheduleLabel.setFont(new java.awt.Font("Tahoma", 0, 18)); 
         individualScheduleLabel.setText("Choose a train or driver");
@@ -419,9 +418,6 @@ public class MboSchedulerUI extends javax.swing.JFrame
 
         chooseStationLabel.setText("Select a station:");
         schedulePanel.add(chooseStationLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 70, -1, -1));
-
-        jFormattedTextField1.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(java.text.DateFormat.getTimeInstance(java.text.DateFormat.MEDIUM))));
-        schedulePanel.add(jFormattedTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 280, 110, -1));
 
         jTextArea1.setColumns(20);
         jTextArea1.setLineWrap(true);
@@ -436,11 +432,11 @@ public class MboSchedulerUI extends javax.swing.JFrame
         jButton8.setText("Undo");
         schedulePanel.add(jButton8, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 510, -1, -1));
 
-        jComboBox4.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Pioneer", "Edgebrook", "Whited" }));
-        schedulePanel.add(jComboBox4, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 320, -1, -1));
+        trainScheduleCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Not initialized" }));
+        schedulePanel.add(trainScheduleCombo, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 70, -1, -1));
 
-        jLabel9.setText("Edit station:");
-        schedulePanel.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 320, -1, -1));
+        chooseTrainLabel.setText("Select a train:");
+        schedulePanel.add(chooseTrainLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 320, -1, -1));
 
         jButton9.setText("Add");
         schedulePanel.add(jButton9, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 320, -1, -1));
@@ -758,8 +754,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
     private javax.swing.JComboBox<String> startTimeCombo;
     private javax.swing.JComboBox<String> endTimeCombo;
     private javax.swing.JComboBox<String> stationScheduleCombo;
-    private javax.swing.JComboBox<String> jComboBox4;
-    private javax.swing.JFormattedTextField jFormattedTextField1;
+    private javax.swing.JComboBox<String> trainScheduleCombo;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -771,7 +766,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel individualScheduleLabel;
     private javax.swing.JLabel chooseStationLabel;
-    private javax.swing.JLabel jLabel9;
+    private javax.swing.JLabel chooseTrainLabel;
     private javax.swing.JPanel mainPanel;
     private javax.swing.JPanel schedulePanel;
     private javax.swing.JPanel jPanel3;
