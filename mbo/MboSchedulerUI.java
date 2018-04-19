@@ -85,18 +85,15 @@ public class MboSchedulerUI extends javax.swing.JFrame
         jButton5 = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
-        individualScheduleTable = new javax.swing.JTable();
+		driverSchedulePane = new javax.swing.JScrollPane();
+        trainScheduleTable = new javax.swing.JTable();
+		driverScheduleTable = new javax.swing.JTable();
         individualScheduleLabel = new javax.swing.JLabel();
         chooseStationLabel = new javax.swing.JLabel();
         jScrollPane4 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
-        jButton7 = new javax.swing.JButton();
-        jButton8 = new javax.swing.JButton();
         trainScheduleCombo = new javax.swing.JComboBox<>();
         chooseTrainLabel = new javax.swing.JLabel();
-        jButton9 = new javax.swing.JButton();
-        jButton10 = new javax.swing.JButton();
-        jLabel10 = new javax.swing.JLabel();
+        driverScheduleLabel = new javax.swing.JLabel();
 
 		mainMessageLabel = new JLabel();
 		throughputMessageLabel = new JLabel();	
@@ -388,64 +385,48 @@ public class MboSchedulerUI extends javax.swing.JFrame
         jLabel6.setText("Click a train or employee ID to see their schedule");
         schedulePanel.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 400, -1, -1));
 
-        individualScheduleTable.setModel(new DefaultTableModel(
-            new Object [][] {
-                {"8:20:00", "Begin Shift", "Yard"},
-                {"8:20:00", "Begin Driving Train 2", "Yard"},
-                {"12:20:00", "Get off Train", "Yard"},
-                {"12:20:00", "Begin Break", "Yard"},
-                {"12:50:00", "End Break", "Yard"},
-                {"12:50:00", "Begin Driving Train 6", "Yard"},
-                {"17:50:00", "End Driving Train 6", "Yard"},
-                {"17:50:00", "End Shift", "Yard"}
-            },
-            new String [] {
-                "Time", "Action", "Station"
-            }
+        trainScheduleTable.setModel(new DefaultTableModel(
+            new Object[][] {{"Not initialized", "Not initialized", "Not initialized"}},
+            new String[] {"Time", "Action", "Station"}
         ) {
             public boolean isCellEditable(int rowIndex, int columnIndex) 
 			{
                 return false;
             }
         });
-        jScrollPane3.setViewportView(individualScheduleTable);
-
+        jScrollPane3.setViewportView(trainScheduleTable);
         schedulePanel.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 110, 380, 180));
+		
+		driverScheduleTable.setModel(new DefaultTableModel(
+			new Object[][] {{"Not initialized", "Not initialized", "Not initialized"}},
+			new String[] {"Time", "Action", "Train ID"}
+		) {
+			public boolean isCellEditable(int rowIndex, int columnIndex)
+			{
+				return false;
+			}
+		});
+		driverSchedulePane.setViewportView(driverScheduleTable);
+		schedulePanel.add(driverSchedulePane, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 320, 380, 180));
 
         individualScheduleLabel.setFont(new java.awt.Font("Tahoma", 0, 18)); 
-        individualScheduleLabel.setText("Choose a train or driver");
+        individualScheduleLabel.setText("Train Schedule");
         schedulePanel.add(individualScheduleLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 30, -1, -1));
 
         chooseStationLabel.setText("Select a station:");
         schedulePanel.add(chooseStationLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 70, -1, -1));
 
-        jTextArea1.setColumns(20);
-        jTextArea1.setLineWrap(true);
-        jTextArea1.setRows(5);
-        jScrollPane4.setViewportView(jTextArea1);
-
         schedulePanel.add(jScrollPane4, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 400, 500, -1));
 
-        jButton7.setText("Confirm");
-        schedulePanel.add(jButton7, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 510, -1, -1));
-
-        jButton8.setText("Undo");
-        schedulePanel.add(jButton8, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 510, -1, -1));
-
         trainScheduleCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Not initialized" }));
-        schedulePanel.add(trainScheduleCombo, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 70, -1, -1));
+        schedulePanel.add(trainScheduleCombo, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 70, -1, -1));
 
         chooseTrainLabel.setText("Select a train:");
-        schedulePanel.add(chooseTrainLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 320, -1, -1));
-
-        jButton9.setText("Add");
-        schedulePanel.add(jButton9, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 320, -1, -1));
-
-        jButton10.setText("Remove");
-        schedulePanel.add(jButton10, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 320, -1, -1));
-
-        jLabel10.setText("minutes");
-        schedulePanel.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 280, -1, -1));
+        schedulePanel.add(chooseTrainLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 70, -1, -1));
+		
+		driverScheduleLabel.setFont(new java.awt.Font("Tahoma", 0, 18));
+        driverScheduleLabel.setText("Driver Schedule");
+        schedulePanel.add(driverScheduleLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 300, -1, -1));
 
         getContentPane().add(schedulePanel, "card4");
 
@@ -501,13 +482,18 @@ public class MboSchedulerUI extends javax.swing.JFrame
 			if (!schedule.stationSchedulesExist())
 				schedule.generateStationSchedules();
 			String defaultStation = schedule.getStationNames().get(0);
-			// Fill in station selection combo box
+			// Populate the station selection combo box
 			String[] stations = new String[schedule.getStationNames().size()];
 			for (int i = 0; i < schedule.getStationNames().size(); i++)
 			{
 				stations[i] = schedule.getStationNames().get(i);
 			}
 			stationScheduleCombo.setModel(new javax.swing.DefaultComboBoxModel<>(stations));
+			// Populate the train selection combo box
+			String[] trains = new String[schedule.getTrainIDs().size()];
+			for (int i = 0; i < schedule.getTrainIDs().size(); i++)
+				trains[i] = schedule.getTrainIDs().get(i).toString();
+			trainScheduleCombo.setModel(new javax.swing.DefaultComboBoxModel<>(trains));
 			// Make the station schedule table
 			generateStationTable(defaultStation);
 			CardLayout cl = (CardLayout)(getContentPane().getLayout());
@@ -741,22 +727,18 @@ public class MboSchedulerUI extends javax.swing.JFrame
 
     // Variables declaration - do not modify                     
     private javax.swing.JButton enterThroughputButton;
-    private javax.swing.JButton jButton10;
     private javax.swing.JButton loadScheduleButton;
     private javax.swing.JButton finishedThroughputButton;
     private javax.swing.JButton generateScheduleButton;
     private javax.swing.JButton viewShceduleButton;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton exportScheduleButton;
-    private javax.swing.JButton jButton7;
-    private javax.swing.JButton jButton8;
-    private javax.swing.JButton jButton9;
     private javax.swing.JComboBox<String> startTimeCombo;
     private javax.swing.JComboBox<String> endTimeCombo;
     private javax.swing.JComboBox<String> stationScheduleCombo;
     private javax.swing.JComboBox<String> trainScheduleCombo;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel driverScheduleLabel;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel2;
@@ -778,12 +760,13 @@ public class MboSchedulerUI extends javax.swing.JFrame
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
+	private javax.swing.JScrollPane driverSchedulePane;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTable throughputTable;
     private javax.swing.JTable stationScheduleTable;
-    private javax.swing.JTable individualScheduleTable;
+    private javax.swing.JTable trainScheduleTable;
+	private javax.swing.JTable driverScheduleTable;
     private javax.swing.JTable jTable4;
-    private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextField jTextField1;
 	private JLabel mainMessageLabel;
 	private JLabel throughputMessageLabel;
