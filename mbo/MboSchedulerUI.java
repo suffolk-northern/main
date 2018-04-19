@@ -87,7 +87,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
         jScrollPane3 = new javax.swing.JScrollPane();
         individualScheduleTable = new javax.swing.JTable();
         individualScheduleLabel = new javax.swing.JLabel();
-        jLabel8 = new javax.swing.JLabel();
+        chooseStationLabel = new javax.swing.JLabel();
         jFormattedTextField1 = new javax.swing.JFormattedTextField();
         jScrollPane4 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
@@ -295,7 +295,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
         jLabel4.setText("Enter Throughput");
 		
 		throughputMessageLabel.setFont(new java.awt.Font("Tahoma", 0, 14));	
-		throughputMessageLabel.setText("Testing testing testing");
+		throughputMessageLabel.setText("");
 
         finishedThroughputButton.setText("Return to Scheduler");
         finishedThroughputButton.addActionListener(new java.awt.event.ActionListener() 
@@ -346,7 +346,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
 		
 		scheduleMessageLabel.setFont(new java.awt.Font("Tahoma", 0, 14));
 		scheduleMessageLabel.setText("Testing testing testing");
-		schedulePanel.add(scheduleMessageLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 300, -1, -1));
+		schedulePanel.add(scheduleMessageLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 500, -1, -1));
 
         stationScheduleTable.setModel(new DefaultTableModel(
             new Object [][] {
@@ -417,8 +417,8 @@ public class MboSchedulerUI extends javax.swing.JFrame
         individualScheduleLabel.setText("Choose a train or driver");
         schedulePanel.add(individualScheduleLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 30, -1, -1));
 
-        jLabel8.setText("Delay selected by:");
-        schedulePanel.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 280, -1, -1));
+        chooseStationLabel.setText("Select a station:");
+        schedulePanel.add(chooseStationLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 70, -1, -1));
 
         jFormattedTextField1.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(java.text.DateFormat.getTimeInstance(java.text.DateFormat.MEDIUM))));
         schedulePanel.add(jFormattedTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 280, 110, -1));
@@ -501,10 +501,18 @@ public class MboSchedulerUI extends javax.swing.JFrame
         // View schedule button in main panel
 		if (schedule != null)
 		{
+			// Make the station schedules
 			if (!schedule.stationSchedulesExist())
 				schedule.generateStationSchedules();
 			String defaultStation = schedule.getStationNames().get(0);
-			System.out.println(defaultStation);
+			// Fill in station selection combo box
+			String[] stations = new String[schedule.getStationNames().size()];
+			for (int i = 0; i < schedule.getStationNames().size(); i++)
+			{
+				stations[i] = schedule.getStationNames().get(i);
+			}
+			stationScheduleCombo.setModel(new javax.swing.DefaultComboBoxModel<>(stations));
+			// Make the station schedule table
 			generateStationTable(defaultStation);
 			CardLayout cl = (CardLayout)(getContentPane().getLayout());
 			cl.show(getContentPane(), "card4");  
@@ -762,7 +770,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel individualScheduleLabel;
-    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel chooseStationLabel;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel mainPanel;
     private javax.swing.JPanel schedulePanel;

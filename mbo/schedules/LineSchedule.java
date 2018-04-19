@@ -46,8 +46,10 @@ public class LineSchedule {
 				int stationIdx = -1;
 				for (StationSchedule ss : stationSchedules)
 				{
-					if (stationName.equals(ss.getName()))
-						stationIdx = stationNames.indexOf(ss);
+					if (stationName.compareTo(ss.getName()) == 0)
+					{
+						stationIdx = stationSchedules.indexOf(ss);
+					}
 				}
 				
 				TrainEvent.EventType et = te.getEvent();
