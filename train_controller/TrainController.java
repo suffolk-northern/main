@@ -54,7 +54,10 @@ public class TrainController implements Updateable
 	int currAuth;			// ctc/mbo cmd
 	double movingAuth = 0.0;
         double totalMovingAuth = 0.0;
-        boolean stationInterval = false;
+        boolean stationGap = false;
+        boolean afterStation = false;
+        boolean mboMode;
+        double distFromLastBeacon;
 
 	ArrayList<String> ads = new ArrayList<>();
 
@@ -197,57 +200,69 @@ public class TrainController implements Updateable
 	{
 		TrackMovementCommand ctcMsg = link.receiveFromTrack();
 		MboMovementCommand mboMsg = link.receiveFromMbo();
+                BeaconMessage beaconMsg = link.receiveFromBeacons();
+                String[] bm;
+                boolean leftSide;
+		if (ctcMsg!=null & !stationGap)
+		{
+                    System.out.println("new ctc: " + currAuth + "\t\tspeed: " + link.speed());
+                    currAuth = ctcMsg.authority;
+                    speedCMD = (double)ctcMsg.speed * 0.277778; // convert kph to mps
+                    movingAuth = currAuth;
+                    mboMode = false;
+		}
 		if (mboMsg!=null)
 		{
                     currAuth = mboMsg.authority;
                     speedCMD = (double)mboMsg.speed * 0.277778; // convert kph to mps
                     movingAuth = currAuth;
-		}
-		if (ctcMsg!=null)
-		{
-                    currAuth = ctcMsg.authority;
-                    speedCMD = (double)ctcMsg.speed * 0.277778; // convert kph to mps
-                    movingAuth = currAuth;
+                    mboMode = true;
 		}
                 double disp = displacement(millis);
 		movingAuth -= disp;
                 totalMovingAuth -= disp;
+                distFromLastBeacon += disp;
+                
+                if(beaconMsg!=null)
+                {
+                    System.out.println(beaconMsg.string);
+                    distFromLastBeacon = 0;
+                }
+                
+                if (beaconMsg!=null & !afterStation & !mboMode)
+                {
+                    bm = beaconMsg.string.split(",");
+                    if(currAuth == 0 | currAuth == (int)Double.parseDouble(bm[0]))
+                    {
+                        currAuth = (int)Double.parseDouble(bm[0]);
+                        movingAuth = currAuth;
+                        stationGap = true;
+                    }
+                    if(bm[1].equals("-1"))
+                        leftSide = true;
+                    else
+                        leftSide = false;
+                }
+                if (beaconMsg!=null & afterStation & distFromLastBeacon < 5);
+                    afterStation = false;
 		if(movingAuth < 1 && currentSpeed == 0)
 		{
                     // train stopped for auth reasons
                     //if(totalMovingAuth > movingAuth)
-                        
+                    stationGap = false;
+                    afterStation = true;
 		}
 	}
-        /*
-        private void stationStopper()
-        {
-            BeaconMessage msg = link.receiveFromBeacons();
-            if(msg.string != null)
-            {
-                stationInterval = !stationInterval;
-                if(stationInterval)
-                {
-                    totalMovingAuth = movingAuth;
-                    movingAuth = 160;
-                }
-                
-            }
-        }
-        */
         
 	// millis is ignored as this is not a model module
 	// All units are meters and seconds
 	public void update(int millis) 
-	{
-                System.out.println("contr disp: " + movingAuth);
-            
+	{            
 		lastSpeed = currentSpeed;
 		currentSpeed = link.speed();
 
 		// Update authority
 		authority(millis);
-                //stationStopper();
 
 		// Set desired speed
 		if(manualMode)
