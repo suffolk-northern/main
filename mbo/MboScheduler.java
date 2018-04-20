@@ -43,6 +43,7 @@ public class MboScheduler implements Updateable
 	
 	public void launchUI()
 	{
+		System.out.println(lineName);
 		ui = new MboSchedulerUI(lineName);
 		ui.setVisible(true);
 	}

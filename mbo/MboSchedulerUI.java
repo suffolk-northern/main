@@ -28,11 +28,9 @@ public class MboSchedulerUI extends javax.swing.JFrame
      * Creates new form Scheduler
      */
     public MboSchedulerUI(String ln) {
-        initComponents();
 		lineName = ln;
-		if (lineName == null)
-			System.out.println("Name is null");
 		scheduleRequest = false;
+        initComponents();
 		
 		// Default start and end times are 9 AM and 5 PM
 		start = new Time(9, 0, 0);
@@ -51,7 +49,6 @@ public class MboSchedulerUI extends javax.swing.JFrame
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
     private void initComponents() {
-
         mainPanel = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         startTimeCombo = new javax.swing.JComboBox<>();
@@ -100,6 +97,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
 		scheduleMessageLabel = new JLabel();
 		
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+		this.setTitle("MBO Scheduler");
         getContentPane().setLayout(new CardLayout());
 		
 		// Main panel
@@ -263,10 +261,11 @@ public class MboSchedulerUI extends javax.swing.JFrame
         loadScheduleButton.setBounds(420, 170, 160, 25);
 
         jLabel12.setFont(new java.awt.Font("Tahoma", 0, 24)); 
+		System.out.println(lineName);
 		String titleString = String.format("MBO Scheduler: %s Line", lineName);
         jLabel12.setText(titleString);
         mainPanel.add(jLabel12);
-        jLabel12.setBounds(290, 20, 290, 29);
+        jLabel12.setBounds(290, 20, 350, 29);
 
         getContentPane().add(mainPanel, "card2");
 
@@ -526,6 +525,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) 
 	{                                         
         // Return to scheduler button in Panel2
+		setMessage("");
         CardLayout cl = (CardLayout)(getContentPane().getLayout());
         cl.show(getContentPane(), "card2");              
     }                                                                           
