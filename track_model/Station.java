@@ -22,6 +22,8 @@ public class Station {
 	protected Beacon beaconNext;
 	// Location
 	protected GlobalCoordinates location;
+	// Station side going forware LEFT = -1, RIGHT = 1
+	protected int side;
 	// Is heater on
 	protected boolean heater = false;
 
@@ -74,6 +76,14 @@ public class Station {
 
 	protected void setLocation(GlobalCoordinates location) {
 		this.location = location;
+	}
+
+	public int getSide() {
+		return side;
+	}
+
+	public void setSide(int side) {
+		this.side = side;
 	}
 
 	public Beacon getBeaconPrev() {

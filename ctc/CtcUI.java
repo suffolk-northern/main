@@ -49,6 +49,7 @@ public class CtcUI extends javax.swing.JFrame {
 	private static javax.swing.table.DefaultTableModel trackModel;
 	private static String[] greenBlocks;
 	private static String[] redBlocks;
+	private static String[] trainIDs;
 
 	public CtcUI(Ctc ctc) {
 		this.ctc = ctc;
@@ -1029,6 +1030,7 @@ public class CtcUI extends javax.swing.JFrame {
 
 	protected static void updateTrainTable(Object[][] rows, int count) {
 
+		/*
 		if (!trainTable.getValueAt(0, 0).equals("")) {
 			for (Object[] row : rows) {
 				for (int i = 0; i < trainTable.getRowCount(); i++) {
@@ -1040,12 +1042,20 @@ public class CtcUI extends javax.swing.JFrame {
 				}
 			}
 		} else {
+		*/
+			trainIDs = new String[count];
+		
 			for (int i = 0; i < count; i++) {
+				
+				trainIDs[i] = "" + rows[i][1];
+				
 				for (int j = 0; j < trainTable.getColumnCount(); j++) {
 					trainTable.setValueAt(rows[i][j], i, j);
 				}
 			}
-		}
+		
+			
+			
 
 	}
 
@@ -1170,6 +1180,8 @@ public class CtcUI extends javax.swing.JFrame {
 		{
 			blockSelect.setModel(new javax.swing.DefaultComboBoxModel<>(redBlocks));
 		}
+		
+		trainSelect.setModel(new javax.swing.DefaultComboBoxModel<>(trainIDs));
 				
 	}
 	
@@ -1293,7 +1305,7 @@ public class CtcUI extends javax.swing.JFrame {
 	private javax.swing.JButton scheduleButton;
 	private javax.swing.JTextField speedSelect;
 	private static javax.swing.JTable trackTable;
-	private javax.swing.JComboBox<String> trainSelect;
+	private static javax.swing.JComboBox<String> trainSelect;
 	private static javax.swing.JTable trainTable;
 	private javax.swing.JScrollPane scrPane;
 
