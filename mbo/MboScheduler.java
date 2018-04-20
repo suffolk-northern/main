@@ -103,8 +103,7 @@ public class MboScheduler implements Updateable
 				ui.setSchedule(lineSched);
 				ui.setMessage("Finished generating schedule.");
 				// System.out.println("Got here");
-			}
-			
+			}	
 		}
 	}
 	
@@ -121,8 +120,6 @@ public class MboScheduler implements Updateable
 			double travelTime = 0;
 			if (curBlock.getStation() == null)
 			{
-				// In seconds
-				// TODO: check units
 				// Block length in m
 				double blockLength = curBlock.getLength();
 				// Speed limit in kph --> m/s
@@ -183,8 +180,7 @@ public class MboScheduler implements Updateable
 		int dispatchedTrains = 0;
 		int lastDispatch = 0;
 		Time curTime = start;
-		
-		// TODO: These ArrayLists should really be queues, oops
+
 		while (curTime.before(end))
 		{
 			int timeSlot = curTime.getHours() - start.getHours();
@@ -240,8 +236,8 @@ public class MboScheduler implements Updateable
 							Time shiftEnds = new Time(lunchEnds.getTime() + breakEndToShiftEnd.getTime());
 							d.setTimes(lunchStarts, lunchEnds, shiftEnds);
 						}
-					}
-						
+						useDriver = d;
+					}		
 				}
 				if (useDriver != null)
 				{
@@ -249,8 +245,7 @@ public class MboScheduler implements Updateable
 					freeDrivers.remove(useDriver);
 					DriverSchedule ds = makeDriverSchedule(null, useDriver.getID(), curTime, arrTime, useTrain);
 					driverScheds.add(ds);
-				}
-				
+				}	
 			}
 			curTime = new Time(curTime.getTime() + (long) (schedIncrement * 1000));
 			lastDispatch += schedIncrement;
