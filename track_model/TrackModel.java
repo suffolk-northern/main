@@ -1006,7 +1006,7 @@ public class TrackModel implements Updateable {
 			// Needs to check beacons constantly.
 			//
 			for (Beacon b : beacons) {
-				if (td.trainModel.location().distanceTo(b.location) < 5) {
+				if (td.trainModel.location().distanceTo(b.location) < 1) {
 					td.trainModel.beaconRadio().send(new BeaconMessage(b.message));
 				}
 			}
