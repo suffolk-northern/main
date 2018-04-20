@@ -83,15 +83,15 @@ public class MboSchedulerUI extends javax.swing.JFrame
         stationScheduleCombo = new javax.swing.JComboBox<>();
         jLabel5 = new javax.swing.JLabel();
         jButton5 = new javax.swing.JButton();
-        jLabel6 = new javax.swing.JLabel();
+        chooseDriverLabel = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
 		driverSchedulePane = new javax.swing.JScrollPane();
         trainScheduleTable = new javax.swing.JTable();
 		driverScheduleTable = new javax.swing.JTable();
         individualScheduleLabel = new javax.swing.JLabel();
         chooseStationLabel = new javax.swing.JLabel();
-        jScrollPane4 = new javax.swing.JScrollPane();
         trainScheduleCombo = new javax.swing.JComboBox<>();
+		driverScheduleCombo = new javax.swing.JComboBox<>();
         chooseTrainLabel = new javax.swing.JLabel();
         driverScheduleLabel = new javax.swing.JLabel();
 
@@ -341,8 +341,8 @@ public class MboSchedulerUI extends javax.swing.JFrame
         schedulePanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 		
 		scheduleMessageLabel.setFont(new java.awt.Font("Tahoma", 0, 14));
-		scheduleMessageLabel.setText("Testing testing testing");
-		schedulePanel.add(scheduleMessageLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 500, -1, -1));
+		scheduleMessageLabel.setText("");
+		schedulePanel.add(scheduleMessageLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 400, -1, -1));
 
         stationScheduleTable.setModel(new DefaultTableModel(
             new Object [][] {
@@ -382,8 +382,8 @@ public class MboSchedulerUI extends javax.swing.JFrame
         });
         schedulePanel.add(jButton5, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 560, -1, -1));
 
-        jLabel6.setText("Click a train or employee ID to see their schedule");
-        schedulePanel.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 400, -1, -1));
+        chooseDriverLabel.setText("Select a driver:");
+        schedulePanel.add(chooseDriverLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 340, -1, -1));
 
         trainScheduleTable.setModel(new DefaultTableModel(
             new Object[][] {{"Not initialized", "Not initialized", "Not initialized"}},
@@ -407,7 +407,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
 			}
 		});
 		driverSchedulePane.setViewportView(driverScheduleTable);
-		schedulePanel.add(driverSchedulePane, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 320, 380, 180));
+		schedulePanel.add(driverSchedulePane, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 380, 380, 180));
 
         individualScheduleLabel.setFont(new java.awt.Font("Tahoma", 0, 18)); 
         individualScheduleLabel.setText("Train Schedule");
@@ -416,10 +416,18 @@ public class MboSchedulerUI extends javax.swing.JFrame
         chooseStationLabel.setText("Select a station:");
         schedulePanel.add(chooseStationLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 70, -1, -1));
 
-        schedulePanel.add(jScrollPane4, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 400, 500, -1));
-
-        trainScheduleCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Not initialized" }));
+        trainScheduleCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] {"Not initialized"}));
         schedulePanel.add(trainScheduleCombo, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 70, -1, -1));
+		trainScheduleCombo.addActionListener(new ActionListener() 
+		{
+			public void actionPerformed(ActionEvent evt)
+			{
+				trainScheduleComboChanged(evt);
+			}
+		});
+		
+		driverScheduleCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] {"Not initialized"}));
+		schedulePanel.add(driverScheduleCombo, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 340, -1, -1));
 
         chooseTrainLabel.setText("Select a train:");
         schedulePanel.add(chooseTrainLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 70, -1, -1));
@@ -485,17 +493,21 @@ public class MboSchedulerUI extends javax.swing.JFrame
 			// Populate the station selection combo box
 			String[] stations = new String[schedule.getStationNames().size()];
 			for (int i = 0; i < schedule.getStationNames().size(); i++)
-			{
 				stations[i] = schedule.getStationNames().get(i);
-			}
 			stationScheduleCombo.setModel(new javax.swing.DefaultComboBoxModel<>(stations));
 			// Populate the train selection combo box
 			String[] trains = new String[schedule.getTrainIDs().size()];
 			for (int i = 0; i < schedule.getTrainIDs().size(); i++)
 				trains[i] = schedule.getTrainIDs().get(i).toString();
 			trainScheduleCombo.setModel(new javax.swing.DefaultComboBoxModel<>(trains));
-			// Make the station schedule table
+			// Populate the driver selection combo box
+			String[] drivers = new String[schedule.getDriverIDs().size()];
+			for (int i = 0; i < schedule.getDriverIDs().size(); i++)
+				drivers[i] = schedule.getDriverIDs().get(i).toString();
+			driverScheduleCombo.setModel(new javax.swing.DefaultComboBoxModel<>(drivers));
+			// Make the schedule tables
 			generateStationTable(defaultStation);
+			generateTrainTable(schedule.getTrainIDs().get(0));
 			CardLayout cl = (CardLayout)(getContentPane().getLayout());
 			cl.show(getContentPane(), "card4");  
 		}
@@ -559,23 +571,19 @@ public class MboSchedulerUI extends javax.swing.JFrame
 		throughputTable.setModel(mod);
 	}
 	
-	public void generateStationTable(String stationName)
+	private void generateStationTable(String stationName)
 	{
 		StationSchedule ss = schedule.getStationSchedule(stationName);
 		if (ss != null)
 		{
 			int numEvents = ss.getEvents().size();
-			System.out.printf("numEvents: %d%n", numEvents);
+			// System.out.printf("numEvents: %d%n", numEvents);
 			String[][] tableObject = new String[numEvents][3];
-			System.out.println(tableObject.length);
+			// System.out.println(tableObject.length);
 			int ind = 0;
 			for (StationEvent se : ss.getEvents())
 			{
-				if (se == null)
-					System.out.println("station event is null");
-				else if (se.getTime() == null)
-					System.out.println("Time is null");
-				System.out.println(se.getTime().toString());
+				// System.out.println(se.getTime().toString());
 				tableObject[ind][0] = se.getTime().toString();
 				if (se.getEvent() == TrainEvent.EventType.ARRIVAL)
 					tableObject[ind][1] = "ARRIVAL";
@@ -595,13 +603,49 @@ public class MboSchedulerUI extends javax.swing.JFrame
 			};
 			stationScheduleTable.setModel(mod);
 		}
-	}                
+	}
+	
+	private void generateTrainTable(int trainID)
+	{
+		TrainSchedule ts = schedule.getTrainSchedule(trainID);
+		if (ts != null)
+		{
+			int numEvents = ts.getEvents().size();
+			String[][] tableObject = new String[numEvents][3];
+			for (int i = 0; i < ts.getEvents().size(); i++)
+			{
+				TrainEvent te = ts.getEvents().get(i);
+				tableObject[i][0] = te.getTime().toString();
+				if (te.getEvent() == TrainEvent.EventType.ARRIVAL)
+					tableObject[i][1] = "ARRIVAL";
+				else
+					tableObject[i][1] = "DEPARTURE";
+				tableObject[i][2] = te.getStation();
+			}
+			String[] headers = {"Time", "Action", "Station"};
+			DefaultTableModel mod = new DefaultTableModel(tableObject, headers)
+			{
+				public boolean isCellEditable(int rowIndex, int colIndex)
+				{
+					return false;
+				}		
+			};
+			trainScheduleTable.setModel(mod);			
+		}
+	}
 	
 	private void stationScheduleComboChanged(ActionEvent evt)
 	{
         JComboBox cb = (JComboBox) evt.getSource();
 		String newStation = (String) cb.getSelectedItem();
 		generateStationTable(newStation);
+	}
+	
+	private void trainScheduleComboChanged(ActionEvent evt)
+	{
+		JComboBox cb = (JComboBox) evt.getSource();
+		String newTrain = (String) cb.getSelectedItem();
+		generateTrainTable(Integer.parseInt(newTrain));
 	}
 
     private void jRadioButton2ActionPerformed(java.awt.event.ActionEvent evt) 
@@ -737,6 +781,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
     private javax.swing.JComboBox<String> endTimeCombo;
     private javax.swing.JComboBox<String> stationScheduleCombo;
     private javax.swing.JComboBox<String> trainScheduleCombo;
+	private javax.swing.JComboBox<String> driverScheduleCombo;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel driverScheduleLabel;
     private javax.swing.JLabel jLabel11;
@@ -745,7 +790,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel chooseDriverLabel;
     private javax.swing.JLabel individualScheduleLabel;
     private javax.swing.JLabel chooseStationLabel;
     private javax.swing.JLabel chooseTrainLabel;
@@ -758,7 +803,6 @@ public class MboSchedulerUI extends javax.swing.JFrame
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
 	private javax.swing.JScrollPane driverSchedulePane;
     private javax.swing.JSeparator jSeparator1;

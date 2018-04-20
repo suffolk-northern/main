@@ -109,7 +109,7 @@ public class LineSchedule {
 	{
 		for (StationSchedule ss : stationSchedules)
 		{
-			System.out.printf("line schedule: %s", ss.getName());
+			// System.out.printf("line schedule: %s", ss.getName());
 			if (ss.getName().equals(stationName))
 				return ss;
 		}
