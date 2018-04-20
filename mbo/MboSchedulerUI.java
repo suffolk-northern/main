@@ -178,7 +178,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
             }
         });
         mainPanel.add(generateScheduleButton);
-        generateScheduleButton.setBounds(120, 290, 141, 25);
+        generateScheduleButton.setBounds(120, 290, 155, 25);
         mainPanel.add(jProgressBar1);
         jProgressBar1.setBounds(110, 330, 157, 14);
         mainPanel.add(jSeparator1);
@@ -193,7 +193,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
             }
         });
         mainPanel.add(viewShceduleButton);
-        viewShceduleButton.setBounds(50, 360, 117, 25);
+        viewShceduleButton.setBounds(50, 360, 130, 25);
 
         exportScheduleButton.setText("Export Schedule");
         exportScheduleButton.addActionListener(new ActionListener() 
@@ -358,7 +358,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
         });
         jScrollPane2.setViewportView(stationScheduleTable);
 
-        schedulePanel.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 110, 370, 280));
+        schedulePanel.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 110, 450, 280));
 
         stationScheduleCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Not initialized" }));
 		stationScheduleCombo.addActionListener(new ActionListener() 
@@ -380,7 +380,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
                 jButton5ActionPerformed(evt);
             }
         });
-        schedulePanel.add(jButton5, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 560, -1, -1));
+        schedulePanel.add(jButton5, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 580, -1, -1));
 
         chooseDriverLabel.setText("Select a driver:");
         schedulePanel.add(chooseDriverLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 340, -1, -1));
@@ -428,6 +428,13 @@ public class MboSchedulerUI extends javax.swing.JFrame
 		
 		driverScheduleCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] {"Not initialized"}));
 		schedulePanel.add(driverScheduleCombo, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 340, -1, -1));
+		driverScheduleCombo.addActionListener(new ActionListener() 
+		{
+			public void actionPerformed(ActionEvent evt)
+			{
+				driverScheduleComboChanged(evt);
+			}
+		});
 
         chooseTrainLabel.setText("Select a train:");
         schedulePanel.add(chooseTrainLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 70, -1, -1));
@@ -508,6 +515,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
 			// Make the schedule tables
 			generateStationTable(defaultStation);
 			generateTrainTable(schedule.getTrainIDs().get(0));
+			generateDriverTable(schedule.getDriverIDs().get(0));
 			CardLayout cl = (CardLayout)(getContentPane().getLayout());
 			cl.show(getContentPane(), "card4");  
 		}
@@ -634,6 +642,36 @@ public class MboSchedulerUI extends javax.swing.JFrame
 		}
 	}
 	
+	private void generateDriverTable(int driverID)
+	{
+		DriverSchedule ds = schedule.getDriverSchedule(driverID);
+		if (ds != null)
+		{
+			int numEvents = ds.getEvents().size();
+			String[][] tableObject = new String[numEvents][3];
+			for (int i = 0; i < ds.getEvents().size(); i++)
+			{
+				DriverEvent te = ds.getEvents().get(i);
+				tableObject[i][0] = te.getTime().toString();
+				if (te.getEvent() == DriverEvent.EventType.EMBARK)
+					tableObject[i][1] = "EMBARK";
+				else
+					tableObject[i][1] = "DISEMBARK";
+				int trainID = te.getTrainID();
+				tableObject[i][2] = String.format("%d", trainID);
+			}
+			String[] headers = {"Time", "Action", "Train ID"};
+			DefaultTableModel mod = new DefaultTableModel(tableObject, headers)
+			{
+				public boolean isCellEditable(int rowIndex, int colIndex)
+				{
+					return false;
+				}		
+			};
+			driverScheduleTable.setModel(mod);			
+		}
+	}
+	
 	private void stationScheduleComboChanged(ActionEvent evt)
 	{
         JComboBox cb = (JComboBox) evt.getSource();
@@ -646,6 +684,13 @@ public class MboSchedulerUI extends javax.swing.JFrame
 		JComboBox cb = (JComboBox) evt.getSource();
 		String newTrain = (String) cb.getSelectedItem();
 		generateTrainTable(Integer.parseInt(newTrain));
+	}
+	
+	private void driverScheduleComboChanged(ActionEvent evt)
+	{
+		JComboBox cb = (JComboBox) evt.getSource();
+		String newDriver = (String) cb.getSelectedItem();
+		generateDriverTable(Integer.parseInt(newDriver));	
 	}
 
     private void jRadioButton2ActionPerformed(java.awt.event.ActionEvent evt) 
