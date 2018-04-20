@@ -358,7 +358,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
         });
         jScrollPane2.setViewportView(stationScheduleTable);
 
-        schedulePanel.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 110, 450, 280));
+        schedulePanel.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 110, 380, 400));
 
         stationScheduleCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Not initialized" }));
 		stationScheduleCombo.addActionListener(new ActionListener() 

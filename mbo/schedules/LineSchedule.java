@@ -19,7 +19,7 @@ public class LineSchedule {
 	{
 		driverSchedules = ds;
 		trainSchedules = ts;
-		driverIDs = new ArrayList<Integer>();
+		driverIDs = new ArrayList<>();
 		for (DriverSchedule dSched : ds)
 		{
 			driverIDs.add(dSched.getID());

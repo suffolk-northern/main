@@ -117,27 +117,28 @@ public class MboScheduler implements Updateable
 		
 		for (BlockTracker curBlock : line)
 		{
-			double travelTime = 0;
+			// Block length in m
+			double blockLength = curBlock.getLength();
+			// Speed limit in kph --> m/s
+			double speedLimit = curBlock.getSpeedLimit() * (1000.0 / 3600.0);
+			// time to travel block in ms
+			double travelTime = (blockLength / speedLimit) * 1000;
+			//System.out.println(travelTime);
+			
 			if (curBlock.getStation() == null)
 			{
-				// Block length in m
-				double blockLength = curBlock.getLength();
-				// Speed limit in kph --> m/s
-				double speedLimit = curBlock.getSpeedLimit() * (1000 / 3600);
-				// time to travel block in ms
-				travelTime = (speedLimit / blockLength) * 1000;
-				long t = curTime.getTime();
-				curTime = new Time(t + (long) travelTime);
+				curTime = new Time(curTime.getTime() + (long) travelTime);
 			}
 			else 
 			{
 				// System.out.printf("Making events at station %s%n", curBlock.getStation());
-				travelTime = curBlock.getSpeedLimit() * curBlock.getLength();
-				long t = curTime.getTime();
-				Time arrTime = new Time(t + (long) (travelTime / 2));
+				// TODO: are stations always in the middle of blocks?
+				// TODO: include time for train decelerating and accelerating around the station
+				Time arrTime = new Time(curTime.getTime() + (long) (travelTime / 2));
 				te.add(new TrainEvent(arrTime, arr, curBlock.getStation()));
 				Time depTime = new Time((arrTime.getTime()) + (long) dwellTime*1000);
 				te.add(new TrainEvent(depTime, dep, curBlock.getStation()));
+				curTime = new Time(depTime.getTime() + (long) (travelTime / 2));
 			}
 		}
 		TrainSchedule ts = new TrainSchedule(trainID, te);
@@ -191,14 +192,14 @@ public class MboScheduler implements Updateable
 				int trainID = trainArr.poll();
 				freeTrains.add(trainID);
 				dispatchedTrains -= 1;
+				Driver driverArriving = null;
 				for (Driver d : trainDrivers)
 				{
 					if (d.getTrain() == trainID)
-					{
-						freeDrivers.add(d);
-						trainDrivers.remove(d);
-					}
+						driverArriving = d;
 				}
+				freeDrivers.add(driverArriving);
+				trainDrivers.remove(driverArriving);
 			}
 			if (dispatchedTrains < trainsNeeded[timeSlot] && lastDispatch >= minTimeBetweenDispatch)
 			{
