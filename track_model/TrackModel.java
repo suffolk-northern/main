@@ -10,6 +10,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -23,7 +24,7 @@ import updater.Updateable;
 
 public class TrackModel implements Updateable {
 
-	private static int temperature;
+	protected static double temperature = 70;
 	// Main Track Model Frame.
 	private static TrackModelFrame tmf;
 	// Database helper.
@@ -158,27 +159,12 @@ public class TrackModel implements Updateable {
 			Station s = stations.get(i);
 			Station dupe = null;
 			TrackBlock tb = getBlock(s.line, s.block);
+			s.setLocation(getPositionAlongBlock(tb, tb.length / 2));
 			//
-			// Checks for stations attributed to multiple blocks.
+			// Adds beacon at start and end of block.
 			//
-			for (int j = 0; j < i; j++) {
-				Station temp = stations.get(j);
-				if (s.name.equalsIgnoreCase(temp.name)) {
-					dupe = temp;
-					break;
-				}
-			}
-			if (dupe != null) {
-				GlobalCoordinates sLocation = getPositionAlongBlock(tb, tb.length / 2);
-				double newLon = (sLocation.longitude() + dupe.location.longitude()) / 2;
-				double newLat = (sLocation.latitude() + dupe.location.latitude()) / 2;
-				s.setLocation(new GlobalCoordinates(newLat, newLon));
-				dupe.setLocation(new GlobalCoordinates(newLat, newLon));
-			} else {
-				s.setLocation(getPositionAlongBlock(tb, tb.length / 2));
-			}
-			s.setBeaconPrev(new Beacon(getPositionAlongBlock(tb, 10), s.block + " PREV"));
-			s.setBeaconNext(new Beacon(getPositionAlongBlock(tb, tb.length - 10), s.block + " NEXT"));
+			s.setBeaconPrev(new Beacon(tb.start, tb.length / 2 + "," + s.getSide()));
+			s.setBeaconNext(new Beacon(tb.end, tb.length / 2 + "," + s.getSide() / -1));
 			beacons.add(s.beaconPrev);
 			beacons.add(s.beaconNext);
 		}
@@ -188,9 +174,11 @@ public class TrackModel implements Updateable {
 	 * Launches main UI for integration.
 	 */
 	public void launchUI() {
-		tmf = new TrackModelFrame(this);
-		tmf.setDefaultCloseOperation(javax.swing.WindowConstants.HIDE_ON_CLOSE);
-		tmf.setLocationRelativeTo(null);
+		if (tmf == null) {
+			tmf = new TrackModelFrame(this);
+			tmf.setDefaultCloseOperation(javax.swing.WindowConstants.HIDE_ON_CLOSE);
+			tmf.setLocationRelativeTo(null);
+		}
 		tmf.setVisible(true);
 	}
 
@@ -455,6 +443,7 @@ public class TrackModel implements Updateable {
 					s = new Station(line, block);
 					s.setSection(rs.getString(2).charAt(0));
 					s.setName(rs.getString(4));
+					s.setSide(rs.getInt(7));
 				} else {
 					System.out.println("Invalid station.");
 				}
@@ -1012,7 +1001,18 @@ public class TrackModel implements Updateable {
 
 	@Override
 	public void update(int time) {
-
+		updateTemperature();
+		for (Station s : stations) {
+			if (temperature < 32) {
+				if (!s.heater) {
+					setHeater(s.line, s.block, true);
+				}
+			} else {
+				if (s.heater) {
+					setHeater(s.line, s.block, false);
+				}
+			}
+		}
 		TrackBlock curBlock;
 		//
 		// Tries to update UI every two seconds.
@@ -1046,12 +1046,32 @@ public class TrackModel implements Updateable {
 		//
 		for (TrainData td : trains) {
 			for (Beacon b : beacons) {
-				if (td.trainModel.location().distanceTo(b.location) < 5) {
+				if (td.trainModel.location().distanceTo(b.location) < 1) {
 					td.trainModel.beaconRadio().send(new BeaconMessage(b.message));
 				}
 			}
 		}
 		count++;
+	}
+
+	private boolean tempIncrease = false;
+	private Random ran = new Random();
+
+	/**
+	 * Updates temperature.
+	 */
+	private void updateTemperature() {
+		if (tempIncrease) {
+			temperature += ran.nextDouble() * 0.1;
+			if (temperature > 105) {
+				tempIncrease = false;
+			}
+		} else {
+			temperature -= ran.nextDouble() * 0.1;
+			if (temperature < -20) {
+				tempIncrease = true;
+			}
+		}
 	}
 
 	/**
