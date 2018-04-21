@@ -145,6 +145,7 @@ public class Main
 		CtcRadio ctcRadio = new CtcRadio(mboCont, mboSched, ctc);
 		ctc.setCtcRadios(ctcRadio,null);
 		mboCont.registerCtc(ctcRadio);
+		mboSched.registerCtc(ctcRadio);
 		// ctcRadio.showScheduler();
 
 		//

@@ -15,11 +15,11 @@ import mbo.schedules.*;
 public class MboSchedulerUI extends javax.swing.JFrame 
 {
 	private LineSchedule schedule;
-	private boolean scheduleRequest;
 	private int[] throughput;
 	private Time start;
 	private Time end;
 	private String lineName;
+	private Request curRequest;
 	
 	// For the view schedule screen
 	private String viewingStation;
@@ -29,7 +29,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
      */
     public MboSchedulerUI(String ln) {
 		lineName = ln;
-		scheduleRequest = false;
+		curRequest = Request.NONE;
         initComponents();
 		
 		// Default start and end times are 9 AM and 5 PM
@@ -61,6 +61,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
         jSeparator1 = new javax.swing.JSeparator();
         viewShceduleButton = new javax.swing.JButton();
         exportScheduleButton = new javax.swing.JButton();
+		exportStringButton = new javax.swing.JButton();
         jLabel11 = new javax.swing.JLabel();
         jRadioButton1 = new javax.swing.JRadioButton();
         jRadioButton2 = new javax.swing.JRadioButton();
@@ -107,7 +108,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
 		mainMessageLabel.setFont(new java.awt.Font("Tahoma", 0, 14));
 		mainMessageLabel.setText(" ");
 		mainPanel.add(mainMessageLabel);
-		mainMessageLabel.setBounds(10, 400, 600, 40);
+		mainMessageLabel.setBounds(10, 450, 600, 40);
 
         jLabel1.setFont(new Font("Tahoma", 0, 18)); 
         jLabel1.setText("Create New Schedule");
@@ -191,18 +192,29 @@ public class MboSchedulerUI extends javax.swing.JFrame
             }
         });
         mainPanel.add(viewShceduleButton);
-        viewShceduleButton.setBounds(50, 360, 130, 25);
+        viewShceduleButton.setBounds(130, 360, 130, 25);
 
-        exportScheduleButton.setText("Export Schedule");
+        exportScheduleButton.setText("Export To File");
         exportScheduleButton.addActionListener(new ActionListener() 
 		{
-            public void actionPerformed(java.awt.event.ActionEvent evt) 
+            public void actionPerformed(ActionEvent evt) 
 			{
                 exportScheduleButtonClicked(evt);
             }
         });
         mainPanel.add(exportScheduleButton);
-        exportScheduleButton.setBounds(200, 360, 130, 25);
+        exportScheduleButton.setBounds(130, 390, 130, 25);
+		
+		exportStringButton.setText("Export To CTC");
+		exportStringButton.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent evt)
+			{
+				exportStringButtonClicked(evt);
+			}
+		});
+		mainPanel.add(exportStringButton);
+		exportStringButton.setBounds(130, 420, 130, 25);
 
         jLabel11.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel11.setText("Automatic Train Dispatch");
@@ -261,7 +273,6 @@ public class MboSchedulerUI extends javax.swing.JFrame
         loadScheduleButton.setBounds(420, 170, 160, 25);
 
         jLabel12.setFont(new java.awt.Font("Tahoma", 0, 24)); 
-		System.out.println(lineName);
 		String titleString = String.format("MBO Scheduler: %s Line", lineName);
         jLabel12.setText(titleString);
         mainPanel.add(jLabel12);
@@ -484,7 +495,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
 
     private void generateScheduleButtonClicked(java.awt.event.ActionEvent evt) 
 	{                                         
-		scheduleRequest = true;
+		 curRequest = Request.SCHEDULE;
     }                                        
 
     private void viewScheduleButtonClicked(java.awt.event.ActionEvent evt) 
@@ -726,12 +737,16 @@ public class MboSchedulerUI extends javax.swing.JFrame
 		}
     }  
 	
+	private void exportStringButtonClicked(ActionEvent evt)
+	{
+		curRequest = Request.EXPORT_TO_CTC;
+	}
+	
 	public void setSchedule(LineSchedule ls)
 	{
 		if (ls != null)
 		{
 			schedule = ls;
-			scheduleRequest = false;
 		}
 	}
 	
@@ -750,11 +765,6 @@ public class MboSchedulerUI extends javax.swing.JFrame
 			mainMessageLabel.setText(s);
 	}
 	
-	public boolean scheduleRequested()
-	{
-		return scheduleRequest;
-	}
-	
 	public int[] getThroughput()
 	{
 		return throughput;
@@ -768,6 +778,21 @@ public class MboSchedulerUI extends javax.swing.JFrame
 	public Time getEndTime()
 	{
 		return end;
+	}
+	
+	public Request getRequest()
+	{
+		return curRequest;
+	}
+	
+	public void requestCompleted()
+	{
+		curRequest = Request.NONE;
+	}
+	
+	public enum Request
+	{
+		NONE, SCHEDULE, EXPORT_TO_CTC
 	}
 
 //    private class ThroughputPanel {
@@ -822,6 +847,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
     private javax.swing.JButton viewShceduleButton;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton exportScheduleButton;
+	private javax.swing.JButton exportStringButton;
     private javax.swing.JComboBox<String> startTimeCombo;
     private javax.swing.JComboBox<String> endTimeCombo;
     private javax.swing.JComboBox<String> stationScheduleCombo;

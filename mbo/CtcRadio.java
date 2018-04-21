@@ -15,6 +15,7 @@ public class CtcRadio {
 	private MboController mboCont;
 	private MboScheduler mboSched;
 	private Ctc ctc;
+	private String schedule;
 	
 	public CtcRadio(MboController mc, MboScheduler ms, Ctc c)
 	{
@@ -58,5 +59,15 @@ public class CtcRadio {
 	public void hideScheduler()
 	{
 		mboSched.hideUI();
+	}
+	
+	public void setSchedule(String schedule)
+	{
+		this.schedule = schedule;
+	}
+	
+	public String getSchedule()
+	{
+		return schedule;
 	}
 }

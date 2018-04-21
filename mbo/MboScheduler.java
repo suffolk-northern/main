@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.sql.Time;
 import java.lang.Math;
+import java.io.StringWriter;
 
 import track_model.TrackModel;
 import track_model.TrackBlock;
@@ -23,6 +24,7 @@ public class MboScheduler implements Updateable
 	private BlockTracker[] line;
 	private LineSchedule lineSched;
 	private TrackModel trackModel;
+	private CtcRadio ctcRadio;
 	
 	// Adjustable parameters
 	private int dwellTime = 20; // Seconds
@@ -43,7 +45,6 @@ public class MboScheduler implements Updateable
 	
 	public void launchUI()
 	{
-		System.out.println(lineName);
 		ui = new MboSchedulerUI(lineName);
 		ui.setVisible(true);
 	}
@@ -57,6 +58,11 @@ public class MboScheduler implements Updateable
 	public void registerTrackModel(TrackModel tm)
 	{
 		trackModel = tm;
+	}
+	
+	public void registerCtc(CtcRadio cr)
+	{
+		ctcRadio = cr;
 	}
 	
 	public void initLine()
@@ -93,18 +99,32 @@ public class MboScheduler implements Updateable
 	public void update(int time)
 	{
 		// TODO: use time
-		if (ui != null && ui.scheduleRequested())
+		if (ui != null)
 		{
-			Time start = ui.getStartTime();
-			Time end = ui.getEndTime();
-			int[] throughput = ui.getThroughput();
-			if (start != null && end != null && throughput != null)
+			MboSchedulerUI.Request requestType = ui.getRequest();
+			if (requestType == MboSchedulerUI.Request.SCHEDULE)
 			{
-				lineSched = makeSchedule(start, end, throughput);
-				ui.setSchedule(lineSched);
-				ui.setMessage("Finished generating schedule.");
-				// System.out.println("Got here");
-			}	
+				Time start = ui.getStartTime();
+				Time end = ui.getEndTime();
+				int[] throughput = ui.getThroughput();
+				if (start != null && end != null && throughput != null)
+				{
+					lineSched = makeSchedule(start, end, throughput);
+					ui.setSchedule(lineSched);
+					ui.requestCompleted();
+					ui.setMessage("Finished generating schedule.");
+					// System.out.println("Got here");
+				}	
+			}
+			else if (requestType == MboSchedulerUI.Request.EXPORT_TO_CTC)
+			{
+				if (lineSched != null)
+				{
+					exportToCtc();
+					ui.requestCompleted();
+					System.out.println("Got here!");
+				}
+			}
 		}
 	}
 	
@@ -268,5 +288,17 @@ public class MboScheduler implements Updateable
 		driverEvents.add(disembarkEvent);
 		DriverSchedule newDS = new DriverSchedule(dID, driverEvents);
 		return newDS;
+	}
+	
+	public void exportToCtc()
+	{
+		if (lineSched != null && ctcRadio != null)
+		{
+			StringWriter sched = new StringWriter();
+			ScheduleWriter schedWrite = new ScheduleWriter(lineSched);
+			schedWrite.writeSchedule(sched);
+			String schedStr = sched.toString();
+			ctcRadio.setSchedule(schedStr);
+		}
 	}
 }
