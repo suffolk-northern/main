@@ -240,6 +240,14 @@ public class TrainModel
 		pointMass.orientation(value);
 	}
 
+	// Returns the mass.
+	//
+	// Units: kilograms
+	public double mass()
+	{
+		return pointMass.mass();
+	}
+
 	// Returns the current speed.
 	//
 	// Units: meters per second
