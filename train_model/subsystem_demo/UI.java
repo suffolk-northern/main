@@ -67,6 +67,8 @@ public class UI
         boolean rDoors = train.door(DoorLocation.right);
         boolean heater = train.heater();
 	boolean lights = train.lights();
+        int passengers = train.passengers();
+        int crew = train.crew();
 
         BeaconMessage beaconMessage = train.lastBeaconMessage();
 
@@ -97,6 +99,8 @@ public class UI
         cabinRDoors.setText(rDoors ? "OPEN" : "CLOSED");
         cabinHeater.setText(heater ? "ON" : "OFF");
 	cabinLights.setText(lights ? "ON" : "OFF");
+        cabinPassengers.setText(String.format("%d", passengers));
+        cabinCrew.setText(String.format("%d", crew));
 
         beaconRxString.setText("\"" + beaconMessage.string + "\"");
 
