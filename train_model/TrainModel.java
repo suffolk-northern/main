@@ -51,8 +51,7 @@ public class TrainModel
 	private static final double DATASHEET_POWER_WATT = 120e3;
 
 	// kilograms
-	private static final double MASS_EMPTY =
-		KILOGRAMS_PER_TON * DATASHEET_MID_MASS_TON;
+	private static final double MASS_EMPTY = 35.0 * KILOGRAMS_PER_TON;
 
 	// derived constants from datasheet constants (SI units)
 	private static final double DERIVED_MID_SPEED =
