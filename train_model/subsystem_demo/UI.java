@@ -50,6 +50,7 @@ public class UI
         final double MPH_PER_KPH = 0.6213712;
         final double Y_PER_M = 1.093613;
         final double POUND_PER_NEWTON = 0.224809;
+        final double KILOGRAMS_PER_TON = 907.185;
 
         TrainModel train = (TrainModel) o;
 
@@ -62,6 +63,7 @@ public class UI
         double speed = MPH_PER_MPS * train.speed();
         double heading = train.orientation().degrees();
         double temperature = cToF(train.temperature());
+        double mass = train.mass() / KILOGRAMS_PER_TON;
 
         boolean lDoors = train.door(DoorLocation.left);
         boolean rDoors = train.door(DoorLocation.right);
@@ -94,6 +96,7 @@ public class UI
         pointStatsSpeed.setText(String.format("%.1f mph", speed));
         pointStatsHeading.setText(String.format("%03.0f'", heading));
         pointStatsTemperature.setText(String.format("%.1f 'F", temperature));
+        pointStatsMass.setText(String.format("%.1f T", mass));
 
         cabinLDoors.setText(lDoors ? "OPEN" : "CLOSED");
         cabinRDoors.setText(rDoors ? "OPEN" : "CLOSED");
