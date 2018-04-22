@@ -106,12 +106,17 @@ public class MboController implements Updateable
 				int prevBlock = curBlock.getPrevBlockId();
 				int speedLimit = curBlock.getSpeedLimit();
 				char section = curBlock.getSection();
-				line[i] = new BlockTracker(i, nextBlock, prevBlock, blockLength, speedLimit, section, null);
+				boolean forwardDir = false;
+				boolean backwardDir = false;
+				if (curBlock.getNextBlockDir() == 1)
+					forwardDir = true;
+				if (curBlock.getPrevBlockDir() == 1)
+					backwardDir = true;
+				line[i] = new BlockTracker(i, nextBlock, prevBlock, blockLength, speedLimit, section, null, forwardDir, backwardDir);
 				if (curBlock.isIsSwitch())
 				{
 					int switchID = curBlock.getBlock();
 					switchIDs.add(switchID);
-
 				}
 			}
 			
@@ -124,6 +129,8 @@ public class MboController implements Updateable
 				switchBlocks[0] = switchID;
 				switchBlocks[1] = otherSwitchBlocks[0];
 				switchBlocks[2] = otherSwitchBlocks[1];
+				if (line[switchBlocks[0]].getNext() == switchBlocks[1] || line[switchBlocks[0]].getNext() == switchBlocks[2])
+					switchNext[0] = true;
 				if (line[switchBlocks[1]].getNext() == switchID)
 					switchNext[1] = true;
 				if (line[switchBlocks[2]].getNext() == switchID)
@@ -160,7 +167,7 @@ public class MboController implements Updateable
 		updateSwitches();
 //		for (SwitchTracker st : switches)
 //			st.printInfo();
-//		System.out.println(line[75].getNext());
+//		System.out.println(line[100].getNext());
 
 		if (enabled == true)
 		{
@@ -245,7 +252,7 @@ public class MboController implements Updateable
 		GlobalCoordinates trainLoc = train.getCurrentPosition();
 		double trainDist = trackModel.getDistanceAlongBlock(lineName, curBlock.getID(), trainLoc); 
 		double distLeftInBlock = 0;
-		if (train.isGoingForward())
+		if (!train.isGoingForward())
 			distLeftInBlock = train.getBlock().getLength() - trainDist;
 		else
 			distLeftInBlock = trainDist;
@@ -265,6 +272,11 @@ public class MboController implements Updateable
 		// Start with negative authority since loop takes current block into account
 		double authority = -1*distLeftInBlock;
 		boolean blocked = false;
+		boolean forward = train.isGoingForward();
+//		if (forward)
+//			System.out.printf("In block %d, going forward%n", curBlock.getID());
+//		else
+//			System.out.printf("In block %d, going backward%n", curBlock.getID());
 		for (int i = 0; i < line.length; i++)
 		{
 			for (int j = 0; j < trainBlocks.size(); j++)
@@ -273,7 +285,7 @@ public class MboController implements Updateable
 				{
 					GlobalCoordinates otherTrainLoc = trainTrains.get(j).getCurrentPosition();
 					double otherTrainDist = trackModel.getDistanceAlongBlock(lineName, trainBlocks.get(j).getID(), otherTrainLoc);
-					if (train.isGoingForward())
+					if (forward)
 						authority += otherTrainDist;
 					else
 						authority += trainBlocks.get(j).getLength() - otherTrainDist;
@@ -287,20 +299,42 @@ public class MboController implements Updateable
 			blocked = false;
 			authority += curBlock.getLength();
 			
-			if (train.isGoingForward() && curBlock.getNext() < 0)
+			if (forward)
 			{
-				// System.out.printf("Got here with authority %f%n", authority);
-				blocked = true;
+				if (curBlock.getNext() < 0)
+					blocked = true;
+				else if (line[curBlock.getNext()].getNext() == curBlock.getID())
+				{
+					if (!line[curBlock.getNext()].canGoBackward())
+						blocked = true;
+				}
 			}
-			else if (!train.isGoingForward() && curBlock.getPrev() < 0)
-				blocked = true;
+			else 
+			{
+				if (curBlock.getPrev() < 0 || !line[curBlock.getPrev()].canGoBackward())
+					blocked = true;
+			}
+			
+			// System.out.printf("Current authority: %f%n", authority);
 			
 			if (blocked)
 				break;
-			
-			if (curBlock.getNext() < 0)
-				break;
-			curBlock = line[curBlock.getNext()];
+			if (forward)
+			{
+				System.out.printf("About to check block %d going forwards%n", curBlock.getNext());
+				BlockTracker nextBlock = line[curBlock.getNext()];
+				if (nextBlock.getID() < curBlock.getID())
+					forward = false;
+				curBlock = nextBlock;
+			}
+			else
+			{
+				System.out.printf("About to check block %d going backwards%n", curBlock.getNext());
+				BlockTracker prevBlock = line[curBlock.getPrev()];
+				if (prevBlock.getID() > curBlock.getID())
+					forward = true;
+				curBlock = prevBlock;
+			}
 		}
 		
 		if (authority > MAX_AUTHORITY)
@@ -337,8 +371,8 @@ public class MboController implements Updateable
 			switchPos[2][1] = 57;
 			switchPos[3][0] = 0;
 			switchPos[3][1] = 62;
-			switchPos[4][0] = 101;
-			switchPos[4][1] = 76;
+			switchPos[4][0] = 76;
+			switchPos[4][1] = 77;
 			switchPos[5][0] = 85;
 			switchPos[5][1] = 100;
 		}
@@ -381,35 +415,6 @@ public class MboController implements Updateable
 					line[unconnectedBlock].setNextBlock(-1);
 				else
 					line[unconnectedBlock].setPrevBlock(-1);
-				
-				// For the block not connected by the switch, make sure whatever
-				// end was connected before is now blocked
-//				int checkBlock = line[unconnectedBlock].getNext();
-//				if (checkBlock == connectedBlock1 || checkBlock == connectedBlock2)
-//					line[unconnectedBlock].setNextBlockOpen(false);
-//				checkBlock = line[unconnectedBlock].getPrev();
-//				if (checkBlock == connectedBlock1 || checkBlock == connectedBlock2)
-//					line[unconnectedBlock].setPrevBlockOpen(false);	
-//				
-//				// For the blocks connected by the switch, make sure the connection
-//				// to the unconnected 
-//				if (line[connectedBlock1].getNext() == unconnectedBlock)
-//					line[connectedBlock1].setNextBlockOpen(false);
-//				else
-//					line[connectedBlock1].setNextBlockOpen(true);
-//				if (line[connectedBlock1].getPrev() == unconnectedBlock)
-//					line[connectedBlock1].setPrevBlockOpen(false);
-//				else
-//					line[connectedBlock1].setPrevBlockOpen(true);				
-//				
-//				if (line[connectedBlock2].getNext() == unconnectedBlock)
-//					line[connectedBlock2].setNextBlockOpen(false);
-//				else
-//					line[connectedBlock2].setNextBlockOpen(true);
-//				if (line[connectedBlock2].getPrev() == unconnectedBlock)
-//					line[connectedBlock2].setPrevBlockOpen(false);
-//				else
-//					line[connectedBlock2].setPrevBlockOpen(true);	
 			}
  		}
 	}

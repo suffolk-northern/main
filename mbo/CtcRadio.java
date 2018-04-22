@@ -27,9 +27,7 @@ public class CtcRadio {
 	// 2 ints in each row, one for each block id
 	public int[][] getSwitchStates(String lineName)
 	{
-		// TODO: make this method public in CTC
-		// return ctc.requestSwitches(lineName);
-		return null;
+		return ctc.requestSwitches(lineName);
 	}
 	
 	public void enableMovingBlock()

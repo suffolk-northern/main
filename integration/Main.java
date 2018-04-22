@@ -40,10 +40,8 @@ public class Main
 	// FIXME: see imports and initialize()
 	private static Ctc ctc;
 	private static TrackModel trackModel;
-
-	// temporary single references for initial integration
-	private static TrainModel singleTrainModel;
-	private static TrainController singleTrainController;
+	private static TrainModel[] trainModels;
+	private static TrainController[] trainControllers;
 	private static MboController mboController;
 
 	public static void main(String[] args)
@@ -85,22 +83,17 @@ public class Main
 		MboController mboCont = new MboController("Green");
 		MboScheduler mboSched = new MboScheduler("Green");
 
-		final int numberOfTrains = 1;
+		final int numberOfTrains = 3;
 
-		TrainController[] trainControllers =
-			new TrainController[numberOfTrains];
+		trainControllers = new TrainController[numberOfTrains];
 
-		TrainModel[] trainModels =
-			new TrainModel[numberOfTrains];
+		trainModels = new TrainModel[numberOfTrains];
 
 		for (int i = 0; i < numberOfTrains; ++i)
 		{
 			trainControllers[i] = new TrainController();
 			trainModels[i] = new TrainModel(i, trackModel);
 		}
-
-		singleTrainController = trainControllers[0];
-		singleTrainModel = trainModels[0];
 
 		ArrayList<Updateable> trainObjects =
 			new ArrayList<Updateable>();
@@ -121,7 +114,11 @@ public class Main
 
 		// CTC <---> track controller
 		ctc.setTrackModel(trackModel);
-
+		
+		// CTC <---> trains
+		for(int i = 0; i < numberOfTrains; i++)
+			ctc.setTrain(i);
+		
 		// track model <---> train model
 		for (TrainModel trainModel : trainModels)
 			trackModel.registerTrain(trainModel, "Green");
@@ -166,8 +163,8 @@ public class Main
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				new UI(ctc, trackModel,
-				       singleTrainModel,
-				       singleTrainController)
+				       trainModels,
+				       trainControllers)
 				          .setVisible(true);
 			}
 		});

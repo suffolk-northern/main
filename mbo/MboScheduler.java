@@ -66,7 +66,7 @@ public class MboScheduler implements Updateable
 				if (curBlock.isIsStation())
 					stationName = TrackModel.getStation(lineName, defaultLine.get(i)).getName();
 					
-				line[i] = new BlockTracker(defaultLine.get(i), nextBlock, prevBlock, blockLength, speedLimit, section, stationName);
+				line[i] = new BlockTracker(defaultLine.get(i), nextBlock, prevBlock, blockLength, speedLimit, section, stationName, false, false);
 			}
 		}
 	}
