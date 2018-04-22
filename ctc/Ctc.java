@@ -1969,27 +1969,55 @@ public class Ctc implements Updateable{
 		}
 	}
 	
+	public static void strToSched(String sched_in)
+	{
+		Schedule sched = new Schedule();
+		
+		StringTokenizer stok = new StringTokenizer(sched_in,"\n");
+		String str;
+		while(stok.hasMoreTokens())
+		{
+			str = stok.nextToken();
+			//System.out.println(str);
+		}
+		
+	}
+	
+	protected static class Dispatch{
+		
+		protected ArrayDeque<Block> route;
+		protected String time;
+		protected int driver;
+		
+		public Dispatch()
+		{
+			route = new ArrayDeque<Block>();
+			time = null;
+			driver = -1;
+		}
+		
+	}
+	
 	protected static class Schedule{
 		
-		ArrayDeque<ArrayDeque<Block>> schedule;
-		ArrayDeque<String> times;
+		ArrayDeque<Dispatch> schedule;
 		
 		public Schedule()
 		{
-			schedule = new ArrayDeque<ArrayDeque<Block>>();
+			schedule = new ArrayDeque<Dispatch>();
 		}
 		
-		public void addRoute(ArrayDeque<Block> route)
+		public void addRoute(Dispatch route)
 		{
 			schedule.add(route);
 		}
 		
-		public ArrayDeque<Block> peekRoute()
+		public Dispatch peekRoute()
 		{
 			return schedule.peekFirst();
 		}
 		
-		public ArrayDeque<Block> getRoute()
+		public Dispatch getRoute()
 		{
 			return schedule.poll();
 		}

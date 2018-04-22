@@ -64,6 +64,7 @@ public class CtcRadio {
 	public void setSchedule(String schedule)
 	{
 		this.schedule = schedule;
+		ctc.strToSched(schedule);
 	}
 	
 	public String getSchedule()
