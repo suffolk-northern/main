@@ -505,7 +505,7 @@ public class TrackModel implements Updateable {
 	 */
 	public static void setBlockMessage(String line, int block, TrackMovementCommand tmc) {
 		for (TrainData td : trains) {
-			if (td.trackBlock.line.equalsIgnoreCase(line) && td.trackBlock.block == block) {
+			if (td.trackBlock.line.equalsIgnoreCase(line) && td.trackBlock.block == block && td.trackBlock.isPowerOn) {
 				td.trainModel.trackCircuit().send(tmc);
 				td.trackBlock.message = "Speed: " + tmc.speed + ", Auth: " + tmc.authority;
 			}
@@ -565,6 +565,7 @@ public class TrackModel implements Updateable {
 		TrackBlock tb = getBlock(line, block);
 		if (tb != null) {
 			tb.isPowerOn = on;
+			tb.isOccupied = !on;
 			if (tmf != null) {
 				tmf.refreshTables();
 			}
