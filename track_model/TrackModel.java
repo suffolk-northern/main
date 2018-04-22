@@ -369,7 +369,7 @@ public class TrackModel implements Updateable {
 	public static boolean flipSwitch(String line, int block) {
 		boolean success = false;
 		TrackBlock tb = getBlock(line, block);
-		if (tb != null && tb.isSwitch) {
+		if (tb != null && tb.isSwitch && tb.isPowerOn) {
 			int mainBlock = tb.switchDirection < 0 ? tb.prevBlockId : tb.nextBlockId;
 			int switchBlock = tb.switchBlockId;
 			if (tb.switchPosition == mainBlock) {
@@ -579,14 +579,17 @@ public class TrackModel implements Updateable {
 	 * @param block
 	 * @param signal
 	 */
-	public static void setCrossingSignal(String line, int block, boolean signal) {
+	public static boolean setCrossingSignal(String line, int block, boolean signal) {
 		Crossing c = getCrossing(line, block);
-		if (c != null) {
+		TrackBlock tb = getBlock(line, block);
+		if (c != null && tb.isPowerOn) {
 			c.signal = signal;
 			if (tmf != null) {
 				tmf.refreshTables();
 			}
+			return true;
 		}
+		return false;
 	}
 
 	/**
