@@ -11,17 +11,9 @@ import java.util.Arrays;
 
 import java.awt.EventQueue;
 
-// FIXME: package names don't match directory names: ctc, train_controller
-//
-// FIXME: naming convention: trainController should be TrainController
-//
-// FIXME: naming convention: pick Ctc and Mbo or CTC and MBO
-//
 import ctc.Ctc;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-//import mbo.Mbo;
-import track_controller.TrackController;
 import mbo.MboController;
 import mbo.MboScheduler;
 import mbo.CtcRadio;
@@ -37,7 +29,6 @@ public class Main
 	private static ArrayList<Updateable> updateables =
 		new ArrayList<Updateable>();
 
-	// FIXME: see imports and initialize()
 	private static Ctc ctc;
 	private static TrackModel trackModel;
 	private static TrainModel[] trainModels;
@@ -58,7 +49,6 @@ public class Main
 		// instantiate modules
 		//
 
-		// FIXME: launches UI in constructor
 		ctc = new Ctc();
 
 		trackModel = new TrackModel();
@@ -110,8 +100,6 @@ public class Main
 		// link modules
 		//
 
-		// FIXME: none of this linking works
-
 		// CTC <---> track controller
 		ctc.setTrackModel(trackModel);
 		
@@ -149,7 +137,6 @@ public class Main
 		// fill updateables
 		//
 
-		// FIXME: see instantiations above
 		updateables.add(ctc);
 		updateables.add(mboCont);
 		//updateables.add(mboSched);

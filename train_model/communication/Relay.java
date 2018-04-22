@@ -6,7 +6,6 @@
 
 package train_model.communication;
 
-import track_controller.communication.Authority;
 import track_model.GlobalCoordinates;
 import train_model.TrainModel;
 import train_model.communication.BeaconMessage;
