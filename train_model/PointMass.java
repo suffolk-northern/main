@@ -44,6 +44,9 @@ public class PointMass
 	private boolean forward = true;
 	private boolean fromCommon = false;
 
+	private int startCounter = 0;
+	private static final int startCounterMod = 1000;
+
 	// Constructs a PointMass as a copy of another object.
 	public PointMass(PointMass other)
 	{
@@ -95,6 +98,11 @@ public class PointMass
 		this.speed = 0.0;
 
 		block = null;
+
+		// FIXME: this is a hack, because the track model slews us
+		// repeatedly for some reason
+		startCounter = startCounterMod;
+
 		push(0.0, 10);
 	}
 
@@ -167,6 +175,13 @@ public class PointMass
 		// Steer trains.
 
 		if (block == null) {
+			startCounter += time;
+			if (startCounter >= startCounterMod)
+				startCounter = 0;
+
+			if (startCounter != 0)
+				return;
+
 			block = track.getClosestBlock(pose.position, LINE);
 
 			forward = track.getSide(pose.position,
