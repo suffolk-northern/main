@@ -906,6 +906,10 @@ public class Ctc implements Updateable{
 				//System.out.println("Occ or reserved. Auth " + auth + " to train " + ID);
 				return auth;
 			} // check switches are in correct position
+			else if(block.equals(end) && block.yard)
+			{
+				auth += 50;
+			}
 			else if(block.equals(end) && block.hasStation && !block.hasSwitch())
 			{
 				auth += block.length / 2;
