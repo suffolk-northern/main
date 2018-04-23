@@ -985,11 +985,11 @@ public class TrackModel implements Updateable {
 			//
 			curBlock = getBlock(td.trackBlock.line, td.trainModel.block());
 			if (!curBlock.isOccupied) {
-				setOccupancy(curBlock.line, curBlock.block, true);
+				curBlock.isOccupied = true;
 			}
 			if (td.trackBlock.block != curBlock.block) {
 				if (td.trackBlock != null) {
-					setOccupancy(td.trackBlock.line, td.trackBlock.block, false);
+					td.trackBlock.isOccupied = false;
 				}
 				td.trackBlock = curBlock;
 			}
