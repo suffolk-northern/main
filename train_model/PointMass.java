@@ -93,6 +93,9 @@ public class PointMass
 	{
 		this.pose = new Pose(pose);
 		this.speed = 0.0;
+
+		block = null;
+		push(0.0, 10);
 	}
 
 	// Returns the current speed.
@@ -161,15 +164,27 @@ public class PointMass
 
 		if (speed < 0.0) speed = 0.0;
 
-		if (displacementChange < 0.00001)
-			return;
-
 		// Steer trains.
 
-		if (block == null)
+		if (block == null) {
 			block = track.getClosestBlock(pose.position, LINE);
 
+			forward = track.getSide(pose.position,
+			                 LINE, block.getBlock());
+			displacement = forward ? 0.0 : block.getLength();
+			pose.position = track.getPositionAlongBlock(
+			                 LINE, block.getBlock(), displacement);
+		}
+
 		double length = block.getLength();
+
+		if (block.getBlock() == 0) {
+			block = null;
+			return;
+		}
+
+		if (displacementChange < 0.00001)
+			return;
 
 		if (forward)
 			displacement += displacementChange;
@@ -186,6 +201,14 @@ public class PointMass
 		                                            displacement);
 
 		pose.orientation = oldPosition.directionTo(pose.position);
+
+		if (block.getBlock() == 0) {
+			block = null;
+			displacement = 0.0;
+			lastBlockId = 0;
+			forward = true;
+			fromCommon = false;
+		}
 	}
 
 	// How much mass (in kilograms) weighs this many pounds
