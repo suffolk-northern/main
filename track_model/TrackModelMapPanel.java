@@ -117,7 +117,7 @@ public class TrackModelMapPanel extends JPanel {
 		plopCrossings(g);
 		plopSwitches(g);
 		plopTrack(g);
-//		plopBeacons(g);
+		plopBeacons(g);
 		plopTrains(g);
 		printText(g);
 	}
@@ -302,10 +302,10 @@ public class TrackModelMapPanel extends JPanel {
 	private void plopBeacons(Graphics g) {
 		Graphics2D g2 = (Graphics2D) g;
 		for (Beacon b : tm.beacons) {
-			double x = xBound + (b.location.longitude() - minLon) * lonMultiplier;
-			double y = yBound - (b.location.latitude() - minLat) * latMultiplier;
-			g2.setColor(Color.CYAN);
-			g2.fillOval((int) x, (int) y, 5, 5);
+			double x = getXPosition(b.location.longitude());
+			double y = getYPosition(b.location.latitude());
+			g2.setColor(Color.MAGENTA);
+			g2.fillOval((int) x - 3, (int) y - 3, 6, 6);
 		}
 	}
 

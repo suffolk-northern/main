@@ -44,6 +44,9 @@ public class PointMass
 	private boolean forward = true;
 	private boolean fromCommon = false;
 
+	private int startCounter = 0;
+	private static final int startCounterMod = 1000;
+
 	// Constructs a PointMass as a copy of another object.
 	public PointMass(PointMass other)
 	{
@@ -99,6 +102,14 @@ public class PointMass
 		this.line = line;
 		this.pose = new Pose(pose);
 		this.speed = 0.0;
+
+		block = null;
+
+		// FIXME: this is a hack, because the track model slews us
+		// repeatedly for some reason
+		startCounter = startCounterMod;
+
+		push(0.0, 10);
 	}
 
 	// Returns the current speed.
@@ -167,15 +178,34 @@ public class PointMass
 
 		if (speed < 0.0) speed = 0.0;
 
-		if (displacementChange < 0.00001)
-			return;
-
 		// Steer trains.
 
-		if (block == null)
-			block = track.getClosestBlock(pose.position, line);
+		if (block == null) {
+			startCounter += time;
+			if (startCounter >= startCounterMod)
+				startCounter = 0;
+
+			if (startCounter != 0)
+				return;
+
+			block = track.getClosestBlock(pose.position, LINE);
+
+			forward = track.getSide(pose.position,
+			                 LINE, block.getBlock());
+			displacement = forward ? 0.0 : block.getLength();
+			pose.position = track.getPositionAlongBlock(
+			                 LINE, block.getBlock(), displacement);
+		}
 
 		double length = block.getLength();
+
+		if (block.getBlock() == 0) {
+			block = null;
+			return;
+		}
+
+		if (displacementChange < 0.00001)
+			return;
 
 		if (forward)
 			displacement += displacementChange;
@@ -192,6 +222,14 @@ public class PointMass
 		                                            displacement);
 
 		pose.orientation = oldPosition.directionTo(pose.position);
+
+		if (block.getBlock() == 0) {
+			block = null;
+			displacement = 0.0;
+			lastBlockId = 0;
+			forward = true;
+			fromCommon = false;
+		}
 	}
 
 	// How much mass (in kilograms) weighs this many pounds
