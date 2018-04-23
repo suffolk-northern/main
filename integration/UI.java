@@ -202,7 +202,7 @@ public class UI extends javax.swing.JFrame {
             Integer.parseInt(jTextField2.getText())
         );
 
-        trackModel.setYardMessage(0, 0, command);
+        trackModel.setYardMessage(0, "green", 0, command);
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
