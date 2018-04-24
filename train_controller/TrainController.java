@@ -33,7 +33,7 @@ public class TrainController implements Updateable
 	double mass = 50*907.185;
 	double error;
 	double timeConstant = 5;
-	double Kp = 0.98; 		// Range: 0 -> 0.5
+	double Kp = 0.98; 		// Default values
 	double Ki = 1 - Kp;
 	double [] queue = new double[5000];
 	int queueInsert = 0;
@@ -47,6 +47,7 @@ public class TrainController implements Updateable
 	double loopPower;
 
 	boolean manualBrake;
+        boolean emergencyBrake;
 	double brakeCMD;		// to link
 	double loopBrake;
         double startBrake;
@@ -58,8 +59,14 @@ public class TrainController implements Updateable
         boolean afterStation = false;
         boolean mboMode;
         double distFromLastBeacon;
-
+        
+        TrainControllerUI gui;
 	ArrayList<String> ads = new ArrayList<>();
+        boolean allowKSet = true;
+        boolean allowDoors = true;
+        boolean dwelling;
+        int dwellBurstCyclesCount = 0;
+        int MIN_DWELL = 10;             // min seconds to dwell
 
 	public TrainController() 
 	{
@@ -69,39 +76,49 @@ public class TrainController implements Updateable
 		currAuth = 0;
 		driverSetSpeed = 0;
 		manualBrake = true;
+                emergencyBrake = false;
+                currentSpeed = 0;
+                powerCMD = 0;
+                
 
 		ads.add("Come to Pitt, the #1 public university in northeast Oakland");
 		ads.add("Broken frisbee? Get a new one today! Visit getnewfrisbee.com");
 		ads.add("Got blisters on your feet from playing frisbee? Visit betterfrisbeecleats.com");
 		ads.add("Do your teamates make fun of you because you can't catch a frisbee? Visit frisbeelessons.com");
 		ads.add("Can't hold a conversation without bringing up frisbee? Visit frisbeefreaksanonymous.com");
-	}
+        }
 
 	public void registerTrain(ControllerLink link)
 	{
+            System.out.println("registering Train");
 		this.link = link;
 		link.power(0);
 		link.serviceBrake(1.0);
+                gui = new TrainControllerUI(this);
 	}
 
 	public void launchGUI()
 	{
-		TrainControllerUI gui = new TrainControllerUI(this);
 		gui.setVisible(true);
 	}
-
+        
 	// Setters/getters for driver GUI
 
-	public void setKs(double p)
+	public void setKs(double p, double i)
 	{
 		Kp = p;
-		Ki = 1 - p;
+		Ki = i;
 	}
 
 	public void setBrakesEngaged(boolean command)
 	{
 		manualBrake = command;
 	}
+        
+        public void setEmergencyBrake()
+        {
+            emergencyBrake = true;
+        }
 
 	public void setDriverSpeed(int command)
 	{
@@ -187,7 +204,17 @@ public class TrainController implements Updateable
 	{
 		return movingAuth * 1.09361;	 // convert m to yd
 	}
+        
+        public boolean getAllowKSet()
+        {
+            return allowKSet;
+        }
 
+        public boolean getAllowDoors()
+        {
+            return allowDoors;
+        }
+        
 	// Calculates train displacement since last update
 	private double displacement(int millis)
 	{
@@ -202,10 +229,9 @@ public class TrainController implements Updateable
 		MboMovementCommand mboMsg = link.receiveFromMbo();
                 BeaconMessage beaconMsg = link.receiveFromBeacons();
                 String[] bm;
-                boolean leftSide;
+                boolean leftSide = false;
 		if (ctcMsg!=null & !stationGap)
 		{
-                    System.out.println("new ctc: " + currAuth + "\t\tspeed: " + link.speed());
                     currAuth = ctcMsg.authority;
                     speedCMD = (double)ctcMsg.speed * 0.277778; // convert kph to mps
                     movingAuth = currAuth;
@@ -245,12 +271,31 @@ public class TrainController implements Updateable
                 }
                 if (beaconMsg!=null & afterStation & distFromLastBeacon < 5);
                     afterStation = false;
-		if(movingAuth < 1 && currentSpeed == 0)
+		if((movingAuth < 5 && currentSpeed == 0) | dwelling)
 		{
-                    // train stopped for auth reasons
-                    //if(totalMovingAuth > movingAuth)
+                    // Train stopped for auth reasons
+                    if(stationGap | dwelling)
+                    {
+                        afterStation = true;
+                        // Wait min dwell time
+                        if(dwellBurstCyclesCount++ * (double)millis/1000 < MIN_DWELL)
+                        {
+                            dwelling = true;
+                            // Open appropriate Doors;
+                            setLeftDoors(leftSide);
+                            setRightDoors(!leftSide);
+                            System.out.println("DWELLING!!!!!");
+                        }
+                        else
+                        {
+                            dwelling = false;
+                            dwellBurstCyclesCount = 0;
+                            // Close appropriate doors
+                            setLeftDoors(false);
+                            setRightDoors(false);
+                        }
+                    }
                     stationGap = false;
-                    afterStation = true;
 		}
 	}
         
@@ -258,6 +303,14 @@ public class TrainController implements Updateable
 	// All units are meters and seconds
 	public void update(int millis) 
 	{            
+                if(currentSpeed>0)
+                {
+                    allowKSet = false;
+                    allowDoors = true;
+                }
+                else
+                    allowDoors = false;
+                
 		lastSpeed = currentSpeed;
 		currentSpeed = link.speed();
 
@@ -305,11 +358,23 @@ public class TrainController implements Updateable
 		if(brakeCMD < 0)
 			brakeCMD = 0;
 		// If driver braking in manual mode, or if authority about to expire
-		if((manualBrake && manualMode) || movingAuth - 0.1 <= Math.pow(currentSpeed,2) / (2 * MAX_SDECEL))
+		if((manualBrake && manualMode) || movingAuth - 4 <= Math.pow(currentSpeed,2) / (2 * MAX_SDECEL))
 		{
 			brakeCMD = 1;
 			powerCMD = 0;
 		}
+                if(emergencyBrake)
+                {
+                    link.power(0);
+                    link.applyEmergencyBrake();
+                    return;
+                }
+                if(dwelling)
+                {
+                    link.power(0);
+                    link.serviceBrake(1);
+                    return;
+                }
 		link.power(powerCMD);		
 		link.serviceBrake(brakeCMD);
 		//////////////////////////////////////////
