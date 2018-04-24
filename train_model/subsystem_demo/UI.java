@@ -235,7 +235,7 @@ public class UI
         jLabel4 = new javax.swing.JLabel();
         controlSBrake = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
+        controlEBrake = new javax.swing.JLabel();
         jLabel14 = new javax.swing.JLabel();
         cabinHeater = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
@@ -338,8 +338,8 @@ public class UI
         jLabel6.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
         jLabel6.setText("E Brake");
 
-        jLabel7.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
-        jLabel7.setText("OFF");
+        controlEBrake.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        controlEBrake.setText("OFF");
 
         jLabel14.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
         jLabel14.setText("Heater");
@@ -363,7 +363,7 @@ public class UI
                     .addComponent(cabinHeater)
                     .addComponent(controlPower)
                     .addComponent(controlSBrake)
-                    .addComponent(jLabel7))
+                    .addComponent(controlEBrake))
                 .addContainerGap(43, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
@@ -380,7 +380,7 @@ public class UI
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel6)
-                    .addComponent(jLabel7))
+                    .addComponent(controlEBrake))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel14)
@@ -1271,6 +1271,7 @@ public class UI
     private javax.swing.JLabel cabinLights;
     private javax.swing.JLabel cabinPassengers;
     private javax.swing.JLabel cabinRDoors;
+    private javax.swing.JLabel controlEBrake;
     private javax.swing.JLabel controlPower;
     private javax.swing.JLabel controlSBrake;
     private javax.swing.JButton failuresBeaconRx;
@@ -1310,7 +1311,6 @@ public class UI
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
