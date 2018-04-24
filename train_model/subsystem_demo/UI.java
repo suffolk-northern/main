@@ -100,14 +100,14 @@ public class UI
         pointStatsLatitude.setText(String.format(
             "%03.0f'%02.0f'%05.2f\"",
             latitude,
-            (latitude % 60.0) * 60.0,
-            (latitude % 3600.0) * 3600.0
+            (latitude * 60.0) % 60.0,
+            (latitude * 3600.0) % 60.0
         ));
         pointStatsLongitude.setText(String.format(
             "%03.0f'%02.0f'%05.2f\"",
-            longitude,
-            (longitude % 60.0) * 60.0,
-            (longitude % 3600.0) * 3600.0
+            -longitude,
+            (-longitude * 60.0) % 60.0,
+            (-longitude * 3600.0) % 60.0
         ));
 
         pointStatsSpeed.setText(String.format("%.1f mph", speed));
@@ -133,14 +133,14 @@ public class UI
         mboTxLatitude.setText(String.format(
             "%03.0f'%02.0f'%05.2f\"",
             latitude,
-            (latitude % 60.0) * 60.0,
-            (latitude % 3600.0) * 3600.0
+            (latitude * 60.0) % 60.0,
+            (latitude * 3600.0) % 60.0
         ));
         mboTxLongitude.setText(String.format(
             "%03.0f'%02.0f'%05.2f\"",
-            longitude,
-            (longitude % 60.0) * 60.0,
-            (longitude % 3600.0) * 3600.0
+            -longitude,
+            (-longitude * 60.0) % 60.0,
+            (-longitude * 3600.0) % 60.0
         ));
 
         mboRxSpeed.setText(String.format("%.1f mph",
