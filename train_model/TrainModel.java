@@ -349,7 +349,7 @@ public class TrainModel
 
 		doors[index] = true;
 
-		if (pointMass.atStation())
+		if (!pointMass.atStation())
 			return;
 
 		int leaving = cabin.unloadPassengers();
