@@ -222,12 +222,15 @@ public class TrainModel
 		return pointMass.orientation();
 	}
 
-	// Moves to the given pose instantaneously.
+	// Instantaneously moves to the given pose on the given line.
 	//
 	// Sets the speed to zero.
-	public void slew(Pose pose)
+	//
+	// Throws IllegalArgumentException if line is not "green" or "red",
+	// ignoring case.
+	public void slew(String line, Pose pose)
 	{
-		pointMass.slew(pose);
+		pointMass.slew(line.toLowerCase(), pose);
 	}
 
 	// Sets the orientation.

@@ -776,15 +776,17 @@ public class TrackModel implements Updateable {
 	 * Sets a message to the yard.
 	 *
 	 * @param trainId
+	 * @param line
 	 * @param driverId
 	 * @param tmc
 	 */
-	public void setYardMessage(int trainId, int driverId, TrackMovementCommand tmc) {
+	public void setYardMessage(int trainId, String line, int driverId, TrackMovementCommand tmc) {
 		for (TrainData td : trains) {
 			if (td.trainModel.id() == trainId) {
-				String line = td.trackBlock.line;
+				td.trackBlock = getYardBlock(line);
 				if (tmc.authority > 0) {
-					td.trainModel.slew(new Pose(getFirstBlock(line).start,
+					TrackBlock fb = getFirstBlock(line);
+					td.trainModel.slew(line, new Pose(line.equalsIgnoreCase("green") ? fb.start : getPositionAlongBlock(line, fb.prevBlockId, fb.length - 3),
 							line.equalsIgnoreCase("green") ? GREEN_LINE_ORIENTATION : RED_LINE_ORIENTATION));
 				}
 				td.trainModel.trackCircuit().send(tmc);
@@ -811,7 +813,7 @@ public class TrackModel implements Updateable {
 		line = line.toLowerCase();
 		if (doTablesExist()) {
 			trains.add(new TrainData(tm, getYardBlock(line)));
-			tm.slew(new Pose(getYardBlock(line).start, GREEN_LINE_ORIENTATION));
+			tm.slew(line, new Pose(getYardBlock(line).start, GREEN_LINE_ORIENTATION));
 		}
 	}
 
