@@ -188,13 +188,13 @@ public class PointMass
 			if (startCounter != 0)
 				return;
 
-			block = track.getClosestBlock(pose.position, LINE);
+			block = track.getClosestBlock(pose.position, line);
 
 			forward = track.getSide(pose.position,
-			                 LINE, block.getBlock());
+			                 line, block.getBlock());
 			displacement = forward ? 0.0 : block.getLength();
 			pose.position = track.getPositionAlongBlock(
-			                 LINE, block.getBlock(), displacement);
+			                 line, block.getBlock(), displacement);
 		}
 
 		double length = block.getLength();
