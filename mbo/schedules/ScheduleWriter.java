@@ -62,8 +62,8 @@ public class ScheduleWriter {
 	private void write(PrintWriter writer)
 	{
 		writer.printf("---Train Schedules---\n");
-		System.out.println(sched.getTrainIDs().size());
-		System.out.println(sched.getDriverIDs().size());
+		//System.out.println(sched.getTrainIDs().size());
+		//System.out.println(sched.getDriverIDs().size());
 		for (int trainID : sched.getTrainIDs())
 		{
 			TrainSchedule ts = sched.getTrainSchedule(trainID);
