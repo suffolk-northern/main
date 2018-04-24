@@ -1893,7 +1893,8 @@ public class Ctc implements Updateable{
 		if(train.location.num == 0)
 		{
 			trackmodel.setYardMessage(train.ID, train.location.line, 0, tmc);
-			dispatched.add(train);
+			if(!dispatched.contains(train))
+				dispatched.add(train);
 		}
 		else
 			trackmodel.setBlockMessage(loc.line, loc.num, tmc);
