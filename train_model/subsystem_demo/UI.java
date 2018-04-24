@@ -50,6 +50,7 @@ public class UI
         final double MPH_PER_KPH = 0.6213712;
         final double Y_PER_M = 1.093613;
         final double POUND_PER_NEWTON = 0.224809;
+        final double KILOGRAMS_PER_TON = 907.185;
 
         TrainModel train = (TrainModel) o;
 
@@ -62,11 +63,14 @@ public class UI
         double speed = MPH_PER_MPS * train.speed();
         double heading = train.orientation().degrees();
         double temperature = cToF(train.temperature());
+        double mass = train.mass() / KILOGRAMS_PER_TON;
 
         boolean lDoors = train.door(DoorLocation.left);
         boolean rDoors = train.door(DoorLocation.right);
         boolean heater = train.heater();
 	boolean lights = train.lights();
+        int passengers = train.passengers();
+        int crew = train.crew();
 
         BeaconMessage beaconMessage = train.lastBeaconMessage();
 
@@ -92,11 +96,14 @@ public class UI
         pointStatsSpeed.setText(String.format("%.1f mph", speed));
         pointStatsHeading.setText(String.format("%03.0f'", heading));
         pointStatsTemperature.setText(String.format("%.1f 'F", temperature));
+        pointStatsMass.setText(String.format("%.1f T", mass));
 
         cabinLDoors.setText(lDoors ? "OPEN" : "CLOSED");
         cabinRDoors.setText(rDoors ? "OPEN" : "CLOSED");
         cabinHeater.setText(heater ? "ON" : "OFF");
 	cabinLights.setText(lights ? "ON" : "OFF");
+        cabinPassengers.setText(String.format("%d", passengers));
+        cabinCrew.setText(String.format("%d", crew));
 
         beaconRxString.setText("\"" + beaconMessage.string + "\"");
 
@@ -174,6 +181,8 @@ public class UI
         pointStatsHeading = new javax.swing.JLabel();
         jLabel19 = new javax.swing.JLabel();
         pointStatsTemperature = new javax.swing.JLabel();
+        jLabel12 = new javax.swing.JLabel();
+        pointStatsMass = new javax.swing.JLabel();
         jPanel7 = new javax.swing.JPanel();
         jLabel15 = new javax.swing.JLabel();
         jPanel8 = new javax.swing.JPanel();
@@ -185,6 +194,10 @@ public class UI
         cabinLights = new javax.swing.JLabel();
         jLabel14 = new javax.swing.JLabel();
         cabinHeater = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        cabinPassengers = new javax.swing.JLabel();
+        jLabel18 = new javax.swing.JLabel();
+        cabinCrew = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jPanel9 = new javax.swing.JPanel();
         jLabel20 = new javax.swing.JLabel();
@@ -329,6 +342,12 @@ public class UI
         pointStatsTemperature.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
         pointStatsTemperature.setText("00 'C");
 
+        jLabel12.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        jLabel12.setText("Mass");
+
+        pointStatsMass.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        pointStatsMass.setText("99.9");
+
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
         jPanel6Layout.setHorizontalGroup(
@@ -337,21 +356,23 @@ public class UI
                 .addContainerGap()
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel6Layout.createSequentialGroup()
+                        .addComponent(jLabel13)
+                        .addGap(18, 18, 18)
+                        .addComponent(pointStatsSpeed))
+                    .addGroup(jPanel6Layout.createSequentialGroup()
                         .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel9)
                             .addComponent(jLabel11)
                             .addComponent(jLabel19)
-                            .addComponent(jLabel3))
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel12))
                         .addGap(24, 24, 24)
                         .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(pointStatsMass)
                             .addComponent(pointStatsHeading)
                             .addComponent(pointStatsTemperature)
                             .addComponent(pointStatsLatitude)
-                            .addComponent(pointStatsLongitude)))
-                    .addGroup(jPanel6Layout.createSequentialGroup()
-                        .addComponent(jLabel13)
-                        .addGap(18, 18, 18)
-                        .addComponent(pointStatsSpeed)))
+                            .addComponent(pointStatsLongitude))))
                 .addContainerGap(55, Short.MAX_VALUE))
         );
         jPanel6Layout.setVerticalGroup(
@@ -377,7 +398,11 @@ public class UI
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel19)
                     .addComponent(pointStatsTemperature))
-                .addContainerGap(29, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel12)
+                    .addComponent(pointStatsMass))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
@@ -396,8 +421,8 @@ public class UI
                 .addContainerGap()
                 .addComponent(jLabel8)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(24, Short.MAX_VALUE))
+                .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         jLabel15.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
@@ -429,6 +454,18 @@ public class UI
         cabinHeater.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
         cabinHeater.setText("OFF");
 
+        jLabel5.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        jLabel5.setText("Pass");
+
+        cabinPassengers.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        cabinPassengers.setText("999");
+
+        jLabel18.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        jLabel18.setText("Crew");
+
+        cabinCrew.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        cabinCrew.setText("9");
+
         javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
         jPanel8.setLayout(jPanel8Layout);
         jPanel8Layout.setHorizontalGroup(
@@ -439,9 +476,13 @@ public class UI
                     .addComponent(jLabel16)
                     .addComponent(jLabel17)
                     .addComponent(jLabel10)
-                    .addComponent(jLabel14))
+                    .addComponent(jLabel14)
+                    .addComponent(jLabel5)
+                    .addComponent(jLabel18))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(cabinCrew)
+                    .addComponent(cabinPassengers)
                     .addComponent(cabinHeater)
                     .addComponent(cabinLights)
                     .addComponent(cabinRDoors)
@@ -467,7 +508,15 @@ public class UI
                 .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel14)
                     .addComponent(cabinHeater))
-                .addContainerGap(27, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel5)
+                    .addComponent(cabinPassengers))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel18)
+                    .addComponent(cabinCrew))
+                .addContainerGap(32, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
@@ -486,8 +535,8 @@ public class UI
                 .addContainerGap()
                 .addComponent(jLabel15)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -842,20 +891,24 @@ public class UI
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel beaconRxString;
+    private javax.swing.JLabel cabinCrew;
     private javax.swing.JLabel cabinHeater;
     private javax.swing.JLabel cabinLDoors;
     private javax.swing.JLabel cabinLights;
+    private javax.swing.JLabel cabinPassengers;
     private javax.swing.JLabel cabinRDoors;
     private javax.swing.JLabel controlPower;
     private javax.swing.JLabel controlSBrake;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
+    private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;
@@ -871,6 +924,7 @@ public class UI
     private javax.swing.JLabel jLabel34;
     private javax.swing.JLabel jLabel35;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
@@ -898,6 +952,7 @@ public class UI
     private javax.swing.JLabel pointStatsHeading;
     private javax.swing.JLabel pointStatsLatitude;
     private javax.swing.JLabel pointStatsLongitude;
+    private javax.swing.JLabel pointStatsMass;
     private javax.swing.JLabel pointStatsSpeed;
     private javax.swing.JLabel pointStatsTemperature;
     private javax.swing.JLabel trackRxAuthority;

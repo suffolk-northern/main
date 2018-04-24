@@ -110,6 +110,9 @@ public class Main
 		// track model <---> train model
 		for (TrainModel trainModel : trainModels)
 			trackModel.registerTrain(trainModel, "Green");
+		
+		// track model <---> train model
+		trackModel.registerCtc(ctc);
 
 		// train model <---> train controller
 		for (int i = 0; i < trainControllers.length; ++i)

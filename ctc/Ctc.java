@@ -42,6 +42,7 @@ public class Ctc implements Updateable{
 	public static ArrayDeque<Block> greenline = new ArrayDeque<Block>();
 	public static ArrayDeque<Block> redline = new ArrayDeque<Block>();
 	public static ArrayDeque<Block> switches = new ArrayDeque<Block>();
+	public static ArrayDeque<Block> stations = new ArrayDeque<Block>();
 	public static ArrayDeque<TrackCon> trackcons = new ArrayDeque<TrackCon>();
 	
 	public static ArrayDeque<Loop> loops = new ArrayDeque<Loop>();
@@ -341,6 +342,7 @@ public class Ctc implements Updateable{
 				block.station = trackmodel.getStation(line,bl.getBlock()).getName(); 
 				block.hasStation = true;
 				switches.add(block);
+				stations.add(block);
 				greenline.add(block);
 			}
 			else if(bl.isIsCrossing())
@@ -349,7 +351,9 @@ public class Ctc implements Updateable{
 			}
 			else if(bl.isIsStation())
 			{
-				greenline.add(new Block(line,bl.getSection(),bl.getBlock(),bl.getLength(),bl.getNextBlockDir(),bl.getPrevBlockDir(),null,null,false,true,trackmodel.getStation(line,bl.getBlock()).getName()));
+				block = new Block(line,bl.getSection(),bl.getBlock(),bl.getLength(),bl.getNextBlockDir(),bl.getPrevBlockDir(),null,null,false,true,trackmodel.getStation(line,bl.getBlock()).getName());
+				greenline.add(block);
+				stations.add(block);
 			}
 			else if(bl.isIsSwitch())
 			{
@@ -1455,6 +1459,32 @@ public class Ctc implements Updateable{
 				calcThroughput();
 			}
 		}
+	}
+	
+	public void updatePassengers(int departing, int boarding, int trainID, String line, int num)
+	{
+		Train train = getTrain(trainID);
+		Block st = null;
+		
+		ArrayDeque<Block> stemp = stations.clone();
+		for(Block block : stemp)
+		{
+			if(block.line.equalsIgnoreCase(line) && block.num == num)
+			{
+				st = block;
+				break;
+			}		
+		}
+		
+		if(!train.location.equals(st))
+			return;
+		
+		train.passengers -= departing;
+		train.passengers += boarding;
+		
+		calcThroughput();
+		
+		
 	}
 
 	private static Train getTrain(Block location) {

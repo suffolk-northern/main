@@ -27,7 +27,7 @@ public class PointMass
 	private static final double yardsPerMeter = 1.093613;
 
 	// in kilograms
-	private final double mass;
+	private double mass;
 
 	// combination of these two represents displacement/velocity vectors
 	//
@@ -75,6 +75,27 @@ public class PointMass
 		this.mass = mass;
 		this.pose = new Pose(pose);
 		this.track = track;
+	}
+
+	// Returns the mass.
+	//
+	// Units: kilograms
+	public double mass()
+	{
+		return mass;
+	}
+
+	// Sets the mass.
+	//
+	// Units: kilograms
+	//
+	// Throws IllegalArgumentException if zero or negative.
+	public void mass(double value)
+	{
+		if (value <= 0.0)
+		    throw new IllegalArgumentException("mass range");
+
+		mass = value;
 	}
 
 	// Returns the current pose.

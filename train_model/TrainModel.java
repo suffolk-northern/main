@@ -11,6 +11,7 @@ import java.util.Observable;
 import track_model.GlobalCoordinates;
 import track_model.Orientation;
 import track_model.TrackModel;
+import train_model.Cabin;
 import train_model.PointHeat;
 import train_model.PointMass;
 import train_model.Pose;
@@ -49,9 +50,8 @@ public class TrainModel
 	private static final double DATASHEET_MID_MASS_TON  = 50.00;
 	private static final double DATASHEET_POWER_WATT = 120e3;
 
-	// kilograms (constant for now)
-	private static final double MASS_EMPTY =
-		KILOGRAMS_PER_TON * DATASHEET_MID_MASS_TON;
+	// kilograms
+	private static final double MASS_EMPTY = 35.0 * KILOGRAMS_PER_TON;
 
 	// derived constants from datasheet constants (SI units)
 	private static final double DERIVED_MID_SPEED =
@@ -114,6 +114,8 @@ public class TrainModel
 	private int notifyObserversCount = 0;
 
 	private final TrackModel track;
+
+	private final Cabin cabin = new Cabin();
 
 	// Constructs a TrainModel with the given identifier.
 	public TrainModel(int id, TrackModel track)
@@ -237,6 +239,14 @@ public class TrainModel
 		pointMass.orientation(value);
 	}
 
+	// Returns the mass.
+	//
+	// Units: kilograms
+	public double mass()
+	{
+		return pointMass.mass();
+	}
+
 	// Returns the current speed.
 	//
 	// Units: meters per second
@@ -323,12 +333,27 @@ public class TrainModel
 
 	// Opens specified door(s).
 	//
+	// Side effect: Exchanges passengers with the track model for the
+	// nearest station.
+	//
 	// No failure modes. Always succeeds.
 	public void openDoor(DoorLocation location)
 	{
 		int index = doorLocationToIndex(location);
 
+		if (doors[index])
+			return;
+
 		doors[index] = true;
+
+		int leaving = cabin.unloadPassengers();
+		int free = cabin.free();
+
+		int boarding = track.exchangePassengers(id(), leaving, free);
+
+		cabin.loadPassengers(boarding);
+
+		pointMass.mass(MASS_EMPTY + cabin.mass());
 	}
 
 	// Closes specified door(s).
@@ -383,6 +408,20 @@ public class TrainModel
 	public void lightsOff()
 	{
 		lightsAreOn = false;
+	}
+
+	// Returns the number of passengers aboard.
+	//
+	// Does not include crew.
+	public int passengers()
+	{
+		return cabin.passengers();
+	}
+
+	// Returns the number of crew members aboard.
+	public int crew()
+	{
+		return cabin.crew();
 	}
 
 	// Determines if we should notify observers this update. If so, notifes
