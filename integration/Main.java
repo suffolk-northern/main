@@ -35,6 +35,7 @@ public class Main
 	private static TrainModel[] trainModels;
 	private static TrainController[] trainControllers;
 	private static MboController mboController;
+	private static Driver[] drivers;
 
 	public static void main(String[] args)
 	{
@@ -84,7 +85,7 @@ public class Main
 		
 		final int numberOfDrivers = 20;
 		
-		Driver[] drivers = new Driver[numberOfDrivers];
+		drivers = new Driver[numberOfDrivers];
 
 		for (int i = 0; i < numberOfTrains; ++i)
 		{
