@@ -164,12 +164,19 @@ public class Ctc implements Updateable{
 			{
 				if(isForwardSwitch(block))
 				{
-					if(block.prev.occupied)
-						train = getTrain(block.prev);
-					if(train == null && block.sw_curr_to.occupied)
-						train = getTrain(block.sw_curr_to);
-					
-					//System.out.println("forward switch");
+					if(isBi(block) && block.sw_to.contains(getBlock(block.line,0)))
+					{
+						train = dispatched.poll();
+					}
+					else
+					{
+						if(block.prev.occupied)
+							train = getTrain(block.prev);
+						if(train == null && block.sw_curr_to.occupied)
+							train = getTrain(block.sw_curr_to);
+
+						//System.out.println("forward switch");
+					}
 				}
 				else if(isBackwardSwitch(block))
 				{
@@ -215,7 +222,7 @@ public class Ctc implements Updateable{
 					block.broken = true;
 				}
 			}
-			else if(!newOcc && isForwardSwitch(block))
+			else if(!newOcc && isForwardSwitch(block) && !isBi(block))
 			{
 				 if(block.sw_curr_to.equals(getBlock(block.line,0)))
 				 {
