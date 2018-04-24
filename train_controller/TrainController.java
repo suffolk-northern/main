@@ -22,6 +22,7 @@ public class TrainController implements Updateable
 	boolean rightDoorsCMD;
 	boolean leftDoorsCMD;
 	boolean heaterOnCMD;
+        int temperatureCMD = 70;
 
 	double currentSpeed;
 	double lastSpeed = 0.0; 	// to calc displacement
@@ -67,7 +68,8 @@ public class TrainController implements Updateable
         boolean dwelling;
         int dwellBurstCyclesCount = 0;
         int MIN_DWELL = 10;             // min seconds to dwell
-
+        boolean leftSide = false;
+        
 	public TrainController() 
 	{
 		// Before train recieves first command, make everything safe
@@ -145,30 +147,39 @@ public class TrainController implements Updateable
         public void setLeftDoors(boolean cmd)
         {
 		if(cmd && currentSpeed == 0)
-			link.openDoor(DoorLocation.left);
+                {
+		//	link.openDoor(DoorLocation.left);
+                        leftDoorsCMD = true;
+                }
 		else
+                {
 			link.closeDoor(DoorLocation.left);
+                        leftDoorsCMD = false;
+                }
         }
         
         public void setRightDoors(boolean cmd)
         {
 		if(cmd && currentSpeed == 0)
-			link.openDoor(DoorLocation.right);
+                {
+		//	link.openDoor(DoorLocation.right);
+                        rightDoorsCMD = true;
+                }
 		else
+                {
 			link.closeDoor(DoorLocation.right);
+                        rightDoorsCMD = false;
+                }
         }
-
-	public void setHeater(boolean command)
-	{
-		if(command)
-			link.heaterOn();
-		else
-			link.heaterOff();
-	}
+        
+        public void setTemp(int temp)
+        {
+            temperatureCMD = temp;
+        }
 
 	public double getTemp() 
 	{
-		return link.temperature();
+		return link.temperature() * 9/5 + 32;   // convert C to F
 	}
 
 	public double getPowerKW() 
@@ -214,6 +225,19 @@ public class TrainController implements Updateable
             return allowDoors;
         }
         
+        public int getDoorStates()
+        {
+            if(!leftDoorsCMD & !rightDoorsCMD)
+                return 0;
+            if(!leftDoorsCMD & rightDoorsCMD)
+                return 1;
+            if(leftDoorsCMD & ! rightDoorsCMD)
+                return 2;
+            if(leftDoorsCMD & rightDoorsCMD)
+                return 3;
+            return -1;
+        }
+        
 	// Calculates train displacement since last update
 	private double displacement(int millis)
 	{
@@ -228,7 +252,6 @@ public class TrainController implements Updateable
 		MboMovementCommand mboMsg = link.receiveFromMbo();
                 BeaconMessage beaconMsg = link.receiveFromBeacons();
                 String[] bm;
-                boolean leftSide = false;
 		if (ctcMsg!=null & !stationGap)
 		{
                     currAuth = ctcMsg.authority;
@@ -282,6 +305,8 @@ public class TrainController implements Updateable
                             // Open appropriate Doors;
                             setLeftDoors(leftSide);
                             setRightDoors(!leftSide);
+                            leftDoorsCMD = leftSide;
+                            rightDoorsCMD = !leftSide;
                         }
                         else
                         {
@@ -290,16 +315,28 @@ public class TrainController implements Updateable
                             // Close appropriate doors
                             setLeftDoors(false);
                             setRightDoors(false);
+                            leftDoorsCMD = false;
+                            rightDoorsCMD = false;
                         }
                     }
                     stationGap = false;
 		}
 	}
         
+        public void updateHeater()
+        {
+            if(getTemp() >= temperatureCMD & link.heater())
+                link.heaterOff();
+            else if(getTemp() < temperatureCMD & !link.heater())
+                link.heaterOn();
+        }
+        
 	// millis is ignored as this is not a model module
 	// All units are meters and seconds
 	public void update(int millis) 
 	{            
+                updateHeater();
+                
                 if(currentSpeed>0)
                 {
                     allowKSet = false;

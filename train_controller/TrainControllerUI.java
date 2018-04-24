@@ -21,6 +21,9 @@ public class TrainControllerUI extends javax.swing.JFrame {
             CmdAuthLabel.setText(df.format(controller.getCTCauth()) + " yds");
             RunningAuthLabel.setText(df.format(controller.getMovingAuth()) + " yds");
             PowerLabel.setText(df.format(controller.getPowerKW()) + " kW");
+            ActualTempLabel.setText(Integer.toString((int)controller.getTemp()));
+            
+            updateDoorLabels();
         }
     };
     /**
@@ -79,10 +82,10 @@ public class TrainControllerUI extends javax.swing.JFrame {
         TempSlider = new javax.swing.JSlider();
         jLabel16 = new javax.swing.JLabel();
         LightsToggle = new javax.swing.JToggleButton();
-        LDoorsToggle = new javax.swing.JToggleButton();
-        RDoorsToggle = new javax.swing.JToggleButton();
-        jLabel6 = new javax.swing.JLabel();
+        ActualTempLabel = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
+        LeftDoorButton = new javax.swing.JButton();
+        RightDoorButton = new javax.swing.JButton();
         ControlPanel = new javax.swing.JPanel();
         SetSpeedSlider = new javax.swing.JSlider();
         jLabel17 = new javax.swing.JLabel();
@@ -313,6 +316,11 @@ public class TrainControllerUI extends javax.swing.JFrame {
         TempSlider.setPaintLabels(true);
         TempSlider.setPaintTicks(true);
         TempSlider.setValue(70);
+        TempSlider.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                TempSliderStateChanged(evt);
+            }
+        });
 
         jLabel16.setText("Set Temp");
 
@@ -323,23 +331,23 @@ public class TrainControllerUI extends javax.swing.JFrame {
             }
         });
 
-        LDoorsToggle.setText("L Doors");
-        LDoorsToggle.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                LDoorsToggleActionPerformed(evt);
-            }
-        });
-
-        RDoorsToggle.setText("R Doors");
-        RDoorsToggle.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                RDoorsToggleActionPerformed(evt);
-            }
-        });
-
-        jLabel6.setText("70 *F");
+        ActualTempLabel.setText("70 *F");
 
         jLabel10.setText("Current Temp:");
+
+        LeftDoorButton.setText("L Doors");
+        LeftDoorButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                LeftDoorButtonActionPerformed(evt);
+            }
+        });
+
+        RightDoorButton.setText("R Doors");
+        RightDoorButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                RightDoorButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout PeripheralsPanelLayout = new javax.swing.GroupLayout(PeripheralsPanel);
         PeripheralsPanel.setLayout(PeripheralsPanelLayout);
@@ -357,13 +365,13 @@ public class TrainControllerUI extends javax.swing.JFrame {
                             .addGroup(PeripheralsPanelLayout.createSequentialGroup()
                                 .addComponent(jLabel10)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel6)))
+                                .addComponent(ActualTempLabel)))
                         .addGroup(PeripheralsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(PeripheralsPanelLayout.createSequentialGroup()
                                 .addGap(0, 0, Short.MAX_VALUE)
                                 .addGroup(PeripheralsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PeripheralsPanelLayout.createSequentialGroup()
-                                        .addComponent(RDoorsToggle)
+                                        .addComponent(RightDoorButton)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(RDoorsLabel))
                                     .addComponent(TempSlider, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -373,8 +381,9 @@ public class TrainControllerUI extends javax.swing.JFrame {
                                 .addComponent(jLabel16)
                                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PeripheralsPanelLayout.createSequentialGroup()
-                        .addComponent(LDoorsToggle)
-                        .addGap(12, 12, 12)
+                        .addGap(2, 2, 2)
+                        .addComponent(LeftDoorButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(LDoorsLabel)
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
@@ -385,8 +394,8 @@ public class TrainControllerUI extends javax.swing.JFrame {
                 .addGroup(PeripheralsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(LDoorsLabel)
                     .addComponent(RDoorsLabel)
-                    .addComponent(LDoorsToggle)
-                    .addComponent(RDoorsToggle))
+                    .addComponent(LeftDoorButton)
+                    .addComponent(RightDoorButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(PeripheralsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(PeripheralsPanelLayout.createSequentialGroup()
@@ -399,7 +408,7 @@ public class TrainControllerUI extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 7, Short.MAX_VALUE)
                         .addGroup(PeripheralsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel16)
-                            .addComponent(jLabel6)
+                            .addComponent(ActualTempLabel)
                             .addComponent(jLabel10)))))
         );
 
@@ -581,39 +590,30 @@ public class TrainControllerUI extends javax.swing.JFrame {
         });
     }
     
+    private void updateDoorLabels()
+    {
+        int i = controller.getDoorStates();
+        switch (i) {
+            case 0:     LDoorsLabel.setText("C");
+                        RDoorsLabel.setText("C");
+                        break;
+            case 1:     LDoorsLabel.setText("C");
+                        RDoorsLabel.setText("O");
+                        break;
+            case 2:     LDoorsLabel.setText("O");
+                        RDoorsLabel.setText("C");
+                        break;
+            case 3:     LDoorsLabel.setText("O");
+                        RDoorsLabel.setText("O");
+                        break;
+        }
+    }
+    
     private void SetSpeedSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_SetSpeedSliderStateChanged
         // TODO add your handling code here:
         JSlider source = (JSlider)evt.getSource();
         controller.setDriverSpeed(source.getValue());
     }//GEN-LAST:event_SetSpeedSliderStateChanged
-
-    private void LDoorsToggleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LDoorsToggleActionPerformed
-        // TODO add your handling code here:
-        if(LDoorsLabel.getText().equals("O"))
-        {
-            controller.setLeftDoors(false);
-            LDoorsLabel.setText("C");
-        }
-        else
-        {
-            controller.setLeftDoors(true);
-            LDoorsLabel.setText("O");
-        }
-    }//GEN-LAST:event_LDoorsToggleActionPerformed
-
-    private void RDoorsToggleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RDoorsToggleActionPerformed
-        // TODO add your handling code here:
-    if(RDoorsLabel.getText().equals("O"))
-        {
-            controller.setRightDoors(false);
-            RDoorsLabel.setText("C");
-        }
-        else
-        {
-            controller.setRightDoors(true);
-            RDoorsLabel.setText("O");
-        }
-    }//GEN-LAST:event_RDoorsToggleActionPerformed
 
     private void LightsToggleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LightsToggleActionPerformed
         // TODO add your handling code here:
@@ -700,6 +700,39 @@ public class TrainControllerUI extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_KpTextFieldActionPerformed
 
+    private void TempSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_TempSliderStateChanged
+        // TODO add your handling code here:
+        controller.setTemp(TempSlider.getValue());
+    }//GEN-LAST:event_TempSliderStateChanged
+
+    private void LeftDoorButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LeftDoorButtonActionPerformed
+        // TODO add your handling code here:
+        if(LDoorsLabel.getText().equals("O"))
+        {
+            controller.setLeftDoors(false);
+            LDoorsLabel.setText("C");
+        }
+        else
+        {
+            controller.setLeftDoors(true);
+            LDoorsLabel.setText("O");
+        }
+    }//GEN-LAST:event_LeftDoorButtonActionPerformed
+
+    private void RightDoorButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RightDoorButtonActionPerformed
+        // TODO add your handling code here:
+        if(RDoorsLabel.getText().equals("O"))
+        {
+            controller.setRightDoors(false);
+            RDoorsLabel.setText("C");
+        }
+        else
+        {
+            controller.setRightDoors(true);
+            RDoorsLabel.setText("O");
+        }        
+    }//GEN-LAST:event_RightDoorButtonActionPerformed
+    
     /**
      * @param args the command line arguments
      */
@@ -731,6 +764,7 @@ public class TrainControllerUI extends javax.swing.JFrame {
     private javax.swing.JMenuItem menuItem;
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel ActualTempLabel;
     private javax.swing.JButton ApplyButton;
     private javax.swing.JButton BrakeButton;
     private javax.swing.JLabel BrakeLabel;
@@ -746,7 +780,7 @@ public class TrainControllerUI extends javax.swing.JFrame {
     private javax.swing.JTextField KiTextField;
     private javax.swing.JTextField KpTextField;
     private javax.swing.JLabel LDoorsLabel;
-    private javax.swing.JToggleButton LDoorsToggle;
+    private javax.swing.JButton LeftDoorButton;
     private javax.swing.JLabel LightsLabel;
     private javax.swing.JToggleButton LightsToggle;
     private javax.swing.JLabel ManualModeLabel;
@@ -754,7 +788,7 @@ public class TrainControllerUI extends javax.swing.JFrame {
     private javax.swing.JPanel PeripheralsPanel;
     private javax.swing.JLabel PowerLabel;
     private javax.swing.JLabel RDoorsLabel;
-    private javax.swing.JToggleButton RDoorsToggle;
+    private javax.swing.JButton RightDoorButton;
     private javax.swing.JLabel RunningAuthLabel;
     private javax.swing.JSlider SetSpeedSlider;
     private javax.swing.JSlider TempSlider;
@@ -769,7 +803,6 @@ public class TrainControllerUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
