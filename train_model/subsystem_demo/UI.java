@@ -61,6 +61,7 @@ public class UI
 
         double power = HP_PER_WATT * train.power();
         double sBrake = 1e-3 * POUND_PER_NEWTON * train.serviceBrake();
+        boolean eBrake = train.emergencyBrake();
 
         double latitude  = train.location().latitude();
         double longitude = train.location().longitude();
@@ -94,6 +95,7 @@ public class UI
 
         controlPower.setText(String.format("%.0f hp", power));
         controlSBrake.setText(String.format("%.2f M lb", sBrake));
+        controlEBrake.setText(eBrake ? "ON" : "OFF");
 
         pointStatsLatitude.setText(String.format(
             "%03.0f'%02.0f'%05.2f\"",
