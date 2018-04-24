@@ -1972,13 +1972,18 @@ public class Ctc implements Updateable{
 	public static void strToSched(String sched_in)
 	{
 		Schedule sched = new Schedule();
+		StringTokenizer st;
 		
 		StringTokenizer stok = new StringTokenizer(sched_in,"\n");
 		String str;
 		while(stok.hasMoreTokens())
 		{
+			System.out.println("token");
 			str = stok.nextToken();
-			//System.out.println(str);
+			System.out.println(str);
+			
+			st = new StringTokenizer(str," ,");
+			
 		}
 		
 	}
