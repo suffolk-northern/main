@@ -90,7 +90,6 @@ public class TrainController implements Updateable
 
 	public void registerTrain(ControllerLink link)
 	{
-            System.out.println("registering Train");
 		this.link = link;
 		link.power(0);
 		link.serviceBrake(1.0);
@@ -251,7 +250,6 @@ public class TrainController implements Updateable
                 
                 if(beaconMsg!=null)
                 {
-                    System.out.println(beaconMsg.string);
                     distFromLastBeacon = 0;
                 }
                 
@@ -284,7 +282,6 @@ public class TrainController implements Updateable
                             // Open appropriate Doors;
                             setLeftDoors(leftSide);
                             setRightDoors(!leftSide);
-                            System.out.println("DWELLING!!!!!");
                         }
                         else
                         {
