@@ -62,7 +62,7 @@ public class UI
         double longitude = train.location().longitude();
 
         double speed = MPH_PER_MPS * train.speed();
-        double heading = train.orientation().degrees();
+        double grade = train.grade();
         double temperature = cToF(train.temperature());
         double mass = train.mass() / KILOGRAMS_PER_TON;
 
@@ -95,7 +95,7 @@ public class UI
         ));
 
         pointStatsSpeed.setText(String.format("%.1f mph", speed));
-        pointStatsGrade.setText(String.format("%03.0f'", heading));
+        pointStatsGrade.setText(String.format("%.1f%%", grade));
         pointStatsTemperature.setText(String.format("%.1f 'F", temperature));
         pointStatsMass.setText(String.format("%.1f T", mass));
 
