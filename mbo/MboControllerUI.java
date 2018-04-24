@@ -49,7 +49,7 @@ public class MboControllerUI extends JFrame
 		frame.setLayout(null);
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setTitle("MBO Controller");
-		// frame.setSize(1500, 1500);
+		frame.setSize(1500, 1500);
 		Container mainPanel = frame.getContentPane();
 		mainPanel.setLayout(new GridBagLayout());
 		
@@ -66,6 +66,7 @@ public class MboControllerUI extends JFrame
 		titleLabel.setText(String.format("%s Line", lineName));
 		c.gridx = 0;
 		c.gridy = 0;
+		
 		mainPanel.add(titleLabel, c);
 		
 		c.gridx = 0;
@@ -225,9 +226,13 @@ public class MboControllerUI extends JFrame
 		if (isEnabled)
 		{
 			mboEnabledRadio.setSelected(true);
+			mboDisabledRadio.setSelected(false);
 		}
 		else
+		{
 			mboDisabledRadio.setSelected(true);
+			mboEnabledRadio.setSelected(false);
+		}	
 	}
 	
 	public void requestCompleted()

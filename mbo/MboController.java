@@ -81,15 +81,20 @@ public class MboController implements Updateable
 		trackModel = tm;
 	}
 	
-	public void enableMboController()
+	public void enableMboController(boolean isEnabled)
 	{
-		enabled = true;
-		
-	}
-	
-	public void disableMboController()
-	{
-		enabled = false;
+		if (isEnabled)
+		{
+			enabled = true;
+			if (ui != null)
+				ui.setMboEnabled(true);
+		}
+		else
+		{
+			enabled = false;
+			if (ui != null)
+				ui.setMboEnabled(false);
+		}
 	}
 	
 	public void initLine()
@@ -163,16 +168,19 @@ public class MboController implements Updateable
 		}
 		
 		updateSwitches();
-		MboControllerUI.Request request = ui.getRequest();
-		if (request == MboControllerUI.Request.ENABLE_MBO)
+		if (ui != null)
 		{
-			if (!enabled)
-				ctcRadio.enableMovingBlock();
-		}
-		else if (request == MboControllerUI.Request.DISABLE_MBO)
-		{
-			if (enabled)
-				ctcRadio.disableMovingBlock();
+			MboControllerUI.Request request = ui.getRequest();
+			if (request == MboControllerUI.Request.ENABLE_MBO)
+			{
+				if (!enabled)
+					ctcRadio.enableMovingBlock();
+			}
+			else if (request == MboControllerUI.Request.DISABLE_MBO)
+			{
+				if (enabled)
+					ctcRadio.disableMovingBlock();
+			}
 		}
 		
 //		for (SwitchTracker st : switches)

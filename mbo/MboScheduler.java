@@ -27,6 +27,8 @@ public class MboScheduler implements Updateable
 	private TrackModel trackModel;
 	private CtcRadio ctcRadio;
 	
+	private boolean dispatchEnabled;
+	
 	// Adjustable parameters
 	private int dwellTime = 20; // Seconds
 	private int throughputPerTrain = 50;
@@ -42,11 +44,13 @@ public class MboScheduler implements Updateable
 	public MboScheduler(String ln)
 	{
 		lineName = ln;
+		dispatchEnabled = false;
 	}
 	
 	public void launchUI()
 	{
 		ui = new MboSchedulerUI(lineName);
+		ui.setDispatchEnabled(dispatchEnabled);
 		ui.setVisible(true);
 	}
 	
@@ -64,6 +68,11 @@ public class MboScheduler implements Updateable
 	public void registerCtc(CtcRadio cr)
 	{
 		ctcRadio = cr;
+	}
+	
+	public void enableDispatch(boolean isEnabled)
+	{
+		ui.setDispatchEnabled(isEnabled);
 	}
 	
 	public void initLine()

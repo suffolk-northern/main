@@ -63,8 +63,8 @@ public class MboSchedulerUI extends javax.swing.JFrame
 		loadScheduleButton = new javax.swing.JButton();
 		loadStringButton = new javax.swing.JButton();
         jLabel11 = new javax.swing.JLabel();
-        jRadioButton1 = new javax.swing.JRadioButton();
-        jRadioButton2 = new javax.swing.JRadioButton();
+        enableDispatchRadio = new javax.swing.JRadioButton();
+        disableDispatchRadio = new javax.swing.JRadioButton();
         jScrollPane5 = new javax.swing.JScrollPane();
         jTable4 = new javax.swing.JTable();
         loadScheduleButton = new javax.swing.JButton();
@@ -215,19 +215,19 @@ public class MboSchedulerUI extends javax.swing.JFrame
 		mainPanel.add(exportStringButton);
 		exportStringButton.setBounds(130, 420, 130, 25);
 		
-		loadScheduleButton.setText("Load Schedule File");
-		loadScheduleButton.addActionListener(new ActionListener()
+        loadScheduleButton.setText("Load Schedule From File");
+        loadScheduleButton.addActionListener(new ActionListener() 
 		{
-			public void actionPerformed(ActionEvent evt)
+            public void actionPerformed(ActionEvent evt) 
 			{
-				loadScheduleButtonClicked(evt);
-			}
-		});
-		mainPanel.add(loadScheduleButton);
-		loadScheduleButton.setBounds(500, 200, 130, 25);
+                loadScheduleButtonClicked(evt);
+            }
+        });
+        mainPanel.add(loadScheduleButton);
+        loadScheduleButton.setBounds(400, 170, 180, 25);
 		
 		loadStringButton.setText("Load Schedule From CTC");
-		loadScheduleButton.addActionListener(new ActionListener()
+		loadStringButton.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent evt)
 			{
@@ -235,30 +235,39 @@ public class MboSchedulerUI extends javax.swing.JFrame
 			}
 		});
 		mainPanel.add(loadStringButton);
-		loadStringButton.setBounds(525, 250, 180, 25);
+		loadStringButton.setBounds(600, 170, 180, 25);
 
         jLabel11.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel11.setText("Automatic Train Dispatch");
         mainPanel.add(jLabel11);
         jLabel11.setBounds(500, 80, 210, 40);
 
-        jRadioButton1.setText("Enabled");
-        mainPanel.add(jRadioButton1);
-        jRadioButton1.setBounds(510, 120, 80, 25);
+        enableDispatchRadio.setText("Enabled");
+        mainPanel.add(enableDispatchRadio);
+        enableDispatchRadio.setBounds(510, 120, 80, 25);
+		enableDispatchRadio.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent evt)
+			{
+				dispatchEnabledSelected(evt);
+			}
+		});
 
-        jRadioButton2.setText("Disabled");
-        jRadioButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioButton2ActionPerformed(evt);
+        disableDispatchRadio.setText("Disabled");
+        disableDispatchRadio.addActionListener(new ActionListener() 
+		{
+            public void actionPerformed(ActionEvent evt) 
+			{
+                dispatchDisabledSelected(evt);
             }
         });
-        mainPanel.add(jRadioButton2);
-        jRadioButton2.setBounds(610, 120, 77, 25);
-		jRadioButton2.setSelected(true);
+        mainPanel.add(disableDispatchRadio);
+        disableDispatchRadio.setBounds(610, 120, 77, 25);
+		disableDispatchRadio.setSelected(true);
 		
 		ButtonGroup dispatchButtons = new ButtonGroup();
-		dispatchButtons.add(jRadioButton1);
-		dispatchButtons.add(jRadioButton2);
+		dispatchButtons.add(enableDispatchRadio);
+		dispatchButtons.add(disableDispatchRadio);
 
         jTable4.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -275,25 +284,15 @@ public class MboSchedulerUI extends javax.swing.JFrame
                 false, false, false, false
             };
 
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
+            public boolean isCellEditable(int rowIndex, int columnIndex) 
+			{
                 return canEdit [columnIndex];
             }
         });
         jScrollPane5.setViewportView(jTable4);
 
         mainPanel.add(jScrollPane5);
-        jScrollPane5.setBounds(300, 500, 410, 180);
-
-        loadScheduleButton.setText("Load Schedule From File");
-        loadScheduleButton.addActionListener(new java.awt.event.ActionListener() 
-		{
-            public void actionPerformed(java.awt.event.ActionEvent evt) 
-			{
-                loadScheduleButtonClicked(evt);
-            }
-        });
-        mainPanel.add(loadScheduleButton);
-        loadScheduleButton.setBounds(420, 250, 180, 25);
+        jScrollPane5.setBounds(400, 250, 410, 180);
 
         jLabel12.setFont(new java.awt.Font("Tahoma", 0, 24)); 
 		String titleString = String.format("MBO Scheduler: %s Line", lineName);
@@ -727,7 +726,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
 		generateDriverTable(Integer.parseInt(newDriver));	
 	}
 
-    private void jRadioButton2ActionPerformed(java.awt.event.ActionEvent evt) 
+    private void disableDispatchRadioActionPerformed(java.awt.event.ActionEvent evt) 
 	{                                              
         // TODO add your handling code here:
 		System.out.println("This is radio button 2!");
@@ -814,6 +813,20 @@ public class MboSchedulerUI extends javax.swing.JFrame
 			scheduleMessageLabel.setText(s);
 		else
 			mainMessageLabel.setText(s);
+	}
+	
+	public void setDispatchEnabled(boolean isEnabled)
+	{
+		if (isEnabled)
+		{
+			enableDispatchRadio.setSelected(true);
+			disableDispatchRadio.setSelected(false);
+		}
+		else
+		{
+			enableDispatchRadio.setSelected(false);
+			disableDispatchRadio.setSelected(true);
+		}
 	}
 	
 	public int[] getThroughput()
@@ -927,8 +940,8 @@ public class MboSchedulerUI extends javax.swing.JFrame
     private javax.swing.JPanel schedulePanel;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JProgressBar jProgressBar1;
-    private javax.swing.JRadioButton jRadioButton1;
-    private javax.swing.JRadioButton jRadioButton2;
+    private javax.swing.JRadioButton enableDispatchRadio;
+    private javax.swing.JRadioButton disableDispatchRadio;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
