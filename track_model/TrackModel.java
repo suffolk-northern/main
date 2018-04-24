@@ -773,7 +773,7 @@ public class TrackModel implements Updateable {
 		line = line.toLowerCase();
 		if (doTablesExist()) {
 			trains.add(new TrainData(tm, getYardBlock(line)));
-			tm.slew(new Pose(getYardBlock(line).start, GREEN_LINE_ORIENTATION));
+			tm.slew(line, new Pose(getYardBlock(line).start, GREEN_LINE_ORIENTATION));
 		}
 	}
 
