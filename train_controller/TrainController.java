@@ -148,7 +148,7 @@ public class TrainController implements Updateable
         {
 		if(cmd && currentSpeed == 0)
                 {
-		//	link.openDoor(DoorLocation.left);
+			link.openDoor(DoorLocation.left);
                         leftDoorsCMD = true;
                 }
 		else
@@ -162,7 +162,7 @@ public class TrainController implements Updateable
         {
 		if(cmd && currentSpeed == 0)
                 {
-		//	link.openDoor(DoorLocation.right);
+			link.openDoor(DoorLocation.right);
                         rightDoorsCMD = true;
                 }
 		else
