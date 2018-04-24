@@ -12,6 +12,7 @@ import track_model.GlobalCoordinates;
 import track_model.Orientation;
 import track_model.TrackModel;
 import train_model.Cabin;
+import train_model.Failure;
 import train_model.PointHeat;
 import train_model.PointMass;
 import train_model.Pose;
@@ -93,6 +94,10 @@ public class TrainModel
 	// newtons
 	private double serviceBrakeForce = 0.0;
 	private double emergencyBrakeForce = 0.0;
+
+	private boolean engineFailure = false;
+	private boolean serviceBrakeFailure = false;
+	private boolean emergencyBrakeFailure = false;
 
 	// true/false for open/closed
 	//
@@ -189,9 +194,22 @@ public class TrainModel
 		if (engineForce > MAX_ENGINE_FORCE)
 			engineForce = MAX_ENGINE_FORCE;
 
-		double netForce = engineForce
-		                  - serviceBrakeForce
-		                  - emergencyBrakeForce;
+		double effectiveEngineForce = engineForce;
+		double effectiveServiceBrakeForce = serviceBrakeForce;
+		double effectiveEmergencyBrakeForce = emergencyBrakeForce;
+
+		if (engineFailure)
+			effectiveEngineForce = 0.0;
+
+		if (serviceBrakeFailure)
+			effectiveServiceBrakeForce = MAX_SERVICE_BRAKE_FORCE;
+
+		if (emergencyBrakeFailure)
+			effectiveEmergencyBrakeForce = 0.0;
+
+		double netForce = effectiveEngineForce
+		                  - effectiveServiceBrakeForce
+		                  - effectiveEmergencyBrakeForce;
 
 		pointMass.push(netForce, time);
 
@@ -425,6 +443,66 @@ public class TrainModel
 	public int crew()
 	{
 		return cabin.crew();
+	}
+
+	// Returns true if the given failure type has been triggered.
+	public boolean failure(Failure failure)
+	{
+		switch (failure)
+		{
+			case ENGINE:
+				return engineFailure;
+			case SERVICE_BRAKE:
+				return serviceBrakeFailure;
+			case EMERGENCY_BRAKE:
+				return emergencyBrakeFailure;
+			case TRACK_RX:
+				return false;
+			case BEACON_RX:
+				return false;
+			case MBO_RX:
+				return false;
+			case MBO_TX:
+				return false;
+			default:
+				return false;
+		}
+	}
+
+	// Enables or disables the given failure.
+	//
+	// Parameter state determines the resulting state. True/false for
+	// enabled/disabled.
+	public void failure(Failure failure, boolean state)
+	{
+		switch (failure)
+		{
+			case ENGINE:
+				engineFailure = state;
+				break;
+			case SERVICE_BRAKE:
+				serviceBrakeFailure = state;
+				break;
+			case EMERGENCY_BRAKE:
+				emergencyBrakeFailure = state;
+				break;
+			case TRACK_RX:
+				break;
+			case BEACON_RX:
+				break;
+			case MBO_RX:
+				break;
+			case MBO_TX:
+				break;
+			default:
+				break;
+		}
+	}
+
+	// Toggles the state of the given failure between enabled/disabled.
+	public void toggleFailure(Failure failure)
+	{
+		failure(failure, !failure(failure));
 	}
 
 	// Determines if we should notify observers this update. If so, notifes
