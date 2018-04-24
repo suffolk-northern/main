@@ -47,6 +47,7 @@ public class TrainControllerUI extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+		setTitle("Train Controller");
         jDialog1 = new javax.swing.JDialog();
         jLabel4 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();

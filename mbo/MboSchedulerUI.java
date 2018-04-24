@@ -48,7 +48,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
     private void initComponents() {
-
+		setTitle("MBO Scheduler");
         mainPanel = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         startTimeCombo = new javax.swing.JComboBox<>();
