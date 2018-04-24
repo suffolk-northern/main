@@ -912,15 +912,29 @@ public class Ctc implements Updateable{
 					}
 				}
 
-				if(myloop.atCapacity())
+				if(!train.location.line.equalsIgnoreCase("red"))
 				{
-					train.authority = 0;
-				}
+					if(myloop.atCapacity())
+					{
+						train.authority = 0;
+					}
 
-				for(Block bib : myloop.bitrack)
+					for(Block bib : myloop.bitrack)
+					{
+						train.reservedblocks.add(bib);
+						bib.reserved = train.ID;
+					}
+				}
+				else
 				{
-					train.reservedblocks.add(bib);
-					bib.reserved = train.ID;
+					for(Block bib : redline)
+					{
+						if(bib.num != 0)
+						{
+							train.reservedblocks.add(bib);
+							bib.reserved = train.ID;
+						}
+					}
 				}
 			}
 		}
