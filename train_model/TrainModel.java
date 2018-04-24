@@ -467,13 +467,13 @@ public class TrainModel
 			case EMERGENCY_BRAKE:
 				return emergencyBrakeFailure;
 			case TRACK_RX:
-				return false;
+				return relay.failure(Failure.TRACK_RX);
 			case BEACON_RX:
-				return false;
+				return relay.failure(Failure.BEACON_RX);
 			case MBO_RX:
-				return false;
+				return relay.failure(Failure.MBO_RX);
 			case MBO_TX:
-				return false;
+				return relay.failure(Failure.MBO_TX);
 			default:
 				return false;
 		}
@@ -497,12 +497,16 @@ public class TrainModel
 				emergencyBrakeFailure = state;
 				break;
 			case TRACK_RX:
+				relay.failure(Failure.TRACK_RX, state);
 				break;
 			case BEACON_RX:
+				relay.failure(Failure.BEACON_RX, state);
 				break;
 			case MBO_RX:
+				relay.failure(Failure.MBO_RX, state);
 				break;
 			case MBO_TX:
+				relay.failure(Failure.MBO_TX, state);
 				break;
 			default:
 				break;
