@@ -26,13 +26,14 @@ public class MboScheduler implements Updateable
 	private LineSchedule lineSched;
 	private TrackModel trackModel;
 	private CtcRadio ctcRadio;
+	private ArrayList<Integer> trainIDs;
+	private ArrayList<Integer> driverIDs;
 	
 	private boolean dispatchEnabled;
 	
 	// Adjustable parameters
 	private int dwellTime = 20; // Seconds
 	private int throughputPerTrain = 50;
-	private int numTrains = 20;
 	private int numDrivers = 20;
 	private int minTimeBetweenDispatch = 5*60; // Seconds
 	private int schedIncrement = 20; // Seconds
@@ -45,6 +46,8 @@ public class MboScheduler implements Updateable
 	{
 		lineName = ln;
 		dispatchEnabled = false;
+		trainIDs = new ArrayList<>();
+		driverIDs = new ArrayList<>();
 	}
 	
 	public void launchUI()
@@ -241,11 +244,11 @@ public class MboScheduler implements Updateable
 		}
 		
 		LinkedList<Integer> freeTrains = new LinkedList<>();
-		for (int i = 1; i <= numTrains; i++)
-			freeTrains.add(i);
+		for (int i = 0; i < trainIDs.size(); i++)
+			freeTrains.add(trainIDs.get(i));
 		LinkedList<Driver> freeDrivers = new LinkedList<>();
-		for (int i = 1; i <= numDrivers; i++)
-			freeDrivers.add(new Driver(i));
+		for (int i = 0; i < driverIDs.size(); i++)
+			freeDrivers.add(new Driver(driverIDs.get(i)));
 		LinkedList<Driver> trainDrivers = new LinkedList<>();
 		
 		LinkedList<Integer> trainArr = new LinkedList<>();
@@ -274,7 +277,7 @@ public class MboScheduler implements Updateable
 				freeDrivers.add(driverArriving);
 				trainDrivers.remove(driverArriving);
 			}
-			if (dispatchedTrains < trainsNeeded[timeSlot] && lastDispatch >= minTimeBetweenDispatch)
+			if (dispatchedTrains < trainsNeeded[timeSlot] && lastDispatch >= minTimeBetweenDispatch && !freeTrains.isEmpty())
 			{
 				int useTrain = freeTrains.poll();
 				makeTrainSchedule(trainScheds, curTime, useTrain);
@@ -366,5 +369,15 @@ public class MboScheduler implements Updateable
 			String schedStr = sched.toString();
 			ctcRadio.setSchedule(schedStr);
 		}
+	}
+	
+	public void registerTrain(int trainID)
+	{
+		trainIDs.add(trainID);
+	}
+	
+	public void registerDriver(int driverID)
+	{
+		driverIDs.add(driverID);
 	}
 }

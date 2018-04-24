@@ -24,6 +24,7 @@ public class Driver {
 		shiftEnds = se;
 		lunchBegins = lb;
 		lunchEnds = le;
+		timesInitialized = true;
 	}
 	
 	public Driver(int id)
