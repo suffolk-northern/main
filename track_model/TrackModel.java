@@ -574,6 +574,7 @@ public class TrackModel implements Updateable {
 					s.passengers = boarding - availableSeats;
 					boarding = availableSeats;
 				}
+				s.totalPassengers += boarding;
 			}
 		}
 		if (block != -1) {

@@ -516,7 +516,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
 				row.add(s.section);
 				row.add(s.block);
 				row.add(s.name);
-				row.add(s.passengers);
+				row.add(s.totalPassengers);
 				row.add(s.heater ? "ON" : "OFF");
 				stationVector.add(row);
 			}
