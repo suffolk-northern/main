@@ -344,6 +344,16 @@ public class TrainModel
 		emergencyBrakeForce = EMERGENCY_BRAKE_FORCE;
 	}
 
+	// Returns the current grade.
+	//
+	// Units: TBD.
+	public double grade()
+	{
+		// unimplemented
+
+		return 0.0;
+	}
+
 	// Returns true if specified door(s) are open.
 	public boolean door(DoorLocation location)
 	{
