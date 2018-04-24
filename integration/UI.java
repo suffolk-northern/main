@@ -63,7 +63,6 @@ public class UI extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Suffolk Northern Train System");
-        setResizable(false);
 
         ctcButton.setText("CTC");
         ctcButton.addActionListener(new java.awt.event.ActionListener() {
