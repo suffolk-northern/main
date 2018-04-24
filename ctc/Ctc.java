@@ -1861,6 +1861,7 @@ public class Ctc implements Updateable{
 			trackmodel.setBlockMessage(loc.line, loc.num, tmc);
 	}
 	
+	/*
 	protected static void sendSpeedAuthShort(String trainID, double speed, double auth)
 	{
 		Train train = getTrain(Integer.parseInt(trainID));
@@ -1876,7 +1877,7 @@ public class Ctc implements Updateable{
 		else
 			trackmodel.setBlockMessage(train.location.line, train.location.num, tmc);
 	}
-	
+	*/
 	private static boolean isBi(Block bl)
 	{
 		boolean biblocks = false;
