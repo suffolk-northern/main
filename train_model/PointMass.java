@@ -27,7 +27,7 @@ public class PointMass
 	private static final double yardsPerMeter = 1.093613;
 
 	// in kilograms
-	private final double mass;
+	private double mass;
 
 	// combination of these two represents displacement/velocity vectors
 	//
@@ -36,13 +36,16 @@ public class PointMass
 	private double speed = 0.0;
 
 	// for moving along blocks
-	private final String LINE = "green";
+	private String line = "green";
 	private final TrackModel track;
 	private TrackBlock block = null;
 	private double displacement = 0.0;
 	private int lastBlockId = 0;
 	private boolean forward = true;
 	private boolean fromCommon = false;
+
+	private int startCounter = 0;
+	private static final int startCounterMod = 1000;
 
 	// Constructs a PointMass as a copy of another object.
 	public PointMass(PointMass other)
@@ -74,6 +77,27 @@ public class PointMass
 		this.track = track;
 	}
 
+	// Returns the mass.
+	//
+	// Units: kilograms
+	public double mass()
+	{
+		return mass;
+	}
+
+	// Sets the mass.
+	//
+	// Units: kilograms
+	//
+	// Throws IllegalArgumentException if zero or negative.
+	public void mass(double value)
+	{
+		if (value <= 0.0)
+		    throw new IllegalArgumentException("mass range");
+
+		mass = value;
+	}
+
 	// Returns the current pose.
 	public Pose pose()
 	{
@@ -86,13 +110,27 @@ public class PointMass
 		return block != null ? block.getBlock() : 0;
 	}
 
-	// Sets a new pose instantaneously.
+	// Instantaneously moves to the given pose on the given line.
 	//
 	// Sets the speed to zero.
-	public void slew(Pose pose)
+	//
+	// Throws IllegalArgumentException if line is not "green" or "red".
+	public void slew(String line, Pose pose)
 	{
+		if (!line.equals("green") && !line.equals("red"))
+			throw new IllegalArgumentException("invalid line");
+
+		this.line = line;
 		this.pose = new Pose(pose);
 		this.speed = 0.0;
+
+		block = null;
+
+		// FIXME: this is a hack, because the track model slews us
+		// repeatedly for some reason
+		startCounter = startCounterMod;
+
+		push(0.0, 10);
 	}
 
 	// Returns the current speed.
@@ -161,15 +199,34 @@ public class PointMass
 
 		if (speed < 0.0) speed = 0.0;
 
-		if (displacementChange < 0.00001)
-			return;
-
 		// Steer trains.
 
-		if (block == null)
-			block = track.getClosestBlock(pose.position, LINE);
+		if (block == null) {
+			startCounter += time;
+			if (startCounter >= startCounterMod)
+				startCounter = 0;
+
+			if (startCounter != 0)
+				return;
+
+			block = track.getClosestBlock(pose.position, line);
+
+			forward = track.getSide(pose.position,
+			                 line, block.getBlock());
+			displacement = forward ? 0.0 : block.getLength();
+			pose.position = track.getPositionAlongBlock(
+			                 line, block.getBlock(), displacement);
+		}
 
 		double length = block.getLength();
+
+		if (block.getBlock() == 0) {
+			block = null;
+			return;
+		}
+
+		if (displacementChange < 0.00001)
+			return;
 
 		if (forward)
 			displacement += displacementChange;
@@ -181,11 +238,19 @@ public class PointMass
 
 		GlobalCoordinates oldPosition = pose.position;
 
-		pose.position = track.getPositionAlongBlock(LINE,
+		pose.position = track.getPositionAlongBlock(line,
 		                                            block.getBlock(),
 		                                            displacement);
 
 		pose.orientation = oldPosition.directionTo(pose.position);
+
+		if (block.getBlock() == 0) {
+			block = null;
+			displacement = 0.0;
+			lastBlockId = 0;
+			forward = true;
+			fromCommon = false;
+		}
 	}
 
 	// How much mass (in kilograms) weighs this many pounds
@@ -220,6 +285,15 @@ public class PointMass
 		return power >= 0.0 ? absValue : -absValue;
 	}
 
+	// Returns true if on a station block.
+	public boolean atStation()
+	{
+		if (block == null)
+			return false;
+
+		return block.isIsStation();
+	}
+
 	// Configures state for the next block.
 	private void advanceBlock()
 	{
@@ -229,7 +303,7 @@ public class PointMass
 			block.getNextBlockId() :
 			block.getPrevBlockId();
 
-		TrackBlock next = track.getBlock(LINE, nextId);
+		TrackBlock next = track.getBlock(line, nextId);
 
 		boolean isSwitch = block.isIsSwitch();
 		boolean nextIsSwitch = next.isIsSwitch();
@@ -267,17 +341,17 @@ public class PointMass
 		{
 			// move onto left or right branch
 
-			block = track.getBlock(LINE, block.getSwitchPosition());
+			block = track.getBlock(line, block.getSwitchPosition());
 		}
 		else if (isSwitch && !fromCommon)
 		{
 			// move onto common branch
 
 			if (block.getSwitchDirection() > 0)
-				block = track.getBlock(LINE,
+				block = track.getBlock(line,
 				                       block.getPrevBlockId());
 			else
-				block = track.getBlock(LINE,
+				block = track.getBlock(line,
 				                       block.getNextBlockId());
 		}
 		else
@@ -285,7 +359,7 @@ public class PointMass
 			throw new IllegalStateException("algo can't do that");
 		}
 
-		forward = track.getSide(pose.position, LINE, block.getBlock());
+		forward = track.getSide(pose.position, line, block.getBlock());
 		displacement = forward ? 0.0 : block.getLength();
 	}
 

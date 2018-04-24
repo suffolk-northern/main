@@ -11,15 +11,9 @@ import java.util.Arrays;
 
 import java.awt.EventQueue;
 
-// FIXME: package names don't match directory names: ctc, train_controller
-//
-// FIXME: naming convention: trainController should be TrainController
-//
-// FIXME: naming convention: pick Ctc and Mbo or CTC and MBO
-//
 import ctc.Ctc;
 import java.util.logging.Level;
-//import java.util.logging.Logger;
+import java.util.logging.Logger;
 import mbo.MboController;
 import mbo.MboScheduler;
 import mbo.CtcRadio;
@@ -36,13 +30,11 @@ public class Main
 	private static ArrayList<Updateable> updateables =
 		new ArrayList<Updateable>();
 
-	// FIXME: see imports and initialize()
 	private static Ctc ctc;
 	private static TrackModel trackModel;
-
-	// temporary single references for initial integration
-	private static TrainModel singleTrainModel;
-	private static TrainController singleTrainController;
+	private static TrainModel[] trainModels;
+	private static TrainController[] trainControllers;
+	private static MboController mboController;
 
 	public static void main(String[] args)
 	{
@@ -58,7 +50,6 @@ public class Main
 		// instantiate modules
 		//
 
-		// FIXME: launches UI in constructor
 		ctc = new Ctc();
 
 		trackModel = new TrackModel();
@@ -83,13 +74,13 @@ public class Main
 		MboController mboCont = new MboController("Green");
 		MboScheduler mboSched = new MboScheduler("Green");
 
-		final int numberOfTrains = 1;
+		final int numberOfTrainsGreen = 3;
+		final int numberOfTrainsRed = 3;
+		final int numberOfTrains = numberOfTrainsGreen + numberOfTrainsRed;
 
-		TrainController[] trainControllers =
-			new TrainController[numberOfTrains];
+		trainControllers = new TrainController[numberOfTrains];
 
-		TrainModel[] trainModels =
-			new TrainModel[numberOfTrains];
+		trainModels = new TrainModel[numberOfTrains];
 		
 		final int numberOfDrivers = 20;
 		
@@ -106,9 +97,6 @@ public class Main
 			drivers[i] = new Driver(i);
 		}
 
-		singleTrainController = trainControllers[0];
-		singleTrainModel = trainModels[0];
-
 		ArrayList<Updateable> trainObjects =
 			new ArrayList<Updateable>();
 
@@ -124,14 +112,33 @@ public class Main
 		// link modules
 		//
 
-		// FIXME: none of this linking works
-
 		// CTC <---> track controller
 		ctc.setTrackModel(trackModel);
+		
+		// CTC <---> trains
+		for(int i = 0; i < numberOfTrains; i++)
+		{
+			if(i < numberOfTrainsGreen)
+				ctc.setTrain("green",i);
+			else
+				ctc.setTrain("red",i);
+		}
+				
+		
+		
+		
+		// track model <---> CTC
+		trackModel.registerCtc(ctc);
 
 		// track model <---> train model
+
 		for (TrainModel trainModel : trainModels)
-			trackModel.registerTrain(trainModel, "Green");
+		{
+			if(trainModel.id() < numberOfTrainsGreen)
+				trackModel.registerTrain(trainModel, "Green");
+			else
+				trackModel.registerTrain(trainModel, "Red");
+		}
 
 		// train model <---> train controller
 		for (int i = 0; i < trainControllers.length; ++i)
@@ -169,7 +176,6 @@ public class Main
 		// fill updateables
 		//
 
-		// FIXME: see instantiations above
 		updateables.add(ctc);
 		updateables.add(mboCont);
 		updateables.add(mboSched);
@@ -183,8 +189,8 @@ public class Main
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				new UI(ctc, trackModel,
-				       singleTrainModel,
-				       singleTrainController)
+				       trainModels,
+				       trainControllers)
 				          .setVisible(true);
 			}
 		});

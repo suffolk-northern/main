@@ -5,10 +5,12 @@
  */
 package track_model;
 
+import ctc.Ctc;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -22,11 +24,13 @@ import updater.Updateable;
 
 public class TrackModel implements Updateable {
 
-	private static int temperature;
+	protected static double temperature = 70;
 	// Main Track Model Frame.
 	private static TrackModelFrame tmf;
 	// Database helper.
 	protected static final DbHelper dbHelper = new DbHelper();
+	// CTC
+	private static Ctc ctc;
 
 	// ArrayList of registered trains.
 	protected static ArrayList<TrainData> trains = new ArrayList<>();
@@ -155,27 +159,12 @@ public class TrackModel implements Updateable {
 			Station s = stations.get(i);
 			Station dupe = null;
 			TrackBlock tb = getBlock(s.line, s.block);
+			s.setLocation(getPositionAlongBlock(tb, tb.length / 2));
 			//
-			// Checks for stations attributed to multiple blocks.
+			// Adds beacon at start and end of block.
 			//
-			for (int j = 0; j < i; j++) {
-				Station temp = stations.get(j);
-				if (s.name.equalsIgnoreCase(temp.name)) {
-					dupe = temp;
-					break;
-				}
-			}
-			if (dupe != null) {
-				GlobalCoordinates sLocation = getPositionAlongBlock(tb, tb.length / 2);
-				double newLon = (sLocation.longitude() + dupe.location.longitude()) / 2;
-				double newLat = (sLocation.latitude() + dupe.location.latitude()) / 2;
-				s.setLocation(new GlobalCoordinates(newLat, newLon));
-				dupe.setLocation(new GlobalCoordinates(newLat, newLon));
-			} else {
-				s.setLocation(getPositionAlongBlock(tb, tb.length / 2));
-			}
-			s.setBeaconPrev(new Beacon(getPositionAlongBlock(tb, 10), s.block + " PREV"));
-			s.setBeaconNext(new Beacon(getPositionAlongBlock(tb, tb.length - 10), s.block + " NEXT"));
+			s.setBeaconPrev(new Beacon(tb.start, tb.length / 2 + "," + s.getSide()));
+			s.setBeaconNext(new Beacon(tb.end, tb.length / 2 + "," + s.getSide() / -1));
 			beacons.add(s.beaconPrev);
 			beacons.add(s.beaconNext);
 		}
@@ -185,9 +174,11 @@ public class TrackModel implements Updateable {
 	 * Launches main UI for integration.
 	 */
 	public void launchUI() {
-		tmf = new TrackModelFrame(this);
-		tmf.setDefaultCloseOperation(javax.swing.WindowConstants.HIDE_ON_CLOSE);
-		tmf.setLocationRelativeTo(null);
+		if (tmf == null) {
+			tmf = new TrackModelFrame(this);
+			tmf.setDefaultCloseOperation(javax.swing.WindowConstants.HIDE_ON_CLOSE);
+			tmf.setLocationRelativeTo(null);
+		}
 		tmf.setVisible(true);
 	}
 
@@ -381,7 +372,7 @@ public class TrackModel implements Updateable {
 	public static boolean flipSwitch(String line, int block) {
 		boolean success = false;
 		TrackBlock tb = getBlock(line, block);
-		if (tb != null && tb.isSwitch) {
+		if (tb != null && tb.isSwitch && tb.isPowerOn) {
 			int mainBlock = tb.switchDirection < 0 ? tb.prevBlockId : tb.nextBlockId;
 			int switchBlock = tb.switchBlockId;
 			if (tb.switchPosition == mainBlock) {
@@ -452,6 +443,7 @@ public class TrackModel implements Updateable {
 					s = new Station(line, block);
 					s.setSection(rs.getString(2).charAt(0));
 					s.setName(rs.getString(4));
+					s.setSide(rs.getInt(7));
 				} else {
 					System.out.println("Invalid station.");
 				}
@@ -516,7 +508,7 @@ public class TrackModel implements Updateable {
 	 */
 	public static void setBlockMessage(String line, int block, TrackMovementCommand tmc) {
 		for (TrainData td : trains) {
-			if (td.trackBlock.line.equalsIgnoreCase(line) && td.trackBlock.block == block) {
+			if (td.trackBlock.line.equalsIgnoreCase(line) && td.trackBlock.block == block && td.trackBlock.isPowerOn) {
 				td.trainModel.trackCircuit().send(tmc);
 				td.trackBlock.message = "Speed: " + tmc.speed + ", Auth: " + tmc.authority;
 			}
@@ -558,11 +550,38 @@ public class TrackModel implements Updateable {
 		}
 	}
 
-	public static int exchangePassengers(int departing) {
+	/**
+	 * Passengers exchange.
+	 *
+	 * @param trainId
+	 * @param departing
+	 * @param availableSeats
+	 * @return
+	 */
+	public static int exchangePassengers(int trainId, int departing, int availableSeats) {
 		int boarding = Station.generatePassengers();
+		String line = "";
+		int block = -1;
 
-//        ctc.updatePassengers(departing, boarding, train, station);
-		return boarding;
+		for (TrainData td : trains) {
+			if (td.trainModel.id() == trainId) {
+				line = td.trackBlock.line;
+				block = td.trackBlock.block;
+				Station s = getStation(line, block);
+				boarding += s.passengers;
+				s.passengers = 0;
+				if (boarding > availableSeats) {
+					s.passengers = boarding - availableSeats;
+					boarding = availableSeats;
+				}
+				s.totalPassengers += boarding;
+			}
+		}
+		if (block != -1) {
+			ctc.updatePassengers(departing, boarding, trainId, line, block);
+			return boarding;
+		}
+		return 0;
 	}
 
 	/**
@@ -576,6 +595,7 @@ public class TrackModel implements Updateable {
 		TrackBlock tb = getBlock(line, block);
 		if (tb != null) {
 			tb.isPowerOn = on;
+			tb.isOccupied = !on;
 			if (tmf != null) {
 				tmf.refreshTables();
 			}
@@ -589,14 +609,17 @@ public class TrackModel implements Updateable {
 	 * @param block
 	 * @param signal
 	 */
-	public static void setCrossingSignal(String line, int block, boolean signal) {
+	public static boolean setCrossingSignal(String line, int block, boolean signal) {
 		Crossing c = getCrossing(line, block);
-		if (c != null) {
+		TrackBlock tb = getBlock(line, block);
+		if (c != null && tb.isPowerOn) {
 			c.signal = signal;
 			if (tmf != null) {
 				tmf.refreshTables();
 			}
+			return true;
 		}
+		return false;
 	}
 
 	/**
@@ -650,7 +673,7 @@ public class TrackModel implements Updateable {
 				53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 52, 51,
 				50, 49, 48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 38, 37, 36, 35,
 				34, 33, 32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19,
-				18, 17, 16, 15, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+				18, 17, 16, 15, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0};
 			for (int i : redLine) {
 				defaultLine.add(i);
 			}
@@ -687,6 +710,8 @@ public class TrackModel implements Updateable {
 			}
 			swit = tb.switchBlockId;
 		}
+
+		defaultLine.add(0);
 		return defaultLine;
 	}
 
@@ -744,20 +769,31 @@ public class TrackModel implements Updateable {
 	 * Sets a message to the yard.
 	 *
 	 * @param trainId
+	 * @param line
 	 * @param driverId
 	 * @param tmc
 	 */
-	public void setYardMessage(int trainId, int driverId, TrackMovementCommand tmc) {
+	public void setYardMessage(int trainId, String line, int driverId, TrackMovementCommand tmc) {
 		for (TrainData td : trains) {
 			if (td.trainModel.id() == trainId) {
-				String line = td.trackBlock.line;
+				td.trackBlock = getYardBlock(line);
 				if (tmc.authority > 0) {
-					td.trainModel.slew(new Pose(getFirstBlock(line).start,
+					TrackBlock fb = getFirstBlock(line);
+					td.trainModel.slew(line, new Pose(line.equalsIgnoreCase("green") ? fb.start : getPositionAlongBlock(line, fb.prevBlockId, fb.length - 3),
 							line.equalsIgnoreCase("green") ? GREEN_LINE_ORIENTATION : RED_LINE_ORIENTATION));
 				}
 				td.trainModel.trackCircuit().send(tmc);
 			}
 		}
+	}
+
+	/**
+	 * Registers CTC locally.
+	 *
+	 * @param ctc
+	 */
+	public void registerCtc(Ctc ctc) {
+		this.ctc = ctc;
 	}
 
 	/**
@@ -770,7 +806,7 @@ public class TrackModel implements Updateable {
 		line = line.toLowerCase();
 		if (doTablesExist()) {
 			trains.add(new TrainData(tm, getYardBlock(line)));
-			tm.slew(new Pose(getYardBlock(line).start, GREEN_LINE_ORIENTATION));
+			tm.slew(line, new Pose(getYardBlock(line).start, GREEN_LINE_ORIENTATION));
 		}
 	}
 
@@ -965,44 +1001,76 @@ public class TrackModel implements Updateable {
 
 	@Override
 	public void update(int time) {
-
+		updateTemperature();
+		for (Station s : stations) {
+			if (temperature < 32) {
+				if (!s.heater) {
+					setHeater(s.line, s.block, true);
+				}
+			} else {
+				if (s.heater) {
+					setHeater(s.line, s.block, false);
+				}
+			}
+		}
 		TrackBlock curBlock;
+		//
+		// Tries to update UI every two seconds.
+		//
 		for (TrainData td : trains) {
 			//
-			// Tries to update UI every two seconds.
+			// Manages occupied track blocks.
 			//
-			if (count == 2000 / time) {
-				//
-				// Manages occupied track blocks.
-				//
-				curBlock = getBlock(td.trackBlock.line, td.trainModel.block());
-				if (!curBlock.isOccupied) {
-					setOccupancy(curBlock.line, curBlock.block, true);
+			curBlock = getBlock(td.trackBlock.line, td.trainModel.block());
+			if (!curBlock.isOccupied) {
+				curBlock.isOccupied = true;
+			}
+			if (td.trackBlock.block != curBlock.block) {
+				if (td.trackBlock != null) {
+					td.trackBlock.isOccupied = false;
 				}
-				if (td.trackBlock.block != curBlock.block) {
-					if (td.trackBlock != null) {
-						setOccupancy(td.trackBlock.line, td.trackBlock.block, false);
-					}
-					td.trackBlock = curBlock;
-					//
-					// Refreshes UI.
-					//
-				}
-				if (tmf != null) {
-					tmf.refreshTables();
-				}
-				count = 0;
+				td.trackBlock = curBlock;
 			}
 			//
 			// Needs to check beacons constantly.
 			//
 			for (Beacon b : beacons) {
-				if (td.trainModel.location().distanceTo(b.location) < 5) {
+				if (td.trainModel.location().distanceTo(b.location) < 1) {
 					td.trainModel.beaconRadio().send(new BeaconMessage(b.message));
 				}
 			}
 		}
+
+		if (count == 2000 / time) {
+			//
+			// Refreshes UI.
+			//
+			if (tmf != null) {
+				tmf.refreshTables();
+			}
+			count = 0;
+		}
 		count++;
+	}
+
+	private boolean tempIncrease = false;
+	private Random ran = new Random();
+
+	/**
+	 * Updates temperature.
+	 */
+	private void updateTemperature() {
+		if (tempIncrease) {
+			temperature += ran.nextDouble() * 0.1;
+			if (temperature > 105) {
+				tempIncrease = false;
+			}
+		} else {
+			temperature -= ran.nextDouble() * 0.1;
+			if (temperature < -20) {
+				tempIncrease = true;
+			}
+		}
 	}
 
 	/**

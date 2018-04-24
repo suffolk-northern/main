@@ -6,6 +6,7 @@ import java.lang.Math;
 import train_model.communication.ControllerLink;
 import train_model.communication.TrackMovementCommand;
 import train_model.communication.MboMovementCommand;
+import train_model.communication.BeaconMessage;
 import train_model.DoorLocation;
 import updater.Updateable;
 
@@ -32,7 +33,7 @@ public class TrainController implements Updateable
 	double mass = 50*907.185;
 	double error;
 	double timeConstant = 5;
-	double Kp = 0.98; 		// Range: 0 -> 0.5
+	double Kp = 0.98; 		// Default values
 	double Ki = 1 - Kp;
 	double [] queue = new double[5000];
 	int queueInsert = 0;
@@ -46,14 +47,26 @@ public class TrainController implements Updateable
 	double loopPower;
 
 	boolean manualBrake;
+        boolean emergencyBrake;
 	double brakeCMD;		// to link
 	double loopBrake;
         double startBrake;
 
 	int currAuth;			// ctc/mbo cmd
 	double movingAuth = 0.0;
-
+        double totalMovingAuth = 0.0;
+        boolean stationGap = false;
+        boolean afterStation = false;
+        boolean mboMode;
+        double distFromLastBeacon;
+        
+        TrainControllerUI gui;
 	ArrayList<String> ads = new ArrayList<>();
+        boolean allowKSet = true;
+        boolean allowDoors = true;
+        boolean dwelling;
+        int dwellBurstCyclesCount = 0;
+        int MIN_DWELL = 10;             // min seconds to dwell
 
 	public TrainController() 
 	{
@@ -63,39 +76,48 @@ public class TrainController implements Updateable
 		currAuth = 0;
 		driverSetSpeed = 0;
 		manualBrake = true;
+                emergencyBrake = false;
+                currentSpeed = 0;
+                powerCMD = 0;
+                
 
 		ads.add("Come to Pitt, the #1 public university in northeast Oakland");
 		ads.add("Broken frisbee? Get a new one today! Visit getnewfrisbee.com");
 		ads.add("Got blisters on your feet from playing frisbee? Visit betterfrisbeecleats.com");
 		ads.add("Do your teamates make fun of you because you can't catch a frisbee? Visit frisbeelessons.com");
 		ads.add("Can't hold a conversation without bringing up frisbee? Visit frisbeefreaksanonymous.com");
-	}
+        }
 
 	public void registerTrain(ControllerLink link)
 	{
 		this.link = link;
 		link.power(0);
 		link.serviceBrake(1.0);
+                gui = new TrainControllerUI(this);
 	}
 
 	public void launchGUI()
 	{
-		TrainControllerUI gui = new TrainControllerUI(this);
 		gui.setVisible(true);
 	}
-
+        
 	// Setters/getters for driver GUI
 
-	public void setKs(double p)
+	public void setKs(double p, double i)
 	{
 		Kp = p;
-		Ki = 1 - p;
+		Ki = i;
 	}
 
 	public void setBrakesEngaged(boolean command)
 	{
 		manualBrake = command;
 	}
+        
+        public void setEmergencyBrake()
+        {
+            emergencyBrake = true;
+        }
 
 	public void setDriverSpeed(int command)
 	{
@@ -122,7 +144,7 @@ public class TrainController implements Updateable
         
         public void setLeftDoors(boolean cmd)
         {
-		if(cmd)
+		if(cmd && currentSpeed == 0)
 			link.openDoor(DoorLocation.left);
 		else
 			link.closeDoor(DoorLocation.left);
@@ -130,7 +152,7 @@ public class TrainController implements Updateable
         
         public void setRightDoors(boolean cmd)
         {
-		if(cmd)
+		if(cmd && currentSpeed == 0)
 			link.openDoor(DoorLocation.right);
 		else
 			link.closeDoor(DoorLocation.right);
@@ -181,7 +203,17 @@ public class TrainController implements Updateable
 	{
 		return movingAuth * 1.09361;	 // convert m to yd
 	}
+        
+        public boolean getAllowKSet()
+        {
+            return allowKSet;
+        }
 
+        public boolean getAllowDoors()
+        {
+            return allowDoors;
+        }
+        
 	// Calculates train displacement since last update
 	private double displacement(int millis)
 	{
@@ -194,29 +226,88 @@ public class TrainController implements Updateable
 	{
 		TrackMovementCommand ctcMsg = link.receiveFromTrack();
 		MboMovementCommand mboMsg = link.receiveFromMbo();
+                BeaconMessage beaconMsg = link.receiveFromBeacons();
+                String[] bm;
+                boolean leftSide = false;
+		if (ctcMsg!=null & !stationGap)
+		{
+                    currAuth = ctcMsg.authority;
+                    speedCMD = (double)ctcMsg.speed * 0.277778; // convert kph to mps
+                    movingAuth = currAuth;
+                    mboMode = false;
+		}
 		if (mboMsg!=null)
 		{
-			speedCMD = (double)mboMsg.speed * 0.277778; // convert kph to mps
-			currAuth = mboMsg.authority;
-			movingAuth = currAuth;
+                    currAuth = mboMsg.authority;
+                    speedCMD = (double)mboMsg.speed * 0.277778; // convert kph to mps
+                    movingAuth = currAuth;
+                    mboMode = true;
 		}
-		if (ctcMsg!=null)
+                double disp = displacement(millis);
+		movingAuth -= disp;
+                totalMovingAuth -= disp;
+                distFromLastBeacon += disp;
+                
+                if(beaconMsg!=null)
+                {
+                    distFromLastBeacon = 0;
+                }
+                
+                if (beaconMsg!=null & !afterStation & !mboMode)
+                {
+                    bm = beaconMsg.string.split(",");
+                    if(currAuth == 0 | currAuth == (int)Double.parseDouble(bm[0]))
+                    {
+                        currAuth = (int)Double.parseDouble(bm[0]);
+                        movingAuth = currAuth;
+                        stationGap = true;
+                    }
+                    if(bm[1].equals("-1"))
+                        leftSide = true;
+                    else
+                        leftSide = false;
+                }
+                if (beaconMsg!=null & afterStation & distFromLastBeacon < 5);
+                    afterStation = false;
+		if((movingAuth < 5 && currentSpeed == 0) | dwelling)
 		{
-			speedCMD = (double)ctcMsg.speed *  0.277778; // convert kph to mps
-			currAuth = ctcMsg.authority;
-			movingAuth = currAuth;
-		}
-		movingAuth -= displacement(millis);
-		if(movingAuth < 0)
-		{
-			// TODO flash console light or something
+                    // Train stopped for auth reasons
+                    if(stationGap | dwelling)
+                    {
+                        afterStation = true;
+                        // Wait min dwell time
+                        if(dwellBurstCyclesCount++ * (double)millis/1000 < MIN_DWELL)
+                        {
+                            dwelling = true;
+                            // Open appropriate Doors;
+                            setLeftDoors(leftSide);
+                            setRightDoors(!leftSide);
+                        }
+                        else
+                        {
+                            dwelling = false;
+                            dwellBurstCyclesCount = 0;
+                            // Close appropriate doors
+                            setLeftDoors(false);
+                            setRightDoors(false);
+                        }
+                    }
+                    stationGap = false;
 		}
 	}
-
+        
 	// millis is ignored as this is not a model module
 	// All units are meters and seconds
 	public void update(int millis) 
-	{
+	{            
+                if(currentSpeed>0)
+                {
+                    allowKSet = false;
+                    allowDoors = true;
+                }
+                else
+                    allowDoors = false;
+                
 		lastSpeed = currentSpeed;
 		currentSpeed = link.speed();
 
@@ -264,11 +355,23 @@ public class TrainController implements Updateable
 		if(brakeCMD < 0)
 			brakeCMD = 0;
 		// If driver braking in manual mode, or if authority about to expire
-		if((manualBrake && manualMode) || movingAuth - 0.1 <= Math.pow(currentSpeed,2) / (2 * MAX_SDECEL))
+		if((manualBrake && manualMode) || movingAuth - 4 <= Math.pow(currentSpeed,2) / (2 * MAX_SDECEL))
 		{
 			brakeCMD = 1;
 			powerCMD = 0;
 		}
+                if(emergencyBrake)
+                {
+                    link.power(0);
+                    link.applyEmergencyBrake();
+                    return;
+                }
+                if(dwelling)
+                {
+                    link.power(0);
+                    link.serviceBrake(1);
+                    return;
+                }
 		link.power(powerCMD);		
 		link.serviceBrake(brakeCMD);
 		//////////////////////////////////////////

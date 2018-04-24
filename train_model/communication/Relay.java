@@ -6,8 +6,8 @@
 
 package train_model.communication;
 
-import track_controller.communication.Authority;
 import track_model.GlobalCoordinates;
+import train_model.Failure;
 import train_model.TrainModel;
 import train_model.communication.BeaconMessage;
 import train_model.communication.MboMovementCommand;
@@ -34,6 +34,11 @@ public class Relay
 	private BeaconMessage beaconMessageCached = null;
 	private   MboMovementCommand    mboMessageCached = null;
 	private TrackMovementCommand  trackMessageCached = null;
+
+	private boolean failureTrackRx = false;
+	private boolean failureBeaconRx = false;
+	private boolean failureMboTx = false;
+	private boolean failureMboRx = false;
 
 	// Constructs a Relay associated that interacts with a TrainModel.
 	public Relay(TrainModel train)
@@ -69,6 +74,9 @@ public class Relay
 	// Returns null if no information is available.
 	public GlobalCoordinates location()
 	{
+		if (failureMboTx)
+			return null;
+
 		return train.location();
 	}
 
@@ -76,6 +84,9 @@ public class Relay
 	// that message. Else returns null.
 	public BeaconMessage beaconMessage()
 	{
+		if (failureBeaconRx)
+			return null;
+
 		BeaconMessage value = beaconMessageCached;
 		beaconMessageCached = null;
 		return value;
@@ -85,6 +96,9 @@ public class Relay
 	// message. Else returns null.
 	public MboMovementCommand mboMessage()
 	{
+		if (failureMboRx)
+			return null;
+
 		MboMovementCommand value = mboMessageCached;
 		mboMessageCached = null;
 		return value;
@@ -94,6 +108,9 @@ public class Relay
 	// returns that message. Else returns null.
 	public TrackMovementCommand trackMessage()
 	{
+		if (failureTrackRx)
+			return null;
+
 		TrackMovementCommand value = trackMessageCached;
 		trackMessageCached = null;
 		return value;
@@ -115,5 +132,48 @@ public class Relay
 	public TrackMovementCommand lastTrackMessage()
 	{
 		return new TrackMovementCommand(trackMessageLast);
+	}
+
+	// Returns true if the given failure type has been triggered.
+	public boolean failure(Failure failure)
+	{
+		switch (failure)
+		{
+			case TRACK_RX:
+				return failureTrackRx;
+			case BEACON_RX:
+				return failureBeaconRx;
+			case MBO_RX:
+				return failureMboTx;
+			case MBO_TX:
+				return failureMboRx;
+			default:
+				return false;
+		}
+	}
+
+	// Enables or disables the given failure.
+	//
+	// Parameter state determines the resulting state. True/false for
+	// enabled/disabled.
+	public void failure(Failure failure, boolean state)
+	{
+		switch (failure)
+		{
+			case TRACK_RX:
+				failureTrackRx = state;
+				break;
+			case BEACON_RX:
+				failureBeaconRx = state;
+				break;
+			case MBO_RX:
+				failureMboTx = state;
+				break;
+			case MBO_TX:
+				failureMboRx = state;
+				break;
+			default:
+				break;
+		}
 	}
 }

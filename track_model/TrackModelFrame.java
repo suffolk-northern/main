@@ -327,6 +327,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
 					+ " name text,\n"
 					+ " passengers integer,\n"
 					+ " message varchar(128),\n"
+					+ " side integer,\n"
 					+ " PRIMARY KEY (line, block)\n"
 					+ ");");
 			conn.close();
@@ -351,7 +352,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
 			PreparedStatement blockStmt = conn.prepareStatement("INSERT INTO BLOCKS VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
 			PreparedStatement connStmt = conn.prepareStatement("INSERT INTO CONNECTIONS VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
 			PreparedStatement crossingStmt = conn.prepareStatement("INSERT INTO CROSSINGS VALUES(?, ?, ?);");
-			PreparedStatement stationStmt = conn.prepareStatement("INSERT INTO STATIONS VALUES(?, ?, ?, ?, ?, ?);");
+			PreparedStatement stationStmt = conn.prepareStatement("INSERT INTO STATIONS VALUES(?, ?, ?, ?, ?, ?, ?);");
 			//
 			// Parses through supplid CSV file.
 			//
@@ -419,6 +420,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
 					stationStmt.setString(4, swag.size() > 1 ? swag.get(1).trim() : "");
 					stationStmt.setInt(5, 0);
 					stationStmt.setString(6, "");
+					stationStmt.setInt(7, Integer.parseInt(items.get(22)));
 					stationStmt.addBatch();
 				}
 			}
@@ -514,7 +516,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
 				row.add(s.section);
 				row.add(s.block);
 				row.add(s.name);
-				row.add(s.passengers);
+				row.add(s.totalPassengers);
 				row.add(s.heater ? "ON" : "OFF");
 				stationVector.add(row);
 			}

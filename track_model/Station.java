@@ -16,12 +16,15 @@ public class Station {
 	// Station name
 	protected String name;
 	// Passengers at the station
-	protected int passengers;
+	protected int passengers = 0;
+	protected int totalPassengers = 0;
 	// Beacon message
 	protected Beacon beaconPrev;
 	protected Beacon beaconNext;
 	// Location
 	protected GlobalCoordinates location;
+	// Station side going forware LEFT = -1, RIGHT = 1
+	protected int side;
 	// Is heater on
 	protected boolean heater = false;
 
@@ -76,6 +79,14 @@ public class Station {
 		this.location = location;
 	}
 
+	public int getSide() {
+		return side;
+	}
+
+	public void setSide(int side) {
+		this.side = side;
+	}
+
 	public Beacon getBeaconPrev() {
 		return beaconPrev;
 	}
@@ -106,7 +117,7 @@ public class Station {
 	 * @return passengers
 	 */
 	public static int generatePassengers() {
-		return (int) (Math.random() * 20);
+		return (int) (Math.random() * 25);
 	}
 
 	@Override

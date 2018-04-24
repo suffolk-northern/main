@@ -154,7 +154,7 @@ public class MurphFrame extends javax.swing.JFrame {
 		String block = blockComboBox.getSelectedItem().toString().split(",")[2];
 		block = block.substring(block.lastIndexOf(" "), block.length()).trim();
 
-		TrackModel.setMaintenance(line, Integer.parseInt(block), true);
+		TrackModel.setOccupancy(line, Integer.parseInt(block), true);
 	}
 
 	/**
