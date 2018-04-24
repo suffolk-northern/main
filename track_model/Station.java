@@ -17,6 +17,7 @@ public class Station {
 	protected String name;
 	// Passengers at the station
 	protected int passengers = 0;
+	protected int totalPassengers = 0;
 	// Beacon message
 	protected Beacon beaconPrev;
 	protected Beacon beaconNext;
