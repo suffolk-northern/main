@@ -755,7 +755,8 @@ public class TrackModel implements Updateable {
 			if (td.trainModel.id() == trainId) {
 				td.trackBlock = getYardBlock(line);
 				if (tmc.authority > 0) {
-					td.trainModel.slew(line, new Pose(getFirstBlock(line).start,
+					TrackBlock fb = getFirstBlock(line);
+					td.trainModel.slew(line, new Pose(line.equalsIgnoreCase("green") ? fb.start : getPositionAlongBlock(line, fb.prevBlockId, fb.length - 3),
 							line.equalsIgnoreCase("green") ? GREEN_LINE_ORIENTATION : RED_LINE_ORIENTATION));
 				}
 				td.trainModel.trackCircuit().send(tmc);
