@@ -672,7 +672,7 @@ public class TrackModel implements Updateable {
 				53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 52, 51,
 				50, 49, 48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 38, 37, 36, 35,
 				34, 33, 32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19,
-				18, 17, 16, 15, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+				18, 17, 16, 15, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0};
 			for (int i : redLine) {
 				defaultLine.add(i);
 			}
@@ -681,46 +681,36 @@ public class TrackModel implements Updateable {
 		//
 		// Iterates through blocks to find valid route.
 		//
-		try {
-			TrackBlock first = getFirstBlock(line);
-			int swit = 0;
-			boolean valid = false;
-			int cur = first.block;
-			int prev = first.switchDirection > 0 ? 999 : -1;
+		TrackBlock first = getFirstBlock(line);
+		int swit = 0;
+		boolean valid = false;
+		int cur = first.block;
+		int prev = first.switchDirection > 0 ? 999 : -1;
 
-			try (Connection conn = dbHelper.getConnection()) {
-				while (swit != 0 || !valid) {
-					ResultSet rs = dbHelper.query(conn, "SELECT * FROM CONNECTIONS WHERE LINE='" + line + "' AND BLOCK=" + cur);
-					if (rs.next()) {
-						defaultLine.add(cur);
-						if (cur > prev && rs.getInt(7) == 1) {
-							prev = cur;
-							cur = rs.getInt(6);
-							valid = rs.getInt(9) == 1;
-						} else if (cur < prev && rs.getInt(5) == 1) {
-							prev = cur;
-							cur = rs.getInt(4);
-							valid = rs.getInt(9) == -1;
-						} else {
-							prev = cur;
-							cur = rs.getInt(8);
-							valid = false;
-						}
-						if (first != null && first.block == prev) {
-							first = null;
-							continue;
-						}
-						swit = rs.getInt(8);
-					} else {
-						break;
-
-					}
-				}
+		while (swit != 0 || !valid) {
+			TrackBlock tb = getBlock(line, cur);
+			defaultLine.add(cur);
+			if (cur > prev && tb.nextBlockDir == 1) {
+				prev = cur;
+				cur = tb.nextBlockId;
+				valid = tb.switchDirection == 1;
+			} else if (cur < prev && tb.prevBlockDir == 1) {
+				prev = cur;
+				cur = tb.prevBlockId;
+				valid = tb.switchDirection == -1;
+			} else {
+				prev = cur;
+				cur = tb.switchBlockId;
+				valid = false;
 			}
-		} catch (SQLException ex) {
-			Logger.getLogger(TrackModel.class
-					.getName()).log(Level.SEVERE, null, ex);
+			if (first != null && first.block == prev) {
+				first = null;
+				continue;
+			}
+			swit = tb.switchBlockId;
 		}
+
+		defaultLine.add(0);
 		return defaultLine;
 	}
 
