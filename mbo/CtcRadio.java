@@ -34,11 +34,18 @@ public class CtcRadio {
 	public void enableMovingBlock()
 	{
 		mboCont.enableMboController();
+		// TODO: add corresponding CTC function
 	}
 	
 	public void disableMovingBlock()
 	{
 		mboCont.disableMboController();
+		// TODO: add corresponding CTC function
+	}
+	
+	public void enableAutomaticDispatch(boolean isEnabled)
+	{
+		// TODO: Add MBO and CTC functions
 	}
 	
 	public void showController()

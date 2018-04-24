@@ -84,6 +84,7 @@ public class MboController implements Updateable
 	public void enableMboController()
 	{
 		enabled = true;
+		
 	}
 	
 	public void disableMboController()
@@ -152,9 +153,6 @@ public class MboController implements Updateable
 	public void update(int time)
 	{
 		// TODO: parameter time not used
-
-		int index = 0;
-
 		for (int i = 0; i < trains.size(); i++) 
 		{
 			TrainTracker trainInfo = trains.get(i);
@@ -165,11 +163,23 @@ public class MboController implements Updateable
 		}
 		
 		updateSwitches();
+		MboControllerUI.Request request = ui.getRequest();
+		if (request == MboControllerUI.Request.ENABLE_MBO)
+		{
+			if (!enabled)
+				ctcRadio.enableMovingBlock();
+		}
+		else if (request == MboControllerUI.Request.DISABLE_MBO)
+		{
+			if (enabled)
+				ctcRadio.disableMovingBlock();
+		}
+		
 //		for (SwitchTracker st : switches)
 //			st.printInfo();
 //		System.out.println(line[100].getNext());
 
-		if (enabled == true)
+		if (enabled)
 		{
 			for (TrainTracker trainInfo:trains)
 			{

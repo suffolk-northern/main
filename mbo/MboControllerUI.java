@@ -14,6 +14,7 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.TableModel;
 import java.util.ArrayList;
+import java.awt.event.*;
 
 /**
  *
@@ -21,6 +22,8 @@ import java.util.ArrayList;
  */
 public class MboControllerUI extends JFrame
 {
+	private Request curRequest;
+	
 	private JFrame frame;
 	private JPanel mainPanel;
 	private JScrollPane trainPanel;
@@ -32,6 +35,10 @@ public class MboControllerUI extends JFrame
 	ArrayList<Integer> trainIDs;
 	private String[] tableHeader;
 	private Object[][] tableContents;
+	
+	private JLabel mboModeLabel;
+	private JRadioButton mboEnabledRadio;
+	private JRadioButton mboDisabledRadio;
 	
 	public MboControllerUI(String ln)
 	{
@@ -45,9 +52,13 @@ public class MboControllerUI extends JFrame
 		// frame.setSize(1500, 1500);
 		Container mainPanel = frame.getContentPane();
 		mainPanel.setLayout(new GridBagLayout());
+		
 		trainPanel = new JScrollPane();
 		trainTable = new JTable();
 		titleLabel = new JLabel();
+		mboModeLabel = new javax.swing.JLabel();
+		mboEnabledRadio = new javax.swing.JRadioButton();
+		mboDisabledRadio = new javax.swing.JRadioButton();
 		
 		GridBagConstraints c = new GridBagConstraints();
 		
@@ -90,6 +101,42 @@ public class MboControllerUI extends JFrame
 		trainTable.getColumnModel().getColumn(5).setPreferredWidth(3*width / 10);
 		
 		trainPanel.setPreferredSize(new Dimension(width, 200));
+		
+		c.gridx = 0;
+		c.gridy = 2;
+		mboModeLabel.setFont(new Font("Tahome", 0, 18));
+		mboModeLabel.setText("Moving Block Mode");
+		mainPanel.add(mboModeLabel);
+		
+		c.gridx = 0;
+		c.gridy = 3;
+		mboEnabledRadio.setText("Enabled");
+		mainPanel.add(mboEnabledRadio);
+		mboEnabledRadio.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent evt) 
+			{
+				enableMboSelected(evt);
+			}
+		});
+		
+		c.gridx = 1;
+		c.gridy = 3;
+		mboDisabledRadio.setText("Disabled");
+		mainPanel.add(mboDisabledRadio);
+		mboDisabledRadio.setSelected(true);
+		mboDisabledRadio.addActionListener(new ActionListener() 
+		{
+			public void actionPerformed(ActionEvent evt)
+			{
+				disableMboSelected(evt);
+			}
+		});
+		
+		ButtonGroup mboButtons = new ButtonGroup();
+		mboButtons.add(mboEnabledRadio);
+		mboButtons.add(mboDisabledRadio);
+		
         frame.pack();
         frame.setVisible(true);
 		
@@ -159,6 +206,43 @@ public class MboControllerUI extends JFrame
 		model.setValueAt(null, row, 3);
 		model.setValueAt(null, row, 4);
 		model.setValueAt(null, row, 5);		
+	}
+	
+	private void enableMboSelected(ActionEvent evt)
+	{
+		if (curRequest == Request.NONE)
+			curRequest = Request.ENABLE_MBO;
+	}
+	
+	private void disableMboSelected(ActionEvent evt)
+	{
+		if (curRequest == Request.NONE)
+			curRequest = Request.DISABLE_MBO;
+	}
+	
+	public void setMboEnabled(boolean isEnabled)
+	{
+		if (isEnabled)
+		{
+			mboEnabledRadio.setSelected(true);
+		}
+		else
+			mboDisabledRadio.setSelected(true);
+	}
+	
+	public void requestCompleted()
+	{
+		curRequest = Request.NONE;
+	}
+	
+	public Request getRequest()
+	{
+		return curRequest;
+	}
+	
+	public enum Request
+	{
+		NONE, ENABLE_MBO, DISABLE_MBO
 	}
 		
 	public static void main(String args[]) 

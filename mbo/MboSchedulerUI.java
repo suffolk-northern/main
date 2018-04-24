@@ -20,7 +20,6 @@ public class MboSchedulerUI extends javax.swing.JFrame
 	private Time end;
 	private String lineName;
 	private Request curRequest;
-	
 	private File loadFile;
 	
     /**
@@ -92,7 +91,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
 		driverScheduleCombo = new javax.swing.JComboBox<>();
         chooseTrainLabel = new javax.swing.JLabel();
         driverScheduleLabel = new javax.swing.JLabel();
-
+	
 		mainMessageLabel = new JLabel();
 		throughputMessageLabel = new JLabel();	
 		scheduleMessageLabel = new JLabel();
@@ -236,7 +235,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
 			}
 		});
 		mainPanel.add(loadStringButton);
-		loadStringButton.setBounds(500, 200, 200, 25);
+		loadStringButton.setBounds(525, 250, 180, 25);
 
         jLabel11.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel11.setText("Automatic Train Dispatch");
@@ -255,6 +254,11 @@ public class MboSchedulerUI extends javax.swing.JFrame
         });
         mainPanel.add(jRadioButton2);
         jRadioButton2.setBounds(610, 120, 77, 25);
+		jRadioButton2.setSelected(true);
+		
+		ButtonGroup dispatchButtons = new ButtonGroup();
+		dispatchButtons.add(jRadioButton1);
+		dispatchButtons.add(jRadioButton2);
 
         jTable4.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -278,7 +282,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
         jScrollPane5.setViewportView(jTable4);
 
         mainPanel.add(jScrollPane5);
-        jScrollPane5.setBounds(400, 210, 410, 180);
+        jScrollPane5.setBounds(300, 500, 410, 180);
 
         loadScheduleButton.setText("Load Schedule From File");
         loadScheduleButton.addActionListener(new java.awt.event.ActionListener() 
@@ -289,7 +293,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
             }
         });
         mainPanel.add(loadScheduleButton);
-        loadScheduleButton.setBounds(420, 170, 200, 25);
+        loadScheduleButton.setBounds(420, 250, 180, 25);
 
         jLabel12.setFont(new java.awt.Font("Tahoma", 0, 24)); 
 		String titleString = String.format("MBO Scheduler: %s Line", lineName);
@@ -727,7 +731,19 @@ public class MboSchedulerUI extends javax.swing.JFrame
 	{                                              
         // TODO add your handling code here:
 		System.out.println("This is radio button 2!");
-    }                                                                                  
+    }    
+	
+	private void dispatchEnabledSelected(ActionEvent evt)
+	{
+		if (curRequest == Request.NONE)
+			curRequest = Request.ENABLE_DISPATCH;
+	}
+	
+	private void dispatchDisabledSelected(ActionEvent evt)
+	{
+		if (curRequest == Request.NONE)
+			curRequest = Request.DISABLE_DISPATCH;
+	}
 
     private void loadScheduleButtonClicked(ActionEvent evt) 
 	{                                          
@@ -832,7 +848,8 @@ public class MboSchedulerUI extends javax.swing.JFrame
 	
 	public enum Request
 	{
-		NONE, SCHEDULE, EXPORT_TO_CTC, LOAD_FROM_CTC, LOAD_FROM_FILE
+		NONE, SCHEDULE, EXPORT_TO_CTC, LOAD_FROM_CTC, LOAD_FROM_FILE,
+		ENABLE_DISPATCH, DISABLE_DISPATCH
 	}
 
 //    private class ThroughputPanel {
