@@ -81,14 +81,20 @@ public class MboController implements Updateable
 		trackModel = tm;
 	}
 	
-	public void enableMboController()
+	public void enableMboController(boolean isEnabled)
 	{
-		enabled = true;
-	}
-	
-	public void disableMboController()
-	{
-		enabled = false;
+		if (isEnabled)
+		{
+			enabled = true;
+			if (ui != null)
+				ui.setMboEnabled(true);
+		}
+		else
+		{
+			enabled = false;
+			if (ui != null)
+				ui.setMboEnabled(false);
+		}
 	}
 	
 	public void initLine()
@@ -152,9 +158,6 @@ public class MboController implements Updateable
 	public void update(int time)
 	{
 		// TODO: parameter time not used
-
-		int index = 0;
-
 		for (int i = 0; i < trains.size(); i++) 
 		{
 			TrainTracker trainInfo = trains.get(i);
@@ -165,11 +168,26 @@ public class MboController implements Updateable
 		}
 		
 		updateSwitches();
+		if (ui != null)
+		{
+			MboControllerUI.Request request = ui.getRequest();
+			if (request == MboControllerUI.Request.ENABLE_MBO)
+			{
+				if (!enabled)
+					ctcRadio.enableMovingBlock();
+			}
+			else if (request == MboControllerUI.Request.DISABLE_MBO)
+			{
+				if (enabled)
+					ctcRadio.disableMovingBlock();
+			}
+		}
+		
 //		for (SwitchTracker st : switches)
 //			st.printInfo();
 //		System.out.println(line[100].getNext());
 
-		if (enabled == true)
+		if (enabled)
 		{
 			for (TrainTracker trainInfo:trains)
 			{
@@ -321,7 +339,7 @@ public class MboController implements Updateable
 				break;
 			if (forward)
 			{
-				System.out.printf("About to check block %d going forwards%n", curBlock.getNext());
+				// System.out.printf("About to check block %d going forwards%n", curBlock.getNext());
 				BlockTracker nextBlock = line[curBlock.getNext()];
 				if (nextBlock.getID() < curBlock.getID())
 					forward = false;
@@ -329,7 +347,7 @@ public class MboController implements Updateable
 			}
 			else
 			{
-				System.out.printf("About to check block %d going backwards%n", curBlock.getNext());
+				// System.out.printf("About to check block %d going backwards%n", curBlock.getNext());
 				BlockTracker prevBlock = line[curBlock.getPrev()];
 				if (prevBlock.getID() > curBlock.getID())
 					forward = true;

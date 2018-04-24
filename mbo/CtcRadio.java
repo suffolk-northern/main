@@ -15,6 +15,7 @@ public class CtcRadio {
 	private MboController mboCont;
 	private MboScheduler mboSched;
 	private Ctc ctc;
+	private String schedule;
 	
 	public CtcRadio(MboController mc, MboScheduler ms, Ctc c)
 	{
@@ -32,12 +33,20 @@ public class CtcRadio {
 	
 	public void enableMovingBlock()
 	{
-		mboCont.enableMboController();
+		mboCont.enableMboController(true);
+		// TODO: add corresponding CTC function
 	}
 	
 	public void disableMovingBlock()
 	{
-		mboCont.disableMboController();
+		mboCont.enableMboController(false);
+		// TODO: add corresponding CTC function
+	}
+	
+	public void enableAutomaticDispatch(boolean isEnabled)
+	{
+		// TODO: Add CTC function
+		mboSched.enableDispatch(isEnabled);
 	}
 	
 	public void showController()
@@ -58,5 +67,16 @@ public class CtcRadio {
 	public void hideScheduler()
 	{
 		mboSched.hideUI();
+	}
+	
+	public void setSchedule(String schedule)
+	{
+		this.schedule = schedule;
+		ctc.strToSched(schedule);
+	}
+	
+	public String getSchedule()
+	{
+		return schedule;
 	}
 }
