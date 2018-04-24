@@ -12,6 +12,7 @@ import track_model.GlobalCoordinates;
 import track_model.Orientation;
 import track_model.TrackModel;
 import train_model.Cabin;
+import train_model.Failure;
 import train_model.PointHeat;
 import train_model.PointMass;
 import train_model.Pose;
@@ -93,6 +94,10 @@ public class TrainModel
 	// newtons
 	private double serviceBrakeForce = 0.0;
 	private double emergencyBrakeForce = 0.0;
+
+	private boolean engineFailure = false;
+	private boolean serviceBrakeFailure = false;
+	private boolean emergencyBrakeFailure = false;
 
 	// true/false for open/closed
 	//
@@ -189,9 +194,22 @@ public class TrainModel
 		if (engineForce > MAX_ENGINE_FORCE)
 			engineForce = MAX_ENGINE_FORCE;
 
-		double netForce = engineForce
-		                  - serviceBrakeForce
-		                  - emergencyBrakeForce;
+		double effectiveEngineForce = engineForce;
+		double effectiveServiceBrakeForce = serviceBrakeForce;
+		double effectiveEmergencyBrakeForce = emergencyBrakeForce;
+
+		if (engineFailure)
+			effectiveEngineForce = 0.0;
+
+		if (serviceBrakeFailure)
+			effectiveServiceBrakeForce = MAX_SERVICE_BRAKE_FORCE;
+
+		if (emergencyBrakeFailure)
+			effectiveEmergencyBrakeForce = 0.0;
+
+		double netForce = effectiveEngineForce
+		                  - effectiveServiceBrakeForce
+		                  - effectiveEmergencyBrakeForce;
 
 		pointMass.push(netForce, time);
 
@@ -326,6 +344,16 @@ public class TrainModel
 		emergencyBrakeForce = EMERGENCY_BRAKE_FORCE;
 	}
 
+	// Returns the current grade.
+	//
+	// Units: TBD.
+	public double grade()
+	{
+		// unimplemented
+
+		return 0.0;
+	}
+
 	// Returns true if specified door(s) are open.
 	public boolean door(DoorLocation location)
 	{
@@ -425,6 +453,70 @@ public class TrainModel
 	public int crew()
 	{
 		return cabin.crew();
+	}
+
+	// Returns true if the given failure type has been triggered.
+	public boolean failure(Failure failure)
+	{
+		switch (failure)
+		{
+			case ENGINE:
+				return engineFailure;
+			case SERVICE_BRAKE:
+				return serviceBrakeFailure;
+			case EMERGENCY_BRAKE:
+				return emergencyBrakeFailure;
+			case TRACK_RX:
+				return relay.failure(Failure.TRACK_RX);
+			case BEACON_RX:
+				return relay.failure(Failure.BEACON_RX);
+			case MBO_RX:
+				return relay.failure(Failure.MBO_RX);
+			case MBO_TX:
+				return relay.failure(Failure.MBO_TX);
+			default:
+				return false;
+		}
+	}
+
+	// Enables or disables the given failure.
+	//
+	// Parameter state determines the resulting state. True/false for
+	// enabled/disabled.
+	public void failure(Failure failure, boolean state)
+	{
+		switch (failure)
+		{
+			case ENGINE:
+				engineFailure = state;
+				break;
+			case SERVICE_BRAKE:
+				serviceBrakeFailure = state;
+				break;
+			case EMERGENCY_BRAKE:
+				emergencyBrakeFailure = state;
+				break;
+			case TRACK_RX:
+				relay.failure(Failure.TRACK_RX, state);
+				break;
+			case BEACON_RX:
+				relay.failure(Failure.BEACON_RX, state);
+				break;
+			case MBO_RX:
+				relay.failure(Failure.MBO_RX, state);
+				break;
+			case MBO_TX:
+				relay.failure(Failure.MBO_TX, state);
+				break;
+			default:
+				break;
+		}
+	}
+
+	// Toggles the state of the given failure between enabled/disabled.
+	public void toggleFailure(Failure failure)
+	{
+		failure(failure, !failure(failure));
 	}
 
 	// Determines if we should notify observers this update. If so, notifes
