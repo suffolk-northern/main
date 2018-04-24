@@ -66,7 +66,6 @@ public class MboControllerUI extends JFrame
 		titleLabel.setText(String.format("%s Line", lineName));
 		c.gridx = 0;
 		c.gridy = 0;
-		
 		mainPanel.add(titleLabel, c);
 		
 		c.gridx = 0;
@@ -107,12 +106,12 @@ public class MboControllerUI extends JFrame
 		c.gridy = 2;
 		mboModeLabel.setFont(new Font("Tahome", 0, 18));
 		mboModeLabel.setText("Moving Block Mode");
-		mainPanel.add(mboModeLabel);
+		mainPanel.add(mboModeLabel, c);
 		
 		c.gridx = 0;
 		c.gridy = 3;
 		mboEnabledRadio.setText("Enabled");
-		mainPanel.add(mboEnabledRadio);
+		mainPanel.add(mboEnabledRadio, c);
 		mboEnabledRadio.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent evt) 
@@ -124,7 +123,7 @@ public class MboControllerUI extends JFrame
 		c.gridx = 1;
 		c.gridy = 3;
 		mboDisabledRadio.setText("Disabled");
-		mainPanel.add(mboDisabledRadio);
+		mainPanel.add(mboDisabledRadio, c);
 		mboDisabledRadio.setSelected(true);
 		mboDisabledRadio.addActionListener(new ActionListener() 
 		{

@@ -339,7 +339,7 @@ public class MboController implements Updateable
 				break;
 			if (forward)
 			{
-				System.out.printf("About to check block %d going forwards%n", curBlock.getNext());
+				// System.out.printf("About to check block %d going forwards%n", curBlock.getNext());
 				BlockTracker nextBlock = line[curBlock.getNext()];
 				if (nextBlock.getID() < curBlock.getID())
 					forward = false;
@@ -347,7 +347,7 @@ public class MboController implements Updateable
 			}
 			else
 			{
-				System.out.printf("About to check block %d going backwards%n", curBlock.getNext());
+				// System.out.printf("About to check block %d going backwards%n", curBlock.getNext());
 				BlockTracker prevBlock = line[curBlock.getPrev()];
 				if (prevBlock.getID() > curBlock.getID())
 					forward = true;

@@ -78,6 +78,11 @@ public class MboScheduler implements Updateable
 	public void initLine()
 	{
 		// System.out.println("Got here");
+		if (trackModel == null)
+		{
+			System.out.println("Track model not initialized, could not load track");
+			return;
+		}
 		if (line == null)
 		{
 			ArrayList<Integer> defaultLine = trackModel.getDefaultLine(lineName);
@@ -86,7 +91,7 @@ public class MboScheduler implements Updateable
 			line = new BlockTracker[numBlocks];
 			for (int i = 0; i < numBlocks; i++)
 			{
-				TrackBlock curBlock = TrackModel.getBlock(lineName, defaultLine.get(i));
+				TrackBlock curBlock = trackModel.getBlock(lineName, defaultLine.get(i));
 				// System.out.printf("Checking block %d%n", curBlock.getBlock());
 				double blockLength = curBlock.getLength();
 				int nextBlock = curBlock.getNextBlockId();
@@ -97,7 +102,7 @@ public class MboScheduler implements Updateable
 				String stationName = null;
 				if (curBlock.isIsStation())
 				{
-					stationName = TrackModel.getStation(lineName, defaultLine.get(i)).getName();
+					stationName = trackModel.getStation(lineName, defaultLine.get(i)).getName();
 					// System.out.printf("Station name: %s%n", stationName);
 				}
 					
@@ -163,9 +168,20 @@ public class MboScheduler implements Updateable
 		}
 	}
 	
-	private TrainSchedule makeTrainSchedule(Time startTime, int trainID)
+	private void makeTrainSchedule(ArrayList<TrainSchedule> trainScheds, Time startTime, int trainID)
 	{
-		ArrayList<TrainEvent> te = new ArrayList<TrainEvent>();
+		// Check if this train already exists and append to its schedule if so
+		ArrayList<TrainEvent> te = new ArrayList<>();
+		boolean appending = false;
+		for (TrainSchedule ts : trainScheds)
+		{
+			if (trainID == ts.getID())
+			{
+				te = ts.getEvents();
+				appending = true;
+			}
+		}
+		
 		TrainEvent.EventType arr = TrainEvent.EventType.ARRIVAL;
 		TrainEvent.EventType dep = TrainEvent.EventType.DEPARTURE;
 		te.add(new TrainEvent(startTime, dep, "Yard"));
@@ -179,8 +195,6 @@ public class MboScheduler implements Updateable
 			double speedLimit = curBlock.getSpeedLimit() * (1000.0 / 3600.0);
 			// time to travel block in ms
 			double travelTime = (blockLength / speedLimit) * 1000;
-			//System.out.println(travelTime);
-			
 			if (curBlock.getStation() == null)
 			{
 				curTime = new Time(curTime.getTime() + (long) travelTime);
@@ -188,7 +202,6 @@ public class MboScheduler implements Updateable
 			else 
 			{
 				// System.out.printf("Making events at station %s%n", curBlock.getStation());
-				// TODO: are stations always in the middle of blocks?
 				// TODO: include time for train decelerating and accelerating around the station
 				Time arrTime = new Time(curTime.getTime() + (long) (travelTime / 2));
 				te.add(new TrainEvent(arrTime, arr, curBlock.getStation()));
@@ -197,15 +210,19 @@ public class MboScheduler implements Updateable
 				curTime = new Time(depTime.getTime() + (long) (travelTime / 2));
 			}
 		}
-		TrainSchedule ts = new TrainSchedule(trainID, te);
-		return ts;
+		if (!appending)
+		{
+			TrainSchedule sched = new TrainSchedule(trainID, te);
+			trainScheds.add(sched);
+		}
 	}
 	
 	private Time getLoopTime()
 	{
-		TrainSchedule ts = makeTrainSchedule(new Time(0), 1);
-		int lastEventInd = ts.getEvents().size();
-		TrainEvent lastEvent = ts.getEvents().get(lastEventInd-1);
+		ArrayList<TrainSchedule> ts = new ArrayList<>();
+		makeTrainSchedule(ts, new Time(0), 1);
+		int lastEventInd = ts.get(0).getEvents().size();
+		TrainEvent lastEvent = ts.get(0).getEvents().get(lastEventInd-1);
 		return lastEvent.getTime();
 	}
 	
@@ -245,13 +262,13 @@ public class MboScheduler implements Updateable
 			if (!trainArrTimes.isEmpty() && curTime.after(trainArrTimes.peek()))
 			{
 				trainArrTimes.poll();
-				int trainID = trainArr.poll();
-				freeTrains.add(trainID);
+				int arrivingTrainID = trainArr.poll();
+				freeTrains.add(arrivingTrainID);
 				dispatchedTrains -= 1;
 				Driver driverArriving = null;
 				for (Driver d : trainDrivers)
 				{
-					if (d.getTrain() == trainID)
+					if (d.getTrain() == arrivingTrainID)
 						driverArriving = d;
 				}
 				freeDrivers.add(driverArriving);
@@ -260,8 +277,7 @@ public class MboScheduler implements Updateable
 			if (dispatchedTrains < trainsNeeded[timeSlot] && lastDispatch >= minTimeBetweenDispatch)
 			{
 				int useTrain = freeTrains.poll();
-				TrainSchedule ts = makeTrainSchedule(curTime, useTrain);
-				trainScheds.add(ts);
+				makeTrainSchedule(trainScheds, curTime, useTrain);
 				lastDispatch = 0;
 				dispatchedTrains += 1;
 				// TODO: add logic for adding to the schedules of repeat trains
@@ -300,8 +316,7 @@ public class MboScheduler implements Updateable
 				{
 					trainDrivers.add(useDriver);
 					freeDrivers.remove(useDriver);
-					DriverSchedule ds = makeDriverSchedule(null, useDriver.getID(), curTime, arrTime, useTrain);
-					driverScheds.add(ds);
+					makeDriverSchedule(driverScheds, useDriver.getID(), curTime, arrTime, useTrain);
 				}	
 			}
 			curTime = new Time(curTime.getTime() + (long) (schedIncrement * 1000));
@@ -311,18 +326,34 @@ public class MboScheduler implements Updateable
 		return ls;
 	}
 	
-	public DriverSchedule makeDriverSchedule(DriverSchedule ds, int dID, Time embarkTime, Time disembarkTime, int tID)
+	private void makeDriverSchedule(ArrayList<DriverSchedule> ds, int dID, Time embarkTime, Time disembarkTime, int tID)
 	{
-		// TODO: append to exisiting driver schedule if it exists
+		DriverSchedule appendSched = null;
+		for (DriverSchedule curSched : ds)
+		{
+			if (curSched.getID() == dID)
+				appendSched = curSched;
+		}
+		
 		DriverEvent.EventType embark = DriverEvent.EventType.EMBARK;
 		DriverEvent.EventType disembark = DriverEvent.EventType.DISEMBARK;
 		DriverEvent embarkEvent = new DriverEvent(embarkTime, embark, tID);
 		DriverEvent disembarkEvent = new DriverEvent(disembarkTime, disembark, tID);
-		ArrayList<DriverEvent> driverEvents = new ArrayList<>();
-		driverEvents.add(embarkEvent);
-		driverEvents.add(disembarkEvent);
-		DriverSchedule newDS = new DriverSchedule(dID, driverEvents);
-		return newDS;
+		
+		if (appendSched == null)
+		{
+			ArrayList<DriverEvent> driverEvents = new ArrayList<>();
+			driverEvents.add(embarkEvent);
+			driverEvents.add(disembarkEvent);
+			DriverSchedule newDS = new DriverSchedule(dID, driverEvents);
+			ds.add(newDS);
+		}
+		else
+		{
+			ArrayList<DriverEvent> driverEvents = appendSched.getEvents();
+			driverEvents.add(embarkEvent);
+			driverEvents.add(disembarkEvent);
+		}
 	}
 	
 	public void exportToCtc()
