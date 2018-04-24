@@ -13,6 +13,8 @@ package train_model.subsystem_demo;
 import java.util.Observable;
 import java.util.Observer;
 
+import java.awt.Color;
+
 import train_model.DoorLocation;
 import train_model.Failure;
 import train_model.TrainModel;
@@ -75,6 +77,14 @@ public class UI
         int passengers = train.passengers();
         int crew = train.crew();
 
+        boolean failureEngine         = train.failure(Failure.ENGINE);
+        boolean failureServiceBrake   = train.failure(Failure.SERVICE_BRAKE);
+        boolean failureEmergencyBrake = train.failure(Failure.EMERGENCY_BRAKE);
+        boolean failureTrackRx        = train.failure(Failure.TRACK_RX);
+        boolean failureBeaconRx       = train.failure(Failure.BEACON_RX);
+        boolean failureMboTx          = train.failure(Failure.MBO_TX);
+        boolean failureMboRx          = train.failure(Failure.MBO_RX);
+
         BeaconMessage beaconMessage = train.lastBeaconMessage();
 
         TrackMovementCommand trackMessage = train.lastTrackMessage();
@@ -135,6 +145,59 @@ public class UI
                                          MPH_PER_KPH * mboMessage.speed));
         mboRxAuthority.setText(String.format("%.1f y",
                                          Y_PER_M * mboMessage.authority));
+
+        if (failureEngine)
+            controlPower.setForeground(Color.RED);
+        else
+            controlPower.setForeground(Color.BLACK);
+
+        if (failureServiceBrake)
+            controlSBrake.setForeground(Color.RED);
+        else
+            controlSBrake.setForeground(Color.BLACK);
+
+        if (failureEmergencyBrake)
+            controlEBrake.setForeground(Color.RED);
+        else
+            controlEBrake.setForeground(Color.BLACK);
+
+        if (failureTrackRx)
+        {
+            trackRxSpeed    .setForeground(Color.RED);
+            trackRxAuthority.setForeground(Color.RED);
+        }
+        else
+        {
+            trackRxSpeed    .setForeground(Color.BLACK);
+            trackRxAuthority.setForeground(Color.BLACK);
+        }
+
+        if (failureBeaconRx)
+            beaconRxString.setForeground(Color.RED);
+        else
+            beaconRxString.setForeground(Color.BLACK);
+
+        if (failureMboTx)
+        {
+            mboTxLatitude .setForeground(Color.RED);
+            mboTxLongitude.setForeground(Color.RED);
+        }
+        else
+        {
+            mboTxLatitude .setForeground(Color.BLACK);
+            mboTxLongitude.setForeground(Color.BLACK);
+        }
+
+        if (failureMboRx)
+        {
+            mboRxSpeed    .setForeground(Color.RED);
+            mboRxAuthority.setForeground(Color.RED);
+        }
+        else
+        {
+            mboRxSpeed    .setForeground(Color.BLACK);
+            mboRxAuthority.setForeground(Color.BLACK);
+        }
     }
 
     // Celsius to Fahrenheit
