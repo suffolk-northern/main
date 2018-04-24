@@ -372,7 +372,7 @@ public class TrackModel implements Updateable {
 	public static boolean flipSwitch(String line, int block) {
 		boolean success = false;
 		TrackBlock tb = getBlock(line, block);
-		if (tb != null && tb.isSwitch) {
+		if (tb != null && tb.isSwitch && tb.isPowerOn) {
 			int mainBlock = tb.switchDirection < 0 ? tb.prevBlockId : tb.nextBlockId;
 			int switchBlock = tb.switchBlockId;
 			if (tb.switchPosition == mainBlock) {
@@ -508,7 +508,7 @@ public class TrackModel implements Updateable {
 	 */
 	public static void setBlockMessage(String line, int block, TrackMovementCommand tmc) {
 		for (TrainData td : trains) {
-			if (td.trackBlock.line.equalsIgnoreCase(line) && td.trackBlock.block == block) {
+			if (td.trackBlock.line.equalsIgnoreCase(line) && td.trackBlock.block == block && td.trackBlock.isPowerOn) {
 				td.trainModel.trackCircuit().send(tmc);
 				td.trackBlock.message = "Speed: " + tmc.speed + ", Auth: " + tmc.authority;
 			}
@@ -594,6 +594,7 @@ public class TrackModel implements Updateable {
 		TrackBlock tb = getBlock(line, block);
 		if (tb != null) {
 			tb.isPowerOn = on;
+			tb.isOccupied = !on;
 			if (tmf != null) {
 				tmf.refreshTables();
 			}
@@ -607,14 +608,17 @@ public class TrackModel implements Updateable {
 	 * @param block
 	 * @param signal
 	 */
-	public static void setCrossingSignal(String line, int block, boolean signal) {
+	public static boolean setCrossingSignal(String line, int block, boolean signal) {
 		Crossing c = getCrossing(line, block);
-		if (c != null) {
+		TrackBlock tb = getBlock(line, block);
+		if (c != null && tb.isPowerOn) {
 			c.signal = signal;
 			if (tmf != null) {
 				tmf.refreshTables();
 			}
+			return true;
 		}
+		return false;
 	}
 
 	/**
@@ -1017,39 +1021,38 @@ public class TrackModel implements Updateable {
 		//
 		// Tries to update UI every two seconds.
 		//
-		if (count == 2000 / time) {
-			for (TrainData td : trains) {
-				//
-				// Manages occupied track blocks.
-				//
-				curBlock = getBlock(td.trackBlock.line, td.trainModel.block());
-				if (!curBlock.isOccupied) {
-					setOccupancy(curBlock.line, curBlock.block, true);
-				}
-				if (td.trackBlock.block != curBlock.block) {
-					if (td.trackBlock != null) {
-						setOccupancy(td.trackBlock.line, td.trackBlock.block, false);
-					}
-					td.trackBlock = curBlock;
-				}
-				//
-				// Refreshes UI.
-				//
-				if (tmf != null) {
-					tmf.refreshTables();
-				}
-			}
-			count = 0;
-		}
-		//
-		// Needs to check beacons constantly.
-		//
 		for (TrainData td : trains) {
+			//
+			// Manages occupied track blocks.
+			//
+			curBlock = getBlock(td.trackBlock.line, td.trainModel.block());
+			if (!curBlock.isOccupied) {
+				curBlock.isOccupied = true;
+			}
+			if (td.trackBlock.block != curBlock.block) {
+				if (td.trackBlock != null) {
+					td.trackBlock.isOccupied = false;
+				}
+				td.trackBlock = curBlock;
+			}
+			//
+			// Needs to check beacons constantly.
+			//
 			for (Beacon b : beacons) {
 				if (td.trainModel.location().distanceTo(b.location) < 1) {
 					td.trainModel.beaconRadio().send(new BeaconMessage(b.message));
 				}
 			}
+		}
+
+		if (count == 2000 / time) {
+			//
+			// Refreshes UI.
+			//
+			if (tmf != null) {
+				tmf.refreshTables();
+			}
+			count = 0;
 		}
 		count++;
 	}
