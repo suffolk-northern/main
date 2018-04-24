@@ -21,8 +21,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
 	private String lineName;
 	private Request curRequest;
 	
-	// For the view schedule screen
-	private String viewingStation;
+	private File loadFile;
 	
     /**
      * Creates new form Scheduler
@@ -62,10 +61,11 @@ public class MboSchedulerUI extends javax.swing.JFrame
         viewShceduleButton = new javax.swing.JButton();
         exportScheduleButton = new javax.swing.JButton();
 		exportStringButton = new javax.swing.JButton();
+		loadScheduleButton = new javax.swing.JButton();
+		loadStringButton = new javax.swing.JButton();
         jLabel11 = new javax.swing.JLabel();
         jRadioButton1 = new javax.swing.JRadioButton();
         jRadioButton2 = new javax.swing.JRadioButton();
-        jTextField1 = new javax.swing.JTextField();
         jScrollPane5 = new javax.swing.JScrollPane();
         jTable4 = new javax.swing.JTable();
         loadScheduleButton = new javax.swing.JButton();
@@ -215,6 +215,28 @@ public class MboSchedulerUI extends javax.swing.JFrame
 		});
 		mainPanel.add(exportStringButton);
 		exportStringButton.setBounds(130, 420, 130, 25);
+		
+		loadScheduleButton.setText("Load Schedule File");
+		loadScheduleButton.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent evt)
+			{
+				loadScheduleButtonClicked(evt);
+			}
+		});
+		mainPanel.add(loadScheduleButton);
+		loadScheduleButton.setBounds(500, 200, 130, 25);
+		
+		loadStringButton.setText("Load Schedule From CTC");
+		loadScheduleButton.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent evt)
+			{
+				loadStringButtonClicked(evt);
+			}
+		});
+		mainPanel.add(loadStringButton);
+		loadStringButton.setBounds(500, 200, 200, 25);
 
         jLabel11.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel11.setText("Automatic Train Dispatch");
@@ -233,9 +255,6 @@ public class MboSchedulerUI extends javax.swing.JFrame
         });
         mainPanel.add(jRadioButton2);
         jRadioButton2.setBounds(610, 120, 77, 25);
-
-        mainPanel.add(jTextField1);
-        jTextField1.setBounds(580, 170, 160, 22);
 
         jTable4.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -261,7 +280,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
         mainPanel.add(jScrollPane5);
         jScrollPane5.setBounds(400, 210, 410, 180);
 
-        loadScheduleButton.setText("Select Schedule File");
+        loadScheduleButton.setText("Load Schedule From File");
         loadScheduleButton.addActionListener(new java.awt.event.ActionListener() 
 		{
             public void actionPerformed(java.awt.event.ActionEvent evt) 
@@ -270,7 +289,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
             }
         });
         mainPanel.add(loadScheduleButton);
-        loadScheduleButton.setBounds(420, 170, 160, 25);
+        loadScheduleButton.setBounds(420, 170, 200, 25);
 
         jLabel12.setFont(new java.awt.Font("Tahoma", 0, 24)); 
 		String titleString = String.format("MBO Scheduler: %s Line", lineName);
@@ -710,12 +729,27 @@ public class MboSchedulerUI extends javax.swing.JFrame
 		System.out.println("This is radio button 2!");
     }                                                                                  
 
-    private void loadScheduleButtonClicked(java.awt.event.ActionEvent evt) 
+    private void loadScheduleButtonClicked(ActionEvent evt) 
 	{                                          
         // Open schedule file
+		if (curRequest != Request.NONE)
+			return;
         javax.swing.JFileChooser openFile = new javax.swing.JFileChooser();
+		System.out.println("1");
         openFile.showOpenDialog(null);
-    }                                         
+		System.out.println("2");
+		loadFile = openFile.getSelectedFile();
+		System.out.println(loadFile);
+		System.out.println("3");
+		curRequest = Request.LOAD_FROM_FILE;
+		System.out.println(curRequest);
+    }                         
+	
+	private void loadStringButtonClicked(ActionEvent evt)
+	{
+		if (curRequest == Request.NONE)
+			curRequest = Request.LOAD_FROM_CTC;
+	}
 
     private void exportScheduleButtonClicked(ActionEvent evt) 
 	{                                         
@@ -739,7 +773,8 @@ public class MboSchedulerUI extends javax.swing.JFrame
 	
 	private void exportStringButtonClicked(ActionEvent evt)
 	{
-		curRequest = Request.EXPORT_TO_CTC;
+		if (curRequest == Request.NONE)
+			curRequest = Request.EXPORT_TO_CTC;
 	}
 	
 	public void setSchedule(LineSchedule ls)
@@ -785,6 +820,11 @@ public class MboSchedulerUI extends javax.swing.JFrame
 		return curRequest;
 	}
 	
+	public File getFile()
+	{
+		return loadFile;
+	}
+	
 	public void requestCompleted()
 	{
 		curRequest = Request.NONE;
@@ -792,7 +832,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
 	
 	public enum Request
 	{
-		NONE, SCHEDULE, EXPORT_TO_CTC
+		NONE, SCHEDULE, EXPORT_TO_CTC, LOAD_FROM_CTC, LOAD_FROM_FILE
 	}
 
 //    private class ThroughputPanel {
@@ -841,13 +881,14 @@ public class MboSchedulerUI extends javax.swing.JFrame
 
     // Variables declaration - do not modify                     
     private javax.swing.JButton enterThroughputButton;
-    private javax.swing.JButton loadScheduleButton;
     private javax.swing.JButton finishedThroughputButton;
     private javax.swing.JButton generateScheduleButton;
     private javax.swing.JButton viewShceduleButton;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton exportScheduleButton;
 	private javax.swing.JButton exportStringButton;
+	private javax.swing.JButton loadScheduleButton;
+	private javax.swing.JButton loadStringButton;
     private javax.swing.JComboBox<String> startTimeCombo;
     private javax.swing.JComboBox<String> endTimeCombo;
     private javax.swing.JComboBox<String> stationScheduleCombo;
@@ -882,7 +923,6 @@ public class MboSchedulerUI extends javax.swing.JFrame
     private javax.swing.JTable trainScheduleTable;
 	private javax.swing.JTable driverScheduleTable;
     private javax.swing.JTable jTable4;
-    private javax.swing.JTextField jTextField1;
 	private JLabel mainMessageLabel;
 	private JLabel throughputMessageLabel;
 	private JLabel scheduleMessageLabel;

@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.sql.Time;
 import java.lang.Math;
 import java.io.StringWriter;
+import java.io.File;
 
 import track_model.TrackModel;
 import track_model.TrackBlock;
@@ -102,6 +103,7 @@ public class MboScheduler implements Updateable
 		if (ui != null)
 		{
 			MboSchedulerUI.Request requestType = ui.getRequest();
+			// System.out.println(requestType);
 			if (requestType == MboSchedulerUI.Request.SCHEDULE)
 			{
 				Time start = ui.getStartTime();
@@ -122,8 +124,32 @@ public class MboScheduler implements Updateable
 				{
 					exportToCtc();
 					ui.requestCompleted();
-					System.out.println("Got here!");
 				}
+			}
+			else if (requestType == MboSchedulerUI.Request.LOAD_FROM_CTC)
+			{
+				if (ctcRadio.getSchedule() != null)
+				{
+					lineSched = ScheduleReader.readScheduleString(ctcRadio.getSchedule());
+					ui.setSchedule(lineSched);
+					ui.requestCompleted();
+				}
+			}
+			else if (requestType == MboSchedulerUI.Request.LOAD_FROM_FILE)
+			{
+				File loadFile = ui.getFile();
+				String schedStr = ScheduleReader.readScheduleFile(loadFile);
+				if (schedStr != null)
+				{
+					LineSchedule ls = ScheduleReader.readScheduleString(schedStr);
+					if (ls != null)
+					{
+						lineSched = ls;
+						ui.setSchedule(lineSched);
+						ui.setSchedule(lineSched);
+					}
+				}
+				ui.requestCompleted();
 			}
 		}
 	}

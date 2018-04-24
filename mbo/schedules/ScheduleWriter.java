@@ -2,6 +2,8 @@ package mbo.schedules;
 
 import java.io.*;
 import java.util.Scanner;
+import java.util.ArrayList;
+import java.sql.Time;
 /**
  *
  * @author Kaylene Stocking
@@ -35,6 +37,8 @@ public class ScheduleWriter {
 		}
 	}
 	
+	// Writes the schedule to a StringWriter object passed in, which can be easily
+	// converted to a string
 	public void writeSchedule(StringWriter sw)
 	{
 		if (sched == null)
@@ -57,7 +61,7 @@ public class ScheduleWriter {
 	
 	private void write(PrintWriter writer)
 	{
-		writer.println("---Train Schedules---");
+		writer.printf("---Train Schedules---\n");
 		System.out.println(sched.getTrainIDs().size());
 		System.out.println(sched.getDriverIDs().size());
 		for (int trainID : sched.getTrainIDs())
@@ -75,7 +79,7 @@ public class ScheduleWriter {
 			}
 		}
 
-		writer.println("---Driver Schedules---");
+		writer.printf("---Driver Schedules---\n");
 		for (int driverID : sched.getDriverIDs())
 		{
 			DriverSchedule ds = sched.getDriverSchedule(driverID);
@@ -91,26 +95,5 @@ public class ScheduleWriter {
 			}			
 		}
 		writer.close();
-	}
-	
-	public String readScheduleFile(File file)
-	{
-		try 
-		{
-			Scanner fileScan = new Scanner(file);
-			String fileContent = fileScan.useDelimiter("\\Z").next();
-			return fileContent;
-		}
-		catch (IOException e)
-		{
-			System.out.println(e.getMessage());
-		}
-		return null;
-	}
-	
-	public LineSchedule readScheduleString(String strSchedule)
-	{
-		// TODO: implement this
-		return null;
 	}
 }
