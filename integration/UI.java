@@ -59,7 +59,7 @@ public class UI extends javax.swing.JFrame {
         trainModelButton = new javax.swing.JButton();
         trainControllerButton = new javax.swing.JButton();
         trainId = new javax.swing.JTextField();
-        jLabel1 = new javax.swing.JLabel();
+        trainIdLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Suffolk Northern Train System");
@@ -102,8 +102,8 @@ public class UI extends javax.swing.JFrame {
             }
         });
 
-        jLabel1.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
-        jLabel1.setText("Train ID:");
+        trainIdLabel.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
+        trainIdLabel.setText("Train ID:");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -121,7 +121,7 @@ public class UI extends javax.swing.JFrame {
                             .addComponent(trainControllerButton, javax.swing.GroupLayout.DEFAULT_SIZE, 134, Short.MAX_VALUE)
                             .addComponent(trackModelButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
+                        .addComponent(trainIdLabel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(trainId, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE)))
@@ -136,7 +136,7 @@ public class UI extends javax.swing.JFrame {
                     .addComponent(ctcButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
+                    .addComponent(trainIdLabel)
                     .addComponent(trainId, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -213,10 +213,10 @@ public class UI extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton ctcButton;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JButton trackModelButton;
     private javax.swing.JButton trainControllerButton;
     private javax.swing.JTextField trainId;
+    private javax.swing.JLabel trainIdLabel;
     private javax.swing.JButton trainModelButton;
     // End of variables declaration//GEN-END:variables
 }
