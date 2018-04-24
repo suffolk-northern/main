@@ -15,7 +15,7 @@ public class Cabin
 	private static final int KILOGRAMS_PER_PASSENGER = 68;
 	private static final int SEATS = 400;
 
-	private int crew = 0;
+	private int crew = 1;
 	private int civilians = 0;
 
 	// Returns the total mass of all passengers and crew.

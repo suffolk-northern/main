@@ -13,7 +13,10 @@ package train_model.subsystem_demo;
 import java.util.Observable;
 import java.util.Observer;
 
+import java.awt.Color;
+
 import train_model.DoorLocation;
+import train_model.Failure;
 import train_model.TrainModel;
 import train_model.communication.BeaconMessage;
 import train_model.communication.MboMovementCommand;
@@ -54,14 +57,17 @@ public class UI
 
         TrainModel train = (TrainModel) o;
 
+        int id = train.id();
+
         double power = HP_PER_WATT * train.power();
         double sBrake = 1e-3 * POUND_PER_NEWTON * train.serviceBrake();
+        boolean eBrake = train.emergencyBrake();
 
         double latitude  = train.location().latitude();
         double longitude = train.location().longitude();
 
         double speed = MPH_PER_MPS * train.speed();
-        double heading = train.orientation().degrees();
+        double grade = train.grade();
         double temperature = cToF(train.temperature());
         double mass = train.mass() / KILOGRAMS_PER_TON;
 
@@ -72,29 +78,40 @@ public class UI
         int passengers = train.passengers();
         int crew = train.crew();
 
+        boolean failureEngine         = train.failure(Failure.ENGINE);
+        boolean failureServiceBrake   = train.failure(Failure.SERVICE_BRAKE);
+        boolean failureEmergencyBrake = train.failure(Failure.EMERGENCY_BRAKE);
+        boolean failureTrackRx        = train.failure(Failure.TRACK_RX);
+        boolean failureBeaconRx       = train.failure(Failure.BEACON_RX);
+        boolean failureMboTx          = train.failure(Failure.MBO_TX);
+        boolean failureMboRx          = train.failure(Failure.MBO_RX);
+
         BeaconMessage beaconMessage = train.lastBeaconMessage();
 
         TrackMovementCommand trackMessage = train.lastTrackMessage();
 	  MboMovementCommand   mboMessage = train.lastMboMessage();
 
+        topId.setText(String.format("%d", id));
+
         controlPower.setText(String.format("%.0f hp", power));
         controlSBrake.setText(String.format("%.2f M lb", sBrake));
+        controlEBrake.setText(eBrake ? "ON" : "OFF");
 
         pointStatsLatitude.setText(String.format(
             "%03.0f'%02.0f'%05.2f\"",
             latitude,
-            (latitude % 60.0) * 60.0,
-            (latitude % 3600.0) * 3600.0
+            (latitude * 60.0) % 60.0,
+            (latitude * 3600.0) % 60.0
         ));
         pointStatsLongitude.setText(String.format(
             "%03.0f'%02.0f'%05.2f\"",
-            longitude,
-            (longitude % 60.0) * 60.0,
-            (longitude % 3600.0) * 3600.0
+            -longitude,
+            (-longitude * 60.0) % 60.0,
+            (-longitude * 3600.0) % 60.0
         ));
 
         pointStatsSpeed.setText(String.format("%.1f mph", speed));
-        pointStatsHeading.setText(String.format("%03.0f'", heading));
+        pointStatsGrade.setText(String.format("%.1f%%", grade));
         pointStatsTemperature.setText(String.format("%.1f 'F", temperature));
         pointStatsMass.setText(String.format("%.1f T", mass));
 
@@ -116,20 +133,73 @@ public class UI
         mboTxLatitude.setText(String.format(
             "%03.0f'%02.0f'%05.2f\"",
             latitude,
-            (latitude % 60.0) * 60.0,
-            (latitude % 3600.0) * 3600.0
+            (latitude * 60.0) % 60.0,
+            (latitude * 3600.0) % 60.0
         ));
         mboTxLongitude.setText(String.format(
             "%03.0f'%02.0f'%05.2f\"",
-            longitude,
-            (longitude % 60.0) * 60.0,
-            (longitude % 3600.0) * 3600.0
+            -longitude,
+            (-longitude * 60.0) % 60.0,
+            (-longitude * 3600.0) % 60.0
         ));
 
         mboRxSpeed.setText(String.format("%.1f mph",
                                          MPH_PER_KPH * mboMessage.speed));
         mboRxAuthority.setText(String.format("%.1f y",
                                          Y_PER_M * mboMessage.authority));
+
+        if (failureEngine)
+            controlPower.setForeground(Color.RED);
+        else
+            controlPower.setForeground(Color.BLACK);
+
+        if (failureServiceBrake)
+            controlSBrake.setForeground(Color.RED);
+        else
+            controlSBrake.setForeground(Color.BLACK);
+
+        if (failureEmergencyBrake)
+            controlEBrake.setForeground(Color.RED);
+        else
+            controlEBrake.setForeground(Color.BLACK);
+
+        if (failureTrackRx)
+        {
+            trackRxSpeed    .setForeground(Color.RED);
+            trackRxAuthority.setForeground(Color.RED);
+        }
+        else
+        {
+            trackRxSpeed    .setForeground(Color.BLACK);
+            trackRxAuthority.setForeground(Color.BLACK);
+        }
+
+        if (failureBeaconRx)
+            beaconRxString.setForeground(Color.RED);
+        else
+            beaconRxString.setForeground(Color.BLACK);
+
+        if (failureMboTx)
+        {
+            mboTxLatitude .setForeground(Color.RED);
+            mboTxLongitude.setForeground(Color.RED);
+        }
+        else
+        {
+            mboTxLatitude .setForeground(Color.BLACK);
+            mboTxLongitude.setForeground(Color.BLACK);
+        }
+
+        if (failureMboRx)
+        {
+            mboRxSpeed    .setForeground(Color.RED);
+            mboRxAuthority.setForeground(Color.RED);
+        }
+        else
+        {
+            mboRxSpeed    .setForeground(Color.BLACK);
+            mboRxAuthority.setForeground(Color.BLACK);
+        }
     }
 
     // Celsius to Fahrenheit
@@ -167,7 +237,9 @@ public class UI
         jLabel4 = new javax.swing.JLabel();
         controlSBrake = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
+        controlEBrake = new javax.swing.JLabel();
+        jLabel14 = new javax.swing.JLabel();
+        cabinHeater = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
         jLabel8 = new javax.swing.JLabel();
         jPanel6 = new javax.swing.JPanel();
@@ -178,7 +250,7 @@ public class UI
         jLabel13 = new javax.swing.JLabel();
         pointStatsSpeed = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-        pointStatsHeading = new javax.swing.JLabel();
+        pointStatsGrade = new javax.swing.JLabel();
         jLabel19 = new javax.swing.JLabel();
         pointStatsTemperature = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
@@ -192,12 +264,12 @@ public class UI
         cabinRDoors = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
         cabinLights = new javax.swing.JLabel();
-        jLabel14 = new javax.swing.JLabel();
-        cabinHeater = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         cabinPassengers = new javax.swing.JLabel();
         jLabel18 = new javax.swing.JLabel();
         cabinCrew = new javax.swing.JLabel();
+        jLabel24 = new javax.swing.JLabel();
+        topId = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jPanel9 = new javax.swing.JPanel();
         jLabel20 = new javax.swing.JLabel();
@@ -225,6 +297,25 @@ public class UI
         jLabel35 = new javax.swing.JLabel();
         mboRxSpeed = new javax.swing.JLabel();
         mboRxAuthority = new javax.swing.JLabel();
+        jPanel22 = new javax.swing.JPanel();
+        jPanel17 = new javax.swing.JPanel();
+        jPanel18 = new javax.swing.JPanel();
+        failuresEngine = new javax.swing.JButton();
+        failuresSBrake = new javax.swing.JButton();
+        failuresEBrake = new javax.swing.JButton();
+        jPanel19 = new javax.swing.JPanel();
+        failuresTrackRx = new javax.swing.JButton();
+        failuresBeaconRx = new javax.swing.JButton();
+        jPanel20 = new javax.swing.JPanel();
+        failuresMboTx = new javax.swing.JButton();
+        failuresMboRx = new javax.swing.JButton();
+        jLabel23 = new javax.swing.JLabel();
+        jPanel21 = new javax.swing.JPanel();
+        jPanel23 = new javax.swing.JPanel();
+        advertisement1 = new javax.swing.JLabel();
+        advertisement2 = new javax.swing.JLabel();
+        advertisement3 = new javax.swing.JLabel();
+        jLabel27 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Train Model");
@@ -249,8 +340,14 @@ public class UI
         jLabel6.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
         jLabel6.setText("E Brake");
 
-        jLabel7.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
-        jLabel7.setText("OFF");
+        controlEBrake.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        controlEBrake.setText("OFF");
+
+        jLabel14.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        jLabel14.setText("Heater");
+
+        cabinHeater.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        cabinHeater.setText("OFF");
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -261,12 +358,14 @@ public class UI
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel4)
                     .addComponent(jLabel2)
-                    .addComponent(jLabel6))
+                    .addComponent(jLabel6)
+                    .addComponent(jLabel14))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(cabinHeater)
                     .addComponent(controlPower)
                     .addComponent(controlSBrake)
-                    .addComponent(jLabel7))
+                    .addComponent(controlEBrake))
                 .addContainerGap(43, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
@@ -283,8 +382,12 @@ public class UI
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel6)
-                    .addComponent(jLabel7))
-                .addContainerGap(32, Short.MAX_VALUE))
+                    .addComponent(controlEBrake))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel14)
+                    .addComponent(cabinHeater))
+                .addContainerGap(29, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
@@ -331,10 +434,10 @@ public class UI
         pointStatsSpeed.setText("99 mph");
 
         jLabel3.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
-        jLabel3.setText("Head");
+        jLabel3.setText("Grade");
 
-        pointStatsHeading.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
-        pointStatsHeading.setText("999'");
+        pointStatsGrade.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        pointStatsGrade.setText("99%");
 
         jLabel19.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
         jLabel19.setText("Temp");
@@ -355,24 +458,20 @@ public class UI
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel6Layout.createSequentialGroup()
-                        .addComponent(jLabel13)
-                        .addGap(18, 18, 18)
-                        .addComponent(pointStatsSpeed))
-                    .addGroup(jPanel6Layout.createSequentialGroup()
-                        .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel9)
-                            .addComponent(jLabel11)
-                            .addComponent(jLabel19)
-                            .addComponent(jLabel3)
-                            .addComponent(jLabel12))
-                        .addGap(24, 24, 24)
-                        .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(pointStatsMass)
-                            .addComponent(pointStatsHeading)
-                            .addComponent(pointStatsTemperature)
-                            .addComponent(pointStatsLatitude)
-                            .addComponent(pointStatsLongitude))))
+                    .addComponent(jLabel9)
+                    .addComponent(jLabel11)
+                    .addComponent(jLabel19)
+                    .addComponent(jLabel3)
+                    .addComponent(jLabel12)
+                    .addComponent(jLabel13))
+                .addGap(22, 22, 22)
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(pointStatsSpeed)
+                    .addComponent(pointStatsMass)
+                    .addComponent(pointStatsGrade)
+                    .addComponent(pointStatsTemperature)
+                    .addComponent(pointStatsLatitude)
+                    .addComponent(pointStatsLongitude))
                 .addContainerGap(55, Short.MAX_VALUE))
         );
         jPanel6Layout.setVerticalGroup(
@@ -389,7 +488,7 @@ public class UI
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
-                    .addComponent(pointStatsHeading))
+                    .addComponent(pointStatsGrade))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel13)
@@ -402,7 +501,7 @@ public class UI
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel12)
                     .addComponent(pointStatsMass))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(32, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
@@ -448,12 +547,6 @@ public class UI
         cabinLights.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
         cabinLights.setText("OFF");
 
-        jLabel14.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
-        jLabel14.setText("Heater");
-
-        cabinHeater.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
-        cabinHeater.setText("OFF");
-
         jLabel5.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
         jLabel5.setText("Pass");
 
@@ -476,14 +569,12 @@ public class UI
                     .addComponent(jLabel16)
                     .addComponent(jLabel17)
                     .addComponent(jLabel10)
-                    .addComponent(jLabel14)
                     .addComponent(jLabel5)
                     .addComponent(jLabel18))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(cabinCrew)
                     .addComponent(cabinPassengers)
-                    .addComponent(cabinHeater)
                     .addComponent(cabinLights)
                     .addComponent(cabinRDoors)
                     .addComponent(cabinLDoors))
@@ -506,17 +597,13 @@ public class UI
                     .addComponent(cabinLights))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel14)
-                    .addComponent(cabinHeater))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
                     .addComponent(cabinPassengers))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel18)
                     .addComponent(cabinCrew))
-                .addContainerGap(32, Short.MAX_VALUE))
+                .addContainerGap(24, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
@@ -535,16 +622,28 @@ public class UI
                 .addContainerGap()
                 .addComponent(jLabel15)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+
+        jLabel24.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        jLabel24.setText("ID");
+
+        topId.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        topId.setText("99");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel24)
+                        .addGap(18, 18, 18)
+                        .addComponent(topId)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -554,8 +653,14 @@ public class UI
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel24)
+                    .addComponent(topId))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         jLabel20.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
@@ -621,7 +726,7 @@ public class UI
                 .addComponent(jLabel20)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(135, Short.MAX_VALUE))
+                .addContainerGap(20, Short.MAX_VALUE))
         );
 
         jLabel25.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
@@ -830,6 +935,230 @@ public class UI
             .addComponent(jPanel15, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
+        jPanel17.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        failuresEngine.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        failuresEngine.setText("Engine");
+        failuresEngine.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                failuresEngineActionPerformed(evt);
+            }
+        });
+
+        failuresSBrake.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        failuresSBrake.setText("S Brake");
+        failuresSBrake.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                failuresSBrakeActionPerformed(evt);
+            }
+        });
+
+        failuresEBrake.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        failuresEBrake.setText("E Brake");
+        failuresEBrake.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                failuresEBrakeActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel18Layout = new javax.swing.GroupLayout(jPanel18);
+        jPanel18.setLayout(jPanel18Layout);
+        jPanel18Layout.setHorizontalGroup(
+            jPanel18Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel18Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel18Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(failuresEngine, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(failuresSBrake, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
+                    .addComponent(failuresEBrake, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel18Layout.setVerticalGroup(
+            jPanel18Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel18Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(failuresEngine)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(failuresSBrake)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(failuresEBrake)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        failuresTrackRx.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        failuresTrackRx.setText("Track RX");
+        failuresTrackRx.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                failuresTrackRxActionPerformed(evt);
+            }
+        });
+
+        failuresBeaconRx.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        failuresBeaconRx.setText("Beacon RX");
+        failuresBeaconRx.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                failuresBeaconRxActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel19Layout = new javax.swing.GroupLayout(jPanel19);
+        jPanel19.setLayout(jPanel19Layout);
+        jPanel19Layout.setHorizontalGroup(
+            jPanel19Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel19Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel19Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(failuresTrackRx, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(failuresBeaconRx, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel19Layout.setVerticalGroup(
+            jPanel19Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel19Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(failuresTrackRx)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(failuresBeaconRx)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        failuresMboTx.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        failuresMboTx.setText("MBO TX");
+        failuresMboTx.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                failuresMboTxActionPerformed(evt);
+            }
+        });
+
+        failuresMboRx.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        failuresMboRx.setText("MBO RX");
+        failuresMboRx.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                failuresMboRxActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel20Layout = new javax.swing.GroupLayout(jPanel20);
+        jPanel20.setLayout(jPanel20Layout);
+        jPanel20Layout.setHorizontalGroup(
+            jPanel20Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel20Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel20Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(failuresMboTx, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(failuresMboRx, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel20Layout.setVerticalGroup(
+            jPanel20Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel20Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(failuresMboTx)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(failuresMboRx)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout jPanel17Layout = new javax.swing.GroupLayout(jPanel17);
+        jPanel17.setLayout(jPanel17Layout);
+        jPanel17Layout.setHorizontalGroup(
+            jPanel17Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel17Layout.createSequentialGroup()
+                .addComponent(jPanel18, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel19, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel20, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+        jPanel17Layout.setVerticalGroup(
+            jPanel17Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel18, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel19, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel20, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+
+        jLabel23.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        jLabel23.setText("Failures");
+
+        javax.swing.GroupLayout jPanel22Layout = new javax.swing.GroupLayout(jPanel22);
+        jPanel22.setLayout(jPanel22Layout);
+        jPanel22Layout.setHorizontalGroup(
+            jPanel22Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel22Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel22Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel23)
+                    .addComponent(jPanel17, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel22Layout.setVerticalGroup(
+            jPanel22Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel22Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel23)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel17, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanel23.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        advertisement1.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        advertisement1.setText("ADVERTISEM ADVERTISEM");
+
+        advertisement2.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        advertisement2.setText("ADVERTISEM ADVERTISEM");
+
+        advertisement3.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        advertisement3.setText("ADVERTISEM ADVERTISEM");
+
+        javax.swing.GroupLayout jPanel23Layout = new javax.swing.GroupLayout(jPanel23);
+        jPanel23.setLayout(jPanel23Layout);
+        jPanel23Layout.setHorizontalGroup(
+            jPanel23Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel23Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel23Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(advertisement1, javax.swing.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE)
+                    .addComponent(advertisement2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(advertisement3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        jPanel23Layout.setVerticalGroup(
+            jPanel23Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel23Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(advertisement1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(advertisement2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(advertisement3)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jLabel27.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        jLabel27.setText("Ad");
+
+        javax.swing.GroupLayout jPanel21Layout = new javax.swing.GroupLayout(jPanel21);
+        jPanel21.setLayout(jPanel21Layout);
+        jPanel21Layout.setHorizontalGroup(
+            jPanel21Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel21Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel21Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel23, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel27))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel21Layout.setVerticalGroup(
+            jPanel21Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel21Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel27)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel23, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -837,6 +1166,10 @@ public class UI
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jPanel22, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanel21, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -844,15 +1177,55 @@ public class UI
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jPanel22, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jPanel21, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addContainerGap())))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void failuresEngineActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_failuresEngineActionPerformed
+        // TODO add your handling code here:
+	train.toggleFailure(Failure.ENGINE);
+    }//GEN-LAST:event_failuresEngineActionPerformed
+
+    private void failuresSBrakeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_failuresSBrakeActionPerformed
+        // TODO add your handling code here:
+        train.toggleFailure(Failure.SERVICE_BRAKE);
+    }//GEN-LAST:event_failuresSBrakeActionPerformed
+
+    private void failuresEBrakeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_failuresEBrakeActionPerformed
+        // TODO add your handling code here:
+        train.toggleFailure(Failure.EMERGENCY_BRAKE);
+    }//GEN-LAST:event_failuresEBrakeActionPerformed
+
+    private void failuresTrackRxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_failuresTrackRxActionPerformed
+        // TODO add your handling code here:
+        train.toggleFailure(Failure.TRACK_RX);
+    }//GEN-LAST:event_failuresTrackRxActionPerformed
+
+    private void failuresBeaconRxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_failuresBeaconRxActionPerformed
+        // TODO add your handling code here:
+        train.toggleFailure(Failure.BEACON_RX);
+    }//GEN-LAST:event_failuresBeaconRxActionPerformed
+
+    private void failuresMboTxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_failuresMboTxActionPerformed
+        // TODO add your handling code here:
+        train.toggleFailure(Failure.MBO_TX);
+    }//GEN-LAST:event_failuresMboTxActionPerformed
+
+    private void failuresMboRxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_failuresMboRxActionPerformed
+        // TODO add your handling code here:
+        train.toggleFailure(Failure.MBO_RX);
+    }//GEN-LAST:event_failuresMboRxActionPerformed
 
     /**
      * @param args the command line arguments
@@ -890,6 +1263,9 @@ public class UI
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel advertisement1;
+    private javax.swing.JLabel advertisement2;
+    private javax.swing.JLabel advertisement3;
     private javax.swing.JLabel beaconRxString;
     private javax.swing.JLabel cabinCrew;
     private javax.swing.JLabel cabinHeater;
@@ -897,8 +1273,16 @@ public class UI
     private javax.swing.JLabel cabinLights;
     private javax.swing.JLabel cabinPassengers;
     private javax.swing.JLabel cabinRDoors;
+    private javax.swing.JLabel controlEBrake;
     private javax.swing.JLabel controlPower;
     private javax.swing.JLabel controlSBrake;
+    private javax.swing.JButton failuresBeaconRx;
+    private javax.swing.JButton failuresEBrake;
+    private javax.swing.JButton failuresEngine;
+    private javax.swing.JButton failuresMboRx;
+    private javax.swing.JButton failuresMboTx;
+    private javax.swing.JButton failuresSBrake;
+    private javax.swing.JButton failuresTrackRx;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -914,8 +1298,11 @@ public class UI
     private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel22;
+    private javax.swing.JLabel jLabel23;
+    private javax.swing.JLabel jLabel24;
     private javax.swing.JLabel jLabel25;
     private javax.swing.JLabel jLabel26;
+    private javax.swing.JLabel jLabel27;
     private javax.swing.JLabel jLabel28;
     private javax.swing.JLabel jLabel29;
     private javax.swing.JLabel jLabel3;
@@ -926,7 +1313,6 @@ public class UI
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
@@ -937,7 +1323,14 @@ public class UI
     private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel16;
+    private javax.swing.JPanel jPanel17;
+    private javax.swing.JPanel jPanel18;
+    private javax.swing.JPanel jPanel19;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel20;
+    private javax.swing.JPanel jPanel21;
+    private javax.swing.JPanel jPanel22;
+    private javax.swing.JPanel jPanel23;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
@@ -949,12 +1342,13 @@ public class UI
     private javax.swing.JLabel mboRxSpeed;
     private javax.swing.JLabel mboTxLatitude;
     private javax.swing.JLabel mboTxLongitude;
-    private javax.swing.JLabel pointStatsHeading;
+    private javax.swing.JLabel pointStatsGrade;
     private javax.swing.JLabel pointStatsLatitude;
     private javax.swing.JLabel pointStatsLongitude;
     private javax.swing.JLabel pointStatsMass;
     private javax.swing.JLabel pointStatsSpeed;
     private javax.swing.JLabel pointStatsTemperature;
+    private javax.swing.JLabel topId;
     private javax.swing.JLabel trackRxAuthority;
     private javax.swing.JLabel trackRxSpeed;
     // End of variables declaration//GEN-END:variables
