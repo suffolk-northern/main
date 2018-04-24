@@ -1978,9 +1978,9 @@ public class Ctc implements Updateable{
 		String str;
 		while(stok.hasMoreTokens())
 		{
-			System.out.println("token");
+			//System.out.println("token");
 			str = stok.nextToken();
-			System.out.println(str);
+			//System.out.println(str);
 			
 			st = new StringTokenizer(str," ,");
 			
