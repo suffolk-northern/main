@@ -55,6 +55,8 @@ public class UI
 
         TrainModel train = (TrainModel) o;
 
+        int id = train.id();
+
         double power = HP_PER_WATT * train.power();
         double sBrake = 1e-3 * POUND_PER_NEWTON * train.serviceBrake();
 
@@ -77,6 +79,8 @@ public class UI
 
         TrackMovementCommand trackMessage = train.lastTrackMessage();
 	  MboMovementCommand   mboMessage = train.lastMboMessage();
+
+        topId.setText(String.format("%d", id));
 
         controlPower.setText(String.format("%.0f hp", power));
         controlSBrake.setText(String.format("%.2f M lb", sBrake));
