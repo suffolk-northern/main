@@ -285,6 +285,15 @@ public class PointMass
 		return power >= 0.0 ? absValue : -absValue;
 	}
 
+	// Returns true if on a station block.
+	public boolean atStation()
+	{
+		if (block == null)
+			return false;
+
+		return block.isIsStation();
+	}
+
 	// Configures state for the next block.
 	private void advanceBlock()
 	{
