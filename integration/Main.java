@@ -73,7 +73,9 @@ public class Main
 		MboController mboCont = new MboController("Green");
 		MboScheduler mboSched = new MboScheduler("Green");
 
-		final int numberOfTrains = 3;
+		final int numberOfTrainsGreen = 3;
+		final int numberOfTrainsRed = 3;
+		final int numberOfTrains = numberOfTrainsGreen + numberOfTrainsRed;
 
 		trainControllers = new TrainController[numberOfTrains];
 
@@ -105,11 +107,24 @@ public class Main
 		
 		// CTC <---> trains
 		for(int i = 0; i < numberOfTrains; i++)
-			ctc.setTrain(i);
+		{
+			if(i < numberOfTrainsGreen)
+				ctc.setTrain("green",i);
+			else
+				ctc.setTrain("red",i);
+		}
+				
+		
+		
 		
 		// track model <---> train model
 		for (TrainModel trainModel : trainModels)
-			trackModel.registerTrain(trainModel, "Green");
+		{
+			if(trainModel.id() < numberOfTrainsGreen)
+				trackModel.registerTrain(trainModel, "Green");
+			else
+				trackModel.registerTrain(trainModel, "Red");
+		}
 
 		// train model <---> train controller
 		for (int i = 0; i < trainControllers.length; ++i)

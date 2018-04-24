@@ -246,9 +246,9 @@ public class Ctc implements Updateable{
 		updater.scheduleAtFixedRate(period / speedup);
 	}
 	
-	public void setTrain(int ID)
+	public void setTrain(String line, int ID)
 	{
-		Train train = new Train(ID,getBlock("green",0),0);
+		Train train = new Train(ID,getBlock(line,0),0);
 		trains.add(train);
 		
 		updateTrains();
