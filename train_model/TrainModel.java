@@ -341,6 +341,9 @@ public class TrainModel
 	{
 		int index = doorLocationToIndex(location);
 
+		if (doors[index])
+			return;
+
 		doors[index] = true;
 
 		int leaving = cabin.unloadPassengers();
