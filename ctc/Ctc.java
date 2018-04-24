@@ -363,6 +363,7 @@ public class Ctc implements Updateable{
 				block.station = trackmodel.getStation(line,bl.getBlock()).getName(); 
 				block.hasStation = true;
 				switches.add(block);
+				stations.add(block);
 				thisline.add(block);
 			}
 			else if(bl.isIsCrossing())
@@ -371,7 +372,9 @@ public class Ctc implements Updateable{
 			}
 			else if(bl.isIsStation())
 			{
-				thisline.add(new Block(line,bl.getSection(),bl.getBlock(),bl.getLength(),bl.getNextBlockDir(),bl.getPrevBlockDir(),null,null,false,true,trackmodel.getStation(line,bl.getBlock()).getName()));
+				block = new Block(line,bl.getSection(),bl.getBlock(),bl.getLength(),bl.getNextBlockDir(),bl.getPrevBlockDir(),null,null,false,true,trackmodel.getStation(line,bl.getBlock()).getName());
+				thisline.add(block);
+				stations.add(block);
 			}
 			else if(bl.isIsSwitch())
 			{
@@ -1654,6 +1657,7 @@ public class Ctc implements Updateable{
 		
 		if(!train.location.equals(st))
 			return;
+		
 		
 		train.passengers -= departing;
 		train.passengers += boarding;
