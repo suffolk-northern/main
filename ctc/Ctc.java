@@ -2391,7 +2391,7 @@ public class Ctc implements Updateable{
 		{
 			//System.out.println("token");
 			str = stok.nextToken();
-			System.out.println(str);
+			//System.out.println(str);
 			
 			st = new StringTokenizer(str," ,");
 			
