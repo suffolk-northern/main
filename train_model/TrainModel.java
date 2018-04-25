@@ -81,7 +81,7 @@ public class TrainModel
 	);
 
 	// notify observers once every this many updates
-	private static int NOTIFY_OBSERVERS_MOD = 2;
+	private static int NOTIFY_OBSERVERS_MOD = 10;
 
 	// identifier
 	private final int id;
