@@ -1287,7 +1287,9 @@ public class Ctc implements Updateable{
 	
 	public static void mboDispatch(String line, int tid)
 	{
-		
+		Train train = getTrain(tid);
+		if(!dispatched.contains(train))
+			dispatched.add(train);
 	}
 
 	private static String toCap(String str) {
