@@ -43,6 +43,9 @@ public class TrainModel
 	private static final double KILOGRAMS_PER_TON = 907.185;
 	private static final double MPS_PER_KPH = 0.277778;
 
+	// meters per second per second
+	private static final double GRAVITY = 9.8;
+
 	// datasheet constants
 	private static final double DATASHEET_ACCEL_MPSPS   =  0.50;
 	private static final double DATASHEET_SDECEL_MPSPS  =  1.20;
@@ -79,6 +82,9 @@ public class TrainModel
 		new GlobalCoordinates(0.0, 0.0),
 		Orientation.degrees(0.0)
 	);
+
+	// rolling resistance plus internal mechanical loss
+	private static final double COEFFICIENT_OF_FRICTION = 0.01;
 
 	// notify observers once every this many updates
 	private static int NOTIFY_OBSERVERS_MOD = 2;
@@ -187,9 +193,11 @@ public class TrainModel
 	{
 		double engineForce = pointMass.forceForPower(enginePower);
 
-		// BS force at zero velocity
+		double frictionForce = COEFFICIENT_OF_FRICTION * mass() * GRAVITY;
+
+		// break static friction
 		if (engineForce == 0.0)
-			engineForce = 0.1;
+			engineForce = frictionForce + 0.1;
 
 		if (engineForce > MAX_ENGINE_FORCE)
 			engineForce = MAX_ENGINE_FORCE;
@@ -209,7 +217,8 @@ public class TrainModel
 
 		double netForce = effectiveEngineForce
 		                  - effectiveServiceBrakeForce
-		                  - effectiveEmergencyBrakeForce;
+		                  - effectiveEmergencyBrakeForce
+				  - frictionForce;
 
 		pointMass.push(netForce, time);
 
