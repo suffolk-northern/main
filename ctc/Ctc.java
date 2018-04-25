@@ -1284,6 +1284,11 @@ public class Ctc implements Updateable{
 
 	return null;
 	}
+	
+	public static void mboDispatch(String line, int tid)
+	{
+		
+	}
 
 	private static String toCap(String str) {
 		return str.substring(0, 1).toUpperCase() + str.substring(1);

@@ -27,6 +27,11 @@ public class CtcRadio {
 		ctc = c;
 	}
 	
+	public void tellCtcDispatch(String line, int tid)
+	{
+		ctc.mboDispatch(line,tid);
+	}
+	
 	// Returns a 2D array of integer block IDs, each row is a switch
 	// 2 ints in each row, one for each block id
 	public int[][] getSwitchStates(String lineName)
