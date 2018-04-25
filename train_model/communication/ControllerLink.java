@@ -74,6 +74,14 @@ public class ControllerLink
 		return train.speed();
 	}
 
+	// Returns the engine output power.
+	//
+	// Units: Watts
+	public double power()
+	{
+		return train.power();
+	}
+
 	// Sets the engine output power.
 	//
 	// Units: Proportion of max output power, e.g.,
@@ -89,6 +97,14 @@ public class ControllerLink
 		train.power(value);
 	}
 
+	// Returns the service brake output.
+	//
+	// Units: Newtons
+	public double serviceBrake()
+	{
+		return train.serviceBrake();
+	}
+
 	// Sets the service brake output.
 	//
 	// Units: Proportion of max braking force, e.g.,
@@ -102,6 +118,12 @@ public class ControllerLink
 		throws IllegalArgumentException
 	{
 		train.serviceBrake(value);
+	}
+
+	// Returns true if the emergency brake is applied.
+	public boolean emergencyBrake()
+	{
+		return train.emergencyBrake();
 	}
 
 	// Engages the emergency brake.
