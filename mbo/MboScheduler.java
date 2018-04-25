@@ -145,26 +145,42 @@ public class MboScheduler implements Updateable
 			}
 			else if (requestType == MboSchedulerUI.Request.LOAD_FROM_CTC)
 			{
-				if (ctcRadio.getSchedule() != null)
+				try
 				{
-					lineSched = ScheduleReader.readScheduleString(ctcRadio.getSchedule());
-					ui.setSchedule(lineSched);
-					ui.requestCompleted();
+					LineSchedule ls = ScheduleReader.readScheduleString(ctcRadio.getSchedule());
+					if (ls.getLine().equals(lineName))
+					{
+						lineSched = ls;
+						ui.setSchedule(lineSched);
+					}
+					else
+						ui.setMessage("CTC schedule is for a different line");
 				}
+				catch(Exception e)
+				{
+					ui.setMessage("CTC schedule is missing or corrupted");
+				}
+				ui.requestCompleted();
 			}
 			else if (requestType == MboSchedulerUI.Request.LOAD_FROM_FILE)
 			{
 				File loadFile = ui.getFile();
 				String schedStr = ScheduleReader.readScheduleFile(loadFile);
-				if (schedStr != null)
+				try
 				{
 					LineSchedule ls = ScheduleReader.readScheduleString(schedStr);
-					if (ls != null)
+					if (ls.getLine().equals(lineName))
 					{
 						lineSched = ls;
 						ui.setSchedule(lineSched);
-						ui.setSchedule(lineSched);
 					}
+					else
+						ui.setMessage("This schedule is for a different line.");
+				}
+				catch(Exception e)
+				{
+					System.out.println(e.getMessage());
+					ui.setMessage("Schedule file cannot be read");
 				}
 				ui.requestCompleted();
 			}
@@ -325,7 +341,7 @@ public class MboScheduler implements Updateable
 			curTime = new Time(curTime.getTime() + (long) (schedIncrement * 1000));
 			lastDispatch += schedIncrement;
 		}
-		LineSchedule ls = new LineSchedule(driverScheds, trainScheds);
+		LineSchedule ls = new LineSchedule(driverScheds, trainScheds, lineName);
 		return ls;
 	}
 	
@@ -365,7 +381,7 @@ public class MboScheduler implements Updateable
 		{
 			StringWriter sched = new StringWriter();
 			ScheduleWriter schedWrite = new ScheduleWriter(lineSched);
-			schedWrite.writeSchedule(sched);
+			schedWrite.writeSchedule(sched, lineName);
 			String schedStr = sched.toString();
 			ctcRadio.setSchedule(schedStr);
 		}
