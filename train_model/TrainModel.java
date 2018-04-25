@@ -195,6 +195,8 @@ public class TrainModel
 
 		double frictionForce = COEFFICIENT_OF_FRICTION * mass() * GRAVITY;
 
+		double gravityForce = mass() * GRAVITY * pointMass.grade();
+
 		// break static friction
 		if (engineForce == 0.0)
 			engineForce = frictionForce + 0.1;
@@ -218,7 +220,8 @@ public class TrainModel
 		double netForce = effectiveEngineForce
 		                  - effectiveServiceBrakeForce
 		                  - effectiveEmergencyBrakeForce
-				  - frictionForce;
+				  - frictionForce
+				  - gravityForce;
 
 		pointMass.push(netForce, time);
 
@@ -355,12 +358,10 @@ public class TrainModel
 
 	// Returns the current grade.
 	//
-	// Units: TBD.
+	// Units: Percentage rise/run.
 	public double grade()
 	{
-		// unimplemented
-
-		return 0.0;
+		return 100.0 * pointMass.grade();
 	}
 
 	// Returns true if specified door(s) are open.
