@@ -50,6 +50,9 @@ public class CtcUI extends javax.swing.JFrame {
 	private static String[] greenBlocks;
 	private static String[] redBlocks;
 	private static String[] trainIDs;
+	
+	private static String[] greenSwitches;
+	private static String[] redSwitches;
 
 	public CtcUI(Ctc ctc) {
 		this.ctc = ctc;
@@ -98,6 +101,9 @@ public class CtcUI extends javax.swing.JFrame {
 		scheduleButton = new javax.swing.JButton();
 		closeTrack = new javax.swing.JRadioButton();
 		container = new JPanel();
+		switchLabel = new javax.swing.JLabel();
+		switchSelect = new javax.swing.JComboBox<>();
+		toggle = new javax.swing.JRadioButton();
 		scrPane = new JScrollPane(container);
 		getContentPane().add(scrPane);
 		
@@ -295,9 +301,24 @@ public class CtcUI extends javax.swing.JFrame {
 
 		jScrollPane2.setViewportView(trainTable);
 
-		maintenanceBlock.setEditable(true);
+		maintenanceBlock.setEditable(false);
 		maintenanceBlock.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
 		maintenanceBlock.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{}));
+		
+		switchLabel.setFont(new java.awt.Font("Tahoma", 0, 30));
+		switchLabel.setText("Switches");
+		
+		switchSelect.setFont(new java.awt.Font("Tahoma", 0, 30));
+		switchSelect.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{}));
+		
+		toggle.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
+		toggle.setText("Toggle");
+		toggle.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				toggleActionPerformed(evt);
+			}
+		});
+		
 
 		fixedBlock.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
 		fixedBlock.setText("Fixed Block");
@@ -384,10 +405,30 @@ public class CtcUI extends javax.swing.JFrame {
 										.addGroup(layout.createSequentialGroup()
 												.addGap(77, 77, 77)
 												.addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-														.addComponent(closeTrack)
-														.addComponent(jLabel9)
-														.addComponent(jLabel2)
-														.addComponent(openTrack)
+														
+												
+														
+														
+															.addComponent(jLabel2)
+															.addComponent(openTrack)
+															
+																
+													
+														.addGroup(layout.createSequentialGroup()
+																.addComponent(maintenanceBlock)
+																.addGap(94, 94, 94)
+																.addComponent(switchSelect))
+														
+														.addGroup(layout.createSequentialGroup()
+																.addComponent(closeTrack)
+																.addGap(94, 94, 94)
+																.addComponent(toggle))
+														
+														.addGroup(layout.createSequentialGroup()
+																.addComponent(jLabel9)
+																.addGap(112, 112, 112)
+																.addComponent(switchLabel))
+														
 														.addGroup(layout.createSequentialGroup()
 																.addComponent(fixedBlock)
 																.addGap(94, 94, 94)
@@ -516,13 +557,21 @@ public class CtcUI extends javax.swing.JFrame {
 												.addGap(56, 56, 56)
 												.addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 480, javax.swing.GroupLayout.PREFERRED_SIZE)
 												.addGap(18, 18, 18)
-												.addComponent(jLabel9)
+												.addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+													.addComponent(jLabel9)
+													.addComponent(switchLabel))
 												.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
 												.addComponent(mLineSelect)
 												.addGap(4, 4, 4)
-												.addComponent(maintenanceBlock, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+												.addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+													.addComponent(maintenanceBlock, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+													.addComponent(switchSelect, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+														
 												.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-												.addComponent(openTrack)
+												.addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+													.addComponent(openTrack)
+													.addComponent(toggle))
+												
 												.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
 												.addComponent(closeTrack)
 												.addGap(56, 56, 56)
@@ -1066,6 +1115,9 @@ public class CtcUI extends javax.swing.JFrame {
 		ArrayDeque<String> greens = new ArrayDeque<String>();
 		ArrayDeque<String> reds = new ArrayDeque<String>();
 		
+		ArrayDeque<String> green_sw = new ArrayDeque<String>();
+		ArrayDeque<String> red_sw = new ArrayDeque<String>();
+		
 		String line;
 		
 		trackModel.setRowCount(count);
@@ -1079,10 +1131,14 @@ public class CtcUI extends javax.swing.JFrame {
 			if(line.equalsIgnoreCase("Green"))
 			{
 				greens.add(rows[i][1] + "" + rows[i][2]);
+				if(!rows[i][4].equals(""))
+					green_sw.add(rows[i][1] + "" + rows[i][2]);
 			}
 			else if(line.equalsIgnoreCase("Red"))
 			{
 				reds.add(rows[i][1] + "" + rows[i][2]);
+				if(!rows[i][4].equals(""))
+					red_sw.add(rows[i][1] + "" + rows[i][2]);
 			}
 
 			for (int j = 0; j < trackTable.getColumnCount(); j++) 
@@ -1110,13 +1166,40 @@ public class CtcUI extends javax.swing.JFrame {
 			redBlocks[i] = reds.poll();
 		}
 		
+		sizegreen = green_sw.size();
+		sizered = red_sw.size();
+		
+		greenSwitches = new String[sizegreen];
+		redSwitches = new String[sizered];
+		
+		for(int i = 0; i < sizegreen; i++)
+		{
+			greenSwitches[i] = green_sw.poll();
+		}
+		
+		for(int i = 0; i < sizered; i++)
+		{
+			redSwitches[i] = red_sw.poll();
+		}
+		
 	}
 
 	protected void updateThroughput(double through) {
 		blueThrough.setText(Double.toString(through));
 	}
 
+	private void toggleActionPerformed(java.awt.event.ActionEvent evt) {
+		
+		// inform user
+		String line = (String) mLineSelect.getSelectedItem();
+		String str  = (String) switchSelect.getSelectedItem();
+		
+		ctc.manualFlip(line,str);
 
+
+		
+	}
+	
     private void openTrackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openTrackActionPerformed
 		// TODO add your handling code here:
 
@@ -1165,10 +1248,12 @@ public class CtcUI extends javax.swing.JFrame {
 		if(mLineSelect.getSelectedIndex() == 0)
 		{
 			maintenanceBlock.setModel(new javax.swing.DefaultComboBoxModel<>(greenBlocks));
+			switchSelect.setModel(new javax.swing.DefaultComboBoxModel<>(greenSwitches));
 		}
 		else
 		{
 			maintenanceBlock.setModel(new javax.swing.DefaultComboBoxModel<>(redBlocks));
+			switchSelect.setModel(new javax.swing.DefaultComboBoxModel<>(redSwitches));
 		}
 	}
 	
@@ -1315,6 +1400,10 @@ public class CtcUI extends javax.swing.JFrame {
 	private static javax.swing.JComboBox<String> trainSelect;
 	private static javax.swing.JTable trainTable;
 	private javax.swing.JScrollPane scrPane;
+	
+	private javax.swing.JLabel switchLabel;
+	private javax.swing.JComboBox<String> switchSelect;
+	private javax.swing.JRadioButton toggle;
 
 	/**
     // Variables declaration - do not modify//GEN-BEGIN:variables
