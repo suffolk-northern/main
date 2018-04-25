@@ -1,12 +1,13 @@
 package mbo.schedules;
 
 import java.sql.Time;
+import java.lang.Comparable;
 
 /**
  *
  * @author Kaylene Stocking
  */
-public class TrainDispatch 
+public class TrainDispatch implements Comparable<TrainDispatch>
 {
 	private int trainID;
 	private int driverID;
@@ -33,4 +34,23 @@ public class TrainDispatch
 	{
 		return time;
 	}
+	
+	// Allow dispatches to be sorted by departure time
+	public int compareTo(TrainDispatch other)
+	{
+		if (time.before(other.getTime()))
+			return -1;
+		else if (time.after(other.getTime()))
+			return 1;
+		else
+			return 0;
+	}
+	
+//	public static Comparator<TrainDispatch> TrainDispatchComparator = new Comparator<>()
+//	{
+//		public int compare(TrainDispatch td1, TrainDispatch td2)
+//		{
+//			return td1.compareTo(td2);
+//		}
+//	};
 }
