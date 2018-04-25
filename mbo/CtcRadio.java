@@ -16,12 +16,14 @@ public class CtcRadio {
 	private MboScheduler mboSched;
 	private Ctc ctc;
 	private String schedule;
+	private String line;
 	
-	public CtcRadio(MboController mc, MboScheduler ms, Ctc c)
+	public CtcRadio(String l, MboController mc, MboScheduler ms, Ctc c)
 	{
 		mboCont = mc;
 		mboSched = ms;
 		ctc = c;
+		line = l;
 	}
 	
 	// Returns a 2D array of integer block IDs, each row is a switch
@@ -35,12 +37,14 @@ public class CtcRadio {
 	{
 		mboCont.enableMboController(true);
 		// TODO: add corresponding CTC function
+		ctc.toMovingBlock(line);
 	}
 	
 	public void disableMovingBlock()
 	{
 		mboCont.enableMboController(false);
 		// TODO: add corresponding CTC function
+		ctc.toFixedBlock(line);
 	}
 	
 	public void enableAutomaticDispatch(boolean isEnabled)
