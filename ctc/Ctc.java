@@ -2385,6 +2385,11 @@ public class Ctc implements Updateable{
 		
 	}
 	
+	public static Date getCurrentTime()
+	{
+		return clock.time();
+	}
+	
 	protected static class Dispatch{
 		
 		protected ArrayDeque<Block> route;

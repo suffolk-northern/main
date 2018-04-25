@@ -8,6 +8,7 @@ package mbo;
 import java.sql.Time;
 
 import ctc.Ctc;
+import java.util.Date;
 
 /**
  *
@@ -85,6 +86,7 @@ public class CtcRadio {
 	public Time getTime()
 	{
 		// TODO: CTC method to get the current time
+		Date date = ctc.getCurrentTime();
 		return null;
 	}
 }
