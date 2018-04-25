@@ -24,6 +24,9 @@ public class TrainControllerUI extends javax.swing.JFrame {
             ActualTempLabel.setText(Integer.toString((int)controller.getTemp()));
             
             updateDoorLabels();
+            updateConsole();
+            updateEBrake();
+
         }
     };
     /**
@@ -49,7 +52,7 @@ public class TrainControllerUI extends javax.swing.JFrame {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-	setTitle("Train Controller");
+
         jDialog1 = new javax.swing.JDialog();
         jLabel4 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
@@ -93,9 +96,12 @@ public class TrainControllerUI extends javax.swing.JFrame {
         ManualModeLabel = new javax.swing.JLabel();
         BrakeLabel = new javax.swing.JLabel();
         BrakeButton = new javax.swing.JButton();
-        EmergencyPanel = new javax.swing.JPanel();
         EmergencyBrakeButton = new javax.swing.JButton();
         EmergencyBrakeLabel = new javax.swing.JLabel();
+        EmergencyPanel = new javax.swing.JPanel();
+        jLabel6 = new javax.swing.JLabel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        Console = new javax.swing.JTextPane();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
 
@@ -453,20 +459,22 @@ public class TrainControllerUI extends javax.swing.JFrame {
             }
         });
 
+        EmergencyBrakeButton.setForeground(new java.awt.Color(255, 51, 51));
+        EmergencyBrakeButton.setText("E BRAKE");
+        EmergencyBrakeButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                EmergencyBrakeButtonActionPerformed(evt);
+            }
+        });
+
+        EmergencyBrakeLabel.setText("ARMED");
+
         javax.swing.GroupLayout ControlPanelLayout = new javax.swing.GroupLayout(ControlPanel);
         ControlPanel.setLayout(ControlPanelLayout);
         ControlPanelLayout.setHorizontalGroup(
             ControlPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(ControlPanelLayout.createSequentialGroup()
                 .addGroup(ControlPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(ControlPanelLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(SetSpeedSlider, javax.swing.GroupLayout.PREFERRED_SIZE, 273, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(ControlPanelLayout.createSequentialGroup()
-                        .addGap(74, 74, 74)
-                        .addComponent(BrakeButton, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(BrakeLabel))
                     .addGroup(ControlPanelLayout.createSequentialGroup()
                         .addGroup(ControlPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(ControlPanelLayout.createSequentialGroup()
@@ -478,8 +486,24 @@ public class TrainControllerUI extends javax.swing.JFrame {
                                 .addComponent(ManualModeToggle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                         .addComponent(ManualModeLabel)
-                        .addGap(47, 47, 47)))
+                        .addGap(47, 47, 47))
+                    .addGroup(ControlPanelLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(SetSpeedSlider, javax.swing.GroupLayout.PREFERRED_SIZE, 273, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(ControlPanelLayout.createSequentialGroup()
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(EmergencyBrakeButton, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(BrakeButton, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(30, 30, 30)))
                 .addGap(10, 10, 10))
+            .addGroup(ControlPanelLayout.createSequentialGroup()
+                .addGap(38, 38, 38)
+                .addComponent(EmergencyBrakeLabel)
+                .addGap(91, 91, 91)
+                .addComponent(BrakeLabel)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         ControlPanelLayout.setVerticalGroup(
             ControlPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -495,21 +519,19 @@ public class TrainControllerUI extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(ControlPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(BrakeButton, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(BrakeLabel))
-                .addGap(16, 16, 16))
+                    .addComponent(EmergencyBrakeButton, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(ControlPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(EmergencyBrakeLabel)
+                    .addComponent(BrakeLabel)))
         );
 
         EmergencyPanel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
-        EmergencyBrakeButton.setForeground(new java.awt.Color(255, 51, 51));
-        EmergencyBrakeButton.setText("EMERGENCY BRAKE");
-        EmergencyBrakeButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                EmergencyBrakeButtonActionPerformed(evt);
-            }
-        });
+        jLabel6.setText("Console");
 
-        EmergencyBrakeLabel.setText("READY");
+        Console.setText("No messages");
+        jScrollPane4.setViewportView(Console);
 
         javax.swing.GroupLayout EmergencyPanelLayout = new javax.swing.GroupLayout(EmergencyPanel);
         EmergencyPanel.setLayout(EmergencyPanelLayout);
@@ -517,21 +539,22 @@ public class TrainControllerUI extends javax.swing.JFrame {
             EmergencyPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(EmergencyPanelLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(EmergencyBrakeButton, javax.swing.GroupLayout.PREFERRED_SIZE, 182, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(54, 54, 54))
-            .addGroup(EmergencyPanelLayout.createSequentialGroup()
-                .addGap(123, 123, 123)
-                .addComponent(EmergencyBrakeLabel)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(EmergencyPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, EmergencyPanelLayout.createSequentialGroup()
+                        .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(36, 36, 36))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, EmergencyPanelLayout.createSequentialGroup()
+                        .addComponent(jLabel6)
+                        .addGap(113, 113, 113))))
         );
         EmergencyPanelLayout.setVerticalGroup(
             EmergencyPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(EmergencyPanelLayout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, EmergencyPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(EmergencyBrakeButton, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(EmergencyBrakeLabel)
-                .addContainerGap())
+                .addComponent(jLabel6)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(16, Short.MAX_VALUE))
         );
 
         jMenu1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
@@ -564,7 +587,7 @@ public class TrainControllerUI extends javax.swing.JFrame {
                 .addComponent(ControlPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(EmergencyPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(7, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -607,6 +630,33 @@ public class TrainControllerUI extends javax.swing.JFrame {
                         RDoorsLabel.setText("O");
                         break;
         }
+    }
+    
+    private void updateConsole()
+    {
+        boolean [] failures = controller.getFailures();
+        String [] messages = {"E-brake failure\n", "Service brake failure\n", "Engine failure\n", "Signal failure"};
+        String msg = new String();
+        boolean allFalse = true;
+        for(int i=0; i<4; i++)
+        {
+            if(failures[i])
+            {
+                msg = msg + messages[i];
+                allFalse = false;
+            }
+        }
+        Console.setText(msg);
+        if(allFalse)
+            Console.setText("No messages");
+    }
+    
+     private void updateEBrake()
+    {
+        if(controller.eBrakeState())
+            EmergencyBrakeLabel.setText("ON");
+        else
+            EmergencyBrakeLabel.setText("ARMED");
     }
     
     private void SetSpeedSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_SetSpeedSliderStateChanged
@@ -693,7 +743,16 @@ public class TrainControllerUI extends javax.swing.JFrame {
 
     private void EmergencyBrakeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EmergencyBrakeButtonActionPerformed
         // TODO add your handling code here:
-        
+        if(EmergencyBrakeLabel.getText().equals("ARMED"))
+        {
+            controller.setEmergencyBrake(true);
+            EmergencyBrakeLabel.setText("ON");
+        }
+        else
+        {
+            controller.setEmergencyBrake(false);
+            EmergencyBrakeLabel.setText("ARMED");
+        }
     }//GEN-LAST:event_EmergencyBrakeButtonActionPerformed
 
     private void KpTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_KpTextFieldActionPerformed
@@ -771,6 +830,7 @@ public class TrainControllerUI extends javax.swing.JFrame {
     private javax.swing.JButton CancelButton;
     private javax.swing.JLabel CmdAuthLabel;
     private javax.swing.JLabel CmdSpeedLabel;
+    private javax.swing.JTextPane Console;
     private javax.swing.JPanel ControlPanel;
     private javax.swing.JLabel CurrentSpeedLabel;
     private javax.swing.JButton EmergencyBrakeButton;
@@ -803,6 +863,7 @@ public class TrainControllerUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
@@ -810,6 +871,7 @@ public class TrainControllerUI extends javax.swing.JFrame {
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTextPane jTextPane1;
     private javax.swing.JTextPane jTextPane2;
     // End of variables declaration//GEN-END:variables

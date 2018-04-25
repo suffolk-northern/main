@@ -49,6 +49,7 @@ public class TrainController implements Updateable
 
 	boolean manualBrake;
         boolean emergencyBrake;
+        boolean passengerEBrakeRequest;
 	double brakeCMD;		// to link
 	double loopBrake;
         double startBrake;
@@ -63,12 +64,19 @@ public class TrainController implements Updateable
         
         TrainControllerUI gui;
 	ArrayList<String> ads = new ArrayList<>();
+        int adsCounter = 0;
+        double adsTimeCounter = 0;
         boolean allowKSet = true;
         boolean allowDoors = true;
         boolean dwelling;
         int dwellBurstCyclesCount = 0;
         int MIN_DWELL = 10;             // min seconds to dwell
         boolean leftSide = false;
+        
+        boolean eBrakeFailure = false;
+        boolean sBrakeFailure = false;
+        boolean engineFailure = false;
+        boolean signalFailure = false;
         
 	public TrainController() 
 	{
@@ -81,6 +89,7 @@ public class TrainController implements Updateable
                 emergencyBrake = false;
                 currentSpeed = 0;
                 powerCMD = 0;
+                passengerEBrakeRequest = false;
                 
 
 		ads.add("Come to Pitt, the #1 public university in northeast Oakland");
@@ -116,9 +125,41 @@ public class TrainController implements Updateable
 		manualBrake = command;
 	}
         
-        public void setEmergencyBrake()
+        public void setEmergencyBrake(boolean cmd)
         {
-            emergencyBrake = true;
+            emergencyBrake = cmd;
+            if(emergencyBrake)
+                link.applyEmergencyBrake();
+            else
+                link.releaseEmergencyBrake();
+        }
+        
+        public boolean[] getFailures()
+        {
+            boolean [] failures = {true, true, true, true};
+            if(!eBrakeFailure)
+                failures[0] = false;
+            if(!sBrakeFailure)
+                failures[1] = false;
+            if(!engineFailure)
+                failures[2] = false;
+            if(!signalFailure)
+                failures[3] = false;
+            return failures;
+        }
+        
+        private void failureDetector()
+        {
+            eBrakeFailure = false;
+            sBrakeFailure = false;
+            engineFailure = false;
+            signalFailure = false;         
+            if(!link.emergencyBrake() & emergencyBrake)
+                eBrakeFailure = true;
+            if(link.serviceBrake() == 38101.77 & brakeCMD != 1)
+                sBrakeFailure = true;
+            if(link.power() == 0 & powerCMD != 0)
+                engineFailure = true;
         }
 
 	public void setDriverSpeed(int command)
@@ -231,11 +272,39 @@ public class TrainController implements Updateable
                 return 0;
             if(!leftDoorsCMD & rightDoorsCMD)
                 return 1;
-            if(leftDoorsCMD & ! rightDoorsCMD)
+            if(leftDoorsCMD & !rightDoorsCMD)
                 return 2;
             if(leftDoorsCMD & rightDoorsCMD)
                 return 3;
             return -1;
+        }
+        
+        private void advertise(int millis)
+        {
+            if(adsCounter == ads.size())
+                adsCounter = 0;           
+            link.advertisement(ads.get(adsCounter));
+            if(adsTimeCounter >= 60)
+            {
+                adsTimeCounter = 0;
+                adsCounter++;
+            }
+            adsTimeCounter += (double)millis/1000;
+        }
+        
+        private void passengerActions()
+        {
+            if(link.receivedEmergencyBrakeRequest())
+            {
+                passengerEBrakeRequest = true;
+                emergencyBrake = true;
+                link.applyEmergencyBrake();
+            }
+        }
+        
+        public boolean eBrakeState()
+        {
+            return link.emergencyBrake();
         }
         
 	// Calculates train displacement since last update
@@ -323,7 +392,7 @@ public class TrainController implements Updateable
 		}
 	}
         
-        public void updateHeater()
+        private void updateHeater()
         {
             if(getTemp() >= temperatureCMD & link.heater())
                 link.heaterOff();
@@ -335,8 +404,11 @@ public class TrainController implements Updateable
 	// All units are meters and seconds
 	public void update(int millis) 
 	{            
+                advertise(millis);
                 updateHeater();
-                
+                passengerActions();
+                failureDetector();
+
                 if(currentSpeed>0)
                 {
                     allowKSet = false;
@@ -397,17 +469,14 @@ public class TrainController implements Updateable
 			brakeCMD = 1;
 			powerCMD = 0;
 		}
-                if(emergencyBrake)
+                if(emergencyBrake | eBrakeFailure | dwelling)
                 {
-                    link.power(0);
-                    link.applyEmergencyBrake();
-                    return;
+                    powerCMD = 0;
+                    brakeCMD = 1;
                 }
-                if(dwelling)
+                if(sBrakeFailure)
                 {
-                    link.power(0);
-                    link.serviceBrake(1);
-                    return;
+                    powerCMD = 0;
                 }
 		link.power(powerCMD);		
 		link.serviceBrake(brakeCMD);
