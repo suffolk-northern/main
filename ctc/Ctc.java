@@ -2373,17 +2373,30 @@ public class Ctc implements Updateable{
 		StringTokenizer st;
 		int id;
 		Train train;
+		Train fake;
+		Block prev = null;
 		boolean cont = true;
 		String time1;
 		String time2;
 		String depart;
 		String arrive;
+		double speed;
+		
+		Block start;
+		Block end;
 		
 		StringTokenizer stok = new StringTokenizer(sched_in,"\n");
 		String str;
 		
+		StringTokenizer lineTok = new StringTokenizer(stok.nextToken()," ");
+		String line = lineTok.nextToken();
+		
+		System.out.println(line);
+		
 		stok.nextToken();
 		str = stok.nextToken();
+		
+		System.out.println(str);
 		
 		// train schedule loop
 		while(stok.hasMoreTokens() && cont)
@@ -2392,20 +2405,68 @@ public class Ctc implements Updateable{
 			st.nextToken();
 			st.nextToken();
 			id = Integer.parseInt(st.nextToken());
+			train = getTrain(id);
 			while(stok.hasMoreTokens())
 			{
 				str = stok.nextToken();
 				st = new StringTokenizer(str," ,");
 				if(st.nextToken().equalsIgnoreCase("Train"))
+				{
+					train.schedule = sched;
+					sched = new Schedule();
+					route = new ArrayDeque<Block>();
 					break;
+				}
 				else if(!st.nextToken().equalsIgnoreCase("Time:"))
 				{
+					train.schedule = sched;
+					sched = new Schedule();
+					route = new ArrayDeque<Block>();
 					cont = false;
 					break;
 				}
 				
+				time1 = st.nextToken();
+				st.nextToken();
+				depart = st.nextToken();
 				
+				str = stok.nextToken();
+				st = new StringTokenizer(str," ,");
+				st.nextToken();
 				
+				time2 = st.nextToken();
+				st.nextToken();
+				arrive = st.nextToken();
+				
+				if(depart.equalsIgnoreCase("YARD"))
+				{
+					start = getBlock(line,0);
+					prev = null;
+				}
+				else
+				{
+					start = getStation(depart);
+				}
+				
+				if(arrive.equalsIgnoreCase("YARD"))
+				{
+					end = getBlock(line,0);
+				}
+				else
+				{
+					end = getStation(arrive);
+				}
+				
+				fake = new Train();
+				fake.lastBlock = prev;
+				fake.location = start;
+					
+				route = findRoute(fake,start,end);
+				prev = route.peekLast();
+				
+				speed = findSpeed(route, time1, time2);
+				
+				sched.addRoute(new Dispatch(route,time1,speed,0));
 			}
 		}
 		
@@ -2431,7 +2492,58 @@ public class Ctc implements Updateable{
 			}
 		}
 		
+		for(Train t : trains)
+		{
+			System.out.println(t.ID);
+			
+			for(Dispatch d : t.schedule.schedule)
+			{
+				for(Block b : d.route)
+				{
+					System.out.print(b.display() + " ");
+				}
+				
+				System.out.println();
+			}
+		}
 		
+	}
+	
+	protected static double toMph(double meters, double hours)
+	{
+		double mph = 0;
+		
+		mph = meters / 1000 / hours;
+		mph /= 1.60934;
+		
+		return mph;
+	}
+	
+	protected static double findSpeed(ArrayDeque<Block> route, String t1, String t2)
+	{
+		double speed = 0;
+		double dist = 0;
+		double hours = 0;
+		double hours1 = 0;
+		double hours2 = 0;
+		
+		for(Block bl : route)
+		{
+			dist += bl.length;
+		}
+		
+		StringTokenizer st = new StringTokenizer(t1,":");
+		hours1 = Integer.parseInt(st.nextToken()) + Integer.parseInt(st.nextToken()) / 60 + Integer.parseInt(st.nextToken()) / 360;
+		
+		st = new StringTokenizer(t2,":");
+		hours2 = Integer.parseInt(st.nextToken()) + Integer.parseInt(st.nextToken()) / 60 + Integer.parseInt(st.nextToken()) / 360;
+		
+		hours = hours2 - hours1;
+		
+		if(hours > 0)
+			speed = toMph(dist,hours);
+		
+		return speed;
 	}
 	
 	protected static class Dispatch{
@@ -2439,12 +2551,22 @@ public class Ctc implements Updateable{
 		protected ArrayDeque<Block> route;
 		protected String time;
 		protected int driver;
+		protected double speed;
 		
 		public Dispatch()
 		{
 			route = new ArrayDeque<Block>();
 			time = null;
 			driver = -1;
+			speed = 0;
+		}
+		
+		public Dispatch(ArrayDeque<Block> r, String t, double s, int d)
+		{
+			route = r;
+			time = t;
+			driver = d;
+			speed = s;
 		}
 		
 	}
