@@ -2369,19 +2369,68 @@ public class Ctc implements Updateable{
 	public static void strToSched(String sched_in)
 	{
 		Schedule sched = new Schedule();
+		ArrayDeque<Block> route = new ArrayDeque<Block>();
 		StringTokenizer st;
+		int id;
+		Train train;
+		boolean cont = true;
+		String time1;
+		String time2;
+		String depart;
+		String arrive;
 		
 		StringTokenizer stok = new StringTokenizer(sched_in,"\n");
 		String str;
+		
+		stok.nextToken();
+		str = stok.nextToken();
+		
+		// train schedule loop
+		while(stok.hasMoreTokens() && cont)
+		{			
+			st = new StringTokenizer(str," ,");
+			st.nextToken();
+			st.nextToken();
+			id = Integer.parseInt(st.nextToken());
+			while(stok.hasMoreTokens())
+			{
+				str = stok.nextToken();
+				st = new StringTokenizer(str," ,");
+				if(st.nextToken().equalsIgnoreCase("Train"))
+					break;
+				else if(!st.nextToken().equalsIgnoreCase("Time:"))
+				{
+					cont = false;
+					break;
+				}
+				
+				
+				
+			}
+		}
+		
+		// driver schedule loop
+		str = stok.nextToken();
 		while(stok.hasMoreTokens())
 		{
-			//System.out.println("token");
-			str = stok.nextToken();
-			//System.out.println(str);
-			
 			st = new StringTokenizer(str," ,");
-			
+			st.nextToken();
+			st.nextToken();
+			id = Integer.parseInt(st.nextToken());
+			while(stok.hasMoreTokens())
+			{
+				str = stok.nextToken();
+				st = new StringTokenizer(str," ,");
+				if(st.nextToken().equalsIgnoreCase("Driver"))
+					break;
+
+				
+				
+				
+				
+			}
 		}
+		
 		
 	}
 	
