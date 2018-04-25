@@ -52,8 +52,14 @@ public class MboController implements Updateable
 			for (TrainTracker trainInfo : trains)
 			{
 				int ID = trainInfo.getID();
-				char section = trainInfo.getBlock().getSection();
-				int blockID = trainInfo.getBlock().getID();
+				char section = '0';
+				int blockID = 0;
+				if (trainInfo.getBlock() != null)
+				{
+					section = trainInfo.getBlock().getSection();
+					blockID = trainInfo.getBlock().getID();
+				}
+				// int blockID = trainInfo.getBlock().getID();
 				GlobalCoordinates pos = trainInfo.getLocation();
 				// TODO: replace with real distance along block
 				int distance = 0;
@@ -196,7 +202,10 @@ public class MboController implements Updateable
 				updateLocation(trainInfo);
 				double authority = findAuthority(trainInfo);
 				trainInfo.setAuthority((int) authority);
-				trainInfo.setSuggestedSpeed(trainInfo.block.getSpeedLimit());
+				if (trainInfo.getBlock() != null)
+					trainInfo.setSuggestedSpeed(trainInfo.getBlock().getSpeedLimit());
+				else
+					trainInfo.setSuggestedSpeed(0);
 				MboMovementCommand com;
 				try
 				{
@@ -210,8 +219,9 @@ public class MboController implements Updateable
 				}
 				trainInfo.getRadio().send(com);
 				GlobalCoordinates loc = trainInfo.getLocation();
-				// TODO: change to distance along block
-				int blockID = trainInfo.getBlock().getID();
+				int blockID = 0;
+				if (trainInfo.getBlock() != null)
+					blockID = trainInfo.getBlock().getID();
 				int trackDist = (int) trackModel.getDistanceAlongBlock(lineName, blockID, trainInfo.getCurrentPosition());
 				if (ui != null)
 					ui.updateTrain(trainInfo.getID(), trainInfo.block.getSection(), trainInfo.block.getID(), trackDist, trainInfo.getAuthority(), trainInfo.getSuggestedSpeed());
@@ -238,7 +248,7 @@ public class MboController implements Updateable
 	{
 		int blockNum = getBlockFromLoc(radio.receive());
 		BlockTracker block;
-		if (blockNum > 0)
+		if (blockNum >= 0)
 			block = line[blockNum];
 		else
 			block = null;
@@ -266,6 +276,9 @@ public class MboController implements Updateable
 	private double findAuthority(TrainTracker train)
 	{
 		BlockTracker curBlock = train.getBlock();
+		// Train has no authority if it hasn't been dispatched yet
+		if (curBlock == null)
+			return 0;
 		BlockTracker blockingBlock = curBlock;
 		GlobalCoordinates trainLoc = train.getCurrentPosition();
 		double trainDist = trackModel.getDistanceAlongBlock(lineName, curBlock.getID(), trainLoc); 
@@ -362,9 +375,13 @@ public class MboController implements Updateable
 	
 	private void updateLocation(TrainTracker train)
 	{
+		if (train.getBlock() == null)
+			return;
 		GlobalCoordinates newLocation = train.getRadio().receive();
-		double newDistance = trackModel.getDistanceAlongBlock(lineName, train.getBlock().getID(), newLocation);
-		double oldDistance = trackModel.getDistanceAlongBlock(lineName, train.getBlock().getID(), train.getLastPosition());
+		int blockID = -1;
+		blockID = train.getBlock().getID();
+		double newDistance = trackModel.getDistanceAlongBlock(lineName, blockID, newLocation);
+		double oldDistance = trackModel.getDistanceAlongBlock(lineName, blockID, train.getLastPosition());
 		if (newDistance > oldDistance)
 			train.setGoingForward(true);
 		else

@@ -16,7 +16,7 @@ public class ScheduleWriter {
 		sched = newSched;
 	}
 	
-	public void writeSchedule(File file) 
+	public void writeSchedule(File file, String lineName) 
 	{
 		if (sched == null)
 		{
@@ -28,7 +28,7 @@ public class ScheduleWriter {
 		try 
 		{
 			PrintWriter writer = new PrintWriter(file, "UTF-8");
-			write(writer);
+			write(writer, lineName);
 		}
 		catch (Exception e)
 		{
@@ -39,7 +39,7 @@ public class ScheduleWriter {
 	
 	// Writes the schedule to a StringWriter object passed in, which can be easily
 	// converted to a string
-	public void writeSchedule(StringWriter sw)
+	public void writeSchedule(StringWriter sw, String lineName)
 	{
 		if (sched == null)
 		{
@@ -50,7 +50,7 @@ public class ScheduleWriter {
 		try 
 		{
 			PrintWriter writer = new PrintWriter(sw);
-			write(writer);
+			write(writer, lineName);
 		}
 		catch (Exception e)
 		{
@@ -59,8 +59,9 @@ public class ScheduleWriter {
 		}
 	}	
 	
-	private void write(PrintWriter writer)
+	private void write(PrintWriter writer, String lineName)
 	{
+		writer.printf("%s Line\n", lineName);
 		writer.printf("---Train Schedules---\n");
 		//System.out.println(sched.getTrainIDs().size());
 		//System.out.println(sched.getDriverIDs().size());
