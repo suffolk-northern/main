@@ -299,9 +299,11 @@ public class TrackBlock {
 				+ "\tLength: " + length + "\n"
 				+ "\tCurvature: " + curvature + "\n"
 				+ "\tGrade: " + grade + "\n"
+				+ "\tSpeed Limit: " + speedLimit + "\n"
 				+ "\tUnderground: " + isUnderground + "\n"
 				+ "\tPower: " + isPowerOn + "\n"
 				+ "\tOccupied: " + isOccupied + "\n"
-				+ "\tMessage: " + message;
+				+ "\tClosed: " + closedForMaintenance + "\n"
+				+ "\tDirection: " + ((nextBlockDir == 1 && prevBlockDir == 1) ? "Bidirectional" : (nextBlockDir == 1 ? "Forward" : "Backward"));
 	}
 }
