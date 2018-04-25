@@ -43,6 +43,9 @@ public class TrainModel
 	private static final double KILOGRAMS_PER_TON = 907.185;
 	private static final double MPS_PER_KPH = 0.277778;
 
+	// meters per second per second
+	private static final double GRAVITY = 9.8;
+
 	// datasheet constants
 	private static final double DATASHEET_ACCEL_MPSPS   =  0.50;
 	private static final double DATASHEET_SDECEL_MPSPS  =  1.20;
@@ -80,8 +83,11 @@ public class TrainModel
 		Orientation.degrees(0.0)
 	);
 
+	// rolling resistance plus internal mechanical loss
+	private static final double COEFFICIENT_OF_FRICTION = 0.01;
+
 	// notify observers once every this many updates
-	private static int NOTIFY_OBSERVERS_MOD = 2;
+	private static int NOTIFY_OBSERVERS_MOD = 10;
 
 	// identifier
 	private final int id;
@@ -122,12 +128,15 @@ public class TrainModel
 
 	private final Cabin cabin = new Cabin();
 
+	private String advertisement = "";
+
 	// Constructs a TrainModel with the given identifier.
 	public TrainModel(int id, TrackModel track)
 	{
 		this.id = id;
 		this.track = track;
-		this.pointMass = new PointMass(MASS_EMPTY, INITIAL_POSE, track);
+		this.pointMass = new PointMass(MASS_EMPTY + cabin.mass(),
+		                               INITIAL_POSE, track);
 	}
 
 	// Returns this train's identifier.
@@ -187,9 +196,13 @@ public class TrainModel
 	{
 		double engineForce = pointMass.forceForPower(enginePower);
 
-		// BS force at zero velocity
+		double frictionForce = COEFFICIENT_OF_FRICTION * mass() * GRAVITY;
+
+		double gravityForce = mass() * GRAVITY * pointMass.grade();
+
+		// break static friction
 		if (engineForce == 0.0)
-			engineForce = 0.1;
+			engineForce = frictionForce + 0.1;
 
 		if (engineForce > MAX_ENGINE_FORCE)
 			engineForce = MAX_ENGINE_FORCE;
@@ -209,7 +222,9 @@ public class TrainModel
 
 		double netForce = effectiveEngineForce
 		                  - effectiveServiceBrakeForce
-		                  - effectiveEmergencyBrakeForce;
+		                  - effectiveEmergencyBrakeForce
+				  - frictionForce
+				  - gravityForce;
 
 		pointMass.push(netForce, time);
 
@@ -281,6 +296,9 @@ public class TrainModel
 	// Units: Watts
 	public double power()
 	{
+		if (engineFailure)
+			return 0.0;
+
 		return enginePower;
 	}
 
@@ -307,6 +325,9 @@ public class TrainModel
 	// Units: Newtons
 	public double serviceBrake()
 	{
+		if (serviceBrakeFailure)
+			return MAX_SERVICE_BRAKE_FORCE;
+
 		return serviceBrakeForce;
 	}
 
@@ -328,15 +349,16 @@ public class TrainModel
 		serviceBrakeForce = MAX_SERVICE_BRAKE_FORCE * value;
 	}
 
-	// Returns true if the emergency brake has been applied.
+	// Returns true if the emergency brake is engaged.
 	public boolean emergencyBrake()
 	{
+		if (emergencyBrakeFailure)
+			return false;
+
 		return emergencyBrakeForce != 0.0;
 	}
 
 	// Engages the emergency brake.
-	//
-	// Irreversible. Damages the vehicle.
 	//
 	// Failure mode: Emergency brake applies no force regardless of input.
 	public void applyEmergencyBrake()
@@ -344,14 +366,26 @@ public class TrainModel
 		emergencyBrakeForce = EMERGENCY_BRAKE_FORCE;
 	}
 
+	// Disengages the emergency brake.
+	//
+	// Failure mode: Emergency brake applies no force regardless of input.
+	public void releaseEmergencyBrake()
+	{
+		emergencyBrakeForce = 0.0;
+	}
+
+	// Requests for the train controller to apply the emergency brake.
+	public void requestEmergencyBrake()
+	{
+		controllerLink.requestEmergencyBrake();
+	}
+
 	// Returns the current grade.
 	//
-	// Units: TBD.
+	// Units: Percentage rise/run.
 	public double grade()
 	{
-		// unimplemented
-
-		return 0.0;
+		return 100.0 * pointMass.grade();
 	}
 
 	// Returns true if specified door(s) are open.
@@ -520,6 +554,18 @@ public class TrainModel
 	public void toggleFailure(Failure failure)
 	{
 		failure(failure, !failure(failure));
+	}
+
+	// Returns the currently displayed advertisement.
+	public String advertisement()
+	{
+		return advertisement;
+	}
+
+	// Sets the advertisement to some string.
+	public void advertisement(String value)
+	{
+		advertisement = value;
 	}
 
 	// Determines if we should notify observers this update. If so, notifes

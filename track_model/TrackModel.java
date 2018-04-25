@@ -157,7 +157,6 @@ public class TrackModel implements Updateable {
 		//
 		for (int i = 0; i < stations.size(); i++) {
 			Station s = stations.get(i);
-			Station dupe = null;
 			TrackBlock tb = getBlock(s.line, s.block);
 			s.setLocation(getPositionAlongBlock(tb, tb.length / 2));
 			//
@@ -521,8 +520,9 @@ public class TrackModel implements Updateable {
 	 * @param line
 	 * @param block
 	 * @param maintain
+	 * @return
 	 */
-	public static void setMaintenance(String line, int block, boolean maintain) {
+	public static boolean setMaintenance(String line, int block, boolean maintain) {
 		TrackBlock tb = getBlock(line, block);
 		if (tb != null) {
 			tb.closedForMaintenance = maintain;
@@ -530,7 +530,9 @@ public class TrackModel implements Updateable {
 			if (tmf != null) {
 				tmf.refreshTables();
 			}
+			return true;
 		}
+		return false;
 	}
 
 	/**
@@ -539,15 +541,18 @@ public class TrackModel implements Updateable {
 	 * @param line
 	 * @param block
 	 * @param occupied
+	 * @return
 	 */
-	protected static void setOccupancy(String line, int block, boolean occupied) {
+	protected static boolean setOccupancy(String line, int block, boolean occupied) {
 		TrackBlock tb = getBlock(line, block);
 		if (tb != null && block != 0 && !tb.closedForMaintenance) {
 			tb.isOccupied = occupied;
 			if (tmf != null) {
 				tmf.refreshTables();
 			}
+			return true;
 		}
+		return false;
 	}
 
 	/**
@@ -589,9 +594,10 @@ public class TrackModel implements Updateable {
 	 *
 	 * @param line
 	 * @param block
-	 * @param power
+	 * @param on
+	 * @return
 	 */
-	protected static void setPower(String line, int block, boolean on) {
+	protected static boolean setPower(String line, int block, boolean on) {
 		TrackBlock tb = getBlock(line, block);
 		if (tb != null) {
 			tb.isPowerOn = on;
@@ -599,7 +605,9 @@ public class TrackModel implements Updateable {
 			if (tmf != null) {
 				tmf.refreshTables();
 			}
+			return true;
 		}
+		return false;
 	}
 
 	/**
@@ -608,6 +616,7 @@ public class TrackModel implements Updateable {
 	 * @param line
 	 * @param block
 	 * @param signal
+	 * @return
 	 */
 	public static boolean setCrossingSignal(String line, int block, boolean signal) {
 		Crossing c = getCrossing(line, block);
@@ -628,8 +637,9 @@ public class TrackModel implements Updateable {
 	 * @param line
 	 * @param block
 	 * @param heaterStatus
+	 * @return
 	 */
-	public static void setHeater(String line, int block, boolean heaterStatus) {
+	public static boolean setHeater(String line, int block, boolean heaterStatus) {
 		TrackBlock tb = getBlock(line, block);
 		if (tb != null && tb.isStation) {
 			Station s = getStation(line, block);
@@ -637,7 +647,9 @@ public class TrackModel implements Updateable {
 			if (tmf != null) {
 				tmf.refreshTables();
 			}
+			return true;
 		}
+		return false;
 	}
 
 	/**
@@ -683,6 +695,9 @@ public class TrackModel implements Updateable {
 		// Iterates through blocks to find valid route.
 		//
 		TrackBlock first = getFirstBlock(line);
+		if (first == null) {
+			return defaultLine;
+		}
 		int swit = 0;
 		boolean valid = false;
 		int cur = first.block;
@@ -1024,10 +1039,16 @@ public class TrackModel implements Updateable {
 			curBlock = getBlock(td.trackBlock.line, td.trainModel.block());
 			if (!curBlock.isOccupied) {
 				curBlock.isOccupied = true;
+				if (curBlock.isCrossing) {
+					setCrossingSignal(curBlock.line, curBlock.block, true);
+				}
 			}
 			if (td.trackBlock.block != curBlock.block) {
 				if (td.trackBlock != null) {
 					td.trackBlock.isOccupied = false;
+					if (td.trackBlock.isCrossing) {
+						setCrossingSignal(td.trackBlock.line, td.trackBlock.block, false);
+					}
 				}
 				td.trackBlock = curBlock;
 			}

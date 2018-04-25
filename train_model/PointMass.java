@@ -294,6 +294,20 @@ public class PointMass
 		return block.isIsStation();
 	}
 
+	// Returns the current track grade as a proportion rise/run.
+	public double grade()
+	{
+		if (block == null)
+			return 0.0;
+
+		double value = block.getGrade() / 100.0;
+
+		if (!forward)
+			value = -value;
+
+		return value;
+	}
+
 	// Configures state for the next block.
 	private void advanceBlock()
 	{
