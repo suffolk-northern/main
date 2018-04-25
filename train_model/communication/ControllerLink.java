@@ -26,6 +26,8 @@ public class ControllerLink
 	private final Relay relay;
 	private final TrainModel train;
 
+	private boolean emergencyBrakeRequest = false;
+
 	// Constructs a TrackCircuit that interacts with a Relay and its
 	// TrainModel.
 	public ControllerLink(Relay relay, TrainModel train)
@@ -74,6 +76,14 @@ public class ControllerLink
 		return train.speed();
 	}
 
+	// Returns the engine output power.
+	//
+	// Units: Watts
+	public double power()
+	{
+		return train.power();
+	}
+
 	// Sets the engine output power.
 	//
 	// Units: Proportion of max output power, e.g.,
@@ -87,6 +97,14 @@ public class ControllerLink
 		throws IllegalArgumentException
 	{
 		train.power(value);
+	}
+
+	// Returns the service brake output.
+	//
+	// Units: Newtons
+	public double serviceBrake()
+	{
+		return train.serviceBrake();
 	}
 
 	// Sets the service brake output.
@@ -104,14 +122,41 @@ public class ControllerLink
 		train.serviceBrake(value);
 	}
 
+	// Returns true if the emergency brake is applied.
+	public boolean emergencyBrake()
+	{
+		return train.emergencyBrake();
+	}
+
 	// Engages the emergency brake.
-	//
-	// Irreversible. Damages the vehicle.
 	//
 	// Failure mode: Emergency brake applies no force regardless of input.
 	public void applyEmergencyBrake()
 	{
 		train.applyEmergencyBrake();
+	}
+
+	// Disengages the emergency brake.
+	//
+	// Failure mode: Emergency brake applies no force regardless of input.
+	public void releaseEmergencyBrake()
+	{
+		train.releaseEmergencyBrake();
+	}
+
+	// Returns true if an emergency brake request was received since last call.
+	public boolean receivedEmergencyBrakeRequest()
+	{
+		boolean value = emergencyBrakeRequest;
+		emergencyBrakeRequest = false;
+
+		return value;
+	}
+
+	// Causes receivedEmergencyBrakeRequest to return true next call.
+	public void requestEmergencyBrake()
+	{
+		emergencyBrakeRequest = true;
 	}
 
 	// Opens specified door(s).
@@ -172,5 +217,11 @@ public class ControllerLink
 	public void lightsOff()
 	{
 		train.lightsOff();
+	}
+
+	// Sets the advertisement to some string.
+	public void advertisement(String value)
+	{
+		train.advertisement(value);
 	}
 }
