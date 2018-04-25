@@ -133,7 +133,8 @@ public class TrainModel
 	{
 		this.id = id;
 		this.track = track;
-		this.pointMass = new PointMass(MASS_EMPTY, INITIAL_POSE, track);
+		this.pointMass = new PointMass(MASS_EMPTY + cabin.mass(),
+		                               INITIAL_POSE, track);
 	}
 
 	// Returns this train's identifier.
