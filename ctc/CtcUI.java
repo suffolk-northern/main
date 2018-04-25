@@ -408,9 +408,14 @@ public class CtcUI extends javax.swing.JFrame {
 														
 															.addComponent(jLabel2)
 															.addComponent(openTrack)
-															.addComponent(switchSelect)
+															
 																
 													
+														.addGroup(layout.createSequentialGroup()
+																.addComponent(maintenanceBlock)
+																.addGap(94, 94, 94)
+																.addComponent(switchSelect))
+														
 														.addGroup(layout.createSequentialGroup()
 																.addComponent(closeTrack)
 																.addGap(94, 94, 94)
@@ -418,7 +423,7 @@ public class CtcUI extends javax.swing.JFrame {
 														
 														.addGroup(layout.createSequentialGroup()
 																.addComponent(jLabel9)
-																.addGap(94, 94, 94)
+																.addGap(112, 112, 112)
 																.addComponent(switchLabel))
 														
 														.addGroup(layout.createSequentialGroup()
@@ -545,29 +550,25 @@ public class CtcUI extends javax.swing.JFrame {
 														.addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
 														.addComponent(jLabel18)))
 										.addGroup(layout.createSequentialGroup()
-										
-												.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-												.addComponent(switchLabel)
-												.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-												.addComponent(switchSelect)
-												.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-												.addComponent(toggle)
-												.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-												
-										)
-										
-										.addGroup(layout.createSequentialGroup()
 												.addComponent(jLabel2)
 												.addGap(56, 56, 56)
 												.addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 480, javax.swing.GroupLayout.PREFERRED_SIZE)
 												.addGap(18, 18, 18)
-												.addComponent(jLabel9)
+												.addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+													.addComponent(jLabel9)
+													.addComponent(switchLabel))
 												.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
 												.addComponent(mLineSelect)
 												.addGap(4, 4, 4)
-												.addComponent(maintenanceBlock, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+												.addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+													.addComponent(maintenanceBlock, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+													.addComponent(switchSelect, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+														
 												.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-												.addComponent(openTrack)
+												.addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+													.addComponent(openTrack)
+													.addComponent(toggle))
+												
 												.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
 												.addComponent(closeTrack)
 												.addGap(56, 56, 56)
