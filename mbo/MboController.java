@@ -227,8 +227,8 @@ public class MboController implements Updateable
 				}
 				catch (IllegalArgumentException e)
 				{
-					System.out.println("MBO tried to send an invalid speed / authority.");
-					System.out.println("Sending 0 speed / authority instead.");
+					//System.out.println("MBO tried to send an invalid speed / authority.");
+					//System.out.println("Sending 0 speed / authority instead.");
 					com = new MboMovementCommand(0, 0);
 				}
 				trainInfo.getRadio().send(com);

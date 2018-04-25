@@ -181,7 +181,7 @@ public class Main
 		CtcRadio[] ctcRadio = new CtcRadio[lineNames.length];
 		for (int i = 0; i < lineNames.length; i++)
 		{
-			ctcRadio[i] = new CtcRadio(mboCont[i], mboSched[i], ctc);
+			ctcRadio[i] = new CtcRadio(lineNames[i], mboCont[i], mboSched[i], ctc);
 			mboCont[i].registerCtc(ctcRadio[i]);
 			mboSched[i].registerCtc(ctcRadio[i]);
 		}

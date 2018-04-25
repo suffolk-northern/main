@@ -87,7 +87,7 @@ public class TrainModel
 	private static final double COEFFICIENT_OF_FRICTION = 0.01;
 
 	// notify observers once every this many updates
-	private static int NOTIFY_OBSERVERS_MOD = 2;
+	private static int NOTIFY_OBSERVERS_MOD = 10;
 
 	// identifier
 	private final int id;
@@ -127,6 +127,8 @@ public class TrainModel
 	private final TrackModel track;
 
 	private final Cabin cabin = new Cabin();
+
+	private String advertisement = "";
 
 	// Constructs a TrainModel with the given identifier.
 	public TrainModel(int id, TrackModel track)
@@ -294,6 +296,9 @@ public class TrainModel
 	// Units: Watts
 	public double power()
 	{
+		if (engineFailure)
+			return 0.0;
+
 		return enginePower;
 	}
 
@@ -320,6 +325,9 @@ public class TrainModel
 	// Units: Newtons
 	public double serviceBrake()
 	{
+		if (serviceBrakeFailure)
+			return MAX_SERVICE_BRAKE_FORCE;
+
 		return serviceBrakeForce;
 	}
 
@@ -341,20 +349,35 @@ public class TrainModel
 		serviceBrakeForce = MAX_SERVICE_BRAKE_FORCE * value;
 	}
 
-	// Returns true if the emergency brake has been applied.
+	// Returns true if the emergency brake is engaged.
 	public boolean emergencyBrake()
 	{
+		if (emergencyBrakeFailure)
+			return false;
+
 		return emergencyBrakeForce != 0.0;
 	}
 
 	// Engages the emergency brake.
 	//
-	// Irreversible. Damages the vehicle.
-	//
 	// Failure mode: Emergency brake applies no force regardless of input.
 	public void applyEmergencyBrake()
 	{
 		emergencyBrakeForce = EMERGENCY_BRAKE_FORCE;
+	}
+
+	// Disengages the emergency brake.
+	//
+	// Failure mode: Emergency brake applies no force regardless of input.
+	public void releaseEmergencyBrake()
+	{
+		emergencyBrakeForce = 0.0;
+	}
+
+	// Requests for the train controller to apply the emergency brake.
+	public void requestEmergencyBrake()
+	{
+		controllerLink.requestEmergencyBrake();
 	}
 
 	// Returns the current grade.
@@ -531,6 +554,18 @@ public class TrainModel
 	public void toggleFailure(Failure failure)
 	{
 		failure(failure, !failure(failure));
+	}
+
+	// Returns the currently displayed advertisement.
+	public String advertisement()
+	{
+		return advertisement;
+	}
+
+	// Sets the advertisement to some string.
+	public void advertisement(String value)
+	{
+		advertisement = value;
 	}
 
 	// Determines if we should notify observers this update. If so, notifes
