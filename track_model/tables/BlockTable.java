@@ -25,14 +25,14 @@ public class BlockTable extends TrackModelTable {
 					boolean powerOut = ((String) table.getModel().getValueAt(row, 8)).equalsIgnoreCase("OUTAGE");
 					boolean underground = ((String) table.getModel().getValueAt(row, 7)).equalsIgnoreCase("UNDERGROUND");
 
-					if (occupied) {
-						setBackground(Color.RED);
-						setForeground(Color.WHITE);
-					} else if (maintain) {
+					if (maintain) {
 						setBackground(Color.GRAY);
 						setForeground(Color.WHITE);
 					} else if (powerOut) {
 						setBackground(Color.ORANGE);
+						setForeground(Color.BLACK);
+					} else if (occupied) {
+						setBackground(Color.RED);
 						setForeground(Color.WHITE);
 					} else {
 						setBackground(table.getBackground());
