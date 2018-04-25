@@ -281,6 +281,9 @@ public class TrainModel
 	// Units: Watts
 	public double power()
 	{
+		if (engineFailure)
+			return 0.0;
+
 		return enginePower;
 	}
 
@@ -307,6 +310,9 @@ public class TrainModel
 	// Units: Newtons
 	public double serviceBrake()
 	{
+		if (serviceBrakeFailure)
+			return MAX_SERVICE_BRAKE_FORCE;
+
 		return serviceBrakeForce;
 	}
 
@@ -328,9 +334,12 @@ public class TrainModel
 		serviceBrakeForce = MAX_SERVICE_BRAKE_FORCE * value;
 	}
 
-	// Returns true if the emergency brake has been applied.
+	// Returns true if the emergency brake is engaged.
 	public boolean emergencyBrake()
 	{
+		if (emergencyBrakeFailure)
+			return false;
+
 		return emergencyBrakeForce != 0.0;
 	}
 
