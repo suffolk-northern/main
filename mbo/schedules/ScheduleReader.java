@@ -64,7 +64,7 @@ public class ScheduleReader
 			}
 			else
 			{
-				String[] tokens = lines[i].split(". ");
+				String[] tokens = lines[i].split(", ");
 				String[] time = tokens[1].split(":");
 				Time eventTime = new Time(Integer.parseInt(time[0]), Integer.parseInt(time[1]), Integer.parseInt(time[2]));
 				if (reachedDrivers)

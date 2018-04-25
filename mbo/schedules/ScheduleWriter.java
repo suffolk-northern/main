@@ -71,7 +71,7 @@ public class ScheduleWriter {
 			writer.printf("Train ID: %d\n", trainID);
 			for (TrainEvent te : ts.getEvents())
 			{
-				writer.printf("Time: %s, ", te.getTime().toString());
+				writer.printf("Time, %s, ", te.getTime().toString());
 				if (te.getEvent() == TrainEvent.EventType.ARRIVAL)
 					writer.printf("ARRIVAL, ");
 				else
