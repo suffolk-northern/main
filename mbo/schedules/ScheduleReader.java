@@ -35,10 +35,9 @@ public class ScheduleReader
 		ArrayList<TrainEvent> curTrainEvents = new ArrayList<>();
 		ArrayList<DriverEvent> curDriverEvents = new ArrayList<>();
 		int curID = 0;
-		if (!lines[0].equals("---Train Schedules---"))
-			return null;
+		String lineName = lines[0].split(" ")[0];
 		boolean reachedDrivers = false;
-		for (int i = 1; i < lines.length; i++)
+		for (int i = 2; i < lines.length; i++)
 		{
 			if (lines[i].charAt(0) == '-')
 			{
@@ -90,7 +89,7 @@ public class ScheduleReader
 		}
 		
 		ds.add(new DriverSchedule(curID, curDriverEvents));
-		LineSchedule ls = new LineSchedule(ds, ts);
+		LineSchedule ls = new LineSchedule(ds, ts, lineName);
 		return ls;
 	}
 }

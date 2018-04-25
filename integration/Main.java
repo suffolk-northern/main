@@ -163,7 +163,7 @@ public class Main
 		}
 		
 		// CTC <--> MBO
-		CtcRadio ctcRadio = new CtcRadio(mboCont, mboSched, ctc);
+		CtcRadio ctcRadio = new CtcRadio("green",mboCont, mboSched, ctc);
 		ctc.setCtcRadios(ctcRadio,null);
 		mboCont.registerCtc(ctcRadio);
 		mboSched.registerCtc(ctcRadio);
