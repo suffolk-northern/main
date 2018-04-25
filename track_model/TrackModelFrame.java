@@ -471,7 +471,7 @@ public class TrackModelFrame extends javax.swing.JFrame {
 				row.add(tb.isUnderground ? "UNDERGROUND" : "");
 				row.add(tb.isPowerOn ? "POWER" : "OUTAGE");
 				row.add(tb.closedForMaintenance ? "CLOSED" : (tb.isOccupied ? "OCCUPIED" : ""));
-				row.add(tb.message);
+				row.add(tb.nextBlockDir == 1 && tb.prevBlockDir == 1 ? "Bidirectional" : (tb.nextBlockDir == 1 ? "Forward" : "Backward"));
 				blockVector.add(row);
 			}
 			//
