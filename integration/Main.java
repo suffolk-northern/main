@@ -23,6 +23,7 @@ import train_model.TrainModel;
 import updater.Updateable;
 import updater.Updater;
 import updater.ClockMultiplier;
+import mbo.Driver;
 
 public class Main
 {
@@ -34,6 +35,7 @@ public class Main
 	private static TrainModel[] trainModels;
 	private static TrainController[] trainControllers;
 	private static MboController mboController;
+	private static Driver[] drivers;
 
 	public static void main(String[] args)
 	{
@@ -80,11 +82,20 @@ public class Main
 		trainControllers = new TrainController[numberOfTrains];
 
 		trainModels = new TrainModel[numberOfTrains];
+		
+		final int numberOfDrivers = 20;
+		
+		drivers = new Driver[numberOfDrivers];
 
 		for (int i = 0; i < numberOfTrains; ++i)
 		{
 			trainControllers[i] = new TrainController();
 			trainModels[i] = new TrainModel(i, trackModel);
+		}
+		
+		for (int i = 0; i < numberOfDrivers; i++)
+		{
+			drivers[i] = new Driver(i);
 		}
 
 		ArrayList<Updateable> trainObjects =
@@ -139,18 +150,28 @@ public class Main
 		
 		// Track Model <---> MBO
 		mboCont.registerTrackModel(trackModel);
+		mboSched.registerTrackModel(trackModel);
 
 		mboCont.initLine();
-		// mboSched.initLine();
+		mboSched.initLine();
 
 		// train model <---> MBO
 		for (TrainModel trainModel : trainModels)
+		{
 			mboCont.registerTrain(trainModel.id(), trainModel.mboRadio());
+			mboSched.registerTrain(trainModel.id());
+		}
 		
 		// CTC <--> MBO
 		CtcRadio ctcRadio = new CtcRadio(mboCont, mboSched, ctc);
 		ctc.setCtcRadios(ctcRadio,null);
 		mboCont.registerCtc(ctcRadio);
+		mboSched.registerCtc(ctcRadio);
+		
+		for (Driver driver : drivers)
+		{
+			mboSched.registerDriver(driver.getID());
+		}
 
 		//
 		// fill updateables
@@ -158,7 +179,7 @@ public class Main
 
 		updateables.add(ctc);
 		updateables.add(mboCont);
-		//updateables.add(mboSched);
+		updateables.add(mboSched);
 		updateables.add(trackModel);
 		updateables.add(trainMultiplier);
 	}

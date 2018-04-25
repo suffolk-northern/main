@@ -5,7 +5,7 @@ import javax.swing.table.DefaultTableModel;
 
 public class TrackModelTableModel extends DefaultTableModel {
 
-	private static final Object[] BLOCK_COLUMNS = {"Line", "Section", "Block #", "Length (yd)", "Curvature", "Grade", "Speed Limit (mph)", "Underground", "Power", "Status", "Message"};
+	private static final Object[] BLOCK_COLUMNS = {"Line", "Section", "Block #", "Length (yd)", "Curvature", "Grade", "Speed Limit (mph)", "Underground", "Power", "Status", "Direction"};
 	private static final Object[] SWITCH_COLUMNS = {"Line", "Section", "Block #", "Common Branch", "Straight Track", "Diverging Track", "Current Setting"};
 	private static final Object[] CROSSING_COLUMNS = {"Line", "Section", "Block #", "Length", "Occupied", "Signal"};
 	private static final Object[] STATION_COLUMNS = {"Line", "Section", "Block #", "Name", "Passengers Embarking", "Heater"};

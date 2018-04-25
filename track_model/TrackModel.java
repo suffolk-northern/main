@@ -157,7 +157,6 @@ public class TrackModel implements Updateable {
 		//
 		for (int i = 0; i < stations.size(); i++) {
 			Station s = stations.get(i);
-			Station dupe = null;
 			TrackBlock tb = getBlock(s.line, s.block);
 			s.setLocation(getPositionAlongBlock(tb, tb.length / 2));
 			//
@@ -664,6 +663,7 @@ public class TrackModel implements Updateable {
 	 */
 	public static ArrayList<Integer> getDefaultLine(String line) {
 		ArrayList<Integer> defaultLine = new ArrayList<>();
+		line = line.toLowerCase();
 		// Red line temporarily hard coded
 		if (line.equalsIgnoreCase("red")) {
 			int[] redLine = {9, 8, 7, 6, 5, 4, 3, 2, 1, 15, 16, 17, 18, 19, 20,
@@ -729,6 +729,7 @@ public class TrackModel implements Updateable {
 				ResultSet rs = dbHelper.query(conn, "SELECT COUNT(BLOCK) FROM BLOCKS;");
 				if (rs.next()) {
 					count = rs.getInt(1);
+
 				}
 			}
 		} catch (SQLException ex) {
@@ -754,6 +755,7 @@ public class TrackModel implements Updateable {
 				ResultSet rs = dbHelper.query(conn, "SELECT COUNT(BLOCK) FROM BLOCKS WHERE LINE='" + line + "';");
 				if (rs.next()) {
 					count = rs.getInt(1);
+
 				}
 			}
 		} catch (SQLException ex) {
@@ -1021,10 +1023,16 @@ public class TrackModel implements Updateable {
 			curBlock = getBlock(td.trackBlock.line, td.trainModel.block());
 			if (!curBlock.isOccupied) {
 				curBlock.isOccupied = true;
+				if (curBlock.isCrossing) {
+					setCrossingSignal(curBlock.line, curBlock.block, true);
+				}
 			}
 			if (td.trackBlock.block != curBlock.block) {
 				if (td.trackBlock != null) {
 					td.trackBlock.isOccupied = false;
+					if (td.trackBlock.isCrossing) {
+						setCrossingSignal(td.trackBlock.line, td.trackBlock.block, false);
+					}
 				}
 				td.trackBlock = curBlock;
 			}
@@ -1093,6 +1101,7 @@ public class TrackModel implements Updateable {
 				double d = getDistanceAlongBlock(tb.line, tb.block, getPositionAlongBlock(tb, i));
 				if (i - d > 5) {
 					System.out.println("problem " + tb.block + ", " + i + " meters");
+
 				}
 			}
 		}

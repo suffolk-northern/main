@@ -11,6 +11,8 @@ public class Driver {
 	private Time lunchBegins;
 	private Time lunchEnds;
 	private int ID;
+	private int trainID;
+	boolean timesInitialized;
 	
 	// The driver should really only need to know lunchBegins and shiftEnds 
 	// since these are when TrainModel needs to decide where driver gets off
@@ -22,6 +24,31 @@ public class Driver {
 		shiftEnds = se;
 		lunchBegins = lb;
 		lunchEnds = le;
+		timesInitialized = true;
+	}
+	
+	public Driver(int id)
+	{
+		ID = id;
+		timesInitialized = false;
+	}
+	
+	public void setTimes(Time lunchBegins, Time lunchEnds, Time shiftEnds)
+	{
+		this.lunchBegins = lunchBegins;
+		this.lunchEnds = lunchEnds;
+		this.shiftEnds = shiftEnds;
+		timesInitialized = true;
+	}
+	
+	public void setTrain(int trainID)
+	{
+		this.trainID = trainID;
+	}
+	
+	public int getTrain()
+	{
+		return trainID;
 	}
 	
 	public int getID()
@@ -47,5 +74,10 @@ public class Driver {
 	public Time getLunchEnd()
 	{
 		return lunchEnds;
+	}
+	
+	public boolean isTimesInitialized()
+	{
+		return timesInitialized;
 	}
 }

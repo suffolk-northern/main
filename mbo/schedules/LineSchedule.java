@@ -19,12 +19,18 @@ public class LineSchedule {
 	{
 		driverSchedules = ds;
 		trainSchedules = ts;
-		driverIDs = new ArrayList<Integer>();
+		driverIDs = new ArrayList<>();
 		for (DriverSchedule dSched : ds)
+		{
 			driverIDs.add(dSched.getID());
+			// System.out.printf("Line Schedule: driver ID %d%n", dSched.getID());
+		}
 		trainIDs = new ArrayList<Integer>();
 		for (TrainSchedule tSched : ts)
+		{
 			trainIDs.add(tSched.getID());
+			// System.out.printf("Line Schedule: train ID %d%n", tSched.getID());
+		}
 		stationsGenerated = false;
 	}
 	
@@ -40,8 +46,10 @@ public class LineSchedule {
 				int stationIdx = -1;
 				for (StationSchedule ss : stationSchedules)
 				{
-					if (stationName.equals(ss.getName()))
-						stationIdx = stationNames.indexOf(ss);
+					if (stationName.compareTo(ss.getName()) == 0)
+					{
+						stationIdx = stationSchedules.indexOf(ss);
+					}
 				}
 				
 				TrainEvent.EventType et = te.getEvent();
@@ -101,7 +109,7 @@ public class LineSchedule {
 	{
 		for (StationSchedule ss : stationSchedules)
 		{
-			System.out.printf("line schedule: %s", ss.getName());
+			// System.out.printf("line schedule: %s", ss.getName());
 			if (ss.getName().equals(stationName))
 				return ss;
 		}

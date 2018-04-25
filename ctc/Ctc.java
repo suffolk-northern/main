@@ -813,6 +813,14 @@ public class Ctc implements Updateable{
 		}
 	}
 	
+	public static void openSchedule(String line)
+	{
+		if(line.equalsIgnoreCase("green"))
+			greenradio.showScheduler();
+		else
+			redradio.showScheduler();
+	}
+	
 	public static void autoMode(String line)
 	{
 		if(line.equalsIgnoreCase("green"))
@@ -2358,6 +2366,66 @@ public class Ctc implements Updateable{
 		}
 	}
 	
+	public static void strToSched(String sched_in)
+	{
+		Schedule sched = new Schedule();
+		StringTokenizer st;
+		
+		StringTokenizer stok = new StringTokenizer(sched_in,"\n");
+		String str;
+		while(stok.hasMoreTokens())
+		{
+			//System.out.println("token");
+			str = stok.nextToken();
+			//System.out.println(str);
+			
+			st = new StringTokenizer(str," ,");
+			
+		}
+		
+	}
+	
+	protected static class Dispatch{
+		
+		protected ArrayDeque<Block> route;
+		protected String time;
+		protected int driver;
+		
+		public Dispatch()
+		{
+			route = new ArrayDeque<Block>();
+			time = null;
+			driver = -1;
+		}
+		
+	}
+	
+	protected static class Schedule{
+		
+		ArrayDeque<Dispatch> schedule;
+		
+		public Schedule()
+		{
+			schedule = new ArrayDeque<Dispatch>();
+		}
+		
+		public void addRoute(Dispatch route)
+		{
+			schedule.add(route);
+		}
+		
+		public Dispatch peekRoute()
+		{
+			return schedule.peekFirst();
+		}
+		
+		public Dispatch getRoute()
+		{
+			return schedule.poll();
+		}
+		
+	}
+
 	protected static int containsTrack(ArrayDeque<Block> route, ArrayDeque<Block> subtrack)
 	{
 		int contains = 0;
@@ -2560,6 +2628,7 @@ public class Ctc implements Updateable{
 		protected int passengers;
 		protected int driverID;
 		protected Block lastBlock;
+		protected Schedule schedule;
 		protected ArrayDeque<Block> reservedblocks;
 
 		public Train() {
