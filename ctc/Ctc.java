@@ -29,6 +29,8 @@ public class Ctc implements Updateable{
 
 	public static final int TRAINCOLS = 8;
 	public static final int TRACKCOLS = 9;
+	
+	public static final int MAXSPEED = 43;
 
 	public static Ctc ctc;
 	public static CtcUI ui;
@@ -974,6 +976,9 @@ public class Ctc implements Updateable{
 				}
 			}
 		}
+		
+		if(speed > MAXSPEED)
+			speed = MAXSPEED;
 		
 		train.setSpeed(speed);
 		train.setAuth(auth);
