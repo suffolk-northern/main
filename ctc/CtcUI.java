@@ -1214,8 +1214,8 @@ public class CtcUI extends javax.swing.JFrame {
     private void MovingBlockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MovingBlockActionPerformed
 		// TODO add your handling code here:
 		//System.out.println("Transfer control to MBO");
-		ctc.enableMBO("Green");
-		//ctc.enableMBO("Red");
+		String line = (String) lineSelect.getSelectedItem();
+		ctc.enableMBO(line);
 		
     }//GEN-LAST:event_MovingBlockActionPerformed
 

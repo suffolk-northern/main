@@ -35,7 +35,8 @@ public class MboController implements Updateable
 	
 	private ArrayList<SwitchTracker> switches;
 	
-	private static int MAX_AUTHORITY = 3000; // m
+	private static double MAX_AUTHORITY = 3000; // m
+	private static double LOCATION_MARGIN = 1; // m
 	
 	public MboController(String ln)
 	{
@@ -174,6 +175,14 @@ public class MboController implements Updateable
 		}
 		
 		updateSwitches();
+		
+		for (TrainTracker trainInfo : trains)
+		{
+			if (trainInfo == null)
+				continue;
+			updateLocation(trainInfo);
+		}
+		
 		if (ui != null)
 		{
 			MboControllerUI.Request request = ui.getRequest();
@@ -325,51 +334,95 @@ public class MboController implements Updateable
 			}
 			
 			if (blocked)
+			{
+				// Safety margin for error in other train's location
+				authority -= LOCATION_MARGIN;
 				break;
+			}
 			
 			blocked = false;
 			authority += curBlock.getLength();
 			
 			if (forward)
 			{
+				// Check if we are traveling forwards or backwards along the next block
+				System.out.printf("About to check block %d going forwards%n", curBlock.getNext());
 				if (curBlock.getNext() < 0)
 					blocked = true;
-				else if (line[curBlock.getNext()].getNext() == curBlock.getID())
+				else
 				{
-					if (!line[curBlock.getNext()].canGoBackward())
-						blocked = true;
+					BlockTracker nextBlock = line[curBlock.getNext()];
+					GlobalCoordinates endCurBlock = trackModel.getBlock(lineName, curBlock.getID()).getEnd();
+					GlobalCoordinates startNextBlock = trackModel.getBlock(lineName, nextBlock.getID()).getStart();
+					if (startNextBlock.distanceTo(endCurBlock) > 1)
+					{
+						forward = false;
+						if (!nextBlock.canGoBackward())
+							blocked = true;
+					}
+					else
+					{
+						if (!nextBlock.canGoForward())
+							blocked = true;
+					}
+					curBlock = nextBlock;
 				}
 			}
-			else 
+			else
 			{
-				if (curBlock.getPrev() < 0 || !line[curBlock.getPrev()].canGoBackward())
+				System.out.printf("About to check block %d going backwards%n", curBlock.getNext());
+				if (curBlock.getPrev() < 0)
 					blocked = true;
+				else
+				{
+					BlockTracker prevBlock = line[curBlock.getPrev()];
+					GlobalCoordinates startCurBlock = trackModel.getBlock(lineName, curBlock.getID()).getStart();
+					GlobalCoordinates endPrevBlock = trackModel.getBlock(lineName, prevBlock.getID()).getEnd();
+					if (endPrevBlock.distanceTo(startCurBlock) > 1)
+					{
+						forward = true;
+						if (!prevBlock.canGoForward())
+							blocked = true;
+					}
+					else
+					{
+						if (!prevBlock.canGoBackward())
+							blocked = true;
+					}
+					curBlock = prevBlock;
+				}
 			}
+			
+//			if (forward)
+//			{
+//				if (curBlock.getNext() < 0)
+//					blocked = true;
+//				else if (line[curBlock.getNext()].getNext() == curBlock.getID())
+//				{
+//					if (!line[curBlock.getNext()].canGoBackward())
+//						blocked = true;
+//				}
+//			}
+//			else 
+//			{
+//				if (curBlock.getPrev() < 0 || !line[curBlock.getPrev()].canGoBackward())
+//					blocked = true;
+//			}
 			
 			// System.out.printf("Current authority: %f%n", authority);
 			
 			if (blocked)
 				break;
-			if (forward)
-			{
-				// System.out.printf("About to check block %d going forwards%n", curBlock.getNext());
-				BlockTracker nextBlock = line[curBlock.getNext()];
-				if (nextBlock.getID() < curBlock.getID())
-					forward = false;
-				curBlock = nextBlock;
-			}
-			else
-			{
-				// System.out.printf("About to check block %d going backwards%n", curBlock.getNext());
-				BlockTracker prevBlock = line[curBlock.getPrev()];
-				if (prevBlock.getID() > curBlock.getID())
-					forward = true;
-				curBlock = prevBlock;
-			}
+
 		}
+		
+		// Safety margin for error in this train's location
+		authority = authority - LOCATION_MARGIN;
 		
 		if (authority > MAX_AUTHORITY)
 			return MAX_AUTHORITY;
+		if (authority < 0)
+			return 0;
 		return authority;
 	}
 	
@@ -378,15 +431,23 @@ public class MboController implements Updateable
 		if (train.getBlock() == null)
 			return;
 		GlobalCoordinates newLocation = train.getRadio().receive();
-		int blockID = -1;
-		blockID = train.getBlock().getID();
-		double newDistance = trackModel.getDistanceAlongBlock(lineName, blockID, newLocation);
-		double oldDistance = trackModel.getDistanceAlongBlock(lineName, blockID, train.getLastPosition());
-		if (newDistance > oldDistance)
-			train.setGoingForward(true);
-		else
-			train.setGoingForward(false);
-		train.setLastPosition(train.getCurrentPosition());
+		int oldBlockID = train.getBlock().getID();
+		int newBlockID = trackModel.getClosestBlock(newLocation, lineName).getBlock();
+		if (newBlockID != oldBlockID)
+		{
+			double distanceAlongBlock = trackModel.getDistanceAlongBlock(lineName, newBlockID, newLocation);
+			if (distanceAlongBlock < 1)
+				train.setGoingForward(true);
+			else
+				train.setGoingForward(false);
+		}
+//		double newDistance = trackModel.getDistanceAlongBlock(lineName, blockID, newLocation);
+//		double oldDistance = trackModel.getDistanceAlongBlock(lineName, blockID, train.getLastPosition());
+//		if (newDistance > oldDistance)
+//			train.setGoingForward(true);
+//		else
+//			train.setGoingForward(false);
+		// train.setLastPosition(train.getCurrentPosition());
 		train.setCurrentPosition(newLocation);
 	}
 	

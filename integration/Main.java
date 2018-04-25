@@ -72,7 +72,7 @@ public class Main
 			}
 		}
 		
-		String[] lineNames = {"red", "green"};
+		String[] lineNames = {"Green", "Red"};
 		MboController[] mboCont = new MboController[lineNames.length];
 		MboScheduler[] mboSched = new MboScheduler[lineNames.length];
 		for (int i = 0; i < lineNames.length; i++)
@@ -132,9 +132,6 @@ public class Main
 			else
 				ctc.setTrain("red",i);
 		}
-				
-		
-		
 		
 		// track model <---> CTC
 		trackModel.registerCtc(ctc);
@@ -185,7 +182,6 @@ public class Main
 		for (int i = 0; i < lineNames.length; i++)
 		{
 			ctcRadio[i] = new CtcRadio(mboCont[i], mboSched[i], ctc);
-			ctc.setCtcRadios(ctcRadio[i], null);
 			mboCont[i].registerCtc(ctcRadio[i]);
 			mboSched[i].registerCtc(ctcRadio[i]);
 		}
