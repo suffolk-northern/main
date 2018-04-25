@@ -50,6 +50,9 @@ public class CtcUI extends javax.swing.JFrame {
 	private static String[] greenBlocks;
 	private static String[] redBlocks;
 	private static String[] trainIDs;
+	
+	private static String[] greenSwitches;
+	private static String[] redSwitches;
 
 	public CtcUI(Ctc ctc) {
 		this.ctc = ctc;
@@ -1112,6 +1115,9 @@ public class CtcUI extends javax.swing.JFrame {
 		ArrayDeque<String> greens = new ArrayDeque<String>();
 		ArrayDeque<String> reds = new ArrayDeque<String>();
 		
+		ArrayDeque<String> green_sw = new ArrayDeque<String>();
+		ArrayDeque<String> red_sw = new ArrayDeque<String>();
+		
 		String line;
 		
 		trackModel.setRowCount(count);
@@ -1125,10 +1131,14 @@ public class CtcUI extends javax.swing.JFrame {
 			if(line.equalsIgnoreCase("Green"))
 			{
 				greens.add(rows[i][1] + "" + rows[i][2]);
+				if(!rows[i][4].equals(""))
+					green_sw.add(rows[i][1] + "" + rows[i][2]);
 			}
 			else if(line.equalsIgnoreCase("Red"))
 			{
 				reds.add(rows[i][1] + "" + rows[i][2]);
+				if(!rows[i][4].equals(""))
+					red_sw.add(rows[i][1] + "" + rows[i][2]);
 			}
 
 			for (int j = 0; j < trackTable.getColumnCount(); j++) 
@@ -1156,6 +1166,22 @@ public class CtcUI extends javax.swing.JFrame {
 			redBlocks[i] = reds.poll();
 		}
 		
+		sizegreen = green_sw.size();
+		sizered = red_sw.size();
+		
+		greenSwitches = new String[sizegreen];
+		redSwitches = new String[sizered];
+		
+		for(int i = 0; i < sizegreen; i++)
+		{
+			greenSwitches[i] = green_sw.poll();
+		}
+		
+		for(int i = 0; i < sizered; i++)
+		{
+			redSwitches[i] = red_sw.poll();
+		}
+		
 	}
 
 	protected void updateThroughput(double through) {
@@ -1164,7 +1190,13 @@ public class CtcUI extends javax.swing.JFrame {
 
 	private void toggleActionPerformed(java.awt.event.ActionEvent evt) {
 		
+		// inform user
+		String line = (String) mLineSelect.getSelectedItem();
+		String str  = (String) switchSelect.getSelectedItem();
 		
+		ctc.manualFlip(line,str);
+
+
 		
 	}
 	
@@ -1216,10 +1248,12 @@ public class CtcUI extends javax.swing.JFrame {
 		if(mLineSelect.getSelectedIndex() == 0)
 		{
 			maintenanceBlock.setModel(new javax.swing.DefaultComboBoxModel<>(greenBlocks));
+			switchSelect.setModel(new javax.swing.DefaultComboBoxModel<>(greenSwitches));
 		}
 		else
 		{
 			maintenanceBlock.setModel(new javax.swing.DefaultComboBoxModel<>(redBlocks));
+			switchSelect.setModel(new javax.swing.DefaultComboBoxModel<>(redSwitches));
 		}
 	}
 	
