@@ -359,6 +359,12 @@ public class TrainModel
 		emergencyBrakeForce = 0.0;
 	}
 
+	// Requests for the train controller to apply the emergency brake.
+	public void requestEmergencyBrake()
+	{
+		controllerLink.requestEmergencyBrake();
+	}
+
 	// Returns the current grade.
 	//
 	// Units: TBD.

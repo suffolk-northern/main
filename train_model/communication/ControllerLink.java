@@ -26,6 +26,8 @@ public class ControllerLink
 	private final Relay relay;
 	private final TrainModel train;
 
+	private boolean emergencyBrakeRequest = false;
+
 	// Constructs a TrackCircuit that interacts with a Relay and its
 	// TrainModel.
 	public ControllerLink(Relay relay, TrainModel train)
@@ -140,6 +142,21 @@ public class ControllerLink
 	public void releaseEmergencyBrake()
 	{
 		train.releaseEmergencyBrake();
+	}
+
+	// Returns true if an emergency brake request was received since last call.
+	public boolean receivedEmergencyBrakeRequest()
+	{
+		boolean value = emergencyBrakeRequest;
+		emergencyBrakeRequest = false;
+
+		return value;
+	}
+
+	// Causes receivedEmergencyBrakeRequest to return true next call.
+	public void requestEmergencyBrake()
+	{
+		emergencyBrakeRequest = true;
 	}
 
 	// Opens specified door(s).
