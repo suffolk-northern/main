@@ -128,12 +128,18 @@ public class ControllerLink
 
 	// Engages the emergency brake.
 	//
-	// Irreversible. Damages the vehicle.
-	//
 	// Failure mode: Emergency brake applies no force regardless of input.
 	public void applyEmergencyBrake()
 	{
 		train.applyEmergencyBrake();
+	}
+
+	// Disengages the emergency brake.
+	//
+	// Failure mode: Emergency brake applies no force regardless of input.
+	public void releaseEmergencyBrake()
+	{
+		train.releaseEmergencyBrake();
 	}
 
 	// Opens specified door(s).

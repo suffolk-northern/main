@@ -345,12 +345,18 @@ public class TrainModel
 
 	// Engages the emergency brake.
 	//
-	// Irreversible. Damages the vehicle.
-	//
 	// Failure mode: Emergency brake applies no force regardless of input.
 	public void applyEmergencyBrake()
 	{
 		emergencyBrakeForce = EMERGENCY_BRAKE_FORCE;
+	}
+
+	// Disengages the emergency brake.
+	//
+	// Failure mode: Emergency brake applies no force regardless of input.
+	public void releaseEmergencyBrake()
+	{
+		emergencyBrakeForce = 0.0;
 	}
 
 	// Returns the current grade.
