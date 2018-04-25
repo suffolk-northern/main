@@ -102,14 +102,18 @@ public class MboControllerUI extends JFrame
 		
 		c.gridx = 0;
 		c.gridy = 2;
-		mboModeLabel.setFont(new Font("Tahome", 0, 18));
+		mboModeLabel.setFont(new Font("Tahoma", 0, 18));
 		mboModeLabel.setText("Moving Block Mode");
 		mainPanel.add(mboModeLabel, c);
 		
+		JPanel radioPanel = new JPanel();
+		radioPanel.setLayout(new GridBagLayout());
+
 		c.gridx = 0;
-		c.gridy = 3;
+		c.gridy = 0;
 		mboEnabledRadio.setText("Enabled");
-		mainPanel.add(mboEnabledRadio, c);
+		mboEnabledRadio.setSelected(true);
+		radioPanel.add(mboEnabledRadio, c);
 		mboEnabledRadio.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent evt) 
@@ -119,10 +123,9 @@ public class MboControllerUI extends JFrame
 		});
 		
 		c.gridx = 1;
-		c.gridy = 3;
+		c.gridy = 0;
 		mboDisabledRadio.setText("Disabled");
-		mainPanel.add(mboDisabledRadio, c);
-		mboDisabledRadio.setSelected(true);
+		radioPanel.add(mboDisabledRadio, c);
 		mboDisabledRadio.addActionListener(new ActionListener() 
 		{
 			public void actionPerformed(ActionEvent evt)
@@ -134,6 +137,10 @@ public class MboControllerUI extends JFrame
 		ButtonGroup mboButtons = new ButtonGroup();
 		mboButtons.add(mboEnabledRadio);
 		mboButtons.add(mboDisabledRadio);
+		
+		c.gridx = 0;
+		c.gridy = 3;
+		mainPanel.add(radioPanel, c);
 		
         frame.pack();
         frame.setVisible(true);
@@ -168,6 +175,16 @@ public class MboControllerUI extends JFrame
 			   }
 			}
 			);
+			int width = 600;
+			trainTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+			trainTable.getColumnModel().getColumn(0).setPreferredWidth(width / 10);
+			trainTable.getColumnModel().getColumn(1).setPreferredWidth(width / 10);
+			trainTable.getColumnModel().getColumn(2).setPreferredWidth(width / 10);
+			trainTable.getColumnModel().getColumn(3).setPreferredWidth(width / 5);
+			trainTable.getColumnModel().getColumn(4).setPreferredWidth(width / 5);
+			trainTable.getColumnModel().getColumn(5).setPreferredWidth(3*width / 10);
+
+			trainPanel.setPreferredSize(new Dimension(width, 200));
 		}
 		// Convert meters to yards
 		int customAuthority = (int) ((double) authority * 1.0936);
