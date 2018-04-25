@@ -12,6 +12,7 @@ import track_model.TrackBlock;
 import track_model.Station;
 import updater.Updateable;
 import mbo.schedules.*;
+import train_model.communication.TrackMovementCommand;
 
 /**
  *
@@ -28,8 +29,10 @@ public class MboScheduler implements Updateable
 	private CtcRadio ctcRadio;
 	private ArrayList<Integer> trainIDs;
 	private ArrayList<Integer> driverIDs;
+	private LinkedList<TrainDispatch> dispatchQueue;
 	
 	private boolean dispatchEnabled;
+	private boolean mboEnabled;
 	
 	// Adjustable parameters
 	private int dwellTime = 20; // Seconds
@@ -47,6 +50,7 @@ public class MboScheduler implements Updateable
 	{
 		lineName = ln;
 		dispatchEnabled = false;
+		mboEnabled = false;
 		trainIDs = new ArrayList<>();
 		driverIDs = new ArrayList<>();
 	}
@@ -184,6 +188,19 @@ public class MboScheduler implements Updateable
 				}
 				ui.requestCompleted();
 			}
+		}
+		if (dispatchEnabled && mboEnabled && lineSched != null)
+		{
+			Time curTime = ctcRadio.getTime();
+			if (!lineSched.stationSchedulesExist())
+				lineSched.generateStationSchedules();
+			StationSchedule yardSchedule = null;
+			for (String stationName : lineSched.getStationNames())
+			{
+				if (stationName.equalsIgnoreCase("Yard"))
+					yardSchedule = lineSched.getStationSchedule(stationName);
+			}
+			
 		}
 	}
 	
@@ -394,5 +411,13 @@ public class MboScheduler implements Updateable
 	public void registerDriver(int driverID)
 	{
 		driverIDs.add(driverID);
+	}
+	
+	private void dispatchTrain(int trainID, int driverID)
+	{
+		// Set these to 0 since train should be following MBO commands
+		TrackMovementCommand tmc = new TrackMovementCommand(0, 0);
+		trackModel.setYardMessage(trainID, lineName, driverID, tmc);
+		// Method in CTC radio so CTC knows what's going on?
 	}
 }

@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import updater.Updateable;
+import updater.Clock;
 import track_model.GlobalCoordinates;
 import track_model.TrackModel;
 import track_model.TrackBlock;
@@ -19,6 +20,8 @@ import train_model.TrainModel;
 import track_model.Orientation;
 import train_model.communication.MboRadio;
 import train_model.communication.MboMovementCommand;
+import train_model.communication.TrackMovementCommand;
+import mbo.schedules.*;
 
 // Main MBO model
 
@@ -26,22 +29,24 @@ public class MboController implements Updateable
 {
 	private ArrayList<TrainTracker> trains = new ArrayList<TrainTracker>();
 	private BlockTracker[] line; 
-	// private TrackModel myTrack;
 	private MboControllerUI ui;
 	private String lineName;
 	private boolean enabled;
+	private boolean automaticDispatch;
 	private CtcRadio ctcRadio;
 	private TrackModel trackModel;
+	private LineSchedule schedule;
 	
 	private ArrayList<SwitchTracker> switches;
 	
-	private static double MAX_AUTHORITY = 3000; // m
-	private static double LOCATION_MARGIN = 1; // m
+	private static double MAX_AUTHORITY = 3000; // meter
+	private static double LOCATION_MARGIN = 1; // meter
 	
 	public MboController(String ln)
 	{
 		lineName = ln;
 		enabled = false;
+		automaticDispatch = false;
 		switches = new ArrayList<>();
 	}
 	

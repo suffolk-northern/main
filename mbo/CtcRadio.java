@@ -5,6 +5,8 @@
  */
 package mbo;
 
+import java.sql.Time;
+
 import ctc.Ctc;
 
 /**
@@ -78,5 +80,11 @@ public class CtcRadio {
 	public String getSchedule()
 	{
 		return schedule;
+	}
+	
+	public Time getTime()
+	{
+		// TODO: CTC method to get the current time
+		return null;
 	}
 }
