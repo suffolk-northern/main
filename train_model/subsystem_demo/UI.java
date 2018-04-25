@@ -86,6 +86,8 @@ public class UI
         boolean failureMboTx          = train.failure(Failure.MBO_TX);
         boolean failureMboRx          = train.failure(Failure.MBO_RX);
 
+        String advertisement = train.advertisement();
+
         BeaconMessage beaconMessage = train.lastBeaconMessage();
 
         TrackMovementCommand trackMessage = train.lastTrackMessage();
@@ -147,6 +149,40 @@ public class UI
                                          MPH_PER_KPH * mboMessage.speed));
         mboRxAuthority.setText(String.format("%.1f y",
                                          Y_PER_M * mboMessage.authority));
+
+        int length = advertisement.length();
+
+	int length1 = length -  0;
+	int length2 = length - 25;
+	int length3 = length - 50;
+
+	if (length1 <  0) length1 =  0;
+	if (length1 > 25) length1 = 25;
+
+	if (length2 <  0) length2 =  0;
+	if (length2 > 25) length2 = 25;
+
+	if (length3 <  0) length3 =  0;
+	if (length3 > 25) length3 = 25;
+
+	if (length1 > 0)
+		advertisement1.setText(advertisement.substring( 0,  0 + length1));
+	else
+		advertisement1.setText("");
+
+	if (length2 > 0)
+		advertisement2.setText(advertisement.substring(25, 25 + length2));
+	else
+		advertisement2.setText("");
+
+	if (length3 > 0 && length3 < 23)
+		advertisement3.setText(advertisement.substring(50, 50 + length3));
+	else if (length3 >= 23)
+		advertisement3.setText(
+			advertisement.substring(50, 50 + length3 - 3)
+			+ "...");
+	else
+		advertisement3.setText("");
 
         if (failureEngine)
             controlPower.setForeground(Color.RED);

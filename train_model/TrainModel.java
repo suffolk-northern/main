@@ -122,6 +122,8 @@ public class TrainModel
 
 	private final Cabin cabin = new Cabin();
 
+	private String advertisement = "";
+
 	// Constructs a TrainModel with the given identifier.
 	public TrainModel(int id, TrackModel track)
 	{
@@ -541,6 +543,18 @@ public class TrainModel
 	public void toggleFailure(Failure failure)
 	{
 		failure(failure, !failure(failure));
+	}
+
+	// Returns the currently displayed advertisement.
+	public String advertisement()
+	{
+		return advertisement;
+	}
+
+	// Sets the advertisement to some string.
+	public void advertisement(String value)
+	{
+		advertisement = value;
 	}
 
 	// Determines if we should notify observers this update. If so, notifes

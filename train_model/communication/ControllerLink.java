@@ -218,4 +218,10 @@ public class ControllerLink
 	{
 		train.lightsOff();
 	}
+
+	// Sets the advertisement to some string.
+	public void advertisement(String value)
+	{
+		train.advertisement(value);
+	}
 }
