@@ -2453,37 +2453,46 @@ public class Ctc implements Updateable{
 		StringTokenizer stok = new StringTokenizer(sched_in,"\n");
 		String str;
 		
+		System.out.println(sched_in + "\n");
+		
 		StringTokenizer lineTok = new StringTokenizer(stok.nextToken()," ");
 		String line = lineTok.nextToken();
-		
-		System.out.println(line);
+		//System.out.println(line);
 		
 		stok.nextToken();
 		str = stok.nextToken();
 		
-		System.out.println(str);
+		String temp;
 		
 		// train schedule loop
 		while(stok.hasMoreTokens() && cont)
 		{			
 			st = new StringTokenizer(str," ,");
+			System.out.println("str " + str);
 			st.nextToken();
 			st.nextToken();
 			id = Integer.parseInt(st.nextToken());
+			System.out.println("tid: " + id);
 			train = getTrain(id);
-			while(stok.hasMoreTokens())
+			do
 			{
 				str = stok.nextToken();
-				st = new StringTokenizer(str," ,");
-				if(st.nextToken().equalsIgnoreCase("Train"))
+				System.out.println("str " + str);
+				
+				st = new StringTokenizer(str,", ");
+				temp = st.nextToken();
+				System.out.println("temp " + temp);
+				if(temp.equalsIgnoreCase("Train"))
 				{
+					System.out.println("next train");
 					train.schedule = sched;
 					sched = new Schedule();
 					route = new ArrayDeque<Block>();
 					break;
 				}
-				else if(!st.nextToken().equalsIgnoreCase("Time:"))
+				else if(!temp.equalsIgnoreCase("Time:"))
 				{
+					System.out.println("on to drivers");
 					train.schedule = sched;
 					sched = new Schedule();
 					route = new ArrayDeque<Block>();
@@ -2494,14 +2503,23 @@ public class Ctc implements Updateable{
 				time1 = st.nextToken();
 				st.nextToken();
 				depart = st.nextToken();
+				if(st.hasMoreTokens())
+					depart = depart + " " + st.nextToken();
+				
+				System.out.println("t1: " + time1 + " depart from " + depart);
 				
 				str = stok.nextToken();
 				st = new StringTokenizer(str," ,");
+				System.out.println("str: " + str);
 				st.nextToken();
 				
 				time2 = st.nextToken();
 				st.nextToken();
 				arrive = st.nextToken();
+				if(st.hasMoreTokens())
+					arrive = arrive + " " + st.nextToken();
+				
+				System.out.println("t2: " + time2 + " arrive at " + arrive);
 				
 				if(depart.equalsIgnoreCase("YARD"))
 				{
@@ -2526,12 +2544,29 @@ public class Ctc implements Updateable{
 				fake.lastBlock = prev;
 				fake.location = start;
 					
+				System.out.println("from " + start.display() + " to " + end.display());
+				
 				route = findRoute(fake,start,end);
 				prev = route.peekLast();
 				
 				speed = findSpeed(route, time1, time2);
 				
 				sched.addRoute(new Dispatch(route,time1,speed,0));
+			}while(stok.hasMoreTokens());
+		}
+		
+		for(Train t : trains)
+		{
+			System.out.println("train: " + t.ID);
+			
+			for(Dispatch d : t.schedule.schedule)
+			{
+				for(Block b : d.route)
+				{
+					System.out.print(b.display() + " ");
+				}
+				
+				System.out.println();
 			}
 		}
 		
@@ -2557,20 +2592,7 @@ public class Ctc implements Updateable{
 			}
 		}
 		
-		for(Train t : trains)
-		{
-			System.out.println(t.ID);
-			
-			for(Dispatch d : t.schedule.schedule)
-			{
-				for(Block b : d.route)
-				{
-					System.out.print(b.display() + " ");
-				}
-				
-				System.out.println();
-			}
-		}
+		
 		
 	}
 	
