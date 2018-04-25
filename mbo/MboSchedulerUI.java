@@ -750,14 +750,9 @@ public class MboSchedulerUI extends javax.swing.JFrame
 		if (curRequest != Request.NONE)
 			return;
         javax.swing.JFileChooser openFile = new javax.swing.JFileChooser();
-		System.out.println("1");
         openFile.showOpenDialog(null);
-		System.out.println("2");
 		loadFile = openFile.getSelectedFile();
-		System.out.println(loadFile);
-		System.out.println("3");
 		curRequest = Request.LOAD_FROM_FILE;
-		System.out.println(curRequest);
     }                         
 	
 	private void loadStringButtonClicked(ActionEvent evt)
@@ -777,7 +772,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
 			ScheduleWriter sw = new ScheduleWriter(schedule);
 			try 
 			{
-				sw.writeSchedule(file);
+				sw.writeSchedule(file, lineName);
 			}
 			catch (Exception e)
 			{

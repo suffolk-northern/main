@@ -785,8 +785,20 @@ public class Ctc implements Updateable{
 
 	}
 	
+	public static void toFixedBlock(String line)
+	{
+		
+	}
+	
+	public static void toMovingBlock(String line)
+	{
+		
+	}
+	
 	public static void enableMBO(String line)
 	{
+		toMovingBlock(line);
+		
 		if(line.equalsIgnoreCase("green"))
 		{
 			greenradio.enableMovingBlock();
@@ -801,6 +813,8 @@ public class Ctc implements Updateable{
 	
 	public static void disableMBO(String line)
 	{
+		toFixedBlock(line);
+		
 		if(line.equalsIgnoreCase("green"))
 		{
 			greenradio.disableMovingBlock();

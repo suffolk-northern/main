@@ -14,8 +14,9 @@ public class LineSchedule {
 	private ArrayList<StationSchedule> stationSchedules;
 	private ArrayList<String> stationNames;
 	private boolean stationsGenerated;
+	private String lineName;
 	
-	public LineSchedule(ArrayList<DriverSchedule> ds, ArrayList<TrainSchedule> ts)
+	public LineSchedule(ArrayList<DriverSchedule> ds, ArrayList<TrainSchedule> ts, String lineName)
 	{
 		driverSchedules = ds;
 		trainSchedules = ts;
@@ -32,6 +33,7 @@ public class LineSchedule {
 			// System.out.printf("Line Schedule: train ID %d%n", tSched.getID());
 		}
 		stationsGenerated = false;
+		this.lineName = lineName;
 	}
 	
 	public void generateStationSchedules()
@@ -124,5 +126,10 @@ public class LineSchedule {
 	public boolean stationSchedulesExist()
 	{
 		return stationsGenerated;
+	}
+	
+	public String getLine()
+	{
+		return lineName;
 	}
 }

@@ -34,13 +34,14 @@ public class MboScheduler implements Updateable
 	// Adjustable parameters
 	private int dwellTime = 20; // Seconds
 	private int throughputPerTrain = 50;
-	private int numDrivers = 20;
 	private int minTimeBetweenDispatch = 5*60; // Seconds
-	private int schedIncrement = 20; // Seconds
+	private int schedIncrement = 1; // Seconds
 	// TODO: check these times
 	private Time shiftStartToBreakStart = new Time(3, 0, 0);
 	private Time breakStartToBreakEnd = new Time(0, 30, 0);
 	private Time breakEndToShiftEnd = new Time(3, 0, 0);
+	private int accelerationTime = 18; // seconds
+	private int decelerationTime = 120; // seconds
 	
 	public MboScheduler(String ln)
 	{
@@ -132,7 +133,6 @@ public class MboScheduler implements Updateable
 					ui.setSchedule(lineSched);
 					ui.requestCompleted();
 					ui.setMessage("Finished generating schedule.");
-					// System.out.println("Got here");
 				}	
 			}
 			else if (requestType == MboSchedulerUI.Request.EXPORT_TO_CTC)
@@ -145,26 +145,42 @@ public class MboScheduler implements Updateable
 			}
 			else if (requestType == MboSchedulerUI.Request.LOAD_FROM_CTC)
 			{
-				if (ctcRadio.getSchedule() != null)
+				try
 				{
-					lineSched = ScheduleReader.readScheduleString(ctcRadio.getSchedule());
-					ui.setSchedule(lineSched);
-					ui.requestCompleted();
+					LineSchedule ls = ScheduleReader.readScheduleString(ctcRadio.getSchedule());
+					if (ls.getLine().equals(lineName))
+					{
+						lineSched = ls;
+						ui.setSchedule(lineSched);
+					}
+					else
+						ui.setMessage("CTC schedule is for a different line");
 				}
+				catch(Exception e)
+				{
+					ui.setMessage("CTC schedule is missing or corrupted");
+				}
+				ui.requestCompleted();
 			}
 			else if (requestType == MboSchedulerUI.Request.LOAD_FROM_FILE)
 			{
 				File loadFile = ui.getFile();
 				String schedStr = ScheduleReader.readScheduleFile(loadFile);
-				if (schedStr != null)
+				try
 				{
 					LineSchedule ls = ScheduleReader.readScheduleString(schedStr);
-					if (ls != null)
+					if (ls.getLine().equals(lineName))
 					{
 						lineSched = ls;
 						ui.setSchedule(lineSched);
-						ui.setSchedule(lineSched);
 					}
+					else
+						ui.setMessage("This schedule is for a different line.");
+				}
+				catch(Exception e)
+				{
+					System.out.println(e.getMessage());
+					ui.setMessage("Schedule file cannot be read");
 				}
 				ui.requestCompleted();
 			}
@@ -204,9 +220,8 @@ public class MboScheduler implements Updateable
 			}
 			else 
 			{
-				// System.out.printf("Making events at station %s%n", curBlock.getStation());
-				// TODO: include time for train decelerating and accelerating around the station
-				Time arrTime = new Time(curTime.getTime() + (long) (travelTime / 2));
+				long delay = (long) (accelerationTime * 1000) + (long) (decelerationTime * 1000);
+				Time arrTime = new Time(curTime.getTime() + (long) (travelTime / 2) + delay);
 				te.add(new TrainEvent(arrTime, arr, curBlock.getStation()));
 				Time depTime = new Time((arrTime.getTime()) + (long) dwellTime*1000);
 				te.add(new TrainEvent(depTime, dep, curBlock.getStation()));
@@ -325,7 +340,7 @@ public class MboScheduler implements Updateable
 			curTime = new Time(curTime.getTime() + (long) (schedIncrement * 1000));
 			lastDispatch += schedIncrement;
 		}
-		LineSchedule ls = new LineSchedule(driverScheds, trainScheds);
+		LineSchedule ls = new LineSchedule(driverScheds, trainScheds, lineName);
 		return ls;
 	}
 	
@@ -365,7 +380,7 @@ public class MboScheduler implements Updateable
 		{
 			StringWriter sched = new StringWriter();
 			ScheduleWriter schedWrite = new ScheduleWriter(lineSched);
-			schedWrite.writeSchedule(sched);
+			schedWrite.writeSchedule(sched, lineName);
 			String schedStr = sched.toString();
 			ctcRadio.setSchedule(schedStr);
 		}
