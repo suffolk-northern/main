@@ -33,8 +33,6 @@ public class MboControllerUI extends JFrame
 	private int numTrains;
 	private String lineName;
 	ArrayList<Integer> trainIDs;
-	private String[] tableHeader;
-	private Object[][] tableContents;
 	
 	private JLabel mboModeLabel;
 	private JRadioButton mboEnabledRadio;
@@ -73,9 +71,9 @@ public class MboControllerUI extends JFrame
 		mainPanel.add(trainPanel, c);
 		trainPanel.setViewportView(trainTable);
 		
-		tableHeader = new String[] {"Train ID", "Section", "Block", "Location (yards)", "Authority (yards)", "Suggested speed (mph)"};
+		String[] tableHeader = new String[] {"Train ID", "Section", "Block", "Location (yards)", "Authority (yards)", "Suggested speed (mph)"};
 		// TODO: extend to extra rows once we start routing lots of trains
-		tableContents = new Object[][]
+		Object[][] tableContents = new Object[][]
 		{
 			{null, null, null, null, null, null},
 			{null, null, null, null, null, null},
@@ -152,6 +150,25 @@ public class MboControllerUI extends JFrame
 		}
 		trainIDs.add(trainID);
 		int row = trainIDs.indexOf(trainID);
+		TableModel model = trainTable.getModel();
+		if (model.getRowCount() < trainIDs.size())
+		{
+			Object[][] tableContents = new Object[trainIDs.size()][6];
+			for (int i = 0; i < model.getRowCount(); i++)
+			{
+				for (int j = 0; j < 6; j++)
+					tableContents[i][j] = model.getValueAt(i, j);
+			}
+			String[] tableHeader = new String[] {"Train ID", "Section", "Block", "Location (yards)", "Authority (yards)", "Suggested speed (mph)"};
+			trainTable.setModel(new javax.swing.table.DefaultTableModel(tableContents, tableHeader)
+			{
+			   public boolean isCellEditable(int rowIndex, int columnIndex) 
+			   {
+				   return false;
+			   }
+			}
+			);
+		}
 		// Convert meters to yards
 		int customAuthority = (int) ((double) authority * 1.0936);
 		// Convert kph to mph
