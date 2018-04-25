@@ -2,6 +2,7 @@ package mbo.schedules;
 
 import java.sql.Time;
 import java.lang.Comparable;
+import java.util.Comparator;
 
 /**
  *
@@ -46,11 +47,11 @@ public class TrainDispatch implements Comparable<TrainDispatch>
 			return 0;
 	}
 	
-//	public static Comparator<TrainDispatch> TrainDispatchComparator = new Comparator<>()
-//	{
-//		public int compare(TrainDispatch td1, TrainDispatch td2)
-//		{
-//			return td1.compareTo(td2);
-//		}
-//	};
+	public static Comparator<TrainDispatch> TrainDispatchComparator = new Comparator<TrainDispatch>()
+	{
+		public int compare(TrainDispatch td1, TrainDispatch td2)
+		{
+			return td1.compareTo(td2);
+		}
+	};
 }

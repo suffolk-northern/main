@@ -6,6 +6,7 @@ import java.sql.Time;
 import java.lang.Math;
 import java.io.StringWriter;
 import java.io.File;
+import java.util.Arrays;
 
 import track_model.TrackModel;
 import track_model.TrackBlock;
@@ -189,19 +190,21 @@ public class MboScheduler implements Updateable
 				ui.requestCompleted();
 			}
 		}
-		if (dispatchEnabled && mboEnabled && lineSched != null)
-		{
-			Time curTime = ctcRadio.getTime();
-			if (!lineSched.stationSchedulesExist())
-				lineSched.generateStationSchedules();
-			StationSchedule yardSchedule = null;
-			for (String stationName : lineSched.getStationNames())
-			{
-				if (stationName.equalsIgnoreCase("Yard"))
-					yardSchedule = lineSched.getStationSchedule(stationName);
-			}
-			
-		}
+//		if (dispatchEnabled && mboEnabled && lineSched != null)
+//		{
+//			Time curTime = ctcRadio.getTime();
+//			if (dispatchQueue == null)
+//				makeDispatchQueue();
+//			if (!dispatchQueue.isEmpty())
+//			{
+//			TrainDispatch nextDispatch = dispatchQueue.peek();
+//				if (curTime.after(nextDispatch.getTime()))
+//				{
+//					dispatchTrain(nextDispatch.getTrainID(), nextDispatch.getDriverID());
+//					dispatchQueue.poll();
+//				}
+//			}
+//		}
 	}
 	
 	private void makeTrainSchedule(ArrayList<TrainSchedule> trainScheds, Time startTime, int trainID)
@@ -418,6 +421,42 @@ public class MboScheduler implements Updateable
 		// Set these to 0 since train should be following MBO commands
 		TrackMovementCommand tmc = new TrackMovementCommand(0, 0);
 		trackModel.setYardMessage(trainID, lineName, driverID, tmc);
-		// Method in CTC radio so CTC knows what's going on?
+		ctcRadio.tellCtcDispatch(lineName, trainID);
+	}
+	
+	private void makeDispatchQueue()
+	{
+		dispatchQueue = new LinkedList<>();
+		if (!lineSched.stationSchedulesExist())
+			lineSched.generateStationSchedules();
+		StationSchedule yardSchedule = null;
+		for (String stationName : lineSched.getStationNames())
+		{
+			if (stationName.equalsIgnoreCase("Yard"))
+				yardSchedule = lineSched.getStationSchedule(stationName);
+		}	
+		ArrayList<StationEvent> yardEvents = yardSchedule.getEvents();
+		ArrayList<Integer> driverIDs = lineSched.getDriverIDs();
+		for (StationEvent yardEvent : yardEvents)
+		{
+			if (yardEvent.getEvent() == TrainEvent.EventType.DEPARTURE)
+			{
+				Time departTime = yardEvent.getTime();
+				int trainID = yardEvent.getTrainID();
+				for (int driverID : driverIDs)
+				{
+					ArrayList<DriverEvent> driverEvents = lineSched.getDriverSchedule(driverID).getEvents();
+					for (DriverEvent driverEvent : driverEvents)
+					{
+						if (driverEvent.getEvent() == DriverEvent.EventType.EMBARK && driverEvent.getTime() == departTime && driverEvent.getTrainID() == trainID)
+						{
+							TrainDispatch td = new TrainDispatch(trainID, driverID, departTime);
+							dispatchQueue.add(td);
+						}
+					}
+				}
+			}
+		}
+		dispatchQueue.sort(TrainDispatch.TrainDispatchComparator);
 	}
 }
