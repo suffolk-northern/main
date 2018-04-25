@@ -51,6 +51,10 @@ public class CtcRadio {
 	{
 		// TODO: Add CTC function
 		mboSched.enableDispatch(isEnabled);
+		if(isEnabled)
+			ctc.autoMode(line);
+		else
+			ctc.manMode(line);
 	}
 	
 	public void showController()
