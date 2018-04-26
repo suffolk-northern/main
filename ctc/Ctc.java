@@ -58,7 +58,8 @@ public class Ctc implements Updateable{
 	public static int period;
 	public static Clock clock;
 	
-	public static double through = 0;
+	public static double throughgreen = 0;
+	public static double throughred = 0;
 	
 	public static boolean isManualGreen = true;
 	public static boolean isManualRed = true;
@@ -2275,13 +2276,21 @@ public class Ctc implements Updateable{
 
 	private static void calcThroughput() {
 		ArrayDeque<Train> temp = trains.clone();
-		through = 0;
+		Train train;
+		throughgreen = 0;
+		throughred = 0;
 
 		while (!temp.isEmpty()) {
-			through += temp.poll().passengers;
+			
+			train = temp.poll();
+			
+			if(train.location.line.equalsIgnoreCase("green"))
+				throughgreen += train.passengers;
+			else
+				throughred += train.passengers;
 		}
 
-		ui.updateThroughput(through);
+		ui.updateThroughput(throughgreen, throughred);
 	}
 
 	private static ArrayDeque<Block> explored;
