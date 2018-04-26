@@ -70,6 +70,7 @@ public class TrainController implements Updateable
         boolean firstBeacon = true;
         boolean passingTypeApproach = false;
         int passingTypeCount = 0;
+        String s;
         
         boolean eBrakeFailure = false;
         boolean sBrakeFailure = false;
@@ -90,6 +91,7 @@ public class TrainController implements Updateable
                 passengerEBrakeRequest = false;
                 trainID = id;
                 approachingStation = new String();
+                s = new String("Passing x");
                 
 		ads.add("Come to Pitt, the #1 public university in northeast Oakland");
 		ads.add("Broken frisbee? Get a new one today! Visit getnewfrisbee.com");
@@ -189,13 +191,13 @@ public class TrainController implements Updateable
         
         public String getStationText()
         {
-            System.out.println(approachingStation);
-            //String s = "Passing " + approachingStation + "\n";
-            String s = "";
+            s = "Passing " + approachingStation + "\n";
             if(stationGap)
                 s = "Arriving at " + approachingStation + "\n";
-            if(approachingStation.equals("") | afterStation)
+            if(approachingStation.equals(""))
+            {
                 s = "";
+            }            
             return s;
         }
         
@@ -391,16 +393,15 @@ public class TrainController implements Updateable
                     movingAuth = currAuth;
                     mboMode = true;
 		}
-                System.out.println(approachingStation); ///////// delete
                 double disp = displacement(millis);
 		movingAuth -= disp;
                 totalMovingAuth -= disp;
                 distFromLastBeacon += disp;
-               // System.out.println("\t\tafterStation: " + afterStation);
+                
                 if (beaconMsg!=null & !afterStation & (distFromLastBeacon > 5 | firstBeacon) )
                 {
                     firstBeacon = false;
-                   // System.out.println("beaconRecevived!");
+
                     bm = beaconMsg.string.split(",");
                     if((currAuth == 0 | currAuth == (int)Double.parseDouble(bm[0])) & !mboMode)
                     {
@@ -413,6 +414,11 @@ public class TrainController implements Updateable
                         stationGap = true;
                     }
                     approachingStation = stations.get(bm[2]);
+                    if(s.indexOf("Passing") != -1)
+                    {
+                        // Passing second beacon after not stopping at station
+                        approachingStation = "";
+                    }
                     if(bm[1].equals("-1"))
                         leftSide = true;
                     else
