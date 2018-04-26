@@ -224,4 +224,10 @@ public class ControllerLink
 	{
 		train.advertisement(value);
 	}
+
+	// Returns true if a driver is onboard.
+	public boolean hasDriver()
+	{
+		return train.hasDriver();
+	}
 }
