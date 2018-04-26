@@ -120,6 +120,15 @@ public class Station {
 		return (int) (Math.random() * 25);
 	}
 
+	/**
+	 * Get beacon string for station.
+	 *
+	 * @return
+	 */
+	public String getBeaconString() {
+		return line.toLowerCase().charAt(0) + "" + block;
+	}
+
 	@Override
 	public String toString() {
 		return "Hi, I'm Station " + name + " of the " + line + " Line, Section " + section + ".\n"
