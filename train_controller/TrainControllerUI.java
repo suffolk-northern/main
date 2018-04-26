@@ -1,6 +1,5 @@
 package train_controller;
 
-import train_controller.TrainController;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -652,7 +651,7 @@ public class TrainControllerUI extends javax.swing.JFrame {
     private void updateConsole()
     {
         boolean [] failures = controller.getFailures();
-        String [] messages = {"E-brake failure\n", "Service brake failure\n", "Engine failure\n", "Signal failure"};
+        String [] messages = {"E-brake failure\n", "Service brake failure\n", "Engine failure\n", "Signal failure\n"};
         String msg = new String();
         boolean allFalse = true;
         for(int i=0; i<4; i++)
@@ -663,9 +662,10 @@ public class TrainControllerUI extends javax.swing.JFrame {
                 allFalse = false;
             }
         }
+        msg += controller.getStationText();
         Console.setText(msg);
-        if(allFalse)
-            Console.setText("No messages");
+        if(allFalse & msg.equals(""))
+            Console.setText("No messages\n");
     }
     
     private void updateEBrake()

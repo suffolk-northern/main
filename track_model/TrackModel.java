@@ -162,8 +162,8 @@ public class TrackModel implements Updateable {
 			//
 			// Adds beacon at start and end of block.
 			//
-			s.setBeaconPrev(new Beacon(tb.start, tb.length / 2 + "," + s.getSide()));
-			s.setBeaconNext(new Beacon(tb.end, tb.length / 2 + "," + s.getSide() / -1));
+			s.setBeaconPrev(new Beacon(tb.start, tb.length / 2 + "," + s.getSide() + "," + s.getBeaconString()));
+			s.setBeaconNext(new Beacon(tb.end, tb.length / 2 + "," + s.getSide() / -1 + "," + s.getBeaconString()));
 			beacons.add(s.beaconPrev);
 			beacons.add(s.beaconNext);
 		}
