@@ -35,12 +35,12 @@ public class MboController implements Updateable
 	private boolean automaticDispatch;
 	private CtcRadio ctcRadio;
 	private TrackModel trackModel;
-	private LineSchedule schedule;
 	
 	private ArrayList<SwitchTracker> switches;
 	
 	private static double MAX_AUTHORITY = 3000; // meter
 	private static double LOCATION_MARGIN = 1; // meter
+	private static int DWELL_TIME = 20 * 1000; // ms
 	
 	public MboController(String ln)
 	{
@@ -73,6 +73,10 @@ public class MboController implements Updateable
 				int speed = trainInfo.getSuggestedSpeed();
 				ui.addTrain(ID, section, blockID, distance, authority, speed);
 			}
+			if (enabled)
+				ui.setMboEnabled(true);
+			else
+				ui.setMboEnabled(false);
 		}
 	}
 	
@@ -105,7 +109,9 @@ public class MboController implements Updateable
 		{
 			enabled = false;
 			if (ui != null)
-				ui = null;
+			{
+				ui.setMboEnabled(false);
+			}
 		}
 	}
 	
@@ -172,7 +178,6 @@ public class MboController implements Updateable
 	// Updates this object.
 	public void update(int time)
 	{
-		// TODO: parameter time not used
 		for (int i = 0; i < trains.size(); i++) 
 		{
 			TrainTracker trainInfo = trains.get(i);
@@ -215,9 +220,21 @@ public class MboController implements Updateable
 			for (TrainTracker trainInfo:trains)
 			{
 				if (trainInfo == null)
-					break;
-				updateLocation(trainInfo);
+					continue;
 				double authority = findAuthority(trainInfo);
+				if (trainAtStation(trainInfo))
+				{
+					if (trainInfo.getTimeStopped() < DWELL_TIME)
+					{
+						trainInfo.incrementTimeStopped(time);
+						authority = 0;
+					}
+					else
+					{
+						trainInfo.resetTimeStopped();
+						authority = 1;
+					}
+				}
 				trainInfo.setAuthority((int) authority);
 				if (trainInfo.getBlock() != null)
 					trainInfo.setSuggestedSpeed(trainInfo.getBlock().getSpeedLimit());
@@ -242,6 +259,14 @@ public class MboController implements Updateable
 				int trackDist = (int) trackModel.getDistanceAlongBlock(lineName, blockID, trainInfo.getCurrentPosition());
 				if (ui != null)
 					ui.updateTrain(trainInfo.getID(), trainInfo.block.getSection(), trainInfo.block.getID(), trackDist, trainInfo.getAuthority(), trainInfo.getSuggestedSpeed());
+			}
+		}
+		else if (ui != null)
+		{
+			for (TrainTracker trainInfo : trains)
+			{
+				int trackDist = (int) trackModel.getDistanceAlongBlock(lineName, trainInfo.block.getID(), trainInfo.getCurrentPosition());
+				ui.updateTrain(trainInfo.getID(), trainInfo.block.getSection(), trainInfo.block.getID(), trackDist, 0, 0);
 			}
 		}
 	}
@@ -340,6 +365,13 @@ public class MboController implements Updateable
 						authority += trainBlocks.get(j).getLength() - otherTrainDist;
 					blocked = true;
 				}
+			}
+			
+			// Stop at a station
+			if (curBlock.getStation() != null)
+			{
+				authority += curBlock.getLength() / 2;
+				blocked = true;
 			}
 			
 			if (blocked)
@@ -528,6 +560,20 @@ public class MboController implements Updateable
 					line[unconnectedBlock].setPrevBlock(-1);
 			}
  		}
+	}
+	
+	private boolean trainAtStation(TrainTracker train)
+	{
+		if (train.getBlock().getStation() != null)
+		{
+			GlobalCoordinates location = train.getCurrentPosition();
+			double distAlongBlock = trackModel.getDistanceAlongBlock(lineName, train.getBlock().getID(), location);
+			double stationLocation = train.getBlock().getLength() / 2;
+			double margin = 3; // 3 meters within station
+			if (distAlongBlock > stationLocation - margin || distAlongBlock < stationLocation + margin)
+				return true;
+		}
+		return false;
 	}
 	
 //	public int changeTrainLocation(int trainID, GlobalCoordinates location)
