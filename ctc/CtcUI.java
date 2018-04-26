@@ -69,7 +69,7 @@ public class CtcUI extends javax.swing.JFrame {
 		jScrollPane1 = new javax.swing.JScrollPane();
 		trackTable = new javax.swing.JTable();
 		blockSelect = new javax.swing.JComboBox<>();
-		blueThrough = new javax.swing.JTextField();
+		greenThrough = new javax.swing.JTextField();
 		jLabel9 = new javax.swing.JLabel();
 		jLabel19 = new javax.swing.JLabel();
 		multSelect = new javax.swing.JComboBox<>();
@@ -188,8 +188,8 @@ public class CtcUI extends javax.swing.JFrame {
 		blockSelect.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
 		blockSelect.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{}));
 
-		blueThrough.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
-		blueThrough.setText("               ");
+		greenThrough.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
+		greenThrough.setText("               ");
 
 		jLabel9.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
 		jLabel9.setText("Maintenance");
@@ -462,7 +462,7 @@ public class CtcUI extends javax.swing.JFrame {
 																				.addGap(18, 18, 18)
 																				.addComponent(jLabel18))
 																		.addGroup(layout.createSequentialGroup()
-																				.addComponent(blueThrough, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+																				.addComponent(greenThrough, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
 																				.addGap(18, 18, 18)
 																				.addComponent(jLabel17))))
 														.addGroup(layout.createSequentialGroup()
@@ -543,7 +543,7 @@ public class CtcUI extends javax.swing.JFrame {
 												.addGap(1, 1, 1)
 												.addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
 														.addComponent(jLabel8)
-														.addComponent(blueThrough, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+														.addComponent(greenThrough, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
 														.addComponent(clockDisp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
 														.addComponent(jLabel17)
 														.addComponent(multSelect, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -1184,8 +1184,10 @@ public class CtcUI extends javax.swing.JFrame {
 		
 	}
 
-	protected void updateThroughput(double through) {
-		blueThrough.setText(Double.toString(through));
+	protected void updateThroughput(double throughgreen, double throughred) {
+		greenThrough.setText(Double.toString(throughgreen));
+		jTextField4.setText(Double.toString(throughred));
+		
 	}
 
 	private void toggleActionPerformed(java.awt.event.ActionEvent evt) {
@@ -1391,7 +1393,7 @@ public class CtcUI extends javax.swing.JFrame {
 	private javax.swing.JLabel jLabel9;
 	private javax.swing.JScrollPane jScrollPane1;
 	private javax.swing.JScrollPane jScrollPane2;
-	private javax.swing.JTextField blueThrough;
+	private javax.swing.JTextField greenThrough;
 	private javax.swing.JTextField jTextField4;
 	private javax.swing.JTextField clockDisp;
 	private javax.swing.JComboBox<String> lineSelect;

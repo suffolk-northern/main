@@ -58,7 +58,8 @@ public class Ctc implements Updateable{
 	public static int period;
 	public static Clock clock;
 	
-	public static double through = 0;
+	public static double throughgreen = 0;
+	public static double throughred = 0;
 	
 	public static boolean isManualGreen = true;
 	public static boolean isManualRed = true;
@@ -1108,6 +1109,9 @@ public class Ctc implements Updateable{
 		if(speed > MAXSPEED)
 			speed = MAXSPEED;
 		
+		if(speed < 0)
+			speed = 0;
+		
 		train.setSpeed(speed);
 		train.setAuth(auth);
 		sendSpeedAuth(train, speed, auth);
@@ -1557,8 +1561,8 @@ public class Ctc implements Updateable{
 				rows[count][6] = "Closed";
 			else if(block.broken)
 				rows[count][6] = "Broken";
-			else if(block.reserved != -1)
-				rows[count][6] = "Reserved by " + block.reserved;
+			//else if(block.reserved != -1)
+			//	rows[count][6] = "Reserved by " + block.reserved;
 			else
 				rows[count][6] = "";
 
@@ -2069,6 +2073,12 @@ public class Ctc implements Updateable{
 		
 		Block bl = getBlock(line,Integer.parseInt(block.substring(1)));
 		
+		if(bl.occupied && !bl.broken && close)
+			return;
+		
+		if(!close && !bl.closed)
+			return;
+		
 		trackmodel.setMaintenance(line,Integer.parseInt(block.substring(1)),close);
 		if(!close)
 		{
@@ -2102,6 +2112,9 @@ public class Ctc implements Updateable{
 		
 		if(loc.num == 0 && dispatched != null && !dispatched.peekFirst().equals(train))
 			auth = 0;
+		
+		if(speed < 0)
+			speed = 0;
 
 		Block sw = null;
 		Block from = null;
@@ -2275,13 +2288,21 @@ public class Ctc implements Updateable{
 
 	private static void calcThroughput() {
 		ArrayDeque<Train> temp = trains.clone();
-		through = 0;
+		Train train;
+		throughgreen = 0;
+		throughred = 0;
 
 		while (!temp.isEmpty()) {
-			through += temp.poll().passengers;
+			
+			train = temp.poll();
+			
+			if(train.location.line.equalsIgnoreCase("green"))
+				throughgreen += train.passengers;
+			else
+				throughred += train.passengers;
 		}
 
-		ui.updateThroughput(through);
+		ui.updateThroughput(throughgreen, throughred);
 	}
 
 	private static ArrayDeque<Block> explored;
