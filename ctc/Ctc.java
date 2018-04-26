@@ -714,7 +714,7 @@ public class Ctc implements Updateable{
 		ctc = this;
 		ui = new CtcUI(ctc);
 		
-		clock = new Clock();		
+		clock = new Clock(new Date(0,1,1,8,55,0));		
 		
 		
 		/*
