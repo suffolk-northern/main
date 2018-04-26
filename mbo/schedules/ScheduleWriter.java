@@ -71,12 +71,13 @@ public class ScheduleWriter {
 			writer.printf("Train ID: %d\n", trainID);
 			for (TrainEvent te : ts.getEvents())
 			{
-				writer.printf("Time: %s, ", te.getTime().toString());
+				writer.printf("Time, %s, ", te.getTime().toString());
 				if (te.getEvent() == TrainEvent.EventType.ARRIVAL)
 					writer.printf("ARRIVAL, ");
 				else
 					writer.printf("DEPARTURE, ");
-				writer.printf("%s\n", te.getStation());
+				writer.printf("%s, ", te.getStation());
+				writer.printf("%d\n", te.getStationBlock());
 			}
 		}
 
@@ -87,7 +88,7 @@ public class ScheduleWriter {
 			writer.printf("Driver ID: %d\n", driverID);
 			for (DriverEvent de : ds.getEvents())
 			{
-				writer.printf("Time: %s, ", de.getTime().toString());
+				writer.printf("Time, %s, ", de.getTime().toString());
 				if (de.getEvent() == DriverEvent.EventType.EMBARK)
 					writer.printf("EMBARK, ");
 				else

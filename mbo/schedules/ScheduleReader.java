@@ -20,7 +20,7 @@ public class ScheduleReader
 			String fileContent = fileScan.useDelimiter("\\Z").next();
 			return fileContent;
 		}
-		catch (IOException e)
+		catch (Exception e)
 		{
 			System.out.println(e.getMessage());
 		}
@@ -39,11 +39,13 @@ public class ScheduleReader
 		boolean reachedDrivers = false;
 		for (int i = 2; i < lines.length; i++)
 		{
+			// Reached driver schedules
 			if (lines[i].charAt(0) == '-')
 			{
 				ts.add(new TrainSchedule(curID, curTrainEvents));
 				reachedDrivers = true;
 			}
+			// Reached a new train schedule
 			else if (lines[i].substring(0, 2).equals("Tr"))
 			{
 				if (curTrainEvents.size() > 0)
@@ -53,6 +55,7 @@ public class ScheduleReader
 				}
 				curID = Integer.parseInt(lines[i].substring(10));
 			}
+			// Reached a new driver schedule
 			else if (lines[i].charAt(0) == 'D')
 			{
 				if (curDriverEvents.size() > 0)
@@ -62,27 +65,31 @@ public class ScheduleReader
 				}
 				curID = Integer.parseInt(lines[i].substring(11));
 			}
+			// Add train or driver event
 			else
 			{
-				String[] tokens = lines[i].split(". ");
+				String[] tokens = lines[i].split(", ");
 				String[] time = tokens[1].split(":");
 				Time eventTime = new Time(Integer.parseInt(time[0]), Integer.parseInt(time[1]), Integer.parseInt(time[2]));
+				// Driver event
 				if (reachedDrivers)
 				{
 					DriverEvent.EventType et = DriverEvent.EventType.DISEMBARK;
 					if (tokens[2].equals("EMBARK"))
 						et = DriverEvent.EventType.EMBARK;
-					int trainID = Integer.parseInt(tokens[4]);
+					int trainID = Integer.parseInt(tokens[3].substring(6));
 					DriverEvent de = new DriverEvent(eventTime, et, trainID);
 					curDriverEvents.add(de);
 				}
+				// Train event
 				else
 				{
 					TrainEvent.EventType et = TrainEvent.EventType.ARRIVAL;
 					if (tokens[2].equals("DEPARTURE"))
 						et = TrainEvent.EventType.DEPARTURE;
 					String station = tokens[3];
-					TrainEvent te = new TrainEvent(eventTime, et, station);
+					int stationBlock = Integer.parseInt(tokens[4]);
+					TrainEvent te = new TrainEvent(eventTime, et, station, stationBlock);
 					curTrainEvents.add(te);
 				}
 			}

@@ -5,7 +5,10 @@
  */
 package mbo;
 
+import java.sql.Time;
+
 import ctc.Ctc;
+import java.util.Date;
 
 /**
  *
@@ -24,6 +27,11 @@ public class CtcRadio {
 		mboSched = ms;
 		ctc = c;
 		line = l;
+	}
+	
+	public void tellCtcDispatch(String line, int tid)
+	{
+		ctc.mboDispatch(line,tid);
 	}
 	
 	// Returns a 2D array of integer block IDs, each row is a switch
@@ -86,5 +94,12 @@ public class CtcRadio {
 	public String getSchedule()
 	{
 		return schedule;
+	}
+	
+	public Time getTime()
+	{
+		// TODO: CTC method to get the current time
+		Date date = ctc.getCurrentTime();
+		return null;
 	}
 }

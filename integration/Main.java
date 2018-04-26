@@ -72,8 +72,14 @@ public class Main
 			}
 		}
 		
-		MboController mboCont = new MboController("Green");
-		MboScheduler mboSched = new MboScheduler("Green");
+		String[] lineNames = {"Green", "Red"};
+		MboController[] mboCont = new MboController[lineNames.length];
+		MboScheduler[] mboSched = new MboScheduler[lineNames.length];
+		for (int i = 0; i < lineNames.length; i++)
+		{
+			mboCont[i] = new MboController(lineNames[i]);
+			mboSched[i] = new MboScheduler(lineNames[i]);
+		}
 
 		final int numberOfTrainsGreen = 3;
 		final int numberOfTrainsRed = 3;
@@ -83,7 +89,9 @@ public class Main
 
 		trainModels = new TrainModel[numberOfTrains];
 		
-		final int numberOfDrivers = 20;
+		final int numberOfDriversGreen = 10;
+		final int numberOfDriversRed = 10;
+		final int numberOfDrivers = numberOfDriversGreen + numberOfDriversRed;
 		
 		drivers = new Driver[numberOfDrivers];
 
@@ -124,9 +132,6 @@ public class Main
 			else
 				ctc.setTrain("red",i);
 		}
-				
-		
-		
 		
 		// track model <---> CTC
 		trackModel.registerCtc(ctc);
@@ -149,28 +154,45 @@ public class Main
 		
 		
 		// Track Model <---> MBO
-		mboCont.registerTrackModel(trackModel);
-		mboSched.registerTrackModel(trackModel);
-
-		mboCont.initLine();
-		mboSched.initLine();
+		for (int i = 0; i < lineNames.length; i++)
+		{
+			mboCont[i].registerTrackModel(trackModel);
+			mboSched[i].registerTrackModel(trackModel);	
+			mboCont[i].initLine();
+			mboSched[i].initLine();
+		}
 
 		// train model <---> MBO
 		for (TrainModel trainModel : trainModels)
 		{
-			mboCont.registerTrain(trainModel.id(), trainModel.mboRadio());
-			mboSched.registerTrain(trainModel.id());
+			if (trainModel.id() < numberOfTrainsGreen)
+			{
+				mboCont[0].registerTrain(trainModel.id(), trainModel.mboRadio());
+				mboSched[0].registerTrain(trainModel.id());
+			}
+			else
+			{
+				mboCont[1].registerTrain(trainModel.id(), trainModel.mboRadio());
+				mboSched[1].registerTrain(trainModel.id());
+			}
 		}
 		
 		// CTC <--> MBO
-		CtcRadio ctcRadio = new CtcRadio("green",mboCont, mboSched, ctc);
-		ctc.setCtcRadios(ctcRadio,null);
-		mboCont.registerCtc(ctcRadio);
-		mboSched.registerCtc(ctcRadio);
+		CtcRadio[] ctcRadio = new CtcRadio[lineNames.length];
+		for (int i = 0; i < lineNames.length; i++)
+		{
+			ctcRadio[i] = new CtcRadio(lineNames[i], mboCont[i], mboSched[i], ctc);
+			mboCont[i].registerCtc(ctcRadio[i]);
+			mboSched[i].registerCtc(ctcRadio[i]);
+		}
+		ctc.setCtcRadios(ctcRadio[0], ctcRadio[1]);
 		
 		for (Driver driver : drivers)
 		{
-			mboSched.registerDriver(driver.getID());
+			if (driver.getID() < numberOfDriversGreen)
+				mboSched[0].registerDriver(driver.getID());
+			else
+				mboSched[1].registerDriver(driver.getID());
 		}
 
 		//
@@ -178,8 +200,11 @@ public class Main
 		//
 
 		updateables.add(ctc);
-		updateables.add(mboCont);
-		updateables.add(mboSched);
+		for (int i = 0; i < lineNames.length; i++)
+		{
+			updateables.add(mboCont[i]);
+			updateables.add(mboSched[i]);
+		}
 		updateables.add(trackModel);
 		updateables.add(trainMultiplier);
 	}

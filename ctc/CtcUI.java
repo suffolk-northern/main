@@ -1299,22 +1299,26 @@ public class CtcUI extends javax.swing.JFrame {
     private void MovingBlockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MovingBlockActionPerformed
 		// TODO add your handling code here:
 		//System.out.println("Transfer control to MBO");
-		ctc.enableMBO("Green");
-		//ctc.enableMBO("Red");
+		String line = (String) lineSelect.getSelectedItem();
+		ctc.enableMBO(line);
 		
     }//GEN-LAST:event_MovingBlockActionPerformed
 
     private void manualModeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manualModeActionPerformed
 		// TODO add your handling code here:
 		//System.out.println("Manual mode");
-		ctc.manMode("green");
+		String line = (String) lineSelect.getSelectedItem();
+		
+		ctc.manMode(line);
 		//ctc.manMode("red");
     }//GEN-LAST:event_manualModeActionPerformed
 
     private void autoModeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoModeActionPerformed
 		// TODO add your handling code here:
 		//System.out.println("Automatic mode");
-		ctc.autoMode("green");
+		String line = (String) lineSelect.getSelectedItem();
+		
+		ctc.autoMode(line);
 		//ctc.autoMode("red");
     }//GEN-LAST:event_autoModeActionPerformed
 
