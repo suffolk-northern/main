@@ -136,7 +136,7 @@ public class Ctc implements Updateable{
 					if(t.schedule != null && !t.schedule.schedule.isEmpty())
 					{						
 						dis = t.schedule.schedule.peekFirst();
-						System.out.println(dis.time + " vs current time: " + timeToStr());
+						//System.out.println(dis.time + " vs current time: " + timeToStr());
 						if(dis.time.equals(timeToStr()))
 						{
 							System.out.println("auto mode, set route for train: " + t.ID);
@@ -2610,7 +2610,7 @@ public class Ctc implements Updateable{
 				route = findRoute(fake,start,end);
 				prev = route.peekLast();
 				
-				speed = findSpeed(route, time1, time2);
+				speed = MAXSPEED;//findSpeed(route, time1, time2);
 				
 				/*
 				System.out.print("route: ");
