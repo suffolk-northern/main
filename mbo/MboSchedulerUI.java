@@ -365,6 +365,9 @@ public class MboSchedulerUI extends javax.swing.JFrame
                 .addComponent(finishedThroughputButton)
                 .addContainerGap(189, Short.MAX_VALUE))
         );
+		
+//		jPanel3.setLayout(new GridBagLayout());
+//		GridBagConstraints c = new GridBagConstraints();
 
         getContentPane().add(jPanel3, "card3");
 
@@ -528,6 +531,10 @@ public class MboSchedulerUI extends javax.swing.JFrame
 			// Make the station schedules
 			if (!schedule.stationSchedulesExist())
 				schedule.generateStationSchedules();
+			if (schedule.getStationNames().isEmpty())
+			{
+				setMessage("Unusable schedule loaded. Did you enter positive throughput?");
+			}
 			String defaultStation = schedule.getStationNames().get(0);
 			// Populate the station selection combo box
 			String[] stations = new String[schedule.getStationNames().size()];
@@ -724,13 +731,7 @@ public class MboSchedulerUI extends javax.swing.JFrame
 		JComboBox cb = (JComboBox) evt.getSource();
 		String newDriver = (String) cb.getSelectedItem();
 		generateDriverTable(Integer.parseInt(newDriver));	
-	}
-
-    private void disableDispatchRadioActionPerformed(java.awt.event.ActionEvent evt) 
-	{                                              
-        // TODO add your handling code here:
-		System.out.println("This is radio button 2!");
-    }    
+	} 
 	
 	private void dispatchEnabledSelected(ActionEvent evt)
 	{
