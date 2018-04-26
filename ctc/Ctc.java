@@ -134,18 +134,22 @@ public class Ctc implements Updateable{
 				else if(!isManualGreen)
 				{
 					if(t.schedule != null && !t.schedule.schedule.isEmpty())
-					{
+					{						
 						dis = t.schedule.schedule.peekFirst();
 						if(dis.time.equals(timeToStr()))
 						{
+							System.out.println("auto mode, set route for train: " + t.ID);
+							
 							dis = t.schedule.schedule.poll();
 							t.route = dis.route;
 							t.setpoint_speed = dis.speed;
+							t.driverID = dis.driver;
 							if(t.setpoint_speed > MAXSPEED)
 								t.setpoint_speed = MAXSPEED;
 							
 							if(t.route != null && !t.route.isEmpty())
 							{
+								System.out.println("update and send auth for train: " + t.ID);
 								updateAuth(t.location);
 								sendSpeedAuth(t,t.setpoint_speed,t.authority);
 							}
@@ -909,6 +913,8 @@ public class Ctc implements Updateable{
 	
 	public static void autoMode(String line)
 	{
+		System.out.println("auto mode in " + line);
+		
 		if(line.equalsIgnoreCase("green"))
 		{
 			isManualGreen = false;
@@ -2042,7 +2048,8 @@ public class Ctc implements Updateable{
 		
 		if(train.location.num == 0)
 		{
-			trackmodel.setYardMessage(train.ID, train.location.line, 0, tmc);
+			System.out.println("yard message for train " + train.ID);
+			trackmodel.setYardMessage(train.ID, train.location.line, train.driverID, tmc);
 			if(!dispatched.contains(train))
 				dispatched.add(train);
 		}
@@ -2498,6 +2505,7 @@ public class Ctc implements Updateable{
 	{
 		Schedule sched = new Schedule();
 		ArrayDeque<Block> route = new ArrayDeque<Block>();
+		ArrayDeque<Integer> drivers = new ArrayDeque<Integer>();
 		StringTokenizer st;
 		int id;
 		Train train;
@@ -2604,22 +2612,100 @@ public class Ctc implements Updateable{
 				
 				speed = findSpeed(route, time1, time2);
 				
+				/*
 				System.out.print("route: ");
 				for(Block b : route)
 					System.out.print(b.display() + " ");
 				System.out.println();
 				System.out.println("speed: " + speed);
+				*/
 				
 				sched.addRoute(new Dispatch(route,time1,speed,0));
 			}while(stok.hasMoreTokens());
 		}
 		
+		// driver schedule loop
+		str = stok.nextToken();
+		cont = true;
+		while(stok.hasMoreTokens() && cont)
+		{
+			System.out.println("driver str: " + str);
+			st = new StringTokenizer(str,",");
+			toktemp = new StringTokenizer(str," "); 
+			toktemp.nextToken();
+			toktemp.nextToken();
+			id = Integer.parseInt(toktemp.nextToken().trim());
+			while(stok.hasMoreTokens())
+			{
+				str = stok.nextToken();
+				
+				st = new StringTokenizer(str,",");
+				temp = st.nextToken();
+				
+				toktemp = new StringTokenizer(temp," ");
+				temp = toktemp.nextToken();
+				
+				//System.out.println("temp " + temp);
+				if(temp.equalsIgnoreCase("Driver"))
+				{
+					System.out.println("next driver");
+					break;
+				}
+				else if(!temp.equalsIgnoreCase("Time"))
+				{
+					//System.out.println("on to drivers");
+					cont = false;
+					break;
+				}
+				
+				time1 = st.nextToken().trim();
+				st.nextToken();
+				depart = st.nextToken().trim();
+				toktemp = new StringTokenizer(depart," ");
+				toktemp.nextToken();
+				depart = toktemp.nextToken();
+				
+				str = stok.nextToken();
+				st = new StringTokenizer(str,",");
+				st.nextToken();
+				
+				time2 = st.nextToken().trim();
+				st.nextToken();
+				arrive = st.nextToken().trim();
+				toktemp = new StringTokenizer(arrive," ");
+				toktemp.nextToken();
+				arrive = toktemp.nextToken();
+				
+				boolean go = false;
+				train = getTrain(Integer.parseInt(depart));
+				for(Dispatch d : train.schedule.schedule)
+				{
+					if(d.time.equals(time1))
+					{
+						go = true;
+						d.driver = id;
+					}
+					else if(d.time.compareTo(time2) >= 0 && go)
+					{
+						go = false;
+						d.driver = id;
+					}
+					else if(go)
+					{
+						d.driver = id;
+					}
+				}
+			}
+		}
+		
+		/*
 		for(Train t : trains)
 		{
 			System.out.println("train: " + t.ID);
 			
 			for(Dispatch d : t.schedule.schedule)
 			{
+				System.out.println("driver: " + d.driver);
 				for(Block b : d.route)
 				{
 					System.out.print(b.display() + " ");
@@ -2628,30 +2714,7 @@ public class Ctc implements Updateable{
 				System.out.println();
 			}
 		}
-		
-		// driver schedule loop
-		str = stok.nextToken();
-		while(stok.hasMoreTokens())
-		{
-			st = new StringTokenizer(str," ,");
-			st.nextToken();
-			st.nextToken();
-			id = Integer.parseInt(st.nextToken());
-			while(stok.hasMoreTokens())
-			{
-				str = stok.nextToken();
-				st = new StringTokenizer(str," ,");
-				if(st.nextToken().equalsIgnoreCase("Driver"))
-					break;
-
-				
-				
-				
-				
-			}
-		}
-		
-		
+		*/
 		
 	}
 	
@@ -2963,7 +3026,7 @@ public class Ctc implements Updateable{
 		protected Block lastBlock;
 		protected Schedule schedule;
 		protected ArrayDeque<Block> reservedblocks;
-
+		
 		public Train() {
 			ID = 0;
 			location = null;
