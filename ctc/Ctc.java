@@ -2453,7 +2453,7 @@ public class Ctc implements Updateable{
 		StringTokenizer stok = new StringTokenizer(sched_in,"\n");
 		String str;
 		
-		System.out.println(sched_in + "\n");
+		//System.out.println(sched_in + "\n");
 		
 		StringTokenizer lineTok = new StringTokenizer(stok.nextToken()," ");
 		String line = lineTok.nextToken();
@@ -2468,7 +2468,7 @@ public class Ctc implements Updateable{
 		while(stok.hasMoreTokens() && cont)
 		{			
 			st = new StringTokenizer(str," ,");
-			System.out.println("str " + str);
+			//System.out.println("str " + str);
 			st.nextToken();
 			st.nextToken();
 			id = Integer.parseInt(st.nextToken());
@@ -2477,14 +2477,14 @@ public class Ctc implements Updateable{
 			do
 			{
 				str = stok.nextToken();
-				System.out.println("str " + str);
+				//System.out.println("str " + str);
 				
 				st = new StringTokenizer(str,", ");
 				temp = st.nextToken();
-				System.out.println("temp " + temp);
+				//System.out.println("temp " + temp);
 				if(temp.equalsIgnoreCase("Train"))
 				{
-					System.out.println("next train");
+					//System.out.println("next train");
 					train.schedule = sched;
 					sched = new Schedule();
 					route = new ArrayDeque<Block>();
@@ -2492,7 +2492,7 @@ public class Ctc implements Updateable{
 				}
 				else if(!temp.equalsIgnoreCase("Time:"))
 				{
-					System.out.println("on to drivers");
+					//System.out.println("on to drivers");
 					train.schedule = sched;
 					sched = new Schedule();
 					route = new ArrayDeque<Block>();
@@ -2506,11 +2506,11 @@ public class Ctc implements Updateable{
 				if(st.hasMoreTokens())
 					depart = depart + " " + st.nextToken();
 				
-				System.out.println("t1: " + time1 + " depart from " + depart);
+				//System.out.println("t1: " + time1 + " depart from " + depart);
 				
 				str = stok.nextToken();
 				st = new StringTokenizer(str," ,");
-				System.out.println("str: " + str);
+				//System.out.println("str: " + str);
 				st.nextToken();
 				
 				time2 = st.nextToken();
@@ -2519,7 +2519,7 @@ public class Ctc implements Updateable{
 				if(st.hasMoreTokens())
 					arrive = arrive + " " + st.nextToken();
 				
-				System.out.println("t2: " + time2 + " arrive at " + arrive);
+				//System.out.println("t2: " + time2 + " arrive at " + arrive);
 				
 				if(depart.equalsIgnoreCase("YARD"))
 				{
@@ -2544,12 +2544,19 @@ public class Ctc implements Updateable{
 				fake.lastBlock = prev;
 				fake.location = start;
 					
+				System.out.println("depart " + depart + ", arrive " + arrive);
 				System.out.println("from " + start.display() + " to " + end.display());
 				
 				route = findRoute(fake,start,end);
 				prev = route.peekLast();
 				
 				speed = findSpeed(route, time1, time2);
+				
+				System.out.print("route: ");
+				for(Block b : route)
+					System.out.print(b.display() + " ");
+				System.out.println();
+				System.out.println("speed: " + speed);
 				
 				sched.addRoute(new Dispatch(route,time1,speed,0));
 			}while(stok.hasMoreTokens());
@@ -2612,23 +2619,44 @@ public class Ctc implements Updateable{
 		double dist = 0;
 		double hours = 0;
 		double hours1 = 0;
+		double minutes1 = 0;
+		double sec1 = 0;
 		double hours2 = 0;
+		double minutes2 = 0;
+		double sec2 = 0;
 		
 		for(Block bl : route)
 		{
 			dist += bl.length;
 		}
 		
+		System.out.println(t1 + " to " + t2);
+		
 		StringTokenizer st = new StringTokenizer(t1,":");
-		hours1 = Integer.parseInt(st.nextToken()) + Integer.parseInt(st.nextToken()) / 60 + Integer.parseInt(st.nextToken()) / 360;
+		hours1 = Integer.parseInt(st.nextToken());
+		minutes1 = Integer.parseInt(st.nextToken());
+		sec1 = Integer.parseInt(st.nextToken());
 		
 		st = new StringTokenizer(t2,":");
-		hours2 = Integer.parseInt(st.nextToken()) + Integer.parseInt(st.nextToken()) / 60 + Integer.parseInt(st.nextToken()) / 360;
+		hours2 = Integer.parseInt(st.nextToken());
+		minutes2 = Integer.parseInt(st.nextToken());
+		sec2 = Integer.parseInt(st.nextToken());
+		
+		//System.out.println("time");
+		//System.out.println(hours1 + " " + minutes1 + " " + sec1);
+		//System.out.println(hours2 + " " + minutes2 + " " + sec2);
+		
+		hours1 = hours1 + minutes1/60.0 + sec1/3600.0;
+		hours2 = hours2 + minutes2/60.0 + sec2/3600.0;
+		
+		//System.out.println("hours1 " + hours1 + " hours2 " + hours2);
 		
 		hours = hours2 - hours1;
 		
 		if(hours > 0)
 			speed = toMph(dist,hours);
+		
+		System.out.println("dist: " + dist + " hours: " + hours + " speed: " + speed);
 		
 		return speed;
 	}
