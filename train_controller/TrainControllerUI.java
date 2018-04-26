@@ -22,6 +22,7 @@ public class TrainControllerUI extends javax.swing.JFrame {
             RunningAuthLabel.setText(df.format(controller.getMovingAuth()) + " yds");
             PowerLabel.setText(df.format(controller.getPowerKW()) + " kW");
             ActualTempLabel.setText(Integer.toString((int)controller.getTemp()));
+            TrainIDLabel.setText(Integer.toString(controller.trainID));
             
             updateDoorLabels();
             updateConsole();
@@ -102,6 +103,8 @@ public class TrainControllerUI extends javax.swing.JFrame {
         jLabel6 = new javax.swing.JLabel();
         jScrollPane4 = new javax.swing.JScrollPane();
         Console = new javax.swing.JTextPane();
+        jLabel12 = new javax.swing.JLabel();
+        TrainIDLabel = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
 
@@ -533,27 +536,41 @@ public class TrainControllerUI extends javax.swing.JFrame {
         Console.setText("No messages");
         jScrollPane4.setViewportView(Console);
 
+        jLabel12.setText("Train ID");
+
+        TrainIDLabel.setText("?");
+
         javax.swing.GroupLayout EmergencyPanelLayout = new javax.swing.GroupLayout(EmergencyPanel);
         EmergencyPanel.setLayout(EmergencyPanelLayout);
         EmergencyPanelLayout.setHorizontalGroup(
             EmergencyPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(EmergencyPanelLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(EmergencyPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, EmergencyPanelLayout.createSequentialGroup()
-                        .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(36, 36, 36))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, EmergencyPanelLayout.createSequentialGroup()
-                        .addComponent(jLabel6)
-                        .addGap(113, 113, 113))))
+                .addGap(15, 15, 15)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(38, 38, 38)
+                .addComponent(TrainIDLabel)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(EmergencyPanelLayout.createSequentialGroup()
+                .addGap(82, 82, 82)
+                .addComponent(jLabel6)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel12)
+                .addGap(15, 15, 15))
         );
         EmergencyPanelLayout.setVerticalGroup(
             EmergencyPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, EmergencyPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel6)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(EmergencyPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel6)
+                    .addComponent(jLabel12))
+                .addGroup(EmergencyPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(EmergencyPanelLayout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(EmergencyPanelLayout.createSequentialGroup()
+                        .addGap(27, 27, 27)
+                        .addComponent(TrainIDLabel)))
                 .addContainerGap(16, Short.MAX_VALUE))
         );
 
@@ -651,13 +668,14 @@ public class TrainControllerUI extends javax.swing.JFrame {
             Console.setText("No messages");
     }
     
-     private void updateEBrake()
+    private void updateEBrake()
     {
         if(controller.eBrakeState())
             EmergencyBrakeLabel.setText("ON");
         else
             EmergencyBrakeLabel.setText("ARMED");
     }
+    
     
     private void SetSpeedSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_SetSpeedSliderStateChanged
         // TODO add your handling code here:
@@ -852,11 +870,13 @@ public class TrainControllerUI extends javax.swing.JFrame {
     private javax.swing.JLabel RunningAuthLabel;
     private javax.swing.JSlider SetSpeedSlider;
     private javax.swing.JSlider TempSlider;
+    private javax.swing.JLabel TrainIDLabel;
     private javax.swing.JDialog jDialog1;
     private javax.swing.JDialog jDialog2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel2;
