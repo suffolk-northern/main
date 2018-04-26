@@ -69,8 +69,6 @@ public class ScheduleReader
 			else
 			{
 				String[] tokens = lines[i].split(", ");
-				for (int j = 0; j < tokens.length; j++)
-					System.out.println(tokens[j]);
 				String[] time = tokens[1].split(":");
 				Time eventTime = new Time(Integer.parseInt(time[0]), Integer.parseInt(time[1]), Integer.parseInt(time[2]));
 				// Driver event
@@ -79,7 +77,7 @@ public class ScheduleReader
 					DriverEvent.EventType et = DriverEvent.EventType.DISEMBARK;
 					if (tokens[2].equals("EMBARK"))
 						et = DriverEvent.EventType.EMBARK;
-					int trainID = Integer.parseInt(tokens[4]);
+					int trainID = Integer.parseInt(tokens[3].substring(6));
 					DriverEvent de = new DriverEvent(eventTime, et, trainID);
 					curDriverEvents.add(de);
 				}
