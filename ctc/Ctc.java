@@ -323,7 +323,7 @@ public class Ctc implements Updateable{
 	
 	public void setTrain(String line, int ID)
 	{
-		Train train = new Train(ID,getBlock(line,0),0);
+		Train train = new Train(ID,getBlock(line,0),ID);
 		trains.add(train);
 		
 		updateTrains();
@@ -984,7 +984,13 @@ public class Ctc implements Updateable{
 		//printRoute(route);
 
 		train.setRoute(route);
-
+		
+		/*
+		ArrayDeque<Block> re = route.clone();
+		for(Block bl : re)
+			System.out.print(bl.display() + " ");
+		System.out.println();
+*/
 		/*
 		
 		ArrayDeque<SwitchAndPos> swpos = getSwitches(route);
@@ -1129,6 +1135,8 @@ public class Ctc implements Updateable{
 		
 		//System.out.println("calc auth");
 		
+		//System.out.println("start " + start.display());
+		
 		int res = 0;
 		
 		double auth = 0;
@@ -1191,7 +1199,7 @@ public class Ctc implements Updateable{
 			{
 				auth += block.length / 2;
 			}
-			else if (block.hasSwitch()) {
+			else if (block.hasSwitch()/* && (block.equals(getBlock(block.line,trackmodel.getFirstBlock(block.line).getBlock())) || getFirstSwitch(route).peekFirst().equals(block))*/) {
 				if (isForwardSwitch(block) && temp.peek() != null && block.sw_to.contains(temp.peek()) && (!block.getSwitchCurrTo().equals(temp.peek()))) 
 				{
 					if(block.equals(end) && block.hasStation)
@@ -1253,10 +1261,11 @@ public class Ctc implements Updateable{
 				}
 				else if (isBackwardSwitch(block) && prev != null && block.sw_from.contains(prev) && !block.sw_curr_from.equals(prev)) 
 				{
+					/*
 					System.out.println("want from, prev: " + prev.display());
 					System.out.println("is curr: " + block.sw_curr_from.display());
 					System.out.println("is switch: " + block.display());
-					
+					*/
 					success = false;
 					
 					if(flipped)
@@ -1328,9 +1337,16 @@ public class Ctc implements Updateable{
 						auth += block.length;
 				}
 				
+				//System.out.println("first switch at: " + block.display());
 				flipped = true;
 				
 			} 
+			/*
+			else if(!getFirstSwitch(route).peekFirst().equals(block))
+			{
+				return auth;
+			}
+			*/
 			else {
 				auth += block.length;
 			}
@@ -1602,22 +1618,22 @@ public class Ctc implements Updateable{
 			{
 				dist = getDistOnRoute(train,swblock);
 				closest = train;
-				System.out.println("assign closest");
-			}
-			else
-			{
-				System.out.println("train " + train.ID + " dist = " + dist);
+				//System.out.println("assign closest");
 			}
 		}
 		
+		/*
 		if(closest == null)
 			System.out.println("closest null");
 		else if(closest.route == null)
 			System.out.println("route null");
 		else if(getFirstSwitch(closest.route) == null)
 			System.out.println("first null");
-		
+		*/
 		// if switch is not in right config, flip it
+		if(closest == null)
+			return false;
+			
 		Block desired = getFirstSwitch(closest.route).peekLast();
 		if((isForwardSwitch(swblock) && !swblock.sw_curr_to.equals(desired)) || (isBackwardSwitch(swblock) && !swblock.sw_curr_from.equals(desired)))
 		{
