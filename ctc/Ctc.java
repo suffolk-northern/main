@@ -57,8 +57,10 @@ public class Ctc implements Updateable{
 	
 	public static double through = 0;
 	
-	public static boolean isManual = true;
-	public static boolean isFixed = true;
+	public static boolean isManualGreen = true;
+	public static boolean isManualRed = true;
+	public static boolean isFixedGreen = true;
+	public static boolean isFixedRed = true;
 
 	public static void showUI() {
 		ui.showUI();
@@ -85,12 +87,7 @@ public class Ctc implements Updateable{
 		{
 			b.occupied = trackmodel.getBlock(b.line, b.num).isIsOccupied();
 		}
-		/*
-		for(Block b : brokenBlocks)
-		{
-			b.broken = true;
-		}
-		*/
+
 		btemp = toUpdate.clone();
 		
 		for(Block b : btemp)
@@ -109,12 +106,6 @@ public class Ctc implements Updateable{
 			
 		}
 		
-		/*
-		for(Block b : brokenBlocks)
-		{
-			b.broken = true;
-		}
-		*/
 		btemp = toUpdate.clone();
 		
 		for(Block b : btemp)
@@ -129,12 +120,67 @@ public class Ctc implements Updateable{
 			//updateAuth(b);
 		}
 		
+		Dispatch dis;
+		
 		for(Train t : trains)
 		{
-			if(t.route != null && !t.route.isEmpty())
+			if(t.location.line.equalsIgnoreCase("green"))
+			{						
+				if(t.route != null && !t.route.isEmpty())
+				{
+					updateAuth(t.location);
+					sendSpeedAuth(t,t.setpoint_speed,t.authority);
+				}
+				else if(!isManualGreen)
+				{
+					if(t.schedule != null && !t.schedule.schedule.isEmpty())
+					{
+						dis = t.schedule.schedule.peekFirst();
+						if(dis.time.equals(timeToStr()))
+						{
+							dis = t.schedule.schedule.poll();
+							t.route = dis.route;
+							t.setpoint_speed = dis.speed;
+							if(t.setpoint_speed > MAXSPEED)
+								t.setpoint_speed = MAXSPEED;
+							
+							if(t.route != null && !t.route.isEmpty())
+							{
+								updateAuth(t.location);
+								sendSpeedAuth(t,t.setpoint_speed,t.authority);
+							}
+						}
+					}
+				}
+			}
+			else
 			{
-				updateAuth(t.location);
-				sendSpeedAuth(t,t.setpoint_speed,t.authority);
+				if(t.route != null && !t.route.isEmpty())
+				{
+					updateAuth(t.location);
+					sendSpeedAuth(t,t.setpoint_speed,t.authority);
+				}
+				else if(!isManualRed)
+				{
+					if(t.schedule != null && !t.schedule.schedule.isEmpty())
+					{
+						dis = t.schedule.schedule.peekFirst();
+						if(dis.time.equals(timeToStr()))
+						{
+							dis = t.schedule.schedule.poll();
+							t.route = dis.route;
+							t.setpoint_speed = dis.speed;
+							if(t.setpoint_speed > MAXSPEED)
+								t.setpoint_speed = MAXSPEED;
+							
+							if(t.route != null && !t.route.isEmpty())
+							{
+								updateAuth(t.location);
+								sendSpeedAuth(t,t.setpoint_speed,t.authority);
+							}
+						}
+					}
+				}
 			}
 		}
 		
@@ -145,6 +191,13 @@ public class Ctc implements Updateable{
 		updateTrack();
 		updateTrains();
 		return;
+	}
+	
+	public static String timeToStr()
+	{
+		Date d = clock.time();
+		String str = d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds();
+		return str;
 	}
 	
 	private static ArrayDeque<Block> toUpdate;
@@ -792,12 +845,26 @@ public class Ctc implements Updateable{
 	
 	public static void toFixedBlock(String line)
 	{
-		
+		if(line.equalsIgnoreCase("green"))
+		{
+			isFixedGreen = true;
+		}
+		else
+		{
+			isFixedRed = true;
+		}
 	}
 	
 	public static void toMovingBlock(String line)
 	{
-		
+		if(line.equalsIgnoreCase("green"))
+		{
+			isFixedGreen = false;
+		}
+		else
+		{
+			isFixedRed = false;
+		}
 	}
 	
 	public static void enableMBO(String line)
@@ -844,11 +911,11 @@ public class Ctc implements Updateable{
 	{
 		if(line.equalsIgnoreCase("green"))
 		{
-			
+			isManualGreen = false;
 		}
 		else if(line.equalsIgnoreCase("red"))
 		{
-			
+			isManualRed = false;
 		}
 	}
 	
@@ -856,11 +923,11 @@ public class Ctc implements Updateable{
 	{
 		if(line.equalsIgnoreCase("green"))
 		{
-			
+			isManualGreen = true;
 		}
 		else if(line.equalsIgnoreCase("red"))
 		{
-			
+			isManualRed = true;
 		}
 	}
 
@@ -2111,20 +2178,6 @@ public class Ctc implements Updateable{
 
 	}
 
-	//private static void setSwitch(Block swBlock, Block from, Block to) {
-	//	System.out.println("To Track Controller");
-	//	System.out.println("Set switch at block " + swBlock.display());
-	//	System.out.println("To configuration from = " + from.display() + ", to = " + to.display());
-	//}
-
-	private static void getTrackConUpdate() {
-
-	}
-
-	private static void getTicketInfo() {
-
-	}
-
 	private static void calcThroughput() {
 		ArrayDeque<Train> temp = trains.clone();
 		through = 0;
@@ -2473,6 +2526,7 @@ public class Ctc implements Updateable{
 		str = stok.nextToken();
 		
 		String temp;
+		StringTokenizer toktemp;
 		
 		// train schedule loop
 		while(stok.hasMoreTokens() && cont)
@@ -2484,6 +2538,8 @@ public class Ctc implements Updateable{
 			id = Integer.parseInt(st.nextToken());
 			System.out.println("tid: " + id);
 			train = getTrain(id);
+			prev = null;
+			
 			do
 			{
 				str = stok.nextToken();
@@ -2491,10 +2547,14 @@ public class Ctc implements Updateable{
 				
 				st = new StringTokenizer(str,",");
 				temp = st.nextToken();
+				
+				toktemp = new StringTokenizer(temp," ");
+				temp = toktemp.nextToken();
+				
 				System.out.println("temp " + temp);
 				if(temp.equalsIgnoreCase("Train"))
 				{
-					//System.out.println("next train");
+					System.out.println("next train");
 					train.schedule = sched;
 					sched = new Schedule();
 					route = new ArrayDeque<Block>();
