@@ -67,6 +67,9 @@ public class TrainController implements Updateable
         boolean leftSide = false;
         int trainID;
         String approachingStation;
+        boolean firstBeacon = true;
+        boolean passingTypeApproach = false;
+        int passingTypeCount = 0;
         
         boolean eBrakeFailure = false;
         boolean sBrakeFailure = false;
@@ -186,10 +189,12 @@ public class TrainController implements Updateable
         
         public String getStationText()
         {
-            String s = "Passing " + approachingStation + "\n";
+            System.out.println(approachingStation);
+            //String s = "Passing " + approachingStation + "\n";
+            String s = "";
             if(stationGap)
                 s = "Arriving at " + approachingStation + "\n";
-            if(approachingStation.equals(""))
+            if(approachingStation.equals("") | afterStation)
                 s = "";
             return s;
         }
@@ -386,17 +391,16 @@ public class TrainController implements Updateable
                     movingAuth = currAuth;
                     mboMode = true;
 		}
+                System.out.println(approachingStation); ///////// delete
                 double disp = displacement(millis);
 		movingAuth -= disp;
                 totalMovingAuth -= disp;
                 distFromLastBeacon += disp;
-                
-                if(beaconMsg!=null)
+               // System.out.println("\t\tafterStation: " + afterStation);
+                if (beaconMsg!=null & !afterStation & (distFromLastBeacon > 5 | firstBeacon) )
                 {
-                    distFromLastBeacon = 0;
-                }
-                if (beaconMsg!=null & !afterStation)
-                {
+                    firstBeacon = false;
+                   // System.out.println("beaconRecevived!");
                     bm = beaconMsg.string.split(",");
                     if((currAuth == 0 | currAuth == (int)Double.parseDouble(bm[0])) & !mboMode)
                     {
@@ -404,7 +408,7 @@ public class TrainController implements Updateable
                         movingAuth = currAuth;
                         stationGap = true;
                     }
-                    if( mboMode & Math.abs(movingAuth -  Double.parseDouble(bm[0])) < 10 )
+                    if( mboMode & Math.abs(movingAuth - Double.parseDouble(bm[0])) < 10 )
                     {
                         stationGap = true;
                     }
@@ -414,8 +418,15 @@ public class TrainController implements Updateable
                     else
                         leftSide = false;
                 }
-                if (beaconMsg!=null & afterStation & distFromLastBeacon < 5);
+                if(beaconMsg!=null & afterStation & distFromLastBeacon > 5)
+                {
                     afterStation = false;
+                    approachingStation = "";
+                }
+                if(beaconMsg!=null)
+                {
+                    distFromLastBeacon = 0;
+                }
 		if((movingAuth < 5 && currentSpeed == 0) | dwelling)
 		{
                     // Train stopped for auth reasons
@@ -447,7 +458,7 @@ public class TrainController implements Updateable
                     stationGap = false;
 		}
 	}
-        
+
         private void updateHeater()
         {
             if(getTemp() >= temperatureCMD + 1 & link.heater())

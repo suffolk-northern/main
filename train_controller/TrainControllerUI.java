@@ -664,7 +664,7 @@ public class TrainControllerUI extends javax.swing.JFrame {
         }
         msg += controller.getStationText();
         Console.setText(msg);
-        if(allFalse)
+        if(allFalse & msg.equals(""))
             Console.setText("No messages\n");
     }
     
