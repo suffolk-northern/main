@@ -41,7 +41,7 @@ public class MboScheduler implements Updateable
 	private int minTimeBetweenDispatch = 5*60; // Seconds
 	private int schedIncrement = 1; // Seconds
 	// TODO: check these times
-	private Time shiftStartToBreakStart = new Time(3, 0, 0);
+	private Time shiftStartToBreakStart = new Time(4, 0, 0);
 	private Time breakStartToBreakEnd = new Time(0, 30, 0);
 	private Time breakEndToShiftEnd = new Time(3, 0, 0);
 	private int accelerationTime = 18; // seconds

@@ -23,6 +23,7 @@ import java.awt.event.*;
 public class MboControllerUI extends JFrame
 {
 	private Request curRequest;
+	private boolean controllerEnabled;
 	
 	private JFrame frame;
 	private JPanel mainPanel;
@@ -75,7 +76,6 @@ public class MboControllerUI extends JFrame
 		// TODO: extend to extra rows once we start routing lots of trains
 		Object[][] tableContents = new Object[][]
 		{
-			{null, null, null, null, null, null},
 			{null, null, null, null, null, null},
 			{null, null, null, null, null, null},
 			{null, null, null, null, null, null},
@@ -190,7 +190,6 @@ public class MboControllerUI extends JFrame
 		int customAuthority = (int) ((double) authority * 1.0936);
 		// Convert kph to mph
 		int customSpeed = (int) ((double) speed * 0.621371);
-		// System.out.printf("Adding train %d to row %d%n", trainID, row);
 		updateRow(row, trainID, section, block, location, customAuthority, customSpeed);
 		numTrains += 1;
 	}
@@ -202,20 +201,17 @@ public class MboControllerUI extends JFrame
 		int customAuthority = (int) ((double) authority * 1.0936);
 		// Convert kph to mph
 		int customSpeed = (int) ((double) speed * 0.621371);
-		// System.out.printf("Updatating train %d in row %d%n", trainID, row);
 		if (row == -1)
 		{
 			addTrain(trainID, section, block, location, customAuthority, customSpeed);
 			row = trainIDs.indexOf(trainID);
 		}
-		
 		updateRow(row, trainID, section, block, location, customAuthority, customSpeed);
 	}
 	
 	public void removeTrain(int trainID)
 	{
 		int row = trainIDs.indexOf(trainID);
-		// System.out.printf("Removing train %d from row %d%n", trainID, row);
 		clearRow(row);
 		trainIDs.remove(row);
 	}
@@ -227,8 +223,16 @@ public class MboControllerUI extends JFrame
 		model.setValueAt(section, row, 1);
 		model.setValueAt(block, row, 2);
 		model.setValueAt(location, row, 3);
-		model.setValueAt(authority, row, 4);
-		model.setValueAt(speed, row, 5);
+		if (controllerEnabled)
+		{
+			model.setValueAt(authority, row, 4);
+			model.setValueAt(speed, row, 5);
+		}
+		else
+		{
+			model.setValueAt(null, row, 4);
+			model.setValueAt(null, row, 5);
+		}
 	}
 	
 	private void clearRow(int row)
@@ -246,12 +250,14 @@ public class MboControllerUI extends JFrame
 	{
 		if (curRequest == Request.NONE)
 			curRequest = Request.ENABLE_MBO;
+		controllerEnabled = true;
 	}
 	
 	private void disableMboSelected(ActionEvent evt)
 	{
 		if (curRequest == Request.NONE)
 			curRequest = Request.DISABLE_MBO;
+		controllerEnabled = false;
 	}
 	
 	public void setMboEnabled(boolean isEnabled)
@@ -260,11 +266,13 @@ public class MboControllerUI extends JFrame
 		{
 			mboEnabledRadio.setSelected(true);
 			mboDisabledRadio.setSelected(false);
+			controllerEnabled = true;
 		}
 		else
 		{
 			mboDisabledRadio.setSelected(true);
 			mboEnabledRadio.setSelected(false);
+			controllerEnabled = false;
 		}	
 	}
 	

@@ -23,8 +23,9 @@ public class TrainTracker
 	boolean enteredNewBlock;
 //	GlobalCoordinates lastPosition;
 	GlobalCoordinates currentPosition;
-	long timeStopped; // Time at station in ms
+	int timeStopped; // Time at station in ms
 	int newBlockCounter;
+	boolean stoppedAtStation;
 	
 	public TrainTracker(int newID, BlockTracker newBlock, MboRadio newRadio)
 	{
@@ -39,6 +40,7 @@ public class TrainTracker
 		currentPosition = GlobalCoordinates.ORIGIN;
 		timeStopped = 0;
 		newBlockCounter = 0;
+		stoppedAtStation = false;
 	}
 	
 	public void setAuthority(int newAuthority)
@@ -134,5 +136,30 @@ public class TrainTracker
 	public int getNewBlockCounter()
 	{
 		return newBlockCounter;
+	}
+	
+	public void incrementTimeStopped(int increment)
+	{
+		timeStopped += increment;
+	}
+	
+	public void resetTimeStopped()
+	{
+		timeStopped = 0;
+	}
+	
+	public int getTimeStopped()
+	{
+		return timeStopped;
+	}
+	
+	public boolean isStoppedAtStation()
+	{
+		return stoppedAtStation;
+	}
+	
+	public void stopAtStation(boolean stopped)
+	{
+		stoppedAtStation = stopped;
 	}
 }
