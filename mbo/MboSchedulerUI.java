@@ -625,13 +625,10 @@ public class MboSchedulerUI extends javax.swing.JFrame
 		if (ss != null)
 		{
 			int numEvents = ss.getEvents().size();
-			// System.out.printf("numEvents: %d%n", numEvents);
 			String[][] tableObject = new String[numEvents][3];
-			// System.out.println(tableObject.length);
 			int ind = 0;
 			for (StationEvent se : ss.getEvents())
 			{
-				// System.out.println(se.getTime().toString());
 				tableObject[ind][0] = se.getTime().toString();
 				if (se.getEvent() == TrainEvent.EventType.ARRIVAL)
 					tableObject[ind][1] = "ARRIVAL";
@@ -860,15 +857,6 @@ public class MboSchedulerUI extends javax.swing.JFrame
 		NONE, SCHEDULE, EXPORT_TO_CTC, LOAD_FROM_CTC, LOAD_FROM_FILE,
 		ENABLE_DISPATCH, DISABLE_DISPATCH
 	}
-
-//    private class ThroughputPanel {
-//        public static javax.swing.JScrollPane newPanel()
-//        {
-//            javax.swing.JScrollPane panel = new javax.swing.JScrollPane();
-//            javax.swing.JTable table = new javax.swing.JTable();
-//            return panel;
-//        }
-//    }
     
     /**
      * @param args the command line arguments

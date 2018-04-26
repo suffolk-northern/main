@@ -190,7 +190,6 @@ public class MboControllerUI extends JFrame
 		int customAuthority = (int) ((double) authority * 1.0936);
 		// Convert kph to mph
 		int customSpeed = (int) ((double) speed * 0.621371);
-		// System.out.printf("Adding train %d to row %d%n", trainID, row);
 		updateRow(row, trainID, section, block, location, customAuthority, customSpeed);
 		numTrains += 1;
 	}
@@ -202,7 +201,6 @@ public class MboControllerUI extends JFrame
 		int customAuthority = (int) ((double) authority * 1.0936);
 		// Convert kph to mph
 		int customSpeed = (int) ((double) speed * 0.621371);
-		// System.out.printf("Updatating train %d in row %d%n", trainID, row);
 		if (row == -1)
 		{
 			addTrain(trainID, section, block, location, customAuthority, customSpeed);
@@ -214,7 +212,6 @@ public class MboControllerUI extends JFrame
 	public void removeTrain(int trainID)
 	{
 		int row = trainIDs.indexOf(trainID);
-		// System.out.printf("Removing train %d from row %d%n", trainID, row);
 		clearRow(row);
 		trainIDs.remove(row);
 	}

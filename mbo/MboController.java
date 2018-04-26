@@ -149,7 +149,6 @@ public class MboController implements Updateable
 			
 			for (int switchID : switchIDs)
 			{
-				// System.out.printf("Trying to load switch %d%n", switchID);
 				int[] otherSwitchBlocks = trackModel.getBranchesOfSwitch(lineName, switchID);
 				int[] switchBlocks = new int[3];
 				boolean[] switchNext = {false, false, false};
@@ -164,13 +163,6 @@ public class MboController implements Updateable
 					switchNext[2] = true;
 				SwitchTracker st = new SwitchTracker(switchID, switchBlocks, switchNext);
 				switches.add(st);
-				
-//				
-//				System.out.printf("Switch on block: %d%n", switchID);
-//				int block = st.getBlocks()[1];
-//				System.out.printf("First other block: %d, nextBlock is switch: %s%n", block, st.nextIsSwitch(block));
-//				block = st.getBlocks()[2];
-//				System.out.printf("First other block: %d, nextBlock is switch: %s%n", block, st.nextIsSwitch(block));
 			}
 		}
 	}
@@ -182,7 +174,6 @@ public class MboController implements Updateable
 		{
 			TrainTracker trainInfo = trains.get(i);
 			int newBlock = getBlockFromLoc(trainInfo.getLocation());
-			// System.out.printf("Train %d is on block %d%n", trainInfo.getID(), newBlock);
 			if (newBlock > 0)
 				trainInfo.block = line[newBlock];
 		}
@@ -210,10 +201,6 @@ public class MboController implements Updateable
 					ctcRadio.disableMovingBlock();
 			}
 		}
-		
-//		for (SwitchTracker st : switches)
-//			st.printInfo();
-//		System.out.println(line[100].getNext());
 
 		if (enabled)
 		{
@@ -232,12 +219,10 @@ public class MboController implements Updateable
 					else if (trainInfo.getTimeStopped() < DWELL_TIME)
 					{
 						trainInfo.incrementTimeStopped(time);
-						System.out.println(trainInfo.getTimeStopped());
 						authority = 0;
 					}
 					else
 					{
-						System.out.println(trainInfo.getTimeStopped());
 						trainInfo.incrementTimeStopped(time);
 						authority = 100;		
 					}
@@ -258,8 +243,6 @@ public class MboController implements Updateable
 				}
 				catch (IllegalArgumentException e)
 				{
-					//System.out.println("MBO tried to send an invalid speed / authority.");
-					//System.out.println("Sending 0 speed / authority instead.");
 					com = new MboMovementCommand(0, 0);
 				}
 				trainInfo.getRadio().send(com);
@@ -341,7 +324,6 @@ public class MboController implements Updateable
 		else
 			distInBlock = trainDist;
 		
-		// TODO: move this logic to update loop for more efficiency
 		ArrayList<BlockTracker> trainBlocks = new ArrayList<>();
 		ArrayList<TrainTracker> trainTrains = new ArrayList<>();
 		for (int i = 0; i < trains.size(); i++)
@@ -357,11 +339,6 @@ public class MboController implements Updateable
 		double authority = -1*distInBlock;
 		boolean blocked = false;
 		boolean forward = train.isGoingForward();
-		// System.out.println(forward);
-//		if (forward)
-//			System.out.printf("In block %d, going forward%n", curBlock.getID());
-//		else
-//			System.out.printf("In block %d, going backward%n", curBlock.getID());
 		for (int i = 0; i < line.length; i++)
 		{
 			for (int j = 0; j < trainBlocks.size(); j++)
@@ -446,24 +423,6 @@ public class MboController implements Updateable
 				}
 			}
 			
-//			if (forward)
-//			{
-//				if (curBlock.getNext() < 0)
-//					blocked = true;
-//				else if (line[curBlock.getNext()].getNext() == curBlock.getID())
-//				{
-//					if (!line[curBlock.getNext()].canGoBackward())
-//						blocked = true;
-//				}
-//			}
-//			else 
-//			{
-//				if (curBlock.getPrev() < 0 || !line[curBlock.getPrev()].canGoBackward())
-//					blocked = true;
-//			}
-			
-			// System.out.printf("Current authority: %f%n", authority);
-			
 			if (blocked)
 				break;
 
@@ -496,19 +455,11 @@ public class MboController implements Updateable
 		else 
 		{
 			double distanceAlongBlock = trackModel.getDistanceAlongBlock(lineName, newBlockID, newLocation);
-			// System.out.printf("Distance in new block: %f%n", distanceAlongBlock);
 			if (distanceAlongBlock < 1)
 				train.setGoingForward(true);
 			else
 				train.setGoingForward(false);
 		}
-//		double newDistance = trackModel.getDistanceAlongBlock(lineName, blockID, newLocation);
-//		double oldDistance = trackModel.getDistanceAlongBlock(lineName, blockID, train.getLastPosition());
-//		if (newDistance > oldDistance)
-//			train.setGoingForward(true);
-//		else
-//			train.setGoingForward(false);
-		// train.setLastPosition(train.getCurrentPosition());
 		train.setCurrentPosition(newLocation);
 	}
 	
@@ -589,22 +540,4 @@ public class MboController implements Updateable
 		}
 		return false;
 	}
-	
-//	public int changeTrainLocation(int trainID, GlobalCoordinates location)
-//	{
-//		int error = 0;
-//		for (TrainTracker trainInfo:trains)
-//		{
-//			if (trainInfo.getID() == trainID)
-//			{
-//				trainInfo.setLocation(location);
-//				TrackBlock newBlock = getBlock(location);
-//				if (newBlock != null)
-//					train.block = newBlock;
-//				else
-//					error = 1;
-//			}
-//		}
-//		return error;
-//	}
 }
