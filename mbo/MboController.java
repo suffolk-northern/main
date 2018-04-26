@@ -224,16 +224,27 @@ public class MboController implements Updateable
 				double authority = findAuthority(trainInfo);
 				if (trainAtStation(trainInfo))
 				{
-					if (trainInfo.getTimeStopped() < DWELL_TIME)
+					if (!trainInfo.isStoppedAtStation())
+					{
+						trainInfo.stopAtStation(true);
+						trainInfo.resetTimeStopped();
+					}
+					else if (trainInfo.getTimeStopped() < DWELL_TIME)
 					{
 						trainInfo.incrementTimeStopped(time);
+						System.out.println(trainInfo.getTimeStopped());
 						authority = 0;
 					}
 					else
 					{
-						trainInfo.resetTimeStopped();
-						authority = 1;
+						System.out.println(trainInfo.getTimeStopped());
+						trainInfo.incrementTimeStopped(time);
+						authority = 100;		
 					}
+				}
+				else if (trainInfo.isStoppedAtStation())
+				{
+					trainInfo.stopAtStation(false);
 				}
 				trainInfo.setAuthority((int) authority);
 				if (trainInfo.getBlock() != null)
@@ -411,7 +422,10 @@ public class MboController implements Updateable
 			else
 			{
 				if (curBlock.getPrev() < 0)
+				{
 					blocked = true;
+					authority -= curBlock.getLength();
+				}
 				else
 				{
 					BlockTracker prevBlock = line[curBlock.getPrev()];
