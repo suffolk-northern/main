@@ -126,12 +126,12 @@ public class Ctc implements Updateable{
 		{
 			if(t.location.line.equalsIgnoreCase("green"))
 			{						
-				if(t.route != null && !t.route.isEmpty())
-				{
+				if(t.route != null)
+				{					
 					updateAuth(t.location);
 					sendSpeedAuth(t,t.setpoint_speed,t.authority);
 				}
-				else if(!isManualGreen)
+				if(!isManualGreen && (t.route == null || t.route.isEmpty()))
 				{
 					if(t.schedule != null && !t.schedule.schedule.isEmpty())
 					{						
@@ -139,7 +139,7 @@ public class Ctc implements Updateable{
 						//System.out.println(dis.time + " vs current time: " + timeToStr());
 						if(dis.time.equals(timeToStr()))
 						{
-							System.out.println("auto mode, set route for train: " + t.ID);
+							//System.out.println("auto mode, set route for train: " + t.ID);
 							
 							dis = t.schedule.schedule.poll();
 							t.route = dis.route;
@@ -150,7 +150,7 @@ public class Ctc implements Updateable{
 							
 							if(t.route != null && !t.route.isEmpty())
 							{
-								System.out.println("update and send auth for train: " + t.ID);
+								//System.out.println("update and send auth for train: " + t.ID);
 								updateAuth(t.location);
 								sendSpeedAuth(t,t.setpoint_speed,t.authority);
 							}
@@ -159,27 +159,32 @@ public class Ctc implements Updateable{
 				}
 			}
 			else
-			{
-				if(t.route != null && !t.route.isEmpty())
-				{
+			{						
+				if(t.route != null)
+				{					
 					updateAuth(t.location);
 					sendSpeedAuth(t,t.setpoint_speed,t.authority);
 				}
-				else if(!isManualRed)
+				if(!isManualRed && (t.route == null || t.route.isEmpty()))
 				{
 					if(t.schedule != null && !t.schedule.schedule.isEmpty())
-					{
+					{						
 						dis = t.schedule.schedule.peekFirst();
+						//System.out.println(dis.time + " vs current time: " + timeToStr());
 						if(dis.time.equals(timeToStr()))
 						{
+							//System.out.println("auto mode, set route for train: " + t.ID);
+							
 							dis = t.schedule.schedule.poll();
 							t.route = dis.route;
 							t.setpoint_speed = dis.speed;
+							t.driverID = dis.driver;
 							if(t.setpoint_speed > MAXSPEED)
 								t.setpoint_speed = MAXSPEED;
 							
 							if(t.route != null && !t.route.isEmpty())
 							{
+								//System.out.println("update and send auth for train: " + t.ID);
 								updateAuth(t.location);
 								sendSpeedAuth(t,t.setpoint_speed,t.authority);
 							}
@@ -913,7 +918,7 @@ public class Ctc implements Updateable{
 	
 	public static void autoMode(String line)
 	{
-		System.out.println("auto mode in " + line);
+		//System.out.println("auto mode in " + line);
 		
 		if(line.equalsIgnoreCase("green"))
 		{
@@ -1136,6 +1141,14 @@ public class Ctc implements Updateable{
 			return auth;
 		
 		ArrayDeque<Block> temp = route.clone();
+		
+		/*
+		System.out.println("calc auth, route for " + ID);
+		for(Block myb : temp)
+			System.out.print(myb.display());
+		System.out.println();
+		*/
+		
 		Block block = temp.poll();
 		Block prev = null;
 		
@@ -1887,7 +1900,7 @@ public class Ctc implements Updateable{
 		while (!temp.isEmpty()) {
 			train = temp.poll();
 
-			if (train.getRoute() != null && !train.route.isEmpty() /*&& train.getRoute().contains(bl)*/) {
+			if (train.getRoute() != null /*&& train.getRoute().contains(bl)*/) {
 				train.setAuth(calcAuth(train.ID, train.getRoute(), train.getLoc(), train.getRoute().peekLast()));
 				if(!train.route.isEmpty())
 				{
@@ -2048,7 +2061,7 @@ public class Ctc implements Updateable{
 		
 		if(train.location.num == 0)
 		{
-			System.out.println("yard message for train " + train.ID);
+			//System.out.println("yard message for train " + train.ID);
 			trackmodel.setYardMessage(train.ID, train.location.line, train.driverID, tmc);
 			if(!dispatched.contains(train))
 				dispatched.add(train);
@@ -2524,7 +2537,7 @@ public class Ctc implements Updateable{
 		StringTokenizer stok = new StringTokenizer(sched_in,"\n");
 		String str;
 		
-		System.out.println(sched_in + "\n");
+		//System.out.println(sched_in + "\n");
 		
 		StringTokenizer lineTok = new StringTokenizer(stok.nextToken()," ");
 		String line = lineTok.nextToken();
@@ -2562,7 +2575,7 @@ public class Ctc implements Updateable{
 				//System.out.println("temp " + temp);
 				if(temp.equalsIgnoreCase("Train"))
 				{
-					System.out.println("next train");
+					//System.out.println("next train");
 					train.schedule = sched;
 					sched = new Schedule();
 					route = new ArrayDeque<Block>();
@@ -2629,7 +2642,7 @@ public class Ctc implements Updateable{
 		cont = true;
 		while(stok.hasMoreTokens() && cont)
 		{
-			System.out.println("driver str: " + str);
+			//System.out.println("driver str: " + str);
 			st = new StringTokenizer(str,",");
 			toktemp = new StringTokenizer(str," "); 
 			toktemp.nextToken();
@@ -2648,7 +2661,7 @@ public class Ctc implements Updateable{
 				//System.out.println("temp " + temp);
 				if(temp.equalsIgnoreCase("Driver"))
 				{
-					System.out.println("next driver");
+					//System.out.println("next driver");
 					break;
 				}
 				else if(!temp.equalsIgnoreCase("Time"))
@@ -3106,6 +3119,7 @@ public class Ctc implements Updateable{
 		}
 
 		private void setLoc(Block newLoc) {
+			//System.out.println("moved to " + newLoc.display());
 			lastBlock = location;
 			location = newLoc;
 			route.poll();
@@ -3113,6 +3127,17 @@ public class Ctc implements Updateable{
 			{
 				this.clearReserved();
 			}
+			
+			if(newLoc.equals(route.peekLast()))
+			{
+				route.poll();
+			}
+			
+			/*
+			for(Block myb: route)
+				System.out.print(myb.display() + " ");
+			System.out.println();
+			*/
 		}
 
 		public Block getLoc() {
