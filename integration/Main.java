@@ -97,7 +97,7 @@ public class Main
 
 		for (int i = 0; i < numberOfTrains; ++i)
 		{
-			trainControllers[i] = new TrainController();
+			trainControllers[i] = new TrainController(i);
 			trainModels[i] = new TrainModel(i, trackModel);
 		}
 		

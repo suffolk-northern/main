@@ -355,7 +355,6 @@ public class MboController implements Updateable
 			if (forward)
 			{
 				// Check if we are traveling forwards or backwards along the next block
-				// System.out.printf("About to check block %d going forwards%n", curBlock.getNext());
 				if (curBlock.getNext() < 0)
 					blocked = true;
 				else
@@ -379,7 +378,6 @@ public class MboController implements Updateable
 			}
 			else
 			{
-				// System.out.printf("About to check block %d going backwards%n", curBlock.getNext());
 				if (curBlock.getPrev() < 0)
 					blocked = true;
 				else
