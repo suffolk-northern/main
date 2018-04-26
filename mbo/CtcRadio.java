@@ -44,20 +44,19 @@ public class CtcRadio {
 	public void enableMovingBlock()
 	{
 		mboCont.enableMboController(true);
-		// TODO: add corresponding CTC function
+		mboSched.enableMboController(true);
 		ctc.toMovingBlock(line);
 	}
 	
 	public void disableMovingBlock()
 	{
 		mboCont.enableMboController(false);
-		// TODO: add corresponding CTC function
+		mboSched.enableMboController(false);
 		ctc.toFixedBlock(line);
 	}
 	
 	public void enableAutomaticDispatch(boolean isEnabled)
 	{
-		// TODO: Add CTC function
 		mboSched.enableDispatch(isEnabled);
 		if(isEnabled)
 			ctc.autoMode(line);
