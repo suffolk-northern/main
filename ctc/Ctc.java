@@ -1251,8 +1251,12 @@ public class Ctc implements Updateable{
 					else
 						auth += block.length;
 				}
-				else if (isBackwardSwitch(block) && prev != null && block.sw_from.contains(prev) && !block.getSwitchCurrFrom().equals(prev)) 
+				else if (isBackwardSwitch(block) && prev != null && block.sw_from.contains(prev) && !block.sw_curr_from.equals(prev)) 
 				{
+					System.out.println("want from, prev: " + prev.display());
+					System.out.println("is curr: " + block.sw_curr_from.display());
+					System.out.println("is switch: " + block.display());
+					
 					success = false;
 					
 					if(flipped)
@@ -1598,8 +1602,20 @@ public class Ctc implements Updateable{
 			{
 				dist = getDistOnRoute(train,swblock);
 				closest = train;
+				System.out.println("assign closest");
+			}
+			else
+			{
+				System.out.println("train " + train.ID + " dist = " + dist);
 			}
 		}
+		
+		if(closest == null)
+			System.out.println("closest null");
+		else if(closest.route == null)
+			System.out.println("route null");
+		else if(getFirstSwitch(closest.route) == null)
+			System.out.println("first null");
 		
 		// if switch is not in right config, flip it
 		Block desired = getFirstSwitch(closest.route).peekLast();
@@ -1622,6 +1638,8 @@ public class Ctc implements Updateable{
 	
 	private static double getDistOnRoute(Train train, Block block)
 	{
+		
+		
 		ArrayDeque<Block> rtemp = train.route.clone();
 		double dist = 0;
 		Block curr = null;
