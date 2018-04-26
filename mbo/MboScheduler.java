@@ -81,6 +81,7 @@ public class MboScheduler implements Updateable
 	
 	public void enableDispatch(boolean isEnabled)
 	{
+		dispatchEnabled = isEnabled;
 		ui.setDispatchEnabled(isEnabled);
 	}
 	
@@ -135,6 +136,7 @@ public class MboScheduler implements Updateable
 				if (start != null && end != null && throughput != null)
 				{
 					lineSched = makeSchedule(start, end, throughput);
+					makeDispatchQueue();
 					ui.setSchedule(lineSched);
 					ui.requestCompleted();
 					ui.setMessage("Finished generating schedule.");
@@ -156,6 +158,7 @@ public class MboScheduler implements Updateable
 					if (ls.getLine().equals(lineName))
 					{
 						lineSched = ls;
+						makeDispatchQueue();
 						ui.setSchedule(lineSched);
 					}
 					else
@@ -171,22 +174,23 @@ public class MboScheduler implements Updateable
 			{
 				File loadFile = ui.getFile();
 				String schedStr = ScheduleReader.readScheduleFile(loadFile);
-				// try
+				try
 				{
 					LineSchedule ls = ScheduleReader.readScheduleString(schedStr);
 					if (ls.getLine().equals(lineName))
 					{
 						lineSched = ls;
+						makeDispatchQueue();
 						ui.setSchedule(lineSched);
 					}
 					else
 						ui.setMessage("This schedule is for a different line.");
 				}
-//				catch(Exception e)
-//				{
-//					System.out.println(e.getMessage());
-//					ui.setMessage("Schedule file cannot be read");
-//				}
+				catch(Exception e)
+				{
+					System.out.println(e.getMessage());
+					ui.setMessage("Schedule file cannot be read");
+				}
 				ui.requestCompleted();
 			}
 			else if (requestType == MboSchedulerUI.Request.ENABLE_DISPATCH)
@@ -202,21 +206,21 @@ public class MboScheduler implements Updateable
 				ui.requestCompleted();
 			}
 		}
-//		if (dispatchEnabled && mboEnabled && lineSched != null)
-//		{
-//			Time curTime = ctcRadio.getTime();
-//			if (dispatchQueue == null)
-//				makeDispatchQueue();
-//			if (!dispatchQueue.isEmpty())
-//			{
-//			TrainDispatch nextDispatch = dispatchQueue.peek();
-//				if (curTime.after(nextDispatch.getTime()))
-//				{
-//					dispatchTrain(nextDispatch.getTrainID(), nextDispatch.getDriverID());
-//					dispatchQueue.poll();
-//				}
-//			}
-//		}
+		if (dispatchEnabled && mboEnabled && lineSched != null)
+		{
+			Time curTime = ctcRadio.getTime();
+			if (dispatchQueue == null)
+				makeDispatchQueue();
+			if (!dispatchQueue.isEmpty())
+			{
+			TrainDispatch nextDispatch = dispatchQueue.peek();
+				if (curTime.after(nextDispatch.getTime()))
+				{
+					dispatchTrain(nextDispatch.getTrainID(), nextDispatch.getDriverID());
+					dispatchQueue.poll();
+				}
+			}
+		}
 	}
 	
 	private void makeTrainSchedule(ArrayList<TrainSchedule> trainScheds, Time startTime, int trainID)
@@ -434,6 +438,7 @@ public class MboScheduler implements Updateable
 	
 	private void dispatchTrain(int trainID, int driverID)
 	{
+		System.out.println("Dispatched a train!");
 		// Set these to 0 since train should be following MBO commands
 		TrackMovementCommand tmc = new TrackMovementCommand(0, 0);
 		trackModel.setYardMessage(trainID, lineName, driverID, tmc);
@@ -474,5 +479,10 @@ public class MboScheduler implements Updateable
 			}
 		}
 		dispatchQueue.sort(TrainDispatch.TrainDispatchComparator);
+	}
+	
+	public void enableMboController(boolean isEnabled)
+	{
+		mboEnabled = isEnabled;
 	}
 }

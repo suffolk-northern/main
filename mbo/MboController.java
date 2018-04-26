@@ -105,7 +105,7 @@ public class MboController implements Updateable
 		{
 			enabled = false;
 			if (ui != null)
-				ui.setMboEnabled(false);
+				ui = null;
 		}
 	}
 	
@@ -130,7 +130,10 @@ public class MboController implements Updateable
 					forwardDir = true;
 				if (curBlock.getPrevBlockDir() == 1)
 					backwardDir = true;
-				line[i] = new BlockTracker(i, nextBlock, prevBlock, blockLength, speedLimit, section, null, forwardDir, backwardDir);
+				String stationName = null;
+				if (curBlock.isIsStation())
+					stationName = trackModel.getStation(lineName, i).getName();
+				line[i] = new BlockTracker(i, nextBlock, prevBlock, blockLength, speedLimit, section, stationName, forwardDir, backwardDir);
 				if (curBlock.isIsSwitch())
 				{
 					int switchID = curBlock.getBlock();
@@ -293,14 +296,14 @@ public class MboController implements Updateable
 		// Train has no authority if it hasn't been dispatched yet
 		if (curBlock == null)
 			return 0;
-		BlockTracker blockingBlock = curBlock;
+		// BlockTracker blockingBlock = curBlock;
 		GlobalCoordinates trainLoc = train.getCurrentPosition();
 		double trainDist = trackModel.getDistanceAlongBlock(lineName, curBlock.getID(), trainLoc); 
-		double distLeftInBlock = 0;
+		double distInBlock = 0;
 		if (!train.isGoingForward())
-			distLeftInBlock = train.getBlock().getLength() - trainDist;
+			distInBlock = train.getBlock().getLength() - trainDist;
 		else
-			distLeftInBlock = trainDist;
+			distInBlock = trainDist;
 		
 		// TODO: move this logic to update loop for more efficiency
 		ArrayList<BlockTracker> trainBlocks = new ArrayList<>();
@@ -315,9 +318,10 @@ public class MboController implements Updateable
 		}
 		
 		// Start with negative authority since loop takes current block into account
-		double authority = -1*distLeftInBlock;
+		double authority = -1*distInBlock;
 		boolean blocked = false;
 		boolean forward = train.isGoingForward();
+		System.out.println(forward);
 //		if (forward)
 //			System.out.printf("In block %d, going forward%n", curBlock.getID());
 //		else
@@ -438,9 +442,17 @@ public class MboController implements Updateable
 		GlobalCoordinates newLocation = train.getRadio().receive();
 		int oldBlockID = train.getBlock().getID();
 		int newBlockID = trackModel.getClosestBlock(newLocation, lineName).getBlock();
-		if (newBlockID != oldBlockID)
+		int newBlockCounter = train.getNewBlockCounter();
+		if (newBlockID != oldBlockID && newBlockCounter == 0)
+		{
+			train.incrementNewBlockCounter();
+		}
+		else if (newBlockCounter > 0 || newBlockCounter < 10)
+			train.incrementNewBlockCounter();	
+		else 
 		{
 			double distanceAlongBlock = trackModel.getDistanceAlongBlock(lineName, newBlockID, newLocation);
+			System.out.printf("Distance in new block: %f%n", distanceAlongBlock);
 			if (distanceAlongBlock < 1)
 				train.setGoingForward(true);
 			else
