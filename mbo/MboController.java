@@ -77,6 +77,7 @@ public class MboController implements Updateable
 				ui.setMboEnabled(true);
 			else
 				ui.setMboEnabled(false);
+			ui.requestCompleted();
 		}
 	}
 	
@@ -192,13 +193,13 @@ public class MboController implements Updateable
 			MboControllerUI.Request request = ui.getRequest();
 			if (request == MboControllerUI.Request.ENABLE_MBO)
 			{
-				if (!enabled)
-					ctcRadio.enableMovingBlock();
+				ctcRadio.enableMovingBlock();
+				ui.requestCompleted();
 			}
 			else if (request == MboControllerUI.Request.DISABLE_MBO)
 			{
-				if (enabled)
-					ctcRadio.disableMovingBlock();
+				ctcRadio.disableMovingBlock();
+				ui.requestCompleted();
 			}
 		}
 

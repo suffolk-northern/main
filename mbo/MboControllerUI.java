@@ -250,12 +250,14 @@ public class MboControllerUI extends JFrame
 	{
 		if (curRequest == Request.NONE)
 			curRequest = Request.ENABLE_MBO;
+		controllerEnabled = true;
 	}
 	
 	private void disableMboSelected(ActionEvent evt)
 	{
 		if (curRequest == Request.NONE)
 			curRequest = Request.DISABLE_MBO;
+		controllerEnabled = false;
 	}
 	
 	public void setMboEnabled(boolean isEnabled)
