@@ -58,6 +58,7 @@ public class TrainController implements Updateable
 	ArrayList<String> ads = new ArrayList<>();
         int adsCounter = 0;
         double adsTimeCounter = 0;
+        TreeMap<String, String> stations = new TreeMap<>();
         boolean allowKSet = true;
         boolean allowDoors = true;
         boolean dwelling;
@@ -65,6 +66,7 @@ public class TrainController implements Updateable
         int MIN_DWELL = 10;             // min seconds to dwell
         boolean leftSide = false;
         int trainID;
+        String approachingStation;
         
         boolean eBrakeFailure = false;
         boolean sBrakeFailure = false;
@@ -84,13 +86,40 @@ public class TrainController implements Updateable
                 powerCMD = 0;
                 passengerEBrakeRequest = false;
                 trainID = id;
+                approachingStation = new String();
                 
-
 		ads.add("Come to Pitt, the #1 public university in northeast Oakland");
 		ads.add("Broken frisbee? Get a new one today! Visit getnewfrisbee.com");
 		ads.add("Got blisters on your feet from playing frisbee? Visit betterfrisbeecleats.com");
 		ads.add("Do your teamates make fun of you because you can't catch a frisbee? Visit frisbeelessons.com");
 		ads.add("Can't hold a conversation without bringing up frisbee? Visit frisbeefreaksanonymous.com");
+                
+                stations.put("g2", "PIONEER");
+                stations.put("g9", "EDGEBROOK");
+                stations.put("g16", "BABEL");
+                stations.put("g22", "WHITED");
+                stations.put("g31", "SOUTH BANK");
+                stations.put("g39", "CENTRAL");
+                stations.put("g48", "INGLEWOOD");
+                stations.put("g57", "OVERBROOK");
+                stations.put("g65", "GLENBURY");
+                stations.put("g73", "DORMONT");
+                stations.put("g77", "MT LEBANON");
+                stations.put("g88", "POPLAR");
+                stations.put("g96", "CASTLE SHANNON");
+                stations.put("g105", "DORMONT");
+                stations.put("g114", "GLENBURY");
+                stations.put("g123", "OVERBROOK");
+                stations.put("g132", "INGLEWOOD");
+                stations.put("g141", "CENTRAL");
+                stations.put("r7", "SHADYSIDE");
+                stations.put("r16", "HERRON AVE");
+                stations.put("r21", "SWISSVILLE");
+                stations.put("r25", "PENN STATION");
+                stations.put("r35", "STEEL PLAZA");
+                stations.put("r45", "FIRST AVE");
+                stations.put("r48", "STATION SQUARE");
+                stations.put("r60", "SOUTH HILLS JUNCTION");        
         }
 
 	public void registerTrain(ControllerLink link)
@@ -153,6 +182,14 @@ public class TrainController implements Updateable
             if(!signalFailure)
                 failures[3] = false;
             return failures;
+        }
+        
+        public String getStationText()
+        {
+            String s = "Passing " + approachingStation + "\n";
+            if(stationGap)
+                s = "Arriving at " + approachingStation + "\n";
+            return s;
         }
         
         private void failureDetector()
@@ -356,16 +393,20 @@ public class TrainController implements Updateable
                 {
                     distFromLastBeacon = 0;
                 }
-                
-                if (beaconMsg!=null & !afterStation & !mboMode)
+                if (beaconMsg!=null & !afterStation)
                 {
                     bm = beaconMsg.string.split(",");
-                    if(currAuth == 0 | currAuth == (int)Double.parseDouble(bm[0]))
+                    if((currAuth == 0 | currAuth == (int)Double.parseDouble(bm[0])) & !mboMode)
                     {
                         currAuth = (int)Double.parseDouble(bm[0]);
                         movingAuth = currAuth;
                         stationGap = true;
                     }
+                    if( mboMode & Math.abs(movingAuth -  Double.parseDouble(bm[0])) < 10 )
+                    {
+                        stationGap = true;
+                    }
+                    approachingStation = stations.get(bm[2]);
                     if(bm[1].equals("-1"))
                         leftSide = true;
                     else
@@ -467,6 +508,5 @@ public class TrainController implements Updateable
                 }
 		link.power(powerCMD);		
 		link.serviceBrake(brakeCMD);
-		//////////////////////////////////////////
 	}
 }
