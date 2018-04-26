@@ -14,7 +14,7 @@ import updater.Updateable;
 
 public class TrainController implements Updateable
 {
-
+        Vitality vital;
 	ControllerLink link;
 
 	boolean manualMode;		// States of commands from controller GUI
@@ -22,6 +22,7 @@ public class TrainController implements Updateable
 	boolean rightDoorsCMD;
 	boolean leftDoorsCMD;
 	boolean heaterOnCMD;
+        int temperatureCMD = 70;
 
 	double currentSpeed;
 	double lastSpeed = 0.0; 	// to calc displacement
@@ -48,6 +49,7 @@ public class TrainController implements Updateable
 
 	boolean manualBrake;
         boolean emergencyBrake;
+        boolean passengerEBrakeRequest;
 	double brakeCMD;		// to link
 	double loopBrake;
         double startBrake;
@@ -62,13 +64,22 @@ public class TrainController implements Updateable
         
         TrainControllerUI gui;
 	ArrayList<String> ads = new ArrayList<>();
+        int adsCounter = 0;
+        double adsTimeCounter = 0;
         boolean allowKSet = true;
         boolean allowDoors = true;
         boolean dwelling;
         int dwellBurstCyclesCount = 0;
         int MIN_DWELL = 10;             // min seconds to dwell
-
-	public TrainController() 
+        boolean leftSide = false;
+        int trainID;
+        
+        boolean eBrakeFailure = false;
+        boolean sBrakeFailure = false;
+        boolean engineFailure = false;
+        boolean signalFailure = false;
+        
+	public TrainController(int id) 
 	{
 		// Before train recieves first command, make everything safe
 		manualMode = true;
@@ -79,6 +90,8 @@ public class TrainController implements Updateable
                 emergencyBrake = false;
                 currentSpeed = 0;
                 powerCMD = 0;
+                passengerEBrakeRequest = false;
+                trainID = id;
                 
 
 		ads.add("Come to Pitt, the #1 public university in northeast Oakland");
@@ -94,7 +107,14 @@ public class TrainController implements Updateable
 		link.power(0);
 		link.serviceBrake(1.0);
                 gui = new TrainControllerUI(this);
+                // Connect Control class here
+                vital = new Vitality(this);
 	}
+        
+        public ControllerLink getLink()
+        {
+            return link;
+        }
 
 	public void launchGUI()
 	{
@@ -109,14 +129,52 @@ public class TrainController implements Updateable
 		Ki = i;
 	}
 
+        public double[] getKs()
+        {
+            double [] ks = {Kp, Ki};
+            return ks;
+        }
+        
 	public void setBrakesEngaged(boolean command)
 	{
 		manualBrake = command;
 	}
         
-        public void setEmergencyBrake()
+        public void setEmergencyBrake(boolean cmd)
         {
-            emergencyBrake = true;
+            emergencyBrake = cmd;
+            if(emergencyBrake)
+                link.applyEmergencyBrake();
+            else
+                link.releaseEmergencyBrake();
+        }
+        
+        public boolean[] getFailures()
+        {
+            boolean [] failures = {true, true, true, true};
+            if(!eBrakeFailure)
+                failures[0] = false;
+            if(!sBrakeFailure)
+                failures[1] = false;
+            if(!engineFailure)
+                failures[2] = false;
+            if(!signalFailure)
+                failures[3] = false;
+            return failures;
+        }
+        
+        private void failureDetector()
+        {
+            eBrakeFailure = false;
+            sBrakeFailure = false;
+            engineFailure = false;
+            signalFailure = false;         
+            if(!link.emergencyBrake() & emergencyBrake)
+                eBrakeFailure = true;
+            if(link.serviceBrake() == 38101.77 & brakeCMD != 1)
+                sBrakeFailure = true;
+            if(link.power() == 0 & powerCMD != 0)
+                engineFailure = true;
         }
 
 	public void setDriverSpeed(int command)
@@ -128,6 +186,11 @@ public class TrainController implements Updateable
 	{
 		manualMode = command;
 	}
+        
+        public boolean getManualMode()
+        {
+                return manualMode;
+        }
 
 	public void setLights(boolean command) 
 	{
@@ -145,30 +208,39 @@ public class TrainController implements Updateable
         public void setLeftDoors(boolean cmd)
         {
 		if(cmd && currentSpeed == 0)
+                {
 			link.openDoor(DoorLocation.left);
+                        leftDoorsCMD = true;
+                }
 		else
+                {
 			link.closeDoor(DoorLocation.left);
+                        leftDoorsCMD = false;
+                }
         }
         
         public void setRightDoors(boolean cmd)
         {
 		if(cmd && currentSpeed == 0)
+                {
 			link.openDoor(DoorLocation.right);
+                        rightDoorsCMD = true;
+                }
 		else
+                {
 			link.closeDoor(DoorLocation.right);
+                        rightDoorsCMD = false;
+                }
         }
-
-	public void setHeater(boolean command)
-	{
-		if(command)
-			link.heaterOn();
-		else
-			link.heaterOff();
-	}
+        
+        public void setTemp(int temp)
+        {
+            temperatureCMD = temp;
+        }
 
 	public double getTemp() 
 	{
-		return link.temperature();
+		return link.temperature() * 9/5 + 32;   // convert C to F
 	}
 
 	public double getPowerKW() 
@@ -214,6 +286,47 @@ public class TrainController implements Updateable
             return allowDoors;
         }
         
+        public int getDoorStates()
+        {
+            if(!leftDoorsCMD & !rightDoorsCMD)
+                return 0;
+            if(!leftDoorsCMD & rightDoorsCMD)
+                return 1;
+            if(leftDoorsCMD & !rightDoorsCMD)
+                return 2;
+            if(leftDoorsCMD & rightDoorsCMD)
+                return 3;
+            return -1;
+        }
+        
+        private void advertise(int millis)
+        {
+            if(adsCounter == ads.size())
+                adsCounter = 0;           
+            link.advertisement(ads.get(adsCounter));
+            if(adsTimeCounter >= 60)
+            {
+                adsTimeCounter = 0;
+                adsCounter++;
+            }
+            adsTimeCounter += (double)millis/1000;
+        }
+        
+        private void passengerActions()
+        {
+            if(link.receivedEmergencyBrakeRequest())
+            {
+                passengerEBrakeRequest = true;
+                emergencyBrake = true;
+                link.applyEmergencyBrake();
+            }
+        }
+        
+        public boolean eBrakeState()
+        {
+            return link.emergencyBrake();
+        }
+        
 	// Calculates train displacement since last update
 	private double displacement(int millis)
 	{
@@ -228,7 +341,6 @@ public class TrainController implements Updateable
 		MboMovementCommand mboMsg = link.receiveFromMbo();
                 BeaconMessage beaconMsg = link.receiveFromBeacons();
                 String[] bm;
-                boolean leftSide = false;
 		if (ctcMsg!=null & !stationGap)
 		{
                     currAuth = ctcMsg.authority;
@@ -282,6 +394,8 @@ public class TrainController implements Updateable
                             // Open appropriate Doors;
                             setLeftDoors(leftSide);
                             setRightDoors(!leftSide);
+                            leftDoorsCMD = leftSide;
+                            rightDoorsCMD = !leftSide;
                         }
                         else
                         {
@@ -290,16 +404,31 @@ public class TrainController implements Updateable
                             // Close appropriate doors
                             setLeftDoors(false);
                             setRightDoors(false);
+                            leftDoorsCMD = false;
+                            rightDoorsCMD = false;
                         }
                     }
                     stationGap = false;
 		}
 	}
         
+        private void updateHeater()
+        {
+            if(getTemp() >= temperatureCMD & link.heater())
+                link.heaterOff();
+            else if(getTemp() < temperatureCMD & !link.heater())
+                link.heaterOn();
+        }
+        
 	// millis is ignored as this is not a model module
 	// All units are meters and seconds
 	public void update(int millis) 
 	{            
+                advertise(millis);
+                updateHeater();
+                passengerActions();
+                failureDetector();
+
                 if(currentSpeed>0)
                 {
                     allowKSet = false;
@@ -324,53 +453,25 @@ public class TrainController implements Updateable
 		else
 			setSpeed = speedCMD;
 
-		// Obtain error and average error
-		error = setSpeed - currentSpeed;
-		queue[queueInsert++] = error;
-		if(queueInsert%queue.length == 0)
-			queueInsert = 0;
-		averageError = 0;
-		for(int i=0; i < queueFill; i++)
-		{
-			averageError += queue[i] / queueFill;
-		}
-		if(++queueFill > queue.length)
-			queueFill = queue.length;
-
-		////  C O N T R O L    L O O P  /////////
-		loopPower = Kp * error * currentSpeed * mass;
-		loopPower += Ki * averageError * currentSpeed * mass;
-		loopPower /= MAXPOWER;
-		if(currentSpeed == 0)
-			loopPower = 0.01;
-		powerCMD = loopPower;
-		if(powerCMD > 1)
-			powerCMD = 1;
-		if(powerCMD < 0)
-			powerCMD = 0;
-		loopBrake = -1 * loopPower * MAXPOWER / (mass * currentSpeed * MAX_SDECEL);
-		brakeCMD = loopBrake;
-		if(brakeCMD > 1)
-			brakeCMD = 1;
-		if(brakeCMD < 0)
-			brakeCMD = 0;
+                // Calculate power and braking vitally
+                double[] cmds = vital.decision(setSpeed);
+                powerCMD = cmds[0];
+                brakeCMD = cmds[1];
+                
 		// If driver braking in manual mode, or if authority about to expire
 		if((manualBrake && manualMode) || movingAuth - 4 <= Math.pow(currentSpeed,2) / (2 * MAX_SDECEL))
 		{
 			brakeCMD = 1;
 			powerCMD = 0;
 		}
-                if(emergencyBrake)
+                if(emergencyBrake | eBrakeFailure | dwelling)
                 {
-                    link.power(0);
-                    link.applyEmergencyBrake();
-                    return;
+                    powerCMD = 0;
+                    brakeCMD = 1;
                 }
-                if(dwelling)
+                if(sBrakeFailure)
                 {
-                    link.power(0);
-                    link.serviceBrake(1);
-                    return;
+                    powerCMD = 0;
                 }
 		link.power(powerCMD);		
 		link.serviceBrake(brakeCMD);
