@@ -47,6 +47,9 @@ public class Ctc implements Updateable{
 	public static ArrayDeque<Block> stations = new ArrayDeque<Block>();
 	public static ArrayDeque<TrackCon> trackcons = new ArrayDeque<TrackCon>();
 	
+	public static ArrayDeque<Block> defaultgreen = new ArrayDeque<Block>();
+	public static ArrayDeque<Block> defaultred = new ArrayDeque<Block>();
+	
 	public static ArrayDeque<Loop> loops = new ArrayDeque<Loop>();
 	
 	public static ArrayDeque<Train> dispatched = new ArrayDeque<Train>();
@@ -344,6 +347,23 @@ public class Ctc implements Updateable{
 		// add trains to yards
 		//Train train = new Train(0,getBlock("green",0),0);
 		//trains.add(train);
+		
+		Block block = getBlock("green",0);
+		defaultgreen.add(block);
+		for(Integer i : trackmodel.getDefaultLine("green"))
+		{
+			block = getBlock("green",i.intValue());
+			defaultgreen.add(block);
+		}
+		
+		block = getBlock("red",0);
+		defaultred.add(block);
+		for(Integer i : trackmodel.getDefaultLine("red"))
+		{
+			block = getBlock("red",i.intValue());
+			defaultred.add(block);
+		}
+			
 		
 		updateTrack();
 		updateTrains();
@@ -866,13 +886,34 @@ public class Ctc implements Updateable{
 	
 	public static void toMovingBlock(String line)
 	{
+		ArrayDeque<Block> route;
 		if(line.equalsIgnoreCase("green"))
 		{
 			isFixedGreen = false;
+			for(Train train : trains)
+			{
+				route = defaultgreen.clone();
+				if(train.location.line.equalsIgnoreCase("green"))
+				{
+					while(!route.peekFirst().equals(train.location))
+						route.poll();
+					train.route = route;
+				}
+			}
 		}
 		else
 		{
 			isFixedRed = false;
+			for(Train train : trains)
+			{
+				route = defaultred.clone();
+				if(train.location.line.equalsIgnoreCase("red"))
+				{
+					while(!route.peekFirst().equals(train.location))
+						route.poll();
+					train.route = route;
+				}
+			}
 		}
 	}
 	
