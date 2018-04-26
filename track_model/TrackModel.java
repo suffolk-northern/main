@@ -790,15 +790,14 @@ public class TrackModel implements Updateable {
 	 */
 	public void setYardMessage(int trainId, String line, int driverId, TrackMovementCommand tmc) {
 		for (TrainData td : trains) {
-			if (td.driverId == driverId) {
+			if (td.driver() == driverId) {
 				System.out.println("Driver " + driverId + " is already driving another train!");
-				return;
 			}
 		}
 		for (TrainData td : trains) {
 			if (td.trainModel.id() == trainId) {
 				td.trackBlock = getYardBlock(line);
-				td.setDriver(driverId);
+				td.loadDriver(driverId);
 				if (tmc.authority > 0) {
 					TrackBlock fb = getFirstBlock(line);
 					td.trainModel.slew(line, new Pose(line.equalsIgnoreCase("green") ? fb.start : getPositionAlongBlock(line, fb.prevBlockId, fb.length - 3),
@@ -1051,6 +1050,9 @@ public class TrackModel implements Updateable {
 				}
 			}
 			if (td.trackBlock.block != curBlock.block) {
+				if (curBlock.block == 0){
+					td.trainModel.unloadDriver();
+				}
 				if (td.trackBlock != null) {
 					td.trackBlock.isOccupied = false;
 					if (td.trackBlock.isCrossing) {
