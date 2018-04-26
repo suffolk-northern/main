@@ -237,6 +237,7 @@ public class MboScheduler implements Updateable
 		TrainEvent.EventType dep = TrainEvent.EventType.DEPARTURE;
 		te.add(new TrainEvent(startTime, dep, "Yard", 0));
 		Time curTime = startTime;
+		long delay = (long) (accelerationTime * 1000) + (long) (decelerationTime * 1000);
 		
 		for (BlockTracker curBlock : line)
 		{
@@ -252,7 +253,6 @@ public class MboScheduler implements Updateable
 			}
 			else 
 			{
-				long delay = (long) (accelerationTime * 1000) + (long) (decelerationTime * 1000);
 				Time arrTime = new Time(curTime.getTime() + (long) (travelTime / 2) + delay);
 				te.add(new TrainEvent(arrTime, arr, curBlock.getStation(), curBlock.getID()));
 				Time depTime = new Time((arrTime.getTime()) + (long) dwellTime*1000);
@@ -260,11 +260,15 @@ public class MboScheduler implements Updateable
 				curTime = new Time(depTime.getTime() + (long) (travelTime / 2));
 			}
 		}
+		
+		Time yardArriveTime = new Time(curTime.getTime() + delay);
+		te.add(new TrainEvent(yardArriveTime, arr, "Yard", 0));
 		if (!appending)
 		{
 			TrainSchedule sched = new TrainSchedule(trainID, te);
 			trainScheds.add(sched);
 		}
+		
 	}
 	
 	private Time getLoopTime()

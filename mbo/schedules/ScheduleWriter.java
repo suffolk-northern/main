@@ -88,7 +88,7 @@ public class ScheduleWriter {
 			writer.printf("Driver ID: %d\n", driverID);
 			for (DriverEvent de : ds.getEvents())
 			{
-				writer.printf("Time: %s, ", de.getTime().toString());
+				writer.printf("Time, %s, ", de.getTime().toString());
 				if (de.getEvent() == DriverEvent.EventType.EMBARK)
 					writer.printf("EMBARK, ");
 				else
