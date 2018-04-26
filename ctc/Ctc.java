@@ -136,6 +136,7 @@ public class Ctc implements Updateable{
 					if(t.schedule != null && !t.schedule.schedule.isEmpty())
 					{						
 						dis = t.schedule.schedule.peekFirst();
+						System.out.println(dis.time + " vs current time: " + timeToStr());
 						if(dis.time.equals(timeToStr()))
 						{
 							System.out.println("auto mode, set route for train: " + t.ID);
@@ -199,8 +200,7 @@ public class Ctc implements Updateable{
 	
 	public static String timeToStr()
 	{
-		Date d = clock.time();
-		String str = d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds();
+		String str = String.format("%02d", clock.time().getHours()) + ":" + String.format("%02d",clock.time().getMinutes()) + ":" + String.format("%02d",clock.time().getSeconds());
 		return str;
 	}
 	
@@ -771,7 +771,7 @@ public class Ctc implements Updateable{
 		ctc = this;
 		ui = new CtcUI(ctc);
 		
-		clock = new Clock(new Date(0,1,1,8,55,0));		
+		clock = new Clock(new Date(0,1,1,9,04,0));		
 		
 		
 		/*
