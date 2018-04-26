@@ -321,7 +321,7 @@ public class MboController implements Updateable
 		double authority = -1*distInBlock;
 		boolean blocked = false;
 		boolean forward = train.isGoingForward();
-		System.out.println(forward);
+		// System.out.println(forward);
 //		if (forward)
 //			System.out.printf("In block %d, going forward%n", curBlock.getID());
 //		else
@@ -355,7 +355,7 @@ public class MboController implements Updateable
 			if (forward)
 			{
 				// Check if we are traveling forwards or backwards along the next block
-				System.out.printf("About to check block %d going forwards%n", curBlock.getNext());
+				// System.out.printf("About to check block %d going forwards%n", curBlock.getNext());
 				if (curBlock.getNext() < 0)
 					blocked = true;
 				else
@@ -379,7 +379,7 @@ public class MboController implements Updateable
 			}
 			else
 			{
-				System.out.printf("About to check block %d going backwards%n", curBlock.getNext());
+				// System.out.printf("About to check block %d going backwards%n", curBlock.getNext());
 				if (curBlock.getPrev() < 0)
 					blocked = true;
 				else
@@ -452,7 +452,7 @@ public class MboController implements Updateable
 		else 
 		{
 			double distanceAlongBlock = trackModel.getDistanceAlongBlock(lineName, newBlockID, newLocation);
-			System.out.printf("Distance in new block: %f%n", distanceAlongBlock);
+			// System.out.printf("Distance in new block: %f%n", distanceAlongBlock);
 			if (distanceAlongBlock < 1)
 				train.setGoingForward(true);
 			else
