@@ -1109,6 +1109,9 @@ public class Ctc implements Updateable{
 		if(speed > MAXSPEED)
 			speed = MAXSPEED;
 		
+		if(speed < 0)
+			speed = 0;
+		
 		train.setSpeed(speed);
 		train.setAuth(auth);
 		sendSpeedAuth(train, speed, auth);
@@ -2109,6 +2112,9 @@ public class Ctc implements Updateable{
 		
 		if(loc.num == 0 && dispatched != null && !dispatched.peekFirst().equals(train))
 			auth = 0;
+		
+		if(speed < 0)
+			speed = 0;
 
 		Block sw = null;
 		Block from = null;
