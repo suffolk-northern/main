@@ -1558,8 +1558,8 @@ public class Ctc implements Updateable{
 				rows[count][6] = "Closed";
 			else if(block.broken)
 				rows[count][6] = "Broken";
-			else if(block.reserved != -1)
-				rows[count][6] = "Reserved by " + block.reserved;
+			//else if(block.reserved != -1)
+			//	rows[count][6] = "Reserved by " + block.reserved;
 			else
 				rows[count][6] = "";
 
