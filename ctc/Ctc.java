@@ -2070,6 +2070,12 @@ public class Ctc implements Updateable{
 		
 		Block bl = getBlock(line,Integer.parseInt(block.substring(1)));
 		
+		if(bl.occupied && !bl.broken && close)
+			return;
+		
+		if(!close && !bl.closed)
+			return;
+		
 		trackmodel.setMaintenance(line,Integer.parseInt(block.substring(1)),close);
 		if(!close)
 		{
