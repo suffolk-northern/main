@@ -414,9 +414,9 @@ public class TrainController implements Updateable
         
         private void updateHeater()
         {
-            if(getTemp() >= temperatureCMD & link.heater())
+            if(getTemp() >= temperatureCMD + 1 & link.heater())
                 link.heaterOff();
-            else if(getTemp() < temperatureCMD & !link.heater())
+            else if(getTemp() < temperatureCMD - 1 & !link.heater())
                 link.heaterOn();
         }
         
