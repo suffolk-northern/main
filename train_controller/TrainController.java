@@ -14,7 +14,7 @@ import updater.Updateable;
 
 public class TrainController implements Updateable
 {
-
+        Vitality vital;
 	ControllerLink link;
 
 	boolean manualMode;		// States of commands from controller GUI
@@ -72,13 +72,14 @@ public class TrainController implements Updateable
         int dwellBurstCyclesCount = 0;
         int MIN_DWELL = 10;             // min seconds to dwell
         boolean leftSide = false;
+        int trainID;
         
         boolean eBrakeFailure = false;
         boolean sBrakeFailure = false;
         boolean engineFailure = false;
         boolean signalFailure = false;
         
-	public TrainController() 
+	public TrainController(int id) 
 	{
 		// Before train recieves first command, make everything safe
 		manualMode = true;
@@ -90,6 +91,7 @@ public class TrainController implements Updateable
                 currentSpeed = 0;
                 powerCMD = 0;
                 passengerEBrakeRequest = false;
+                trainID = id;
                 
 
 		ads.add("Come to Pitt, the #1 public university in northeast Oakland");
@@ -105,7 +107,14 @@ public class TrainController implements Updateable
 		link.power(0);
 		link.serviceBrake(1.0);
                 gui = new TrainControllerUI(this);
+                // Connect Control class here
+                vital = new Vitality(this);
 	}
+        
+        public ControllerLink getLink()
+        {
+            return link;
+        }
 
 	public void launchGUI()
 	{
@@ -120,6 +129,12 @@ public class TrainController implements Updateable
 		Ki = i;
 	}
 
+        public double[] getKs()
+        {
+            double [] ks = {Kp, Ki};
+            return ks;
+        }
+        
 	public void setBrakesEngaged(boolean command)
 	{
 		manualBrake = command;
@@ -171,6 +186,11 @@ public class TrainController implements Updateable
 	{
 		manualMode = command;
 	}
+        
+        public boolean getManualMode()
+        {
+                return manualMode;
+        }
 
 	public void setLights(boolean command) 
 	{
@@ -433,36 +453,11 @@ public class TrainController implements Updateable
 		else
 			setSpeed = speedCMD;
 
-		// Obtain error and average error
-		error = setSpeed - currentSpeed;
-		queue[queueInsert++] = error;
-		if(queueInsert%queue.length == 0)
-			queueInsert = 0;
-		averageError = 0;
-		for(int i=0; i < queueFill; i++)
-		{
-			averageError += queue[i] / queueFill;
-		}
-		if(++queueFill > queue.length)
-			queueFill = queue.length;
-
-		////  C O N T R O L    L O O P  /////////
-		loopPower = Kp * error * currentSpeed * mass;
-		loopPower += Ki * averageError * currentSpeed * mass;
-		loopPower /= MAXPOWER;
-		if(currentSpeed == 0)
-			loopPower = 0.01;
-		powerCMD = loopPower;
-		if(powerCMD > 1)
-			powerCMD = 1;
-		if(powerCMD < 0)
-			powerCMD = 0;
-		loopBrake = -1 * loopPower * MAXPOWER / (mass * currentSpeed * MAX_SDECEL);
-		brakeCMD = loopBrake;
-		if(brakeCMD > 1)
-			brakeCMD = 1;
-		if(brakeCMD < 0)
-			brakeCMD = 0;
+                // Calculate power and braking vitally
+                double[] cmds = vital.decision(setSpeed);
+                powerCMD = cmds[0];
+                brakeCMD = cmds[1];
+                
 		// If driver braking in manual mode, or if authority about to expire
 		if((manualBrake && manualMode) || movingAuth - 4 <= Math.pow(currentSpeed,2) / (2 * MAX_SDECEL))
 		{
