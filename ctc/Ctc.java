@@ -2536,14 +2536,14 @@ public class Ctc implements Updateable{
 			st.nextToken();
 			st.nextToken();
 			id = Integer.parseInt(st.nextToken());
-			System.out.println("tid: " + id);
+			//System.out.println("tid: " + id);
 			train = getTrain(id);
 			prev = null;
 			
 			do
 			{
 				str = stok.nextToken();
-				System.out.println("str " + str);
+				//System.out.println("str " + str);
 				
 				st = new StringTokenizer(str,",");
 				temp = st.nextToken();
@@ -2551,7 +2551,7 @@ public class Ctc implements Updateable{
 				toktemp = new StringTokenizer(temp," ");
 				temp = toktemp.nextToken();
 				
-				System.out.println("temp " + temp);
+				//System.out.println("temp " + temp);
 				if(temp.equalsIgnoreCase("Train"))
 				{
 					System.out.println("next train");
@@ -2575,11 +2575,11 @@ public class Ctc implements Updateable{
 				st.nextToken();
 				depart = st.nextToken().trim();
 				
-				System.out.println("t1: " + time1 + " depart from " + depart);
+				//System.out.println("t1: " + time1 + " depart from " + depart);
 				
 				str = stok.nextToken();
 				st = new StringTokenizer(str,",");
-				System.out.println("str: " + str);
+				//System.out.println("str: " + str);
 				st.nextToken();
 				
 				time2 = st.nextToken().trim();
@@ -2587,37 +2587,17 @@ public class Ctc implements Updateable{
 				st.nextToken();
 				arrive = st.nextToken().trim();
 				
-				System.out.println("t2: " + time2 + " arrive at " + arrive);
+				//System.out.println("t2: " + time2 + " arrive at " + arrive);
 				
 				start = getBlock(line,Integer.parseInt(depart));
 				end = getBlock(line,Integer.parseInt(arrive));
 				
-				/*
-				if(depart.equalsIgnoreCase("YARD"))
-				{
-					start = getBlock(line,0);
-					prev = null;
-				}
-				else
-				{
-					start = getStation(depart);
-				}
-				
-				if(arrive.equalsIgnoreCase("YARD"))
-				{
-					end = getBlock(line,0);
-				}
-				else
-				{
-					end = getStation(arrive);
-				}
-				*/
 				fake = new Train();
 				fake.lastBlock = prev;
 				fake.location = start;
 					
-				System.out.println("depart " + depart + ", arrive " + arrive);
-				System.out.println("from " + start.display() + " to " + end.display());
+				//System.out.println("depart " + depart + ", arrive " + arrive);
+				//System.out.println("from " + start.display() + " to " + end.display());
 				
 				route = findRoute(fake,start,end);
 				prev = route.peekLast();
@@ -2702,8 +2682,6 @@ public class Ctc implements Updateable{
 			dist += bl.length;
 		}
 		
-		System.out.println(t1 + " to " + t2);
-		
 		StringTokenizer st = new StringTokenizer(t1,":");
 		hours1 = Integer.parseInt(st.nextToken());
 		minutes1 = Integer.parseInt(st.nextToken());
@@ -2714,21 +2692,13 @@ public class Ctc implements Updateable{
 		minutes2 = Integer.parseInt(st.nextToken());
 		sec2 = Integer.parseInt(st.nextToken());
 		
-		//System.out.println("time");
-		//System.out.println(hours1 + " " + minutes1 + " " + sec1);
-		//System.out.println(hours2 + " " + minutes2 + " " + sec2);
-		
 		hours1 = hours1 + minutes1/60.0 + sec1/3600.0;
 		hours2 = hours2 + minutes2/60.0 + sec2/3600.0;
-		
-		//System.out.println("hours1 " + hours1 + " hours2 " + hours2);
 		
 		hours = hours2 - hours1;
 		
 		if(hours > 0)
 			speed = toMph(dist,hours);
-		
-		System.out.println("dist: " + dist + " hours: " + hours + " speed: " + speed);
 		
 		return speed;
 	}
