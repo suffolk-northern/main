@@ -77,6 +77,8 @@ public class UI
 	boolean lights = train.lights();
         int passengers = train.passengers();
         int crew = train.crew();
+        boolean hasDriver = train.hasDriver();
+        int driver = train.driverId();
 
         boolean failureEngine         = train.failure(Failure.ENGINE);
         boolean failureServiceBrake   = train.failure(Failure.SERVICE_BRAKE);
@@ -123,6 +125,7 @@ public class UI
 	cabinLights.setText(lights ? "ON" : "OFF");
         cabinPassengers.setText(String.format("%d", passengers));
         cabinCrew.setText(String.format("%d", crew));
+        cabinDriver.setText(hasDriver ? String.format("%d", driver) : "NONE");
 
         beaconRxString.setText("\"" + beaconMessage.string + "\"");
 
@@ -304,6 +307,8 @@ public class UI
         cabinPassengers = new javax.swing.JLabel();
         jLabel18 = new javax.swing.JLabel();
         cabinCrew = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        cabinDriver = new javax.swing.JLabel();
         jLabel24 = new javax.swing.JLabel();
         topId = new javax.swing.JLabel();
         jPanel24 = new javax.swing.JPanel();
@@ -597,6 +602,12 @@ public class UI
         cabinCrew.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
         cabinCrew.setText("9");
 
+        jLabel7.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        jLabel7.setText("Driver");
+
+        cabinDriver.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        cabinDriver.setText("99");
+
         javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
         jPanel8.setLayout(jPanel8Layout);
         jPanel8Layout.setHorizontalGroup(
@@ -608,9 +619,11 @@ public class UI
                     .addComponent(jLabel17)
                     .addComponent(jLabel10)
                     .addComponent(jLabel5)
-                    .addComponent(jLabel18))
+                    .addComponent(jLabel18)
+                    .addComponent(jLabel7))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(cabinDriver)
                     .addComponent(cabinCrew)
                     .addComponent(cabinPassengers)
                     .addComponent(cabinLights)
@@ -641,7 +654,11 @@ public class UI
                 .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel18)
                     .addComponent(cabinCrew))
-                .addContainerGap(24, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel7)
+                    .addComponent(cabinDriver))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
@@ -660,8 +677,8 @@ public class UI
                 .addContainerGap()
                 .addComponent(jLabel15)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         jLabel24.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
@@ -1339,6 +1356,7 @@ public class UI
     private javax.swing.JLabel advertisement3;
     private javax.swing.JLabel beaconRxString;
     private javax.swing.JLabel cabinCrew;
+    private javax.swing.JLabel cabinDriver;
     private javax.swing.JLabel cabinHeater;
     private javax.swing.JLabel cabinLDoors;
     private javax.swing.JLabel cabinLights;
@@ -1384,6 +1402,7 @@ public class UI
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
