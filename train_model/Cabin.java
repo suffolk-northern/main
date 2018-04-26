@@ -15,8 +15,10 @@ public class Cabin
 	private static final int KILOGRAMS_PER_PASSENGER = 68;
 	private static final int SEATS = 400;
 
-	private int crew = 1;
+	private int crew = 0;
 	private int civilians = 0;
+
+	private int driverId = -1;
 
 	// Returns the total mass of all passengers and crew.
 	public int mass()
@@ -67,5 +69,38 @@ public class Cabin
 		civilians -= count;
 
 		return count;
+	}
+
+	// Returns true if a driver is onboard.
+	public boolean hasDriver()
+	{
+		return crew != 0;
+	}
+
+	// Returns the ID of the driver onboard.
+	//
+	// Returns -1 if no driver is onboard.
+	public int driverId()
+	{
+		if (crew == 0)
+			return -1;
+
+		return driverId;
+	}
+
+	// Loads the driver onto the train.
+	public void loadDriver(int id)
+	{
+		crew = 1;
+		driverId = id;
+	}
+
+	// Unloads the driver from the train.
+	//
+	// Returns the ID of the driver that was on train.
+	public int unloadDriver()
+	{
+		crew = 0;
+		return driverId;
 	}
 }

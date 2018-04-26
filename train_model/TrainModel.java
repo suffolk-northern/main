@@ -568,6 +568,40 @@ public class TrainModel
 		advertisement = value;
 	}
 
+	// Returns true if a driver is onboard.
+	public boolean hasDriver()
+	{
+		return cabin.hasDriver();
+	}
+
+	// Returns the ID of the driver onboard.
+	//
+	// Returns -1 if no driver is onboard.
+	public int driverId()
+	{
+		return cabin.driverId();
+	}
+
+	// Loads the driver onto the train.
+	public void loadDriver(int id)
+	{
+		cabin.loadDriver(id);
+
+		pointMass.mass(MASS_EMPTY + cabin.mass());
+	}
+
+	// Unloads the driver from the train.
+	//
+	// Returns the ID of the driver that was on train.
+	public int unloadDriver()
+	{
+		int id = cabin.unloadDriver();
+
+		pointMass.mass(MASS_EMPTY + cabin.mass());
+
+		return id;
+	}
+
 	// Determines if we should notify observers this update. If so, notifes
 	// Observer objects.
 	private void notifyActions()
