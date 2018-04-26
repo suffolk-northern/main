@@ -29,6 +29,8 @@ public class Ctc implements Updateable{
 
 	public static final int TRAINCOLS = 8;
 	public static final int TRACKCOLS = 9;
+	
+	public static final int MAXSPEED = 43;
 
 	public static Ctc ctc;
 	public static CtcUI ui;
@@ -975,6 +977,9 @@ public class Ctc implements Updateable{
 			}
 		}
 		
+		if(speed > MAXSPEED)
+			speed = MAXSPEED;
+		
 		train.setSpeed(speed);
 		train.setAuth(auth);
 		sendSpeedAuth(train, speed, auth);
@@ -1303,6 +1308,52 @@ public class Ctc implements Updateable{
 		return str.substring(0, 1).toUpperCase() + str.substring(1);
 	}
 
+	
+	public static void manualFlip(String line, String block)
+	{
+		Block bl = getBlock(line,Integer.parseInt(block.substring(1)));
+		boolean success = false;
+		
+		ArrayDeque<Block> flip;
+		Block cur;
+		
+		if(isForwardSwitch(bl))
+		{
+			flip = bl.sw_to.clone();
+			cur = bl.sw_curr_to;
+		}
+		else
+		{
+			flip = bl.sw_from.clone();
+			cur = bl.sw_curr_from;
+		}
+		
+		
+		
+		if(bl.sw_from.peekFirst().occupied == false && bl.sw_from.peekLast().occupied == false)
+		{
+			success = trackmodel.flipSwitch(bl.line,bl.num);
+			if(success)
+			{
+				for(Block b : flip)
+				{
+					if(!b.equals(cur))
+					{
+						if(isForwardSwitch(bl))
+							bl.sw_curr_to = b;
+						else
+							bl.sw_curr_from = b;
+					}
+				}
+				
+				updateTrack();
+			}
+		}
+		
+		updateAuth(bl);
+		updateTrains();
+	}
+	
 	private static void updateTrack() {
 		// for all track block in blue line
 		Object[][] rows = new Object[greenline.size() - 1 + redline.size() - 1][TRACKCOLS];
