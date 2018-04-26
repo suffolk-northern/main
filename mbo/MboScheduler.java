@@ -166,7 +166,7 @@ public class MboScheduler implements Updateable
 			{
 				File loadFile = ui.getFile();
 				String schedStr = ScheduleReader.readScheduleFile(loadFile);
-				try
+				// try
 				{
 					LineSchedule ls = ScheduleReader.readScheduleString(schedStr);
 					if (ls.getLine().equals(lineName))
@@ -177,11 +177,23 @@ public class MboScheduler implements Updateable
 					else
 						ui.setMessage("This schedule is for a different line.");
 				}
-				catch(Exception e)
-				{
-					System.out.println(e.getMessage());
-					ui.setMessage("Schedule file cannot be read");
-				}
+//				catch(Exception e)
+//				{
+//					System.out.println(e.getMessage());
+//					ui.setMessage("Schedule file cannot be read");
+//				}
+				ui.requestCompleted();
+			}
+			else if (requestType == MboSchedulerUI.Request.ENABLE_DISPATCH)
+			{
+				dispatchEnabled = true;
+				ctcRadio.enableAutomaticDispatch(true);
+				ui.requestCompleted();
+			}
+			else if (requestType == MboSchedulerUI.Request.DISABLE_DISPATCH)
+			{
+				dispatchEnabled = false;
+				ctcRadio.enableAutomaticDispatch(false);
 				ui.requestCompleted();
 			}
 		}
@@ -203,7 +215,7 @@ public class MboScheduler implements Updateable
 		
 		TrainEvent.EventType arr = TrainEvent.EventType.ARRIVAL;
 		TrainEvent.EventType dep = TrainEvent.EventType.DEPARTURE;
-		te.add(new TrainEvent(startTime, dep, "Yard"));
+		te.add(new TrainEvent(startTime, dep, "Yard", 0));
 		Time curTime = startTime;
 		
 		for (BlockTracker curBlock : line)
@@ -222,9 +234,9 @@ public class MboScheduler implements Updateable
 			{
 				long delay = (long) (accelerationTime * 1000) + (long) (decelerationTime * 1000);
 				Time arrTime = new Time(curTime.getTime() + (long) (travelTime / 2) + delay);
-				te.add(new TrainEvent(arrTime, arr, curBlock.getStation()));
+				te.add(new TrainEvent(arrTime, arr, curBlock.getStation(), curBlock.getID()));
 				Time depTime = new Time((arrTime.getTime()) + (long) dwellTime*1000);
-				te.add(new TrainEvent(depTime, dep, curBlock.getStation()));
+				te.add(new TrainEvent(depTime, dep, curBlock.getStation(), curBlock.getID()));
 				curTime = new Time(depTime.getTime() + (long) (travelTime / 2));
 			}
 		}

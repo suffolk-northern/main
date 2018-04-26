@@ -76,7 +76,8 @@ public class ScheduleWriter {
 					writer.printf("ARRIVAL, ");
 				else
 					writer.printf("DEPARTURE, ");
-				writer.printf("%s\n", te.getStation());
+				writer.printf("%s, ", te.getStation());
+				writer.printf("%d\n", te.getStationBlock());
 			}
 		}
 
