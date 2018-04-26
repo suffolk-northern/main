@@ -56,6 +56,9 @@ public class Ctc implements Updateable{
 	public static Clock clock;
 	
 	public static double through = 0;
+	
+	public static boolean isManual = true;
+	public static boolean isFixed = true;
 
 	public static void showUI() {
 		ui.showUI();
@@ -2460,7 +2463,7 @@ public class Ctc implements Updateable{
 		StringTokenizer stok = new StringTokenizer(sched_in,"\n");
 		String str;
 		
-		//System.out.println(sched_in + "\n");
+		System.out.println(sched_in + "\n");
 		
 		StringTokenizer lineTok = new StringTokenizer(stok.nextToken()," ");
 		String line = lineTok.nextToken();
@@ -2484,11 +2487,11 @@ public class Ctc implements Updateable{
 			do
 			{
 				str = stok.nextToken();
-				//System.out.println("str " + str);
+				System.out.println("str " + str);
 				
-				st = new StringTokenizer(str,", ");
+				st = new StringTokenizer(str,",");
 				temp = st.nextToken();
-				//System.out.println("temp " + temp);
+				System.out.println("temp " + temp);
 				if(temp.equalsIgnoreCase("Train"))
 				{
 					//System.out.println("next train");
@@ -2497,7 +2500,7 @@ public class Ctc implements Updateable{
 					route = new ArrayDeque<Block>();
 					break;
 				}
-				else if(!temp.equalsIgnoreCase("Time:"))
+				else if(!temp.equalsIgnoreCase("Time"))
 				{
 					//System.out.println("on to drivers");
 					train.schedule = sched;
@@ -2507,27 +2510,29 @@ public class Ctc implements Updateable{
 					break;
 				}
 				
-				time1 = st.nextToken();
+				time1 = st.nextToken().trim();
 				st.nextToken();
-				depart = st.nextToken();
-				if(st.hasMoreTokens())
-					depart = depart + " " + st.nextToken();
+				st.nextToken();
+				depart = st.nextToken().trim();
 				
-				//System.out.println("t1: " + time1 + " depart from " + depart);
+				System.out.println("t1: " + time1 + " depart from " + depart);
 				
 				str = stok.nextToken();
-				st = new StringTokenizer(str," ,");
-				//System.out.println("str: " + str);
+				st = new StringTokenizer(str,",");
+				System.out.println("str: " + str);
 				st.nextToken();
 				
-				time2 = st.nextToken();
+				time2 = st.nextToken().trim();
 				st.nextToken();
-				arrive = st.nextToken();
-				if(st.hasMoreTokens())
-					arrive = arrive + " " + st.nextToken();
+				st.nextToken();
+				arrive = st.nextToken().trim();
 				
-				//System.out.println("t2: " + time2 + " arrive at " + arrive);
+				System.out.println("t2: " + time2 + " arrive at " + arrive);
 				
+				start = getBlock(line,Integer.parseInt(depart));
+				end = getBlock(line,Integer.parseInt(arrive));
+				
+				/*
 				if(depart.equalsIgnoreCase("YARD"))
 				{
 					start = getBlock(line,0);
@@ -2546,7 +2551,7 @@ public class Ctc implements Updateable{
 				{
 					end = getStation(arrive);
 				}
-				
+				*/
 				fake = new Train();
 				fake.lastBlock = prev;
 				fake.location = start;
