@@ -32,27 +32,19 @@ public class TrainController implements Updateable
 	double MAXPOWER = 120000;
 	double MAX_SDECEL = 1.2;
 	double mass = 50*907.185;
-	double error;
-	double timeConstant = 5;
 	double Kp = 0.98; 		// Default values
 	double Ki = 1 - Kp;
-	double [] queue = new double[5000];
-	int queueInsert = 0;
-	int queueFill = 0;
-	double averageError;
+
 
 	int driverSetSpeed;
 	double speedCMD;		// ctc/mbo cmd
 	double setSpeed;	
 	double powerCMD;		// to link
-	double loopPower;
 
 	boolean manualBrake;
         boolean emergencyBrake;
         boolean passengerEBrakeRequest;
 	double brakeCMD;		// to link
-	double loopBrake;
-        double startBrake;
 
 	int currAuth;			// ctc/mbo cmd
 	double movingAuth = 0.0;
