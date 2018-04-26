@@ -47,6 +47,9 @@ public class Ctc implements Updateable{
 	public static ArrayDeque<Block> stations = new ArrayDeque<Block>();
 	public static ArrayDeque<TrackCon> trackcons = new ArrayDeque<TrackCon>();
 	
+	public static ArrayDeque<Block> defaultgreen = new ArrayDeque<Block>();
+	public static ArrayDeque<Block> defaultred = new ArrayDeque<Block>();
+	
 	public static ArrayDeque<Loop> loops = new ArrayDeque<Loop>();
 	
 	public static ArrayDeque<Train> dispatched = new ArrayDeque<Train>();
@@ -56,6 +59,11 @@ public class Ctc implements Updateable{
 	public static Clock clock;
 	
 	public static double through = 0;
+	
+	public static boolean isManualGreen = true;
+	public static boolean isManualRed = true;
+	public static boolean isFixedGreen = true;
+	public static boolean isFixedRed = true;
 
 	public static void showUI() {
 		ui.showUI();
@@ -82,12 +90,7 @@ public class Ctc implements Updateable{
 		{
 			b.occupied = trackmodel.getBlock(b.line, b.num).isIsOccupied();
 		}
-		/*
-		for(Block b : brokenBlocks)
-		{
-			b.broken = true;
-		}
-		*/
+
 		btemp = toUpdate.clone();
 		
 		for(Block b : btemp)
@@ -106,12 +109,6 @@ public class Ctc implements Updateable{
 			
 		}
 		
-		/*
-		for(Block b : brokenBlocks)
-		{
-			b.broken = true;
-		}
-		*/
 		btemp = toUpdate.clone();
 		
 		for(Block b : btemp)
@@ -126,12 +123,77 @@ public class Ctc implements Updateable{
 			//updateAuth(b);
 		}
 		
+		Dispatch dis;
+		
 		for(Train t : trains)
 		{
-			if(t.route != null && !t.route.isEmpty())
-			{
-				updateAuth(t.location);
-				sendSpeedAuth(t,t.setpoint_speed,t.authority);
+			if(t.location.line.equalsIgnoreCase("green"))
+			{						
+				if(t.route != null)
+				{					
+					updateAuth(t.location);
+					sendSpeedAuth(t,t.setpoint_speed,t.authority);
+				}
+				if(!isManualGreen && (t.route == null || t.route.isEmpty()))
+				{
+					if(t.schedule != null && !t.schedule.schedule.isEmpty())
+					{						
+						dis = t.schedule.schedule.peekFirst();
+						//System.out.println(dis.time + " vs current time: " + timeToStr());
+						if(dis.time.equals(timeToStr()))
+						{
+							//System.out.println("auto mode, set route for train: " + t.ID);
+							
+							dis = t.schedule.schedule.poll();
+							t.route = dis.route;
+							t.setpoint_speed = dis.speed;
+							t.driverID = dis.driver;
+							if(t.setpoint_speed > MAXSPEED)
+								t.setpoint_speed = MAXSPEED;
+							
+							if(t.route != null && !t.route.isEmpty())
+							{
+								//System.out.println("update and send auth for train: " + t.ID);
+								updateAuth(t.location);
+								sendSpeedAuth(t,t.setpoint_speed,t.authority);
+							}
+						}
+					}
+				}
+			}
+			else
+			{						
+				if(t.route != null)
+				{					
+					updateAuth(t.location);
+					sendSpeedAuth(t,t.setpoint_speed,t.authority);
+				}
+				if(!isManualRed && (t.route == null || t.route.isEmpty()))
+				{
+					if(t.schedule != null && !t.schedule.schedule.isEmpty())
+					{						
+						dis = t.schedule.schedule.peekFirst();
+						//System.out.println(dis.time + " vs current time: " + timeToStr());
+						if(dis.time.equals(timeToStr()))
+						{
+							//System.out.println("auto mode, set route for train: " + t.ID);
+							
+							dis = t.schedule.schedule.poll();
+							t.route = dis.route;
+							t.setpoint_speed = dis.speed;
+							t.driverID = dis.driver;
+							if(t.setpoint_speed > MAXSPEED)
+								t.setpoint_speed = MAXSPEED;
+							
+							if(t.route != null && !t.route.isEmpty())
+							{
+								//System.out.println("update and send auth for train: " + t.ID);
+								updateAuth(t.location);
+								sendSpeedAuth(t,t.setpoint_speed,t.authority);
+							}
+						}
+					}
+				}
 			}
 		}
 		
@@ -142,6 +204,12 @@ public class Ctc implements Updateable{
 		updateTrack();
 		updateTrains();
 		return;
+	}
+	
+	public static String timeToStr()
+	{
+		String str = String.format("%02d", clock.time().getHours()) + ":" + String.format("%02d",clock.time().getMinutes()) + ":" + String.format("%02d",clock.time().getSeconds());
+		return str;
 	}
 	
 	private static ArrayDeque<Block> toUpdate;
@@ -258,7 +326,7 @@ public class Ctc implements Updateable{
 	
 	public void setTrain(String line, int ID)
 	{
-		Train train = new Train(ID,getBlock(line,0),0);
+		Train train = new Train(ID,getBlock(line,0),ID);
 		trains.add(train);
 		
 		updateTrains();
@@ -279,6 +347,23 @@ public class Ctc implements Updateable{
 		// add trains to yards
 		//Train train = new Train(0,getBlock("green",0),0);
 		//trains.add(train);
+		
+		Block block = getBlock("green",0);
+		defaultgreen.add(block);
+		for(Integer i : trackmodel.getDefaultLine("green"))
+		{
+			block = getBlock("green",i.intValue());
+			defaultgreen.add(block);
+		}
+		
+		block = getBlock("red",0);
+		defaultred.add(block);
+		for(Integer i : trackmodel.getDefaultLine("red"))
+		{
+			block = getBlock("red",i.intValue());
+			defaultred.add(block);
+		}
+			
 		
 		updateTrack();
 		updateTrains();
@@ -711,7 +796,7 @@ public class Ctc implements Updateable{
 		ctc = this;
 		ui = new CtcUI(ctc);
 		
-		clock = new Clock();		
+		clock = new Clock(new Date(0,1,1,9,04,0));		
 		
 		
 		/*
@@ -789,12 +874,47 @@ public class Ctc implements Updateable{
 	
 	public static void toFixedBlock(String line)
 	{
-		
+		if(line.equalsIgnoreCase("green"))
+		{
+			isFixedGreen = true;
+		}
+		else
+		{
+			isFixedRed = true;
+		}
 	}
 	
 	public static void toMovingBlock(String line)
 	{
-		
+		ArrayDeque<Block> route;
+		if(line.equalsIgnoreCase("green"))
+		{
+			isFixedGreen = false;
+			for(Train train : trains)
+			{
+				route = defaultgreen.clone();
+				if(train.location.line.equalsIgnoreCase("green"))
+				{
+					while(!route.peekFirst().equals(train.location))
+						route.poll();
+					train.route = route;
+				}
+			}
+		}
+		else
+		{
+			isFixedRed = false;
+			for(Train train : trains)
+			{
+				route = defaultred.clone();
+				if(train.location.line.equalsIgnoreCase("red"))
+				{
+					while(!route.peekFirst().equals(train.location))
+						route.poll();
+					train.route = route;
+				}
+			}
+		}
 	}
 	
 	public static void enableMBO(String line)
@@ -839,13 +959,15 @@ public class Ctc implements Updateable{
 	
 	public static void autoMode(String line)
 	{
+		//System.out.println("auto mode in " + line);
+		
 		if(line.equalsIgnoreCase("green"))
 		{
-			
+			isManualGreen = false;
 		}
 		else if(line.equalsIgnoreCase("red"))
 		{
-			
+			isManualRed = false;
 		}
 	}
 	
@@ -853,11 +975,11 @@ public class Ctc implements Updateable{
 	{
 		if(line.equalsIgnoreCase("green"))
 		{
-			
+			isManualGreen = true;
 		}
 		else if(line.equalsIgnoreCase("red"))
 		{
-			
+			isManualRed = true;
 		}
 	}
 
@@ -903,7 +1025,13 @@ public class Ctc implements Updateable{
 		//printRoute(route);
 
 		train.setRoute(route);
-
+		
+		/*
+		ArrayDeque<Block> re = route.clone();
+		for(Block bl : re)
+			System.out.print(bl.display() + " ");
+		System.out.println();
+*/
 		/*
 		
 		ArrayDeque<SwitchAndPos> swpos = getSwitches(route);
@@ -1048,6 +1176,8 @@ public class Ctc implements Updateable{
 		
 		//System.out.println("calc auth");
 		
+		//System.out.println("start " + start.display());
+		
 		int res = 0;
 		
 		double auth = 0;
@@ -1060,6 +1190,14 @@ public class Ctc implements Updateable{
 			return auth;
 		
 		ArrayDeque<Block> temp = route.clone();
+		
+		/*
+		System.out.println("calc auth, route for " + ID);
+		for(Block myb : temp)
+			System.out.print(myb.display());
+		System.out.println();
+		*/
+		
 		Block block = temp.poll();
 		Block prev = null;
 		
@@ -1102,7 +1240,7 @@ public class Ctc implements Updateable{
 			{
 				auth += block.length / 2;
 			}
-			else if (block.hasSwitch()) {
+			else if (block.hasSwitch()/* && (block.equals(getBlock(block.line,trackmodel.getFirstBlock(block.line).getBlock())) || getFirstSwitch(route).peekFirst().equals(block))*/) {
 				if (isForwardSwitch(block) && temp.peek() != null && block.sw_to.contains(temp.peek()) && (!block.getSwitchCurrTo().equals(temp.peek()))) 
 				{
 					if(block.equals(end) && block.hasStation)
@@ -1162,8 +1300,13 @@ public class Ctc implements Updateable{
 					else
 						auth += block.length;
 				}
-				else if (isBackwardSwitch(block) && prev != null && block.sw_from.contains(prev) && !block.getSwitchCurrFrom().equals(prev)) 
+				else if (isBackwardSwitch(block) && prev != null && block.sw_from.contains(prev) && !block.sw_curr_from.equals(prev)) 
 				{
+					/*
+					System.out.println("want from, prev: " + prev.display());
+					System.out.println("is curr: " + block.sw_curr_from.display());
+					System.out.println("is switch: " + block.display());
+					*/
 					success = false;
 					
 					if(flipped)
@@ -1235,9 +1378,16 @@ public class Ctc implements Updateable{
 						auth += block.length;
 				}
 				
+				//System.out.println("first switch at: " + block.display());
 				flipped = true;
 				
 			} 
+			/*
+			else if(!getFirstSwitch(route).peekFirst().equals(block))
+			{
+				return auth;
+			}
+			*/
 			else {
 				auth += block.length;
 			}
@@ -1302,6 +1452,13 @@ public class Ctc implements Updateable{
 		}
 
 	return null;
+	}
+	
+	public static void mboDispatch(String line, int tid)
+	{
+		Train train = getTrain(tid);
+		if(!dispatched.contains(train))
+			dispatched.add(train);
 	}
 
 	private static String toCap(String str) {
@@ -1502,10 +1659,22 @@ public class Ctc implements Updateable{
 			{
 				dist = getDistOnRoute(train,swblock);
 				closest = train;
+				//System.out.println("assign closest");
 			}
 		}
 		
+		/*
+		if(closest == null)
+			System.out.println("closest null");
+		else if(closest.route == null)
+			System.out.println("route null");
+		else if(getFirstSwitch(closest.route) == null)
+			System.out.println("first null");
+		*/
 		// if switch is not in right config, flip it
+		if(closest == null)
+			return false;
+			
 		Block desired = getFirstSwitch(closest.route).peekLast();
 		if((isForwardSwitch(swblock) && !swblock.sw_curr_to.equals(desired)) || (isBackwardSwitch(swblock) && !swblock.sw_curr_from.equals(desired)))
 		{
@@ -1526,6 +1695,8 @@ public class Ctc implements Updateable{
 	
 	private static double getDistOnRoute(Train train, Block block)
 	{
+		
+		
 		ArrayDeque<Block> rtemp = train.route.clone();
 		double dist = 0;
 		Block curr = null;
@@ -1804,7 +1975,7 @@ public class Ctc implements Updateable{
 		while (!temp.isEmpty()) {
 			train = temp.poll();
 
-			if (train.getRoute() != null && !train.route.isEmpty() /*&& train.getRoute().contains(bl)*/) {
+			if (train.getRoute() != null /*&& train.getRoute().contains(bl)*/) {
 				train.setAuth(calcAuth(train.ID, train.getRoute(), train.getLoc(), train.getRoute().peekLast()));
 				if(!train.route.isEmpty())
 				{
@@ -1965,7 +2136,8 @@ public class Ctc implements Updateable{
 		
 		if(train.location.num == 0)
 		{
-			trackmodel.setYardMessage(train.ID, train.location.line, 0, tmc);
+			//System.out.println("yard message for train " + train.ID);
+			trackmodel.setYardMessage(train.ID, train.location.line, train.driverID, tmc);
 			if(!dispatched.contains(train))
 				dispatched.add(train);
 		}
@@ -2098,20 +2270,6 @@ public class Ctc implements Updateable{
 			}
 		}
 		
-
-	}
-
-	//private static void setSwitch(Block swBlock, Block from, Block to) {
-	//	System.out.println("To Track Controller");
-	//	System.out.println("Set switch at block " + swBlock.display());
-	//	System.out.println("To configuration from = " + from.display() + ", to = " + to.display());
-	//}
-
-	private static void getTrackConUpdate() {
-
-	}
-
-	private static void getTicketInfo() {
 
 	}
 
@@ -2434,20 +2592,271 @@ public class Ctc implements Updateable{
 	public static void strToSched(String sched_in)
 	{
 		Schedule sched = new Schedule();
+		ArrayDeque<Block> route = new ArrayDeque<Block>();
+		ArrayDeque<Integer> drivers = new ArrayDeque<Integer>();
 		StringTokenizer st;
+		int id;
+		Train train;
+		Train fake;
+		Block prev = null;
+		boolean cont = true;
+		String time1;
+		String time2;
+		String depart;
+		String arrive;
+		double speed;
+		
+		Block start;
+		Block end;
 		
 		StringTokenizer stok = new StringTokenizer(sched_in,"\n");
 		String str;
-		while(stok.hasMoreTokens())
-		{
-			//System.out.println("token");
-			str = stok.nextToken();
-			//System.out.println(str);
-			
+		
+		//System.out.println(sched_in + "\n");
+		
+		StringTokenizer lineTok = new StringTokenizer(stok.nextToken()," ");
+		String line = lineTok.nextToken();
+		//System.out.println(line);
+		
+		stok.nextToken();
+		str = stok.nextToken();
+		
+		String temp;
+		StringTokenizer toktemp;
+		
+		// train schedule loop
+		while(stok.hasMoreTokens() && cont)
+		{			
 			st = new StringTokenizer(str," ,");
+			//System.out.println("str " + str);
+			st.nextToken();
+			st.nextToken();
+			id = Integer.parseInt(st.nextToken());
+			//System.out.println("tid: " + id);
+			train = getTrain(id);
+			prev = null;
 			
+			do
+			{
+				str = stok.nextToken();
+				//System.out.println("str " + str);
+				
+				st = new StringTokenizer(str,",");
+				temp = st.nextToken();
+				
+				toktemp = new StringTokenizer(temp," ");
+				temp = toktemp.nextToken();
+				
+				//System.out.println("temp " + temp);
+				if(temp.equalsIgnoreCase("Train"))
+				{
+					//System.out.println("next train");
+					train.schedule = sched;
+					sched = new Schedule();
+					route = new ArrayDeque<Block>();
+					break;
+				}
+				else if(!temp.equalsIgnoreCase("Time"))
+				{
+					//System.out.println("on to drivers");
+					train.schedule = sched;
+					sched = new Schedule();
+					route = new ArrayDeque<Block>();
+					cont = false;
+					break;
+				}
+				
+				time1 = st.nextToken().trim();
+				st.nextToken();
+				st.nextToken();
+				depart = st.nextToken().trim();
+				
+				//System.out.println("t1: " + time1 + " depart from " + depart);
+				
+				str = stok.nextToken();
+				st = new StringTokenizer(str,",");
+				//System.out.println("str: " + str);
+				st.nextToken();
+				
+				time2 = st.nextToken().trim();
+				st.nextToken();
+				st.nextToken();
+				arrive = st.nextToken().trim();
+				
+				//System.out.println("t2: " + time2 + " arrive at " + arrive);
+				
+				start = getBlock(line,Integer.parseInt(depart));
+				end = getBlock(line,Integer.parseInt(arrive));
+				
+				fake = new Train();
+				fake.lastBlock = prev;
+				fake.location = start;
+					
+				//System.out.println("depart " + depart + ", arrive " + arrive);
+				//System.out.println("from " + start.display() + " to " + end.display());
+				
+				route = findRoute(fake,start,end);
+				prev = route.peekLast();
+				
+				speed = MAXSPEED;//findSpeed(route, time1, time2);
+				
+				/*
+				System.out.print("route: ");
+				for(Block b : route)
+					System.out.print(b.display() + " ");
+				System.out.println();
+				System.out.println("speed: " + speed);
+				*/
+				
+				sched.addRoute(new Dispatch(route,time1,speed,0));
+			}while(stok.hasMoreTokens());
 		}
 		
+		// driver schedule loop
+		str = stok.nextToken();
+		cont = true;
+		while(stok.hasMoreTokens() && cont)
+		{
+			//System.out.println("driver str: " + str);
+			st = new StringTokenizer(str,",");
+			toktemp = new StringTokenizer(str," "); 
+			toktemp.nextToken();
+			toktemp.nextToken();
+			id = Integer.parseInt(toktemp.nextToken().trim());
+			while(stok.hasMoreTokens())
+			{
+				str = stok.nextToken();
+				
+				st = new StringTokenizer(str,",");
+				temp = st.nextToken();
+				
+				toktemp = new StringTokenizer(temp," ");
+				temp = toktemp.nextToken();
+				
+				//System.out.println("temp " + temp);
+				if(temp.equalsIgnoreCase("Driver"))
+				{
+					//System.out.println("next driver");
+					break;
+				}
+				else if(!temp.equalsIgnoreCase("Time"))
+				{
+					//System.out.println("on to drivers");
+					cont = false;
+					break;
+				}
+				
+				time1 = st.nextToken().trim();
+				st.nextToken();
+				depart = st.nextToken().trim();
+				toktemp = new StringTokenizer(depart," ");
+				toktemp.nextToken();
+				depart = toktemp.nextToken();
+				
+				str = stok.nextToken();
+				st = new StringTokenizer(str,",");
+				st.nextToken();
+				
+				time2 = st.nextToken().trim();
+				st.nextToken();
+				arrive = st.nextToken().trim();
+				toktemp = new StringTokenizer(arrive," ");
+				toktemp.nextToken();
+				arrive = toktemp.nextToken();
+				
+				boolean go = false;
+				train = getTrain(Integer.parseInt(depart));
+				for(Dispatch d : train.schedule.schedule)
+				{
+					if(d.time.equals(time1))
+					{
+						go = true;
+						d.driver = id;
+					}
+					else if(d.time.compareTo(time2) >= 0 && go)
+					{
+						go = false;
+						d.driver = id;
+					}
+					else if(go)
+					{
+						d.driver = id;
+					}
+				}
+			}
+		}
+		
+		/*
+		for(Train t : trains)
+		{
+			System.out.println("train: " + t.ID);
+			
+			for(Dispatch d : t.schedule.schedule)
+			{
+				System.out.println("driver: " + d.driver);
+				for(Block b : d.route)
+				{
+					System.out.print(b.display() + " ");
+				}
+				
+				System.out.println();
+			}
+		}
+		*/
+		
+	}
+	
+	protected static double toMph(double meters, double hours)
+	{
+		double mph = 0;
+		
+		mph = meters / 1000 / hours;
+		mph /= 1.60934;
+		
+		return mph;
+	}
+	
+	protected static double findSpeed(ArrayDeque<Block> route, String t1, String t2)
+	{
+		double speed = 0;
+		double dist = 0;
+		double hours = 0;
+		double hours1 = 0;
+		double minutes1 = 0;
+		double sec1 = 0;
+		double hours2 = 0;
+		double minutes2 = 0;
+		double sec2 = 0;
+		
+		for(Block bl : route)
+		{
+			dist += bl.length;
+		}
+		
+		StringTokenizer st = new StringTokenizer(t1,":");
+		hours1 = Integer.parseInt(st.nextToken());
+		minutes1 = Integer.parseInt(st.nextToken());
+		sec1 = Integer.parseInt(st.nextToken());
+		
+		st = new StringTokenizer(t2,":");
+		hours2 = Integer.parseInt(st.nextToken());
+		minutes2 = Integer.parseInt(st.nextToken());
+		sec2 = Integer.parseInt(st.nextToken());
+		
+		hours1 = hours1 + minutes1/60.0 + sec1/3600.0;
+		hours2 = hours2 + minutes2/60.0 + sec2/3600.0;
+		
+		hours = hours2 - hours1;
+		
+		if(hours > 0)
+			speed = toMph(dist,hours);
+		
+		return speed;
+	}
+	
+	public static Date getCurrentTime()
+	{
+		return clock.time();
 	}
 	
 	protected static class Dispatch{
@@ -2455,12 +2864,22 @@ public class Ctc implements Updateable{
 		protected ArrayDeque<Block> route;
 		protected String time;
 		protected int driver;
+		protected double speed;
 		
 		public Dispatch()
 		{
 			route = new ArrayDeque<Block>();
 			time = null;
 			driver = -1;
+			speed = 0;
+		}
+		
+		public Dispatch(ArrayDeque<Block> r, String t, double s, int d)
+		{
+			route = r;
+			time = t;
+			driver = d;
+			speed = s;
 		}
 		
 	}
@@ -2695,7 +3114,7 @@ public class Ctc implements Updateable{
 		protected Block lastBlock;
 		protected Schedule schedule;
 		protected ArrayDeque<Block> reservedblocks;
-
+		
 		public Train() {
 			ID = 0;
 			location = null;
@@ -2775,6 +3194,7 @@ public class Ctc implements Updateable{
 		}
 
 		private void setLoc(Block newLoc) {
+			//System.out.println("moved to " + newLoc.display());
 			lastBlock = location;
 			location = newLoc;
 			route.poll();
@@ -2782,6 +3202,17 @@ public class Ctc implements Updateable{
 			{
 				this.clearReserved();
 			}
+			
+			if(newLoc.equals(route.peekLast()))
+			{
+				route.poll();
+			}
+			
+			/*
+			for(Block myb: route)
+				System.out.print(myb.display() + " ");
+			System.out.println();
+			*/
 		}
 
 		public Block getLoc() {

@@ -10,12 +10,14 @@ public class TrainEvent
 	private Time eventTime;
 	private EventType event;
 	private String station;
+	private int stationBlock;
 	
-	public TrainEvent(Time t, EventType e, String s)
+	public TrainEvent(Time t, EventType e, String s, int stationBlock)
 	{
 		eventTime = t;
 		event = e;
 		station = s;
+		this.stationBlock = stationBlock;
 	}
 	
 	public enum EventType
@@ -36,5 +38,10 @@ public class TrainEvent
 	public String getStation()
 	{
 		return station;
+	}
+	
+	public int getStationBlock()
+	{
+		return stationBlock;
 	}
 }

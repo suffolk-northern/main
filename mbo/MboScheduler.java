@@ -6,12 +6,14 @@ import java.sql.Time;
 import java.lang.Math;
 import java.io.StringWriter;
 import java.io.File;
+import java.util.Arrays;
 
 import track_model.TrackModel;
 import track_model.TrackBlock;
 import track_model.Station;
 import updater.Updateable;
 import mbo.schedules.*;
+import train_model.communication.TrackMovementCommand;
 
 /**
  *
@@ -28,8 +30,10 @@ public class MboScheduler implements Updateable
 	private CtcRadio ctcRadio;
 	private ArrayList<Integer> trainIDs;
 	private ArrayList<Integer> driverIDs;
+	private LinkedList<TrainDispatch> dispatchQueue;
 	
 	private boolean dispatchEnabled;
+	private boolean mboEnabled;
 	
 	// Adjustable parameters
 	private int dwellTime = 20; // Seconds
@@ -47,6 +51,7 @@ public class MboScheduler implements Updateable
 	{
 		lineName = ln;
 		dispatchEnabled = false;
+		mboEnabled = false;
 		trainIDs = new ArrayList<>();
 		driverIDs = new ArrayList<>();
 	}
@@ -76,6 +81,7 @@ public class MboScheduler implements Updateable
 	
 	public void enableDispatch(boolean isEnabled)
 	{
+		dispatchEnabled = isEnabled;
 		ui.setDispatchEnabled(isEnabled);
 	}
 	
@@ -130,6 +136,7 @@ public class MboScheduler implements Updateable
 				if (start != null && end != null && throughput != null)
 				{
 					lineSched = makeSchedule(start, end, throughput);
+					makeDispatchQueue();
 					ui.setSchedule(lineSched);
 					ui.requestCompleted();
 					ui.setMessage("Finished generating schedule.");
@@ -151,6 +158,7 @@ public class MboScheduler implements Updateable
 					if (ls.getLine().equals(lineName))
 					{
 						lineSched = ls;
+						makeDispatchQueue();
 						ui.setSchedule(lineSched);
 					}
 					else
@@ -172,6 +180,7 @@ public class MboScheduler implements Updateable
 					if (ls.getLine().equals(lineName))
 					{
 						lineSched = ls;
+						makeDispatchQueue();
 						ui.setSchedule(lineSched);
 					}
 					else
@@ -183,6 +192,33 @@ public class MboScheduler implements Updateable
 					ui.setMessage("Schedule file cannot be read");
 				}
 				ui.requestCompleted();
+			}
+			else if (requestType == MboSchedulerUI.Request.ENABLE_DISPATCH)
+			{
+				dispatchEnabled = true;
+				ctcRadio.enableAutomaticDispatch(true);
+				ui.requestCompleted();
+			}
+			else if (requestType == MboSchedulerUI.Request.DISABLE_DISPATCH)
+			{
+				dispatchEnabled = false;
+				ctcRadio.enableAutomaticDispatch(false);
+				ui.requestCompleted();
+			}
+		}
+		if (dispatchEnabled && mboEnabled && lineSched != null)
+		{
+			Time curTime = ctcRadio.getTime();
+			if (dispatchQueue == null)
+				makeDispatchQueue();
+			if (!dispatchQueue.isEmpty())
+			{
+			TrainDispatch nextDispatch = dispatchQueue.peek();
+				if (curTime.after(nextDispatch.getTime()))
+				{
+					dispatchTrain(nextDispatch.getTrainID(), nextDispatch.getDriverID());
+					dispatchQueue.poll();
+				}
 			}
 		}
 	}
@@ -203,8 +239,9 @@ public class MboScheduler implements Updateable
 		
 		TrainEvent.EventType arr = TrainEvent.EventType.ARRIVAL;
 		TrainEvent.EventType dep = TrainEvent.EventType.DEPARTURE;
-		te.add(new TrainEvent(startTime, dep, "Yard"));
+		te.add(new TrainEvent(startTime, dep, "Yard", 0));
 		Time curTime = startTime;
+		long delay = (long) (accelerationTime * 1000) + (long) (decelerationTime * 1000);
 		
 		for (BlockTracker curBlock : line)
 		{
@@ -220,19 +257,22 @@ public class MboScheduler implements Updateable
 			}
 			else 
 			{
-				long delay = (long) (accelerationTime * 1000) + (long) (decelerationTime * 1000);
 				Time arrTime = new Time(curTime.getTime() + (long) (travelTime / 2) + delay);
-				te.add(new TrainEvent(arrTime, arr, curBlock.getStation()));
+				te.add(new TrainEvent(arrTime, arr, curBlock.getStation(), curBlock.getID()));
 				Time depTime = new Time((arrTime.getTime()) + (long) dwellTime*1000);
-				te.add(new TrainEvent(depTime, dep, curBlock.getStation()));
+				te.add(new TrainEvent(depTime, dep, curBlock.getStation(), curBlock.getID()));
 				curTime = new Time(depTime.getTime() + (long) (travelTime / 2));
 			}
 		}
+		
+		Time yardArriveTime = new Time(curTime.getTime() + delay);
+		te.add(new TrainEvent(yardArriveTime, arr, "Yard", 0));
 		if (!appending)
 		{
 			TrainSchedule sched = new TrainSchedule(trainID, te);
 			trainScheds.add(sched);
 		}
+		
 	}
 	
 	private Time getLoopTime()
@@ -394,5 +434,55 @@ public class MboScheduler implements Updateable
 	public void registerDriver(int driverID)
 	{
 		driverIDs.add(driverID);
+	}
+	
+	private void dispatchTrain(int trainID, int driverID)
+	{
+		System.out.println("Dispatched a train!");
+		// Set these to 0 since train should be following MBO commands
+		TrackMovementCommand tmc = new TrackMovementCommand(0, 0);
+		trackModel.setYardMessage(trainID, lineName, driverID, tmc);
+		ctcRadio.tellCtcDispatch(lineName, trainID);
+	}
+	
+	private void makeDispatchQueue()
+	{
+		dispatchQueue = new LinkedList<>();
+		if (!lineSched.stationSchedulesExist())
+			lineSched.generateStationSchedules();
+		StationSchedule yardSchedule = null;
+		for (String stationName : lineSched.getStationNames())
+		{
+			if (stationName.equalsIgnoreCase("Yard"))
+				yardSchedule = lineSched.getStationSchedule(stationName);
+		}	
+		ArrayList<StationEvent> yardEvents = yardSchedule.getEvents();
+		ArrayList<Integer> driverIDs = lineSched.getDriverIDs();
+		for (StationEvent yardEvent : yardEvents)
+		{
+			if (yardEvent.getEvent() == TrainEvent.EventType.DEPARTURE)
+			{
+				Time departTime = yardEvent.getTime();
+				int trainID = yardEvent.getTrainID();
+				for (int driverID : driverIDs)
+				{
+					ArrayList<DriverEvent> driverEvents = lineSched.getDriverSchedule(driverID).getEvents();
+					for (DriverEvent driverEvent : driverEvents)
+					{
+						if (driverEvent.getEvent() == DriverEvent.EventType.EMBARK && driverEvent.getTime() == departTime && driverEvent.getTrainID() == trainID)
+						{
+							TrainDispatch td = new TrainDispatch(trainID, driverID, departTime);
+							dispatchQueue.add(td);
+						}
+					}
+				}
+			}
+		}
+		dispatchQueue.sort(TrainDispatch.TrainDispatchComparator);
+	}
+	
+	public void enableMboController(boolean isEnabled)
+	{
+		mboEnabled = isEnabled;
 	}
 }

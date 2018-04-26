@@ -5,7 +5,10 @@
  */
 package mbo;
 
+import java.sql.Time;
+
 import ctc.Ctc;
+import java.util.Date;
 
 /**
  *
@@ -26,6 +29,11 @@ public class CtcRadio {
 		line = l;
 	}
 	
+	public void tellCtcDispatch(String line, int tid)
+	{
+		ctc.mboDispatch(line,tid);
+	}
+	
 	// Returns a 2D array of integer block IDs, each row is a switch
 	// 2 ints in each row, one for each block id
 	public int[][] getSwitchStates(String lineName)
@@ -36,20 +44,19 @@ public class CtcRadio {
 	public void enableMovingBlock()
 	{
 		mboCont.enableMboController(true);
-		// TODO: add corresponding CTC function
+		mboSched.enableMboController(true);
 		ctc.toMovingBlock(line);
 	}
 	
 	public void disableMovingBlock()
 	{
 		mboCont.enableMboController(false);
-		// TODO: add corresponding CTC function
+		mboSched.enableMboController(false);
 		ctc.toFixedBlock(line);
 	}
 	
 	public void enableAutomaticDispatch(boolean isEnabled)
 	{
-		// TODO: Add CTC function
 		mboSched.enableDispatch(isEnabled);
 		if(isEnabled)
 			ctc.autoMode(line);
@@ -86,5 +93,12 @@ public class CtcRadio {
 	public String getSchedule()
 	{
 		return schedule;
+	}
+	
+	public Time getTime()
+	{
+		// TODO: CTC method to get the current time
+		Date date = ctc.getCurrentTime();
+		return null;
 	}
 }
