@@ -189,6 +189,8 @@ public class TrainController implements Updateable
             String s = "Passing " + approachingStation + "\n";
             if(stationGap)
                 s = "Arriving at " + approachingStation + "\n";
+            if(approachingStation.equals(""))
+                s = "";
             return s;
         }
         
@@ -439,6 +441,7 @@ public class TrainController implements Updateable
                             setRightDoors(false);
                             leftDoorsCMD = false;
                             rightDoorsCMD = false;
+                            approachingStation = "";
                         }
                     }
                     stationGap = false;
